@@ -239,30 +239,30 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/aggregate.py": {
-   "evidence": "",
+   "evidence": "RF7k: the only namers are themselves dead (_dpsm_work/contrib/__init__.py, _dpsm_work/contrib/report_json.py); no live script imports, names or runs it",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 273,
    "outputs": [],
    "purpose": "Log-share split and aggregation. Implements dictionary sections 2 and 4.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/attribution.py": {
-   "evidence": "",
+   "evidence": "RF7k: the only namers are themselves dead (_dpsm_work/contrib/__init__.py); no live script imports, names or runs it",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 99,
    "outputs": [],
    "purpose": "fold -> rule owner. Implements the ladder of dictionary section 4.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/compare.py": {
    "evidence": "contrib;含 --selftest",
@@ -313,30 +313,30 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/loader.py": {
-   "evidence": "",
+   "evidence": "RF7k: the only namers are themselves dead (_dpsm_work/contrib/__init__.py); no live script imports, names or runs it",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 81,
    "outputs": [],
    "purpose": "Export JSON -> typed data. No attribution, no math beyond indexing.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/model.py": {
-   "evidence": "",
+   "evidence": "RF7k: the only namers are themselves dead (_dpsm_work/contrib/__init__.py); no live script imports, names or runs it",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 160,
    "outputs": [],
    "purpose": "Data model for the contribution core. Pure data, no I/O, no business logic.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/phase_e_dryrun.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -393,7 +393,7 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/run.py": {
-   "evidence": "",
+   "evidence": "RF7k: the only namers are themselves dead (_dpsm_work/contrib/__init__.py); no live script imports, names or runs it",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [
@@ -401,11 +401,11 @@
    ],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 133,
    "outputs": [],
    "purpose": "CLI: python -m contrib.run [export.json] [--team 1] [--legacy]",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/tests/__init__.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -1325,6 +1325,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 10
+  "unclassified_max": 5
  }
 }
