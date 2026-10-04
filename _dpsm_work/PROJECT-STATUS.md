@@ -306,6 +306,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 38 轮(全量复核,无代码改动)** | 第 37 轮先后留下一次红提交,故本轮把**整条验收重跑**一遍作最终核对:`acceptance_r38` **37 条命令 / 69 条检查 / 0 项**;行为套件 697 用例 0 失败;`check_tool_registry`(G/J/K 全部有牙)PASS;`refactor_final_check` blocks=0;docs123 72 份 0 损伤;文档收敛 0/12;工具治理 **0 条未判定**;部署 DLL 未替换 | 证据即本轮归档 `acceptance_r38` |
 | **第 39 轮(第 4 族收尾结论)** | 矩阵新增 §9:把第 4 族剩下的**帧循环游标**(`Clock`/`_lastTickClock`/`_lastTickFrame`/`_lastGameSteps`/`_hasLastSteps`/`_lastGsPointer`)明确记为**不迁移**,并写出三条理由(无独立规则可搬 / 语义与原生帧循环绑死且离线不可验证 / 热路径风险不对称、收益被方案标注为低);说明为何同族里 `History` 搬了而它们不搬——按"有无可测规则"划分,不是半途而废 | [STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>) |
 | **第 41 轮(缓存决定落地 + Chart 格式统一)** | 用户对缓存三问与 Chart 格式给出决定后落地:缓存规则明确"1 秒节流(严格 `>`)、时间窗是唯一时间判据、切换/开关/结算绕过";新增 `ContributionSession.Generation`(**F9 必须失效,且不能只靠事件数**——重置前后事件数可能相同),F9 两个渲染入口调用 `Invalidate()`;Chart 的 5 处 `:N0` 收到 `DisplayFormat.Num`(百分比 `:F0%` 按决定保留);709 用例 / 102 例负控 | [REFACTOR-BATCH-R41.md](<REFACTOR-BATCH-R41.md>) |
+| **第 42 轮(R42 快照)** | 把用户这一场冻成批次 **r42**(方案自带 `batch_snapshot.py`,硬链接,`--verify` drift=0):**46 文件 / 628.7 MB**;新那一场为任务 **9999(训练场)**、带贡献段、`schemaVersion 1.1`——按 R6 既有判定它**不能**用作 full 基准;同一时间戳刷新的 **masterdata 转储**才是 `MasterDataAccess`(§11)实机验证缺的那一半;本轮**不含插件改动** | [REFACTOR-BATCH-R42.md](<REFACTOR-BATCH-R42.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
