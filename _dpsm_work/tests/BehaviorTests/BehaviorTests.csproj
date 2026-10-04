@@ -58,6 +58,9 @@
     <Compile Include="$(SrcRoot)\Runtime\SessionContinuity.cs" />
     <Compile Include="$(SrcRoot)\Runtime\GlobalRuleRegistry.cs" />
     <Compile Include="$(SrcRoot)\Runtime\BattleRuntimeCounters.cs" />
+    <!-- RF5b: the overlay text layout. No Unity type is involved, which is why it can be compiled here
+         and executed as production code instead of being mirrored by a Python replica. -->
+    <Compile Include="$(SrcRoot)\Ui\DisplayFormat.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

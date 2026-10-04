@@ -311,94 +311,6 @@ public static partial class OverlayUGUI
 	// as a table; with separators the digit counts differ per row and every column drifts.
 	// ---------------------------------------------------------------------------------------------
 
-	private static int DispWidth(char c)
-	{
-		bool wide = (c >= 0x1100 && c <= 0x115F)
-			|| (c >= 0x2E80 && c <= 0xA4CF)
-			|| (c >= 0xAC00 && c <= 0xD7A3)
-			|| (c >= 0xF900 && c <= 0xFAFF)
-			|| (c >= 0xFE30 && c <= 0xFE6F)
-			|| (c >= 0xFF00 && c <= 0xFF60)
-			|| (c >= 0xFFE0 && c <= 0xFFE6);
-		return wide ? 2 : 1;
-	}
-
-	private static int DispWidth(string s)
-	{
-		int w = 0;
-		for (int i = 0; i < s.Length; i++) w += DispWidth(s[i]);
-		return w;
-	}
-
-	/// <summary>1.7.7: text that goes into a width-padded column must not contain a glyph whose width
-	/// depends on the font. A census of the name strings in every export that carries a contribution
-	/// section (13 of them; actor names, rule names, owner names and link names) found exactly ONE
-	/// such character: U+00D7 MULTIPLICATION SIGN, which a CJK
-	/// font may draw full-width (2 columns) while DispWidth counts 1 -- that alone would shift the row.
-	/// Rows whose name contains it (two rule names do) are normalised to the ASCII letter x. The links
-	/// table's arrow is NOT normalised on purpose: it appears in the header AND every data row, so a
-	/// mis-measured arrow moves both by the same amount and the columns stay aligned with each other.</summary>
-	private static string Cell(string s)
-	{
-		return string.IsNullOrEmpty(s) ? "" : s.Replace('\u00D7', 'x');
-	}
-
-	private static string PadR(string s, int width)
-	{
-		int w = DispWidth(s);
-		return w >= width ? s : s + new string(' ', width - w);
-	}
-
-	private static string PadL(string s, int width)
-	{
-		int w = DispWidth(s);
-		return w >= width ? s : new string(' ', width - w) + s;
-	}
-
-	/// <summary>1.7.6: thousands separators, now that the contribution page is drawn in a monospaced
-	/// font. On the proportional UI font the varying digit count was exactly what made each column
-	/// drift; on a 1:2 grid a separator is one extra column and the alignment still holds.</summary>
-	private static string Num(long v)
-	{
-		return v.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
-	}
-
-	/// <summary>1.7.7: money columns use the SAME specifier as the roster's contribution block (:N0),
-	/// so one double can no longer print differently on two surfaces. The F5 page used to cast to long
-	/// (truncation) while the roster rounded -- the user-visible symptom was "基础+自身规则+辅助 加不
-	/// 起来" on the page whose header promises that identity. Rounding is not additive either, so the
-	/// footer now states the residual explicitly instead of implying there is none.</summary>
-	private static string Fmt(double v)
-	{
-		if (double.IsNaN(v) || double.IsInfinity(v)) v = 0.0;
-		return v.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
-	}
-
-	private static string Pct(double v)
-	{
-		if (double.IsNaN(v) || double.IsInfinity(v)) v = 0.0;
-		return v.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) + "%";
-	}
-
-	/// <summary>1.7.7 rev2: PadL never shrinks, so a money value wider than its column pushed the whole
-	/// row right. The corpus already reaches 2.1e8 and one long fight from 1e9 (a 13-character grouped
-	/// number in an 11-column slot). Amt keeps the full grouped form whenever it fits (so nothing about
-	/// today's numbers changes) and otherwise falls back to an M/G/T suffix that always fits. The exact
-	/// value is in the export; this is a display fallback, never a silent truncation of digits.</summary>
-	private static string Amt(double v, int width)
-	{
-		if (double.IsNaN(v) || double.IsInfinity(v)) v = 0.0;
-		string full = Fmt(v);
-		if (DispWidth(full) <= width) return PadL(full, width);
-		string[] suffix = { "M", "G", "T" };
-		double scale = 1e6;
-		for (int i = 0; i < suffix.Length; i++, scale *= 1000.0)
-		{
-			string c = (v / scale).ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + suffix[i];
-			if (DispWidth(c) <= width) return PadL(c, width);
-		}
-		return PadL(">" + new string('9', Math.Max(0, width - 1)), width);
-	}
 
 	// ---------------------------------------------------------------------------------------------
 	// 1.7.7 (P2-A #7): which battle does the "上一场" view describe?
@@ -519,8 +431,8 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "   全队总贡献相加 = 可分析伤害(不是他打出的伤害);直接占比=他实际打出的伤害占比;分池按「倍率对数份额」", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef
 		{
-			Text = "  " + PadR("角色", 16) + PadL("总贡献", 11) + PadL("占比", 8) + PadL("自身", 11)
-				 + PadL("他人因你", 11) + PadL("被队友分走", 11) + PadL("直接占比", 9) + PadL("命中", 6),
+			Text = "  " + DisplayFormat.PadR("角色", 16) + DisplayFormat.PadL("总贡献", 11) + DisplayFormat.PadL("占比", 8) + DisplayFormat.PadL("自身", 11)
+				 + DisplayFormat.PadL("他人因你", 11) + DisplayFormat.PadL("被队友分走", 11) + DisplayFormat.PadL("直接占比", 9) + DisplayFormat.PadL("命中", 6),
 			Color = DimColor, Height = 15f,
 		});
 		for (int i = 0; i < res.Actors.Count; i++)
@@ -530,19 +442,19 @@ public static partial class OverlayUGUI
 			double share = total > 0.0 ? 100.0 * a.Total / total : 0.0;
 			double dshare = total > 0.0 ? 100.0 * a.Direct / total : 0.0;
 			// 1.7.7: the summon marker goes INSIDE Fit, and Fit is given the column width (16 columns).
-			// Before, Fit(name,11) counted characters and the '*' was appended afterwards, so a name of
+			// Before, DisplayFormat.Fit(name,11) counted characters and the '*' was appended afterwards, so a name of
 			// 8 full-width characters + '*' was 17 columns wide and pushed the whole row right.
-			string label = PadR(Fit(Cell(a.Name) + (a.Summon ? "*" : ""), 16), 16);
+			string label = DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(a.Name) + (a.Summon ? "*" : ""), 16), 16);
 			rows.Add(new RowDef
 			{
 				Text = "  " + label
-					 + Amt(a.Total, 11)
-					 + PadL(Pct(share), 8)
-					 + Amt(a.Base + a.Self, 11)
-					 + Amt(a.Assist, 11)
-					 + Amt(a.Received, 11)
-					 + PadL(Pct(dshare), 9)
-					 + Amt(a.Hits, 6),
+					 + DisplayFormat.Amt(a.Total, 11)
+					 + DisplayFormat.PadL(DisplayFormat.Pct(share), 8)
+					 + DisplayFormat.Amt(a.Base + a.Self, 11)
+					 + DisplayFormat.Amt(a.Assist, 11)
+					 + DisplayFormat.Amt(a.Received, 11)
+					 + DisplayFormat.PadL(DisplayFormat.Pct(dshare), 9)
+					 + DisplayFormat.Amt(a.Hits, 6),
 				Color = AllyColor, Height = 16f,
 			});
 		}
@@ -561,21 +473,21 @@ public static partial class OverlayUGUI
 		}
 		rows.Add(new RowDef
 		{
-			Text = "  " + PadR("合计", 16) + Amt(res.Stats.Attributed, 11) + PadL("", 8)
-				 + Amt(sumBase + sumSelf, 11) + Amt(sumAssist, 11) + Amt(sumReceived, 11)
-				 + PadL("", 9) + PadL("", 6),
+			Text = "  " + DisplayFormat.PadR("合计", 16) + DisplayFormat.Amt(res.Stats.Attributed, 11) + DisplayFormat.PadL("", 8)
+				 + DisplayFormat.Amt(sumBase + sumSelf, 11) + DisplayFormat.Amt(sumAssist, 11) + DisplayFormat.Amt(sumReceived, 11)
+				 + DisplayFormat.PadL("", 9) + DisplayFormat.PadL("", 6),
 			Color = NeutralColor, Height = 16f,
 		});
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;
 		rows.Add(new RowDef
 		{
-			Text = "  未归因 " + Fmt(res.Stats.Unattributed) + "(" + Pct(unattrPct) + ")  未计入任何角色",
+			Text = "  未归因 " + DisplayFormat.Fmt(res.Stats.Unattributed) + "(" + DisplayFormat.Pct(unattrPct) + ")  未计入任何角色",
 			Color = DimColor, Height = 15f,
 		});
 		rows.Add(new RowDef
 		{
-			Text = "  (* = 使魔)  可分析伤害 " + Fmt(res.Stats.Analyzable) + "   倍率池 " + Fmt(res.Stats.PoolTotal)
-				 + "   命中 " + Num(res.Stats.Hits) + "   折叠 " + Num(res.Stats.Folds) + "   无构成 " + res.Stats.CalcMissing
+			Text = "  (* = 使魔)  可分析伤害 " + DisplayFormat.Fmt(res.Stats.Analyzable) + "   倍率池 " + DisplayFormat.Fmt(res.Stats.PoolTotal)
+				 + "   命中 " + DisplayFormat.Num(res.Stats.Hits) + "   折叠 " + DisplayFormat.Num(res.Stats.Folds) + "   无构成 " + res.Stats.CalcMissing
 				 + "   (自身+被队友分走=直接打出;各列独立四舍五入,行内相加可能差 1;可分析伤害 ≠ 总伤害,见导出 totals)",
 			Color = DimColor, Height = 15f,
 		});
@@ -585,8 +497,8 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "【规则当量】(该规则带来的份额之和;归属由 byUnit/持有者/全局规则名解析)", Color = HeaderColor, Height = 17f });
 		rows.Add(new RowDef
 		{
-			Text = "  " + PadR("规则", 22) + PadR("通道", 8) + PadR("侧", 5) + PadR("持有者", 14)
-				 + PadL("命中", 7) + PadL("折叠", 7) + PadL("当量", 12),
+			Text = "  " + DisplayFormat.PadR("规则", 22) + DisplayFormat.PadR("通道", 8) + DisplayFormat.PadR("侧", 5) + DisplayFormat.PadR("持有者", 14)
+				 + DisplayFormat.PadL("命中", 7) + DisplayFormat.PadL("折叠", 7) + DisplayFormat.PadL("当量", 12),
 			Color = DimColor, Height = 15f,
 		});
 		int shown = 0;
@@ -598,10 +510,10 @@ public static partial class OverlayUGUI
 			{
 				// 1.7.7 rev2: kind/side were the last padded cells with no width guard -- a future kind
 				// string longer than 8 columns would have shifted the row exactly like the names did.
-				Text = "  " + PadR(Fit(Cell(rr.Name), 22), 22) + PadR(Fit(Cell(rr.Kind), 8), 8) + PadR(Fit(Cell(rr.Side), 5), 5)
-					 + PadR(Fit(Cell(rr.OwnerName), 14), 14)
-					 + Amt(rr.Hits, 7) + Amt(rr.Folds, 7)
-					 + Amt(rr.Damage, 12),
+				Text = "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Name), 22), 22) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Kind), 8), 8) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Side), 5), 5)
+					 + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.OwnerName), 14), 14)
+					 + DisplayFormat.Amt(rr.Hits, 7) + DisplayFormat.Amt(rr.Folds, 7)
+					 + DisplayFormat.Amt(rr.Damage, 12),
 				Color = NeutralColor, Height = 15f,
 			});
 			shown++;
@@ -618,8 +530,8 @@ public static partial class OverlayUGUI
 			{
 				// 1.7.7: the header used to end with "  主要规则", a column no data row ever filled (the link
 				// row carries no rule field) -- it made the header 10 columns wider than its own table.
-				Text = "  " + PadR("提供者", 14) + PadR("→", 4) + PadR("受益者", 14)
-					 + PadL("命中", 7) + PadL("当量", 12),
+				Text = "  " + DisplayFormat.PadR("提供者", 14) + DisplayFormat.PadR("→", 4) + DisplayFormat.PadR("受益者", 14)
+					 + DisplayFormat.PadL("命中", 7) + DisplayFormat.PadL("当量", 12),
 				Color = DimColor, Height = 15f,
 			});
 			int ln = 0;
@@ -630,8 +542,8 @@ public static partial class OverlayUGUI
 				string to = LinkName(res, l.To);
 				rows.Add(new RowDef
 				{
-					Text = "  " + PadR(Fit(Cell(from), 14), 14) + PadR("→", 4) + PadR(Fit(Cell(to), 14), 14)
-						 + Amt(l.Hits, 7) + Amt(l.Amount, 12),
+					Text = "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(from), 14), 14) + DisplayFormat.PadR("→", 4) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(to), 14), 14)
+						 + DisplayFormat.Amt(l.Hits, 7) + DisplayFormat.Amt(l.Amount, 12),
 					Color = AllyColor, Height = 15f,
 				});
 				ln++;
@@ -1204,10 +1116,10 @@ public static partial class OverlayUGUI
 			// 1.7.7 rev2: Fit is width-based now, so the old character budgets (12/10/8) are passed as the
 			// equivalent COLUMN budgets (24/20/16). Passing 12 here would have cut every Japanese name to
 			// roughly half its previous length (peer review caught this as a visible regression).
-			string label = Fit(Cell(a.Name), 24) + (a.Summon ? "[使魔]" : "");
+			string label = DisplayFormat.Fit(DisplayFormat.Cell(a.Name), 24) + (a.Summon ? "[使魔]" : "");
 			rows.Add(new RowDef
 			{
-				Text = "  " + label + "  总贡献 " + Fmt(a.Total) + "(" + Pct(share) + ")  直接输出占比 " + Pct(dshare),
+				Text = "  " + label + "  总贡献 " + DisplayFormat.Fmt(a.Total) + "(" + DisplayFormat.Pct(share) + ")  直接输出占比 " + DisplayFormat.Pct(dshare),
 				Color = AllyColor, Height = 16f,
 			});
 			// 1.7.11 (user request): the second line states the grouping instead of three peer-looking
@@ -1215,7 +1127,7 @@ public static partial class OverlayUGUI
 			// quantities 他人因你 / 被队友分走 are what make the first line readable as an identity.
 			rows.Add(new RowDef
 			{
-				Text = "      自身 " + Fmt(a.Base + a.Self) + "(基础 " + Fmt(a.Base) + " + 自身规则 " + Fmt(a.Self) + ")   他人因你 " + Fmt(a.Assist) + "   被队友分走 " + Fmt(a.Received),
+				Text = "      自身 " + DisplayFormat.Fmt(a.Base + a.Self) + "(基础 " + DisplayFormat.Fmt(a.Base) + " + 自身规则 " + DisplayFormat.Fmt(a.Self) + ")   他人因你 " + DisplayFormat.Fmt(a.Assist) + "   被队友分走 " + DisplayFormat.Fmt(a.Received),
 				Color = DimColor, Height = 15f,
 			});
 			if (++shown >= 12) break;
@@ -1223,7 +1135,7 @@ public static partial class OverlayUGUI
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;
 		rows.Add(new RowDef
 		{
-			Text = "  合计 " + Fmt(res.Stats.Attributed) + "   未归因 " + Fmt(res.Stats.Unattributed) + "(" + Pct(unattrPct) + ")   命中 " + Num(res.Stats.Hits) + "   倍率池 " + Fmt(res.Stats.PoolTotal),
+			Text = "  合计 " + DisplayFormat.Fmt(res.Stats.Attributed) + "   未归因 " + DisplayFormat.Fmt(res.Stats.Unattributed) + "(" + DisplayFormat.Pct(unattrPct) + ")   命中 " + DisplayFormat.Num(res.Stats.Hits) + "   倍率池 " + DisplayFormat.Fmt(res.Stats.PoolTotal),
 			Color = NeutralColor, Height = 16f,
 		});
 		if (res.Rules.Count > 0)
@@ -1236,8 +1148,8 @@ public static partial class OverlayUGUI
 				ContributionRuleRow rr = res.Rules[i];
 				if (rr.Damage <= 0.0) continue;
 				if (n > 0) sb.Append(" · ");
-				sb.Append(Fit(Cell(rr.Name), 20)).Append('(').Append(Fit(Cell(rr.OwnerName), 16)).Append(')')
-				  .Append(Fmt(rr.Damage / 1000000.0)).Append("M");
+				sb.Append(DisplayFormat.Fit(DisplayFormat.Cell(rr.Name), 20)).Append('(').Append(DisplayFormat.Fit(DisplayFormat.Cell(rr.OwnerName), 16)).Append(')')
+				  .Append(DisplayFormat.Fmt(rr.Damage / 1000000.0)).Append("M");
 				n++;
 			}
 			if (n > 0) rows.Add(new RowDef { Text = sb.ToString(), Color = DimColor, Height = 15f });
@@ -1249,35 +1161,6 @@ public static partial class OverlayUGUI
 		});
 	}
 
-	/// <summary>1.7.7: Fit cuts by DISPLAY WIDTH, not by .NET character count.
-	///
-	/// The defect it fixes: PadR/PadL pad to exactly N display columns (CJK = 2), but Fit used to cut the
-	/// string at N characters and append an ellipsis. The two units disagree as soon as a name is wider
-	/// than its column: "エヴァラス・フラウ" is 9 characters but 18 columns, so PadR(...,16) returned it
-	/// unchanged and every numeric column of that row shifted right by 2 (measured on 1.7.6: 25 of 140
-	/// character rows and 78 of 340 rule rows overflowed their column; max overflow 3).
-	///
-	/// The cut mark is two ASCII dots: a period is exactly one column in every font, whereas U+2026 is
-	/// one column in some fonts and two in others -- and a mark that is half a column off would
-	/// reintroduce exactly the off-by-one this release removes.</summary>
-	private const string CutMark = "..";
-
-	private static string Fit(string s, int max)
-	{
-		if (string.IsNullOrEmpty(s)) return "";
-		if (DispWidth(s) <= max) return s;
-		if (max <= CutMark.Length) return CutMark.Substring(0, Math.Max(0, Math.Min(CutMark.Length, max)));
-		int budget = max - CutMark.Length;   // the mark is ASCII, so one column per character
-		int w = 0, i = 0;
-		for (; i < s.Length; i++)
-		{
-			int cw = DispWidth(s[i]);
-			if (w + cw > budget) break;
-			w += cw;
-		}
-		if (i > 0 && char.IsHighSurrogate(s[i - 1])) i--;   // never cut a surrogate pair in half
-		return s.Substring(0, i) + CutMark;
-	}
 
 	private static void AppendSummaryRows(List<RowDef> rows, BattleSummary bs, bool showEnemies)
 	{

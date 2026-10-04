@@ -1,0 +1,15 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_doc_convergence.py --applicability D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_rf5b\applicability.json --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+doc convergence: version=1.7.11 schema=1.1 exports=35 (_dpsm_work/batch_inputs/rf0) sha=36EC96D4 applicability={'411001': ['full', 'not_comparable', 'partial'], '700817': ['partial'], '9999': ['not_comparable']}
+  [PASS] R1 every document names the current version 1.7.11
+  [PASS] R2 no document calls an older version current/deployed/newest
+  [PASS] R3 status documents carry the deployed SHA256 prefix 36EC96D4
+  [PASS] R4 schema is 1.1 wherever it is stated (0.1-draft only on historical lines)
+  [PASS] R5 a corpus total (with the quest breakdown) is 35 everywhere it is stated
+  [PASS] R6 the training ground is not_comparable and no document claims it comparable
+  [PASS] R7 no live document claims the attack-power addends are unsplit
+  [PASS] R8 plugin and offline knownLimits are the same 6 strings
+  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_rf4e)
+  [PASS] R10 a version called section-less really has none (and the count is exact)
+  [PASS] R11 a largest-N-files list contains exactly N entries
+---- P1-B doc convergence: PASS (0/11 failing)

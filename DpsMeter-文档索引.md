@@ -21,7 +21,7 @@
 | 版本 | **1.7.11(已部署)**(F5 表 1 改为 `自身 \| 他人因你 \| 被队友分走`,`自身 = 基础 + 自身规则`;`receivedAssist` 首次进表;两条逐角色恒等式进 `check_export_schema`;版面守卫新增「渲染器↔副本漂移」检查;`check_live_log` 两处误判修复;§7.2.100)。前一版 **1.7.10**(§7.2.99:验证闸门 `give_section_reasons` 读错对象而**从未真正运行** —— 改读 `rosterAudit` + 真实文件负控;`[COMP]` 重算遵守 GivenTalent / Madness / MadnessVictim 三个开关)。更前一版 **1.7.9**(§7.2.98:GivenTalent 开关下传 + `calc.givenFoldOn`;`giveApplied` 双计修复 + `rosterAudit.giveFoldHits`;UI-DIAG `unattrRow`;`check_live_log.py`);备份 `.1.7.9.bak`(1.7.9 现网 DLL)/ `.1.7.7.bak` / `.1.7.6.bak` / `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` |
 | DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`(**387,072 字节**,1.7.11,`36EC96D4…`);回退链 `.1.7.10.bak`(`BF2F174A…`)/ `.1.7.9.bak`(`F3F73C81…`)/ `.1.7.8.bak`(`0B339836…`)/ `.1.7.7.bak`(`7425139C…`)/ `.1.7.6.bak`(`BB96DA65…`)/ `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` / `.1.6.1.bak` / `.1.6.0.bak` / `.1.5.5-verified.bak` |
 | SHA256 | `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42`(1.7.11;1.7.10 = `BF2F174A4059125376946ABCB0E3E4A9176E6B360CAB209078F219A95389AE85`;1.7.9 = `F3F73C81FF3D9CE0B903E5B4BB9C3F60062BF20F93118A853DBB9DCC34E7DBCB`;1.7.8 = `0B33983646280E246AA9E5911AEAB0EC499FC22C6C796460299BD4BDC4B34880`,1.7.7 = `7425139C…`) |
-| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**79 个 .cs / 22,060 行**,排除 obj;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src\Policy\` 纯策略文件,RF4 新增 `src\Runtime\` 状态容器;守卫口径 **99**(含 `tests/`);最大的几个文件见 PROJECT-STATUS §5) |
+| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**80 个 .cs / 22,424 行**,排除 obj;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src\Policy\` 纯策略文件,RF4 新增 `src\Runtime\` 状态容器;守卫口径 **101**(含 `tests/`);最大的几个文件见 PROJECT-STATUS §5) |
 | 回滚档案 | `DpsMeter.dll.1.4.1.bak` / `1.5.0–1.5.4-verified.bak` 等(**102 个 .bak**(其中 `DpsMeter.dll.*.bak` 34 个,实测 2026-10-04));⚠ `1.0.48/1.0.49-crash.bak` **绝不回滚** |
 | 开关 | `BepInEx\config\dev.dpsmeter.cfg`(DamageComposition/Forensics/ReconcileCalc/GivenTalent/StatusResist/Madness/StateTimeline/FactStore/MadnessApplier/GivenGiverHook/**Contribution/ShowContribution** 全 true) |
 | 导出 | **冻结快照 35 份**(`_dpsm_work\batch-inputs-rf0.json`;`exports\` 本身是活的):411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;其中 **22 份含 `contribution` 段**(schema 1.1 ×9 = 1.7.8×3 + 1.7.10×1 + 1.7.11×5;schema 1.0 ×13),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算 |
@@ -38,7 +38,7 @@
   ルゥ=ルルサ 给敌方 ×1.5)、赋予(マッドシーカー 的刻印授予 +10%)、全局规则(母なる変異の飛沫、海魔の残滓)。
 * **队伍贡献表**:每角色 自伤 / 自身规则 / 受队友赋能 / 为团队赋能(对数份额口径),**域内 creditedShare 100%(未归因池 0.0%)**;**整场覆盖率是 `overallAttributedCoverage`,并非 100%**。
 * **时间线**:受击方 18 抗性槽 + 10 状态位,只在变化时出行。
-* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **35 条命令 / 67 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **475 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数)与 **58 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
+* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **35 条命令 / 67 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **518 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数/**文字排版与数字格式**)与 **64 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
 * **阶段 E(1.6.0 起,1.6.1 实机验收通过)**:导出新增 `contribution` 段 —— 每角色 基础/自身规则/辅助/总贡献、
   规则当量、提供者→受益者关系,全部由逐击折叠导出现算。**验收 = 与独立 Python 核心逐字段一致**
   (`contrib.crosscheck` status=OK / mismatches=0,11 角色/21 规则/20 关系);schema 与 v150 problems=0。
@@ -168,7 +168,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 | `_dpsm_work\ROLLBACK-1.6.0.md` | **回退预案**:1.5.5 锚点(DLL 备份 + 源码快照 zip,含哈希)、回退步骤与成功判据 |
 | `_dpsm_work\ROLLBACK-1.7.7.md` | **回退预案**(1.7.6 锚点 `BB96DA65…`、回退步骤、成功/失败判据) |
 | `_dpsm_work\CONTRIBUTION-TABLE-REPORT.md` | **贡献表完整报告**(产出面/字段字典/恒等式/版本兼容矩阵/6 份独立审查发现);数据分析从它开始 |
-| `_dpsm_work\check_contribution_layout.py` | **表格布局守卫**:按显示列重放渲染算术,**并解析 `OverlayUGUI.Rows.cs` 的列标签/宽度与副本逐项对账**(1.7.11 起);`--selftest` 用 1.7.6 语义 + 篡改渲染器宽度反证自身有牙 |
+| `_dpsm_work\check_contribution_layout.py` | **表格布局守卫**:按显示列重放渲染算术,**并解析 `OverlayUGUI.Rows.cs` 的列标签/宽度与副本逐项对账**(1.7.11 起);`--selftest` 用 1.7.6 语义 + 篡改渲染器宽度反证自身有牙。**注意**:宽度/截断/数字格式算法自 RF5b 起在 `Ui/DisplayFormat.cs`,由行为套件直接执行;本守卫只对账**列宽** |
 | `_dpsm_work\contribution_gate.py` | **验证闸门状态机(P0-A)**:PASS=0/WARNING=0/LEGACY=0/DATA_MISSING=3/ERROR=1,优先级 ERROR>DATA_MISSING>LEGACY>WARNING>PASS |
 | `_dpsm_work\contribution_applicability.py` | **任务适用性判定(P0-D)**:32 份时 → full 14 / partial 9 / not_comparable 9(29 份时为 12 / 9 / 8);`--selftest` 18 例 |
 | `_dpsm_work\pairtrusted_impact.py` | **配对可信度影响(P0-C)**:A/B/C 三口径;结论 A≡B、C 不可用作信任闸门;`--selftest` 11 例 |

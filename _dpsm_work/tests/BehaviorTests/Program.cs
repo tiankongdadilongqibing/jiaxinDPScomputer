@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 475;
+	public const int ExpectedCases = 518;
 
 	private static int Main(string[] args)
 	{
@@ -37,6 +37,8 @@ internal static class Program
 		Cases.GlobalRuleApply(r);
 		// RF4 third family: the per-battle counters and their reset transitions.
 		Cases.Counters(r);
+		// RF5b: the display formatter (widths, padding, numbers, fitting), executed as production code.
+		Cases.DisplayFormatCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
