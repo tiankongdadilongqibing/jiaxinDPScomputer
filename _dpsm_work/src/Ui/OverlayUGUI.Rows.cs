@@ -435,17 +435,17 @@ public static partial class OverlayUGUI
 			Text = ContributionColumns.HeaderLine(ContributionColumns.T1),
 			Color = DimColor, Height = 15f,
 		});
-		for (int i = 0; i < res.Actors.Count; i++)
+		// RF5f: the VALUES come from the pure row model (which actors are shown, both shares, and the four
+		// sums the footer prints); the renderer only turns them into rows.
+		ContributionTableValues t1 = ContributionRowModel.Build(res, total);
+		for (int i = 0; i < t1.Rows.Count; i++)
 		{
-			ContributionActorRow a = res.Actors[i];
-			if (a.Total <= 0.0 && a.Direct <= 0.0) continue;
-			double share = total > 0.0 ? 100.0 * a.Total / total : 0.0;
-			double dshare = total > 0.0 ? 100.0 * a.Direct / total : 0.0;
+			ContributionActorValues a = t1.Rows[i];
 			rows.Add(new RowDef
 			{
 				// RF5d: the row is BUILT from the column definition (the widths live there, not here).
-				Text = ContributionColumns.T1Row(a.Name, a.Summon, a.Total, share, a.Base + a.Self, a.Assist,
-				                                 a.Received, dshare, a.Hits),
+				Text = ContributionColumns.T1Row(a.Name, a.Summon, a.Total, a.Share, a.BaseAndSelf, a.Assist,
+				                                 a.Received, a.DirectShare, a.Hits),
 				Color = AllyColor, Height = 16f,
 			});
 		}
@@ -454,17 +454,11 @@ public static partial class OverlayUGUI
 		// put "未归因" under 辅助 and its percentage under 命中.
 		// 1.7.11: 自身 is the sum of BOTH halves it groups (基础 + 自身规则), and 被队友分走 got its own
 		// sum, so the two identities the 口径 line promises can be checked on the totals row itself.
-		double sumBase = 0.0, sumSelf = 0.0, sumAssist = 0.0, sumReceived = 0.0;
-		for (int i = 0; i < res.Actors.Count; i++)
-		{
-			sumBase += res.Actors[i].Base;
-			sumSelf += res.Actors[i].Self;
-			sumAssist += res.Actors[i].Assist;
-			sumReceived += res.Actors[i].Received;
-		}
+		// RF5f: the sums were computed here in a second walk over the actors; the model owns them now (and
+		// they still cover every actor, including the ones the table does not show).
 		rows.Add(new RowDef
 		{
-			Text = ContributionColumns.T1TotalsLine(res.Stats.Attributed, sumBase + sumSelf, sumAssist, sumReceived),
+			Text = ContributionColumns.T1TotalsLine(res.Stats.Attributed, t1.SumBase + t1.SumSelf, t1.SumAssist, t1.SumReceived),
 			Color = NeutralColor, Height = 16f,
 		});
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;

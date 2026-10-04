@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 625;
+	public const int ExpectedCases = 645;
 
 	private static int Main(string[] args)
 	{
@@ -51,6 +51,8 @@ internal static class Program
 		Cases.CompositionTolerance(r);
 		// RF4f: the per-battle activity ring (order, cap, clearing).
 		Cases.CalcActivityLog(r);
+		// RF5f: the contribution table's row values (shown rows vs summed rows).
+		Cases.ContributionRowModelCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
