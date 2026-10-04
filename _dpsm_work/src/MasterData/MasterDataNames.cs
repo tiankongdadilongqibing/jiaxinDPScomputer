@@ -292,36 +292,19 @@ public static class MasterDataNames
 		where TTable : MasterTableBase
 		where TRow : Il2CppObjectBase
 	{
-		try
-		{
-			Il2CppReferenceArray<UnityEngine.Object> found = Resources.FindObjectsOfTypeAll(Il2CppType.Of<TTable>());
-			if (found == null || found.Length == 0) return null;
-			TTable best = null;
-			int bestCount = -1;
-			for (int i = 0; i < found.Length; i++)
-			{
-				try
-				{
-					TTable cand = found[i].TryCast<TTable>();
-					if (cand == null) continue;
-					Il2CppSystem.Collections.Generic.Dictionary<TKey, TRow> d = getRows(cand);
-					int c = d == null ? -1 : d.Count;
-					if (c > bestCount)
-					{
-						bestCount = c;
-						best = cand;
-					}
-				}
-				catch { _instErrors++; }
-			}
-			if (found.Length > 1)
+			// RF6b: the SCAN moved to MasterDataAccess (the same algorithm the dump route had inline). This
+			// method now keeps only the label route's own bookkeeping, so the two routes can count different
+			// things without either of them losing its counters.
+			BestInstance info;
+			TTable best = MasterDataAccess.FindBest<TTable, TKey, TRow>(getRows, out info);
+			_instErrors += info.CastErrors;
+			if (info.Failed) _errors++;
+			if (info.Found > 1)
 			{
 				_duplicateInstances++;
-				Note(label + " 实例=" + found.Length + " 取行数最多(=" + bestCount + ")");
+				Note(label + " 实例=" + info.Found + " 取行数最多(=" + info.BestCount + ")");
 			}
 			return best;
-		}
-		catch { _errors++; return null; }
 	}
 
 	private static List<TRow> Rows<TTable, TKey, TRow>(TTable table,
@@ -329,20 +312,9 @@ public static class MasterDataNames
 		where TTable : MasterTableBase
 		where TRow : Il2CppObjectBase
 	{
-		List<TRow> outList = new List<TRow>();
-		try
-		{
-			Il2CppSystem.Collections.Generic.Dictionary<TKey, TRow> d = getRows(table);
-			if (d == null) return outList;
-			int n = d.Count;
-			Il2CppReferenceArray<TRow> arr = new Il2CppReferenceArray<TRow>(n);
-			d.Values.CopyTo(arr, 0);
-			for (int i = 0; i < arr.Length; i++)
-			{
-				if (arr[i] != null) outList.Add(arr[i]);
-			}
-		}
-		catch { _errors++; }
+		bool failed;
+		List<TRow> outList = MasterDataAccess.Rows<TTable, TKey, TRow>(table, getRows, out failed);
+		if (failed) _errors++;
 		return outList;
 	}
 }
