@@ -296,7 +296,7 @@ def _ev(amount, foldDropped=0, folds=1, residual=0.87, hitType=2):
                      "fold": [{"kind": "text", "factor": 1.15}] * folds}}
 
 
-def selftest():
+def selftest(exports_dir=None):
     tmp = tempfile.mkdtemp(prefix="census_")
     fails = []
 
@@ -344,14 +344,26 @@ def selftest():
          rep["totals"]["droppedShare"] is not None and 0.0 <= rep["totals"]["droppedShare"] < 1.0,
          "%.6f" % rep["totals"]["droppedShare"])
 
-    real = sorted(glob.glob(os.path.join(EXPORTS, "battle_411001_*.json")))
-    if real:
-        c = census_one(real[-1])
-        case("a real export censuses without error and has residuals",
-             c["dealt"] > 0 and bool(c["residual"]["all"]),
-             "%s dealt=%.0f buckets=%d" % (c["file"], c["dealt"], len(c["residual"]["all"])))
-    else:
-        print("  [SKIP] no real exports found")
+    # A real-file control whose fixture is NOT "the last name in a live directory". MEASURED 2026-10-04:
+    # a battle written at 19:59 became real[-1] and had no residuals, so this case failed for a reason that
+    # says nothing about the census -- the same coupling that broke contrib.tests.test_gate in round 1.
+    # The contract is "a real export censuses without error, and the residual detector SEES residuals on
+    # real data", so scan the given corpus for one that has them and report which. A census that stopped
+    # detecting residuals still goes red, because then NO file would report any.
+    real = sorted(glob.glob(os.path.join(exports_dir or EXPORTS, "battle_411001_*.json")))
+    chosen = None
+    for p in real:
+        try:
+            c = census_one(p)
+        except Exception:
+            continue
+        if c["dealt"] > 0 and bool(c["residual"]["all"]):
+            chosen = c
+            break
+    case("a real export censuses and the residual detector sees residuals", chosen is not None,
+         ("%s dealt=%.0f buckets=%d" % (os.path.basename(chosen["file"]), chosen["dealt"],
+                                       len(chosen["residual"]["all"]))) if chosen
+         else "none of %d real export(s) in %s reported residuals" % (len(real), exports_dir or EXPORTS))
 
     shutil.rmtree(tmp, ignore_errors=True)
     print("---- selftest: %s" % ("PASS" if not fails else "FAIL %s" % fails))
@@ -365,7 +377,7 @@ def main(argv=None):
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
     if a.selftest:
-        return selftest()
+        return selftest(a.exports)
     paths = sorted(glob.glob(os.path.join(a.exports, "battle_*.json")))
     if not paths:
         print("no exports at %s" % a.exports)

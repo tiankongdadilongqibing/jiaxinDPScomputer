@@ -59,6 +59,7 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF3.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\STATE-LIFETIME-MATRIX.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF4.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF4B.md',
 ]
 
 

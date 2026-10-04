@@ -1,0 +1,41 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_docs_123.py
+SESSION-STATE.md                               bytes=377042   cjk=65686  U+FFFD=0   mojibake=0   OK
+ARCHITECTURE.md                                bytes=83065    cjk=15468  U+FFFD=0   mojibake=0   OK
+HANDOFF.md                                     bytes=42097    cjk=6859   U+FFFD=0   mojibake=0   OK
+DpsMeter-文档索引.md                               bytes=26477    cjk=3943   U+FFFD=0   mojibake=0   OK
+DpsMeter-使用说明-完整版.txt                          bytes=3187     cjk=619    U+FFFD=0   mojibake=0   OK
+REPORT-换人后总伤害为什么变低-20261003.txt                bytes=9276     cjk=1385   U+FFFD=0   mojibake=0   OK
+REPORT-解包与游戏内数据获取.md                           bytes=23477    cjk=2937   U+FFFD=0   mojibake=0   OK
+MasterDataNames.cs                             bytes=12959    cjk=95     U+FFFD=0   mojibake=0   OK
+AbilityRoster.cs                               bytes=32622    cjk=162    U+FFFD=0   mojibake=0   OK
+BuildInfo.cs                                   bytes=560      cjk=0      U+FFFD=0   mojibake=0   OK
+DpsMeter.csproj                                bytes=3891     cjk=0      U+FFFD=0   mojibake=0   OK
+CONTRIBUTION-DATA-DICTIONARY.md                bytes=42014    cjk=6169   U+FFFD=0   mojibake=0   OK
+PROJECT-DIRECTION-AND-IMPLEMENTATION-PLAN.md   bytes=18210    cjk=3834   U+FFFD=0   mojibake=0   OK
+report_text.py                                 bytes=13565    cjk=829    U+FFFD=0   mojibake=0   OK
+Contribution.cs                                bytes=27964    cjk=5      U+FFFD=0   mojibake=0   OK
+ContributionSession.cs                         bytes=8328     cjk=47     U+FFFD=0   mojibake=0   OK
+dpsmeter_contrib.py                            bytes=8855     cjk=381    U+FFFD=0   mojibake=0   OK
+PROJECT-STATUS.md                              bytes=28847    cjk=4351   U+FFFD=0   mojibake=0   OK
+CONTRIBUTION-NEXT-PHASE-ROADMAP.md             bytes=51726    cjk=10806  U+FFFD=0   mojibake=0   OK
+RELEASE-1.7.11-ACCEPTANCE.md                   bytes=16205    cjk=2678   U+FFFD=0   mojibake=0   OK
+DECISION-REPORT-411001.md                      bytes=7657     cjk=940    U+FFFD=0   mojibake=0   OK
+BUDGET-CENSUS.md                               bytes=14559    cjk=1081   U+FFFD=0   mojibake=0   OK
+N7-PERF-AND-VISUAL-CHECKLIST.md                bytes=7479     cjk=1454   U+FFFD=0   mojibake=0   OK
+CONTRIBUTION-TABLE-REPORT.md                   bytes=66065    cjk=9770   U+FFFD=0   mojibake=0   OK
+IDENTITY-CENSUS.md                             bytes=22027    cjk=1859   U+FFFD=0   mojibake=0   OK
+IDENTITY-METADATA-DESIGN.md                    bytes=18488    cjk=2604   U+FFFD=0   mojibake=0   OK
+ATKADD-MODEL-AUDIT.md                          bytes=27404    cjk=4046   U+FFFD=0   mojibake=0   OK
+atkadd_sensitivity_result.md                   bytes=39683    cjk=1443   U+FFFD=0   mojibake=0   OK
+ROLLBACK-1.7.11.md                             bytes=5730     cjk=948    U+FFFD=0   mojibake=0   OK
+REPO-BOUNDARY.md                               bytes=5313     cjk=816    U+FFFD=0   mojibake=0   OK
+baseline-manifest.json                         bytes=97576    cjk=10     U+FFFD=0   mojibake=0   OK
+batch-inputs-rf0.json                          bytes=6843     cjk=0      U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-RF0-RF2.md                      bytes=15134    cjk=2685   U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-RF3.md                          bytes=7458     cjk=1398   U+FFFD=0   mojibake=0   OK
+STATE-LIFETIME-MATRIX.md                       bytes=10915    cjk=1999   U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-RF4.md                          bytes=6682     cjk=1255   U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-RF4B.md                         bytes=7366     cjk=1500   U+FFFD=0   mojibake=0   OK
+files=37
+TOTAL DAMAGE MARKERS: 0

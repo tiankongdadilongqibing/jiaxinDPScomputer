@@ -140,10 +140,19 @@ public static partial class CompositionProbe
 			System.Collections.Generic.List<GlobalRule> existing;
 			if (_globalRules.TryGetValue(key, out existing))
 			{
-				// the pointer can be REUSED by a different unit in a later battle: re-scan when the
-				// registered owner is not this unit
-				bool same = existing != null && existing.Count > 0 && existing[0].OwnerName == me;
-				if (same || (existing != null && existing.Count == 0 && _ruleOwnerName.ContainsKey(key) && _ruleOwnerName[key] == me)) return;
+				// the pointer can be REUSED by a different unit in a later battle: re-scan when the registered
+				// owner is not this unit. RF4 family 2: the rule itself is GlobalRuleClassifier.SkipRescan.
+				bool hasMemo = _ruleOwnerName.ContainsKey(key);
+				var facts = new GlobalRuleClassifier.RegisterFacts
+				{
+					HasEntry = true,
+					EntryCount = (existing == null) ? -1 : existing.Count,
+					FirstRuleOwnerName = (existing != null && existing.Count > 0) ? existing[0].OwnerName : null,
+					HasNameMemo = hasMemo,
+					NameMemoOwner = hasMemo ? _ruleOwnerName[key] : null,
+					CurrentName = me,
+				};
+				if (GlobalRuleClassifier.SkipRescan(facts)) return;
 			}
 			var rules = new System.Collections.Generic.List<GlobalRule>();
 			// bound the table: entries of destroyed units are skipped at apply time, but they would
@@ -151,10 +160,12 @@ public static partial class CompositionProbe
 			// so this valve is the only place that reclaims them -- and it must reclaim ONLY the dead
 			// owners: a blanket wipe here would strip the battle-wide rules from the units that are
 			// fighting right now, which is exactly the bug the "no clear at battle end" policy avoids.
-			if (_globalRules.Count > 400)
+			// RF4 family 2: the two valve thresholds are named policy constants, and the second test is
+			// measured against the count AFTER the reclamation -- exactly as before.
+			if (GlobalRuleClassifier.ShouldReclaim(_globalRules.Count))
 			{
 				ClearGlobalRules();
-				if (_globalRules.Count > 600) { _globalRules.Clear(); _ruleOwnerName.Clear(); }
+				if (GlobalRuleClassifier.ShouldClearAll(_globalRules.Count)) { _globalRules.Clear(); _ruleOwnerName.Clear(); }
 			}
 			_globalRules[key] = rules;   // register even when empty, so the scan happens once
 			_ruleOwnerName[key] = me;
@@ -184,44 +195,25 @@ public static partial class CompositionProbe
 					for (int ci = 0; ci < cls.Count; ci++)
 					{
 						string cl = cls[ci];
-						bool enemyShape = cl.IndexOf("被ダメージ", System.StringComparison.Ordinal) >= 0;
-						bool allyShape = cl.IndexOf("与ダメージ", System.StringComparison.Ordinal) >= 0
-							&& cl.IndexOf("味方", System.StringComparison.Ordinal) >= 0;
-						if (!enemyShape && !allyShape) continue;
-						if (enemyShape)
-						{
-							if (cl.IndexOf("全て", System.StringComparison.Ordinal) < 0 && cl.IndexOf("すべて", System.StringComparison.Ordinal) < 0) continue;
-							if (cl.IndexOf("敵", System.StringComparison.Ordinal) < 0
-								&& cl.IndexOf("相手", System.StringComparison.Ordinal) < 0
-								&& cl.IndexOf("対象", System.StringComparison.Ordinal) < 0) continue;
-							// owner-relative or HP-conditional clauses stay with the normal scan
-							if (cl.IndexOf("ブロック", System.StringComparison.Ordinal) >= 0) continue;
-							if (cl.IndexOf("耐久", System.StringComparison.Ordinal) >= 0 || cl.IndexOf("HP", System.StringComparison.Ordinal) >= 0) continue;
-						}
-						else
-						{
-							// "味方ヴァイスの魔法攻撃の与ダメージ+15%" (ミャウラ): a buff for ALL allied
-							// attacks, so it must also raise hits made by other units
-							if (cl.IndexOf("耐久", System.StringComparison.Ordinal) >= 0 || cl.IndexOf("HP", System.StringComparison.Ordinal) >= 0) continue;
-						}
-						double f = ParseDamageModifier(cl, enemyShape ? "被ダメージ" : "与ダメージ");
-						if (f == 1.0) continue;
+						// RF4 family 2: "is this clause a battle-wide rule, and of which shape?" is decided by
+						// GlobalRuleClassifier (offline-testable). The identity fields below stay here: they come
+						// from the native object, and the factor still comes from ParseDamageModifier.
+						GlobalRuleShape shape = GlobalRuleClassifier.Classify(cl, ParseDamageModifier);
+						if (shape.Kind == GlobalRuleKind.None) continue;
 						var r = new GlobalRule();
 						r.Owner = key;
 						r.OwnerObj = bo;
 						r.OwnerName = me;
 						r.Source = string.IsNullOrEmpty(nm) ? "" : ("[" + nm + "] ");
-						r.Text = cl;
-						r.Factor = f;
-						r.EnemyTakes = enemyShape;
-						r.PerStatus = cl.IndexOf("それぞれ", System.StringComparison.Ordinal) >= 0;
-						r.Tokens = StatusTokens(cl);
-						bool magic = cl.IndexOf("魔法", System.StringComparison.Ordinal) >= 0;
-						bool phys = cl.IndexOf("物理", System.StringComparison.Ordinal) >= 0;
-						r.MagicOnly = magic && !phys;
-						r.PhysOnly = phys && !magic;
-						r.Vanguard = cl.Contains("前衛") && !cl.Contains("後衛");
-						r.Rearguard = cl.Contains("後衛") && !cl.Contains("前衛");
+						r.Text = shape.Text;
+						r.Factor = shape.Factor;
+						r.EnemyTakes = shape.Kind == GlobalRuleKind.EnemyTakes;
+						r.PerStatus = shape.PerStatus;
+						r.Tokens = shape.Tokens;
+						r.MagicOnly = shape.MagicOnly;
+						r.PhysOnly = shape.PhysOnly;
+						r.Vanguard = shape.Vanguard;
+						r.Rearguard = shape.Rearguard;
 						rules.Add(r);
 					}
 				}

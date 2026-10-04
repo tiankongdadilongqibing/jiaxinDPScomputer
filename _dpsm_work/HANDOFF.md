@@ -34,7 +34,7 @@
 
 | 用途 | 路径 / 命令 |
 |---|---|
-| 插件源码 | `_dpsm_work\src\DpsMeter.csproj`(**74 个 .cs**;RF2 拆出 6 个 `Aggregator*` partial,RF3 `src\Policy\`,RF4 `src\Runtime\`;守卫脚本扫 src+recon_probe+test+tests 共 **89**) |
+| 插件源码 | `_dpsm_work\src\DpsMeter.csproj`(**75 个 .cs**;RF2 拆出 6 个 `Aggregator*` partial,RF3/RF4b `src\Policy\`,RF4a `src\Runtime\`;守卫脚本扫 src+recon_probe+test+tests 共 **90**) |
 | 部署目标 | `BepInEx\plugins\DpsMeter\DpsMeter.dll` |
 | 战斗导出 | `BepInEx\plugins\DpsMeter\exports\*.json`(**活的**:游戏在跑)。批次读冻结快照 **35 份**(`_dpsm_work\batch-inputs-rf0.json`:411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11) |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动游戏被删,只留最新一场的 `[RULE]/[STATE]/[PARAM]`) |
