@@ -1,18 +1,18 @@
 # cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
 # argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\v150_validate.py --selftest
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_low.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_low.txt
 version=1.7.10 quest=411001 problems=1
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_ok.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_ok.txt
 version=1.7.10 quest=411001 problems=0
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_one.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_one.txt
 version=1.7.10 quest=411001 problems=0
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_none.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_none.txt
 version=1.7.10 quest=411001 problems=0
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_drift.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_drift.txt
 version=1.7.10 quest=411001 problems=0
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_liar.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_liar.txt
 version=1.7.10 quest=411001 problems=0
-report -> C:\Users\24134\AppData\Local\Temp\kpi_k064zdb3\r_samever.txt
+report -> C:\Users\24134\AppData\Local\Temp\kpi_m5aflxr7\r_samever.txt
 version=1.7.10 quest=411001 problems=0
   [PASS] a KPI below the baseline minimum - 3pp is called a regression rc=1
   [PASS] a KPI inside the baseline range is not a regression      rc=0

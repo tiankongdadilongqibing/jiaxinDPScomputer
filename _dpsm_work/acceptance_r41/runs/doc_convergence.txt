@@ -9,7 +9,7 @@ doc convergence: version=1.7.11 schema=1.1 exports=35 (_dpsm_work/batch_inputs/r
   [PASS] R6 the training ground is not_comparable and no document claims it comparable
   [PASS] R7 no live document claims the attack-power addends are unsplit
   [PASS] R8 plugin and offline knownLimits are the same 6 strings
-  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_r38)
+  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_r41)
   [PASS] R10 a version called section-less really has none (and the count is exact)
   [PASS] R11 a largest-N-files list contains exactly N entries
   [PASS] R12 no live document calls a finished item undone

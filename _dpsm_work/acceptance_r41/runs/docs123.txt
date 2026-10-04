@@ -7,7 +7,7 @@ DpsMeter-文档索引.md                               bytes=27239    cjk=4050  
 DpsMeter-使用说明-完整版.txt                          bytes=3187     cjk=619    U+FFFD=0   mojibake=0   OK
 REPORT-换人后总伤害为什么变低-20261003.txt                bytes=9276     cjk=1385   U+FFFD=0   mojibake=0   OK
 REPORT-解包与游戏内数据获取.md                           bytes=23477    cjk=2937   U+FFFD=0   mojibake=0   OK
-MasterDataNames.cs                             bytes=13051    cjk=97     U+FFFD=0   mojibake=0   OK
+MasterDataNames.cs                             bytes=12571    cjk=97     U+FFFD=0   mojibake=0   OK
 AbilityRoster.cs                               bytes=32622    cjk=162    U+FFFD=0   mojibake=0   OK
 BuildInfo.cs                                   bytes=560      cjk=0      U+FFFD=0   mojibake=0   OK
 DpsMeter.csproj                                bytes=3891     cjk=0      U+FFFD=0   mojibake=0   OK
@@ -17,7 +17,7 @@ report_text.py                                 bytes=13565    cjk=829    U+FFFD=
 Contribution.cs                                bytes=27964    cjk=5      U+FFFD=0   mojibake=0   OK
 ContributionSession.cs                         bytes=9371     cjk=10     U+FFFD=0   mojibake=0   OK
 dpsmeter_contrib.py                            bytes=8855     cjk=381    U+FFFD=0   mojibake=0   OK
-PROJECT-STATUS.md                              bytes=46288    cjk=7595   U+FFFD=0   mojibake=0   OK
+PROJECT-STATUS.md                              bytes=50654    cjk=8562   U+FFFD=0   mojibake=0   OK
 CONTRIBUTION-NEXT-PHASE-ROADMAP.md             bytes=51726    cjk=10806  U+FFFD=0   mojibake=0   OK
 RELEASE-1.7.11-ACCEPTANCE.md                   bytes=16205    cjk=2678   U+FFFD=0   mojibake=0   OK
 DECISION-REPORT-411001.md                      bytes=7657     cjk=940    U+FFFD=0   mojibake=0   OK
@@ -73,5 +73,13 @@ REFACTOR-BATCH-RF7L.md                         bytes=2983     cjk=517    U+FFFD=
 REFACTOR-BATCH-RF7M.md                         bytes=2243     cjk=426    U+FFFD=0   mojibake=0   OK
 REFACTOR-BATCH-RF7N.md                         bytes=3306     cjk=651    U+FFFD=0   mojibake=0   OK
 REFACTOR-BATCH-R41.md                          bytes=3263     cjk=715    U+FFFD=0   mojibake=0   OK
-files=73
+REFACTOR-BATCH-R42.md                          bytes=2458     cjk=486    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R43.md                          bytes=3045     cjk=722    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R44.md                          bytes=1918     cjk=337    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R45.md                          bytes=2859     cjk=639    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R46.md                          bytes=2704     cjk=519    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R47.md                          bytes=2970     cjk=737    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R48.md                          bytes=1848     cjk=450    U+FFFD=0   mojibake=0   OK
+REFACTOR-BATCH-R49.md                          bytes=2133     cjk=532    U+FFFD=0   mojibake=0   OK
+files=81
 TOTAL DAMAGE MARKERS: 0

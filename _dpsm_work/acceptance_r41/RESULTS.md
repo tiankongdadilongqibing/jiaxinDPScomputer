@@ -1,6 +1,6 @@
 # N0 acceptance run (corpus manifest + guard runs)
 
-- generated: 2026-10-05T06:54:43
+- generated: 2026-10-05T07:41:15
 - exports: 35 files in `D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0`
 - source BuildInfo version: 1.7.11 ; deployed DLL sha256: 36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42
 - config sha256: 97A1037D843637A910B558F06D455575C69280DCB01E81D1DEF0C1D0712AF568 (contrib switches: Contribution=true, GivenGiverHook=true, GivenTalent=true, Madness=true, MadnessApplier=true, MadnessVictim=true, ShowContribution=true)
@@ -109,43 +109,43 @@ Files the applicability report labels NOT_RUN (13): battle_411001_20261003_20544
 
 | run | exit | seconds | log |
 |---|---|---|---|
-| applicability(all) | 0 | 110.05 | `_dpsm_work/acceptance_r41/runs/applicability_all_.txt` |
-| crosscheck(batch) | 1 | 35.1 | `_dpsm_work/acceptance_r41/runs/crosscheck_batch_.txt` |
-| pairtrusted(all) | 0 | 80.54 | `_dpsm_work/acceptance_r41/runs/pairtrusted_all_.txt` |
-| export_schema(all) | 0 | 22.01 | `_dpsm_work/acceptance_r41/runs/export_schema_all_.txt` |
-| layout(all) | 0 | 4.78 | `_dpsm_work/acceptance_r41/runs/layout_all_.txt` |
-| live_log | 0 | 1.46 | `_dpsm_work/acceptance_r41/runs/live_log.txt` |
-| selftest/layout | 0 | 8.98 | `_dpsm_work/acceptance_r41/runs/selftest_layout.txt` |
-| selftest/schema | 0 | 0.29 | `_dpsm_work/acceptance_r41/runs/selftest_schema.txt` |
-| selftest/live_log | 0 | 0.34 | `_dpsm_work/acceptance_r41/runs/selftest_live_log.txt` |
-| doc_convergence | 0 | 0.49 | `_dpsm_work/acceptance_r41/runs/doc_convergence.txt` |
-| selftest/doc_convergence | 0 | 2.86 | `_dpsm_work/acceptance_r41/runs/selftest_doc_convergence.txt` |
-| docs123 | 0 | 0.21 | `_dpsm_work/acceptance_r41/runs/docs123.txt` |
-| selftest/docs123 | 0 | 0.23 | `_dpsm_work/acceptance_r41/runs/selftest_docs123.txt` |
-| test_gate | 0 | 8.19 | `_dpsm_work/acceptance_r41/runs/test_gate.txt` |
-| given_coupling | 0 | 0.12 | `_dpsm_work/acceptance_r41/runs/given_coupling.txt` |
-| selftest/given_coupling | 0 | 0.22 | `_dpsm_work/acceptance_r41/runs/selftest_given_coupling.txt` |
-| p2a | 0 | 36.84 | `_dpsm_work/acceptance_r41/runs/p2a.txt` |
-| factsig | 0 | 0.17 | `_dpsm_work/acceptance_r41/runs/factsig.txt` |
-| selftest/applicability | 0 | 0.16 | `_dpsm_work/acceptance_r41/runs/selftest_applicability.txt` |
-| selftest/pairtrusted | 0 | 25.86 | `_dpsm_work/acceptance_r41/runs/selftest_pairtrusted.txt` |
-| refactor_final_check | 0 | 0.44 | `_dpsm_work/acceptance_r41/runs/refactor_final_check.txt` |
-| selftest/refactor | 0 | 8.81 | `_dpsm_work/acceptance_r41/runs/selftest_refactor.txt` |
-| tool_registry | 0 | 0.43 | `_dpsm_work/acceptance_r41/runs/tool_registry.txt` |
-| selftest/tool_registry | 0 | 0.5 | `_dpsm_work/acceptance_r41/runs/selftest_tool_registry.txt` |
-| archive_index | 0 | 0.24 | `_dpsm_work/acceptance_r41/runs/archive_index.txt` |
-| selftest/archive_index | 0 | 0.22 | `_dpsm_work/acceptance_r41/runs/selftest_archive_index.txt` |
-| v150_validate | 0 | 19.11 | `_dpsm_work/acceptance_r41/runs/v150_validate.txt` |
-| selftest/v150 | 0 | 24.14 | `_dpsm_work/acceptance_r41/runs/selftest_v150.txt` |
+| applicability(all) | 0 | 49.2 | `_dpsm_work/acceptance_r41/runs/applicability_all_.txt` |
+| crosscheck(batch) | 1 | 27.41 | `_dpsm_work/acceptance_r41/runs/crosscheck_batch_.txt` |
+| pairtrusted(all) | 0 | 63.39 | `_dpsm_work/acceptance_r41/runs/pairtrusted_all_.txt` |
+| export_schema(all) | 0 | 13.75 | `_dpsm_work/acceptance_r41/runs/export_schema_all_.txt` |
+| layout(all) | 0 | 2.38 | `_dpsm_work/acceptance_r41/runs/layout_all_.txt` |
+| live_log | 0 | 0.8 | `_dpsm_work/acceptance_r41/runs/live_log.txt` |
+| selftest/layout | 0 | 5.88 | `_dpsm_work/acceptance_r41/runs/selftest_layout.txt` |
+| selftest/schema | 0 | 0.08 | `_dpsm_work/acceptance_r41/runs/selftest_schema.txt` |
+| selftest/live_log | 0 | 0.12 | `_dpsm_work/acceptance_r41/runs/selftest_live_log.txt` |
+| doc_convergence | 0 | 0.24 | `_dpsm_work/acceptance_r41/runs/doc_convergence.txt` |
+| selftest/doc_convergence | 0 | 1.45 | `_dpsm_work/acceptance_r41/runs/selftest_doc_convergence.txt` |
+| docs123 | 0 | 0.14 | `_dpsm_work/acceptance_r41/runs/docs123.txt` |
+| selftest/docs123 | 0 | 0.15 | `_dpsm_work/acceptance_r41/runs/selftest_docs123.txt` |
+| test_gate | 0 | 4.49 | `_dpsm_work/acceptance_r41/runs/test_gate.txt` |
+| given_coupling | 0 | 0.06 | `_dpsm_work/acceptance_r41/runs/given_coupling.txt` |
+| selftest/given_coupling | 0 | 0.06 | `_dpsm_work/acceptance_r41/runs/selftest_given_coupling.txt` |
+| p2a | 0 | 25.77 | `_dpsm_work/acceptance_r41/runs/p2a.txt` |
+| factsig | 0 | 0.11 | `_dpsm_work/acceptance_r41/runs/factsig.txt` |
+| selftest/applicability | 0 | 0.1 | `_dpsm_work/acceptance_r41/runs/selftest_applicability.txt` |
+| selftest/pairtrusted | 0 | 16.23 | `_dpsm_work/acceptance_r41/runs/selftest_pairtrusted.txt` |
+| refactor_final_check | 0 | 0.22 | `_dpsm_work/acceptance_r41/runs/refactor_final_check.txt` |
+| selftest/refactor | 0 | 4.16 | `_dpsm_work/acceptance_r41/runs/selftest_refactor.txt` |
+| tool_registry | 0 | 0.14 | `_dpsm_work/acceptance_r41/runs/tool_registry.txt` |
+| selftest/tool_registry | 0 | 0.24 | `_dpsm_work/acceptance_r41/runs/selftest_tool_registry.txt` |
+| archive_index | 0 | 0.1 | `_dpsm_work/acceptance_r41/runs/archive_index.txt` |
+| selftest/archive_index | 0 | 0.14 | `_dpsm_work/acceptance_r41/runs/selftest_archive_index.txt` |
+| v150_validate | 0 | 15.18 | `_dpsm_work/acceptance_r41/runs/v150_validate.txt` |
+| selftest/v150 | 0 | 19.9 | `_dpsm_work/acceptance_r41/runs/selftest_v150.txt` |
 | selftest/eligibility | 0 | 1.68 | `_dpsm_work/acceptance_r41/runs/selftest_eligibility.txt` |
-| selftest/eligibility_e2e | 0 | 3.98 | `_dpsm_work/acceptance_r41/runs/selftest_eligibility_e2e.txt` |
-| selftest/compare | 0 | 84.21 | `_dpsm_work/acceptance_r41/runs/selftest_compare.txt` |
-| selftest/decision | 0 | 113.08 | `_dpsm_work/acceptance_r41/runs/selftest_decision.txt` |
-| selftest/budget | 0 | 0.69 | `_dpsm_work/acceptance_r41/runs/selftest_budget.txt` |
-| repo_manifest_verify | 0 | 8.58 | `_dpsm_work/acceptance_r41/runs/repo_manifest_verify.txt` |
-| recon_probe | 0 | 3.05 | `_dpsm_work/acceptance_r41/runs/recon_probe.txt` |
-| csharp_behavior | 0 | 2.78 | `_dpsm_work/acceptance_r41/runs/csharp_behavior.txt` |
-| csharp_behavior_negctl | 0 | 25.51 | `_dpsm_work/acceptance_r41/runs/csharp_behavior_negctl.txt` |
+| selftest/eligibility_e2e | 0 | 3.69 | `_dpsm_work/acceptance_r41/runs/selftest_eligibility_e2e.txt` |
+| selftest/compare | 0 | 62.67 | `_dpsm_work/acceptance_r41/runs/selftest_compare.txt` |
+| selftest/decision | 0 | 90.04 | `_dpsm_work/acceptance_r41/runs/selftest_decision.txt` |
+| selftest/budget | 0 | 0.64 | `_dpsm_work/acceptance_r41/runs/selftest_budget.txt` |
+| repo_manifest_verify | 0 | 7.59 | `_dpsm_work/acceptance_r41/runs/repo_manifest_verify.txt` |
+| recon_probe | 0 | 2.44 | `_dpsm_work/acceptance_r41/runs/recon_probe.txt` |
+| csharp_behavior | 0 | 2.6 | `_dpsm_work/acceptance_r41/runs/csharp_behavior.txt` |
+| csharp_behavior_negctl | 0 | 21.5 | `_dpsm_work/acceptance_r41/runs/csharp_behavior_negctl.txt` |
 
 ## per-file verdicts
 
