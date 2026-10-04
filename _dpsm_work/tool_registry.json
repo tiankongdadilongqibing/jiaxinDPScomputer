@@ -367,17 +367,20 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/report_text.py": {
-   "evidence": "RF7l: listed as an INPUT of the active check_docs_123.py (it reads the file for CJK damage), so something live does depend on it -- but it is not a CLI anyone runs; the registry has no status for that and one is needed",
+   "evidence": "RF7m: read by the active _dpsm_work/check_docs_123.py (it opens the file for CJK damage); nobody runs it and nothing imports it, so it is neither active nor indexed",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "inputs_of": [
+    "_dpsm_work/check_docs_123.py"
+   ],
+   "kind": "input",
    "lines": 208,
    "outputs": [],
    "purpose": "Text reports: the full v1 report and the legacy (Stage 0) compatible table.",
-   "status": "unclassified"
+   "status": "referenced-input"
   },
   "_dpsm_work/contrib/rule115_census.py": {
    "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
@@ -1311,20 +1314,23 @@
    "status": "indexed"
   },
   "dpsmeter_contrib.py": {
-   "evidence": "RF7l: listed as an INPUT of the active check_docs_123.py (it reads the file for CJK damage), so something live does depend on it -- but it is not a CLI anyone runs; the registry has no status for that and one is needed",
+   "evidence": "RF7m: read by the active _dpsm_work/check_docs_123.py (it opens the file for CJK damage); nobody runs it and nothing imports it, so it is neither active nor indexed",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "",
+   "inputs_of": [
+    "_dpsm_work/check_docs_123.py"
+   ],
+   "kind": "input",
    "lines": 164,
    "outputs": [],
    "purpose": "",
-   "status": "unclassified"
+   "status": "referenced-input"
   }
  },
  "pins": {
-  "unclassified_max": 3
+  "unclassified_max": 1
  }
 }

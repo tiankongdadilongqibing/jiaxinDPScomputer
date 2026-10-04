@@ -124,6 +124,35 @@ def verify(reg, fresh, pipe, repo=None):
             fail.append("G marked indexed but the pipeline runs it: " + rel)
         if rel in live_importer:
             fail.append("G marked indexed but a LIVE script imports it (%s): %s" % (live_importer[rel], rel))
+    # K (RF7m): the `referenced-input` status -- a file that nobody runs and nothing imports, but that an ACTIVE
+    # gate READS (contrib/report_text.py is read by check_docs_123.py for CJK damage). Calling such a file
+    # "indexed" would be false (a live tool breaks if it goes away) and calling it "active" would be false too
+    # (nobody invokes it). The claim is computed: each listed reader must be an active entry whose own source
+    # text contains the file basename, and the file must not be in the pipeline or a live import target.
+    for rel in sorted(entries):
+        ent = entries[rel]
+        if ent.get("status") != "referenced-input":
+            continue
+        readers = ent.get("inputs_of") or []
+        if not readers:
+            fail.append("K referenced-input declares no inputs_of: " + rel)
+            continue
+        base = os.path.basename(rel)
+        ok = False
+        for rd in readers:
+            if entries.get(rd, {}).get("status") != "active":
+                continue
+            try:
+                with io.open(os.path.join(tool_census.REPO, rd), "r", encoding="utf-8", errors="replace") as fh:
+                    txt = fh.read()
+            except Exception:
+                txt = ""
+            if base in txt:
+                ok = True
+        if not ok:
+            fail.append("K referenced-input is not actually read by any ACTIVE listed reader: " + rel)
+        if rel in pipe or ent.get("in_pipeline"):
+            fail.append("K referenced-input is in the pipeline (it should be active): " + rel)
     # J (RF7f): the liveness closure above follows IMPORTS, and imports are not how this repository mostly
     # runs things -- the tools are CLIs invoked from the pipeline script and from each other by name. Relying
     # on imports alone marked n0_acceptance.py and tests/negative_control.py as dead when I first computed it,
@@ -267,6 +296,22 @@ def selftest():
             fails.append(name)
     case_absent("an indexed script imported only by a DEAD script is NOT reported (G)", _dead_imports_indexed,
                 "G marked indexed but a LIVE script imports it")
+
+    def _k_no_readers(reg2):
+        for r, x in reg2["entries"].items():
+            if x.get("status") == "referenced-input":
+                x["inputs_of"] = []
+                break
+    case("a referenced-input with no declared reader is caught (K)", _k_no_readers,
+         "K referenced-input declares no inputs_of")
+
+    def _k_fake_reader(reg2):
+        for r, x in reg2["entries"].items():
+            if x.get("status") == "referenced-input":
+                x["inputs_of"] = ["_dpsm_work/contrib/legacy_diff.py"]
+                break
+    case("a referenced-input whose reader is not active (or does not read it) is caught (K)", _k_fake_reader,
+         "K referenced-input is not actually read by any ACTIVE listed reader")
 
     def _pin_down(reg2):
         reg2["pins"]["unclassified_max"] = 0
