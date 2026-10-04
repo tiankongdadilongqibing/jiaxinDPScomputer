@@ -300,17 +300,17 @@
    "status": "active"
   },
   "_dpsm_work/contrib/legacy_diff.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 110,
    "outputs": [],
    "purpose": "Regression evidence: does the new core reproduce the legacy Stage-0 table?",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/loader.py": {
    "evidence": "",
@@ -380,17 +380,17 @@
    "status": "unclassified"
   },
   "_dpsm_work/contrib/rule115_census.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 155,
    "outputs": [],
    "purpose": "Phase G item 1 (offline, GO per REVIEW-phaseG-recon): the 1.15 census.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/run.py": {
    "evidence": "",
@@ -481,17 +481,17 @@
    "status": "unclassified"
   },
   "_dpsm_work/contrib_gap_dealt.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 35,
    "outputs": [],
    "purpose": "Pin down the totals.dealt vs per-event-sum gap (HANDOFF todo 4).",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib_recon_155.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -604,17 +604,17 @@
    "status": "indexed"
   },
   "_dpsm_work/evidence_1152_residuals_150_vs_151.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 99,
    "outputs": [],
    "purpose": "Compare residual structure between the 1.5.0 battle and the 1.5.1 battle, and dump",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/evidence_152live_compare.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -747,17 +747,17 @@
    "status": "indexed"
   },
   "_dpsm_work/evidence_153_replay.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 45,
    "outputs": [],
    "purpose": "OFFLINE REPLAY of what 1.5.3 would report on an ALREADY-RECORDED battle, from the per-hit data alone.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/evidence_153live.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -1033,17 +1033,17 @@
    "status": "unclassified"
   },
   "_dpsm_work/madness_owner_check.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 32,
    "outputs": [],
    "purpose": "Who is mad on OUR side, and are the guest-unreadable hook rows that same unit (self-application)?",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/n0_acceptance.py": {
    "evidence": "",
@@ -1156,43 +1156,43 @@
    "status": "indexed"
   },
   "_dpsm_work/rules_census.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 72,
    "outputs": [],
    "purpose": "Per-rule fold-mass census for two battles + the differing units' ability lists.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/sample_intake.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 34,
    "outputs": [],
    "purpose": "Probe the two newest exports (round 6 intake). Read-only; prints ASCII facts.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/tests/il_equiv.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 87,
    "outputs": [],
    "purpose": "RF2 evidence: token-independent comparison of two IlDump transcripts.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/tests/negative_control.py": {
    "evidence": "",
@@ -1208,17 +1208,17 @@
    "status": "unclassified"
   },
   "_dpsm_work/tests/rf2_split.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 148,
    "outputs": [],
    "purpose": "RF2: mechanical split of src/Aggregator.cs into partial files.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/tool_census.py": {
    "evidence": "第 8 轮 RF7:注册表的机械半",
@@ -1236,17 +1236,17 @@
    "status": "active"
   },
   "_dpsm_work/umima_check.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 50,
    "outputs": [],
    "purpose": "What exactly is 海魔の残滓 in comp B, and how does 母なる変異の飛沫 compare?",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/v150_validate.py": {
    "evidence": "第 4 轮修掉活目录夹具;1.5.0 通道校验",
@@ -1264,43 +1264,43 @@
    "status": "active"
   },
   "_dpsm_work/verify_155.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 45,
    "outputs": [],
    "purpose": "1.5.5 acceptance: self-applied madness attribution + give-applier hook.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/victim_check.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 27,
    "outputs": [],
    "purpose": "Control: same enemy set / same front-line structure in the two battles?",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "dpsmeter_analyze.py": {
-   "evidence": "",
+   "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 201,
    "outputs": [],
    "purpose": "DpsMeter 离线精细分析器",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "dpsmeter_contrib.py": {
    "evidence": "",
@@ -1317,6 +1317,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 28
+  "unclassified_max": 14
  }
 }
