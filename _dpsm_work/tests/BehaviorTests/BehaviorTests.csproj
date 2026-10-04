@@ -62,6 +62,7 @@
          and executed as production code instead of being mirrored by a Python replica. -->
     <Compile Include="$(SrcRoot)\Ui\DisplayFormat.cs" />
     <Compile Include="$(SrcRoot)\Ui\ContributionColumns.cs" />
+    <Compile Include="$(SrcRoot)\Ui\FallbackText.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

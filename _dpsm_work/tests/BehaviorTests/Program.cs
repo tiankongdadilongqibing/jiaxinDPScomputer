@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 557;
+	public const int ExpectedCases = 567;
 
 	private static int Main(string[] args)
 	{
@@ -43,6 +43,8 @@ internal static class Program
 		Cases.Columns(r);
 		// RF5d: the data-row builders, constructed from the column definition.
 		Cases.ColumnRows(r);
+		// RF5e: the IMGUI fallback's contribution lines (same number formats as the panel).
+		Cases.FallbackTextCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

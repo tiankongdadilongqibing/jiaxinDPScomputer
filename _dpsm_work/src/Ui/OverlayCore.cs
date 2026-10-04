@@ -134,7 +134,7 @@ public static class OverlayCore
 			if (CharacterInfo.IsAllyTeam(a.Team)) { allyDealt += a.DamageDealt; allyTaken += a.DamageTaken; }
 			else enemyDealt += a.DamageDealt;
 		}
-		GUILayout.Label($"任务 {session.QuestId}  {BattleTime.Hit(secs)}  我方伤害 {allyDealt:N0}  秒伤 {(long)(allyDealt / secs):N0}  受击 {allyTaken:N0}  敌伤害 {enemyDealt:N0}");
+		GUILayout.Label($"任务 {session.QuestId}  {BattleTime.Hit(secs)}  我方伤害 {DisplayFormat.Num(allyDealt)}  秒伤 {DisplayFormat.Num((long)(allyDealt / secs))}  受击 {DisplayFormat.Num(allyTaken)}  敌伤害 {DisplayFormat.Num(enemyDealt)}");
 
 		var allies = new List<ActorStats>();
 		foreach (var a in session.OrderedActors)
@@ -165,7 +165,7 @@ public static class OverlayCore
 		if (Plugin.CfgShowContribution == null || Plugin.CfgShowContribution.Value)
 			DrawContributionDashboard();
 		if (session.UnattributedDamage > 0L)
-			GUILayout.Label($"⚠ 未归属来源伤害 {session.UnattributedDamage:N0} x{session.UnattributedHits} (见运行日志 [PROBE])");
+			GUILayout.Label($"⚠ 未归属来源伤害 {DisplayFormat.Num(session.UnattributedDamage)} x{session.UnattributedHits} (见运行日志 [PROBE])");
 		GUILayout.EndScrollView();
 	}
 
@@ -194,18 +194,21 @@ public static class OverlayCore
 			ContributionActorRow a = res.Actors[i];
 			if (a.Total <= 0.0 && a.Direct <= 0.0) continue;
 			double share = total > 0.0 ? 100.0 * a.Total / total : 0.0;
-			GUILayout.Label($"  {a.Name}{(a.Summon ? "[使魔]" : "")}  总贡献 {a.Total:N0}({share:F2}%)  自身 {(a.Base + a.Self):N0}(基础 {a.Base:N0} + 自身规则 {a.Self:N0})  他人因你 {a.Assist:N0}  被队友分走 {a.Received:N0}");
+			// RF5e: the row text comes from the pure builder, so the fallback formats numbers the same way the
+			// panel and the export do (and the suite executes it).
+			GUILayout.Label(FallbackText.ContributionActorLine(a.Name, a.Summon, a.Total, share, a.Base, a.Self,
+			                                                   a.Assist, a.Received));
 			_desiredHeight += 18f;
 			if (i >= 11) break;
 		}
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;
-		GUILayout.Label($"  合计 {res.Stats.Attributed:N0}   未归因 {res.Stats.Unattributed:N0}({unattrPct:F2}%)   命中 {res.Stats.Hits:N0}");
+		GUILayout.Label(FallbackText.ContributionTotalsLine(res.Stats.Attributed, res.Stats.Unattributed, unattrPct, res.Stats.Hits));
 		_desiredHeight += 18f;
 	}
 
 	private static void DrawHistoryMini(BattleSummary bs)
 	{
-		GUILayout.Label($"上一场 结果 {bs.Result} 任务 {bs.QuestId} {BattleTime.Seconds(bs.DurationSeconds)} 我方{SumDealt(bs, true):N0} 敌{SumDealt(bs, false):N0}");
+		GUILayout.Label($"上一场 结果 {bs.Result} 任务 {bs.QuestId} {BattleTime.Seconds(bs.DurationSeconds)} 我方{DisplayFormat.Num(SumDealt(bs, true))} 敌{DisplayFormat.Num(SumDealt(bs, false))}");
 		_desiredHeight += 24f;
 	}
 
@@ -221,10 +224,10 @@ public static class OverlayCore
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label($"[{(CharacterInfo.IsAllyTeam(a.Team) ? "我" : "敌")}] {a.Name}", GUILayout.Width(150f));
-		GUILayout.Label($"伤害 {a.DamageDealt:N0}", GUILayout.Width(110f));
+		GUILayout.Label($"伤害 {DisplayFormat.Num(a.DamageDealt)}", GUILayout.Width(110f));
 		GUILayout.Label($"秒伤 {a.Dps(secs):F0}", GUILayout.Width(80f));
-		GUILayout.Label($"最大 {a.MaxHitDamage:N0}", GUILayout.Width(90f));
-		GUILayout.Label($"受击 {a.DamageTaken:N0}", GUILayout.Width(90f));
+		GUILayout.Label($"最大 {DisplayFormat.Num(a.MaxHitDamage)}", GUILayout.Width(90f));
+		GUILayout.Label($"受击 {DisplayFormat.Num(a.DamageTaken)}", GUILayout.Width(90f));
 		GUILayout.EndHorizontal();
 		if (!withSkills || a.SkillDamage.Count <= 0) return;
 		var sk = new List<KeyValuePair<int, long>>(a.SkillDamage);
@@ -233,7 +236,7 @@ public static class OverlayCore
 		{
 			GUILayout.BeginHorizontal();
 			GUILayout.Label($"    技能#{kv.Key}", GUILayout.Width(150f));
-			GUILayout.Label(kv.Value.ToString("N0"), GUILayout.Width(100f));
+			GUILayout.Label(DisplayFormat.Num(kv.Value), GUILayout.Width(100f));
 			GUILayout.EndHorizontal();
 		}
 	}

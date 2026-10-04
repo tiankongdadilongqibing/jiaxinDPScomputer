@@ -301,7 +301,7 @@ def main():
     ap.add_argument("--exports", default=DEF_INPUTS if os.path.isdir(DEF_INPUTS) else DEF_EXPORTS)
     # Per-batch output directory. The default names the CURRENT batch, so a plain run reproduces the
     # archive the documents describe; the round-6 archive stays frozen in acceptance_1.7.11 (watched).
-    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_rf5d"))
+    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_rf5e"))
     ap.add_argument("--dll", default=DEF_DLL)
     ap.add_argument("--cfg", default=DEF_CFG)
     ap.add_argument("--log", default=DEF_LOG)

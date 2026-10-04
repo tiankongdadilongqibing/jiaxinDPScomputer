@@ -18,12 +18,12 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**81 个 .cs / 22,575 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **104** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**82 个 .cs / 22,624 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **106** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF4+RF5a–d):**557 个命名用例 / 18 组**,**73 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF4+RF5a–e):**567 个命名用例 / 19 组**,**76 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
 | 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>) |
 
 ## 2. 语料现状(35 份,冻结快照)
@@ -96,7 +96,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | 判定核心 | `Composition/`(14,含 10 个 `CompositionProbe*` partial) | 6,762 | IL2CPP | 否 |
 | 主数据 | `MasterData/`(2) | 1,204 | IL2CPP + 反编译件 | 否 |
 | 输出 | `Output/`(7) | 2,274 | 读会话状态 | `JsonCheck` 由 recon_probe 反向验证 |
-| 界面 | `Ui/`(9) | 3,429 | 分三层:**`DisplayFormat` 纯排版**(43 用例)+ **`ContributionColumns` 列定义与三个行构造器**(39 用例)+ 渲染器(Unity) | 排版层、列定义与行构造能;渲染层靠布局守卫离线复算 |
+| 界面 | `Ui/`(10) | 3,478 | 分三层:**`DisplayFormat` 纯排版**(43 用例)+ **`ContributionColumns` 列定义与三个行构造器**(39 用例)+ 渲染器(Unity) | 排版层、列定义与行构造能;渲染层靠布局守卫离线复算。**面板与回退同源**(RF5e 查证:数字本来就一份,格式化此前两套;回退的贡献行现由 `FallbackText` 构造) |
 
 **最大的 7 个文件**(拆分候选,按行数):`Ui/OverlayUGUI.Rows.cs` **1,241**、
 `Composition/CompositionProbe.Chain.cs` **1,191**、`Composition/CompositionProbe.Talents.cs` **847**、
@@ -278,6 +278,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 10 轮 RF5b(文字排版)** | 覆盖层的文字排版与数字格式从 `Ui/OverlayUGUI.Rows.cs` 分到 `src/Ui/DisplayFormat.cs`(481 行 / 11 成员;Rows 1,375 → 1,258);**编译进行为套件、43 个用例直接执行生产代码**,含方案要求的 CJK/长名/极值/零/未知与代理对不可切断;澄清布局守卫只对账列宽;518 用例 / 64 例负控 | [REFACTOR-BATCH-RF5B.md](<REFACTOR-BATCH-RF5B.md>) |
 | **第 11 轮 RF5c(列定义)** | 三张覆盖层表的列定义(标签/宽度/对齐)与表头/合计行构造移到 `src/Ui/ContributionColumns.cs`;表头与合计行**由定义构造**,数据行宽度由布局守卫与定义对账;实测语义:**行宽 = 列宽和 + 2**(T1 列 83/行 85);542 用例 / 69 例负控 | [REFACTOR-BATCH-RF5C.md](<REFACTOR-BATCH-RF5C.md>) |
 | **第 12 轮 RF5d(数据行)** | `T1Row/T2Row/T3Row` 三个构造器进 `ContributionColumns`:数据行不再内联宽度,**"受校验的副本"变成"没有副本"**;布局守卫改为结构性检查(常量顺序 + 禁止裸宽度);用例核心是"任何取值下行宽恒等于表宽";557 用例 / 73 例负控 | [REFACTOR-BATCH-RF5D.md](<REFACTOR-BATCH-RF5D.md>) |
+| **第 13 轮 RF5e(回退渲染器)** | 查证方案 §10 的"两渲染器":**数字本来就一份**、**格式化此前两套**;新增 `src/Ui/FallbackText.cs` 两条纯构造器,回退的 9 处直接格式化全部改走 `DisplayFormat`(剩余 0 处;秒伤 `:F0` 故意保留);567 用例 / 76 例负控 | [REFACTOR-BATCH-RF5E.md](<REFACTOR-BATCH-RF5E.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
