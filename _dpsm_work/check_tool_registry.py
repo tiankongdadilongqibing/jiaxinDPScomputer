@@ -95,6 +95,21 @@ def verify(reg, fresh, pipe, repo=None):
         if ent.get("kind") in (None, "", "unclassified"):
             fail.append("E active entry has no kind: " + rel)
 
+    # G (RF7b): a script registered as `indexed` claims nothing live depends on it, so it must not be
+    # imported by another script and must not be in the pipeline. That claim is COMPUTED here rather than
+    # trusted: classifying a script as indexed is only valid while this stays true.
+    imported = set()
+    for rel, ent in entries.items():
+        for dep in (ent.get("imports_local") or []):
+            imported.add(dep)
+    for rel in sorted(entries):
+        ent = entries[rel]
+        if ent.get("status") != "indexed":
+            continue
+        if ent.get("in_pipeline") or rel in pipe:
+            fail.append("G marked indexed but the pipeline runs it: " + rel)
+        if rel in imported:
+            fail.append("G marked indexed but another script imports it: " + rel)
     # F: the unclassified count may only go down
     unclassified = len([1 for e in entries.values() if e.get("status") == "unclassified"])
     pin = reg.get("pins", {}).get("unclassified_max")

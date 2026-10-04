@@ -1,0 +1,27 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_p2a_summary_and_lastbattle.py
+A. BattleSession.FromSummary passes the unattributed pool (task 6)
+     BattleSummary.cs declares an UnattributedDamage field: False
+     model replay: caption of the previous battle prints unattributed 0 before the fix, 273702 after
+  [PASS] FromSummary assigns UnattributedDamage -- assignment found in FromSummary
+  [PASS] FromSummary assigns UnattributedHits -- assignment found in FromSummary
+B. the previous-battle contribution view is resolved from Aggregator.History[0] (task 7)
+     ContributionSession.Get() non-live branch is blind to History[0]: False
+  [PASS] a previous-battle resolver exists -- ResolveContributionView defined
+  [PASS] resolver is used by every render path (>=3 call sites incl. imgui) -- 4 call sites
+  [PASS] resolver anchors on Aggregator.History[0] -- History referenced in the resolver body
+  [PASS] resolver recomputes from the finished session -- ContributionSession.Compute used
+     model replay: battle A cached live; battle B fought hidden; after B ends, F5 shows:
+       old control flow -> A   new control flow -> B
+  [PASS] old flow shows the OLDER battle (reproduces the defect) -- old -> A
+  [PASS] new flow shows the MOST RECENT battle -- new -> B
+C. F5 header does not print "task 0 / 0 s" when the battle id is known (task 8, residual)
+     model replay: live battle q=411001, view.QuestId==0 (ReconcileCalc off): header prints 0 then 411001
+  [PASS] header falls back to the live session / last summary -- fallback present
+  [PASS] model: old prints 0 (reproduces the defect) -- old -> 0
+  [PASS] model: new prints the real battle id -- new -> 411001
+D. the value the caption must show exists in the export corpus (export fact)
+     newest 1.7.6 export: battle_411001_20261004_115417.json  totals.unattributedDamage=273702  totals.unattributedHits=71
+  [PASS] unattributedDamage is a real non-zero measurement -- value=273702
+  [PASS] the pre-fix caption would print 0 instead -- FromSummary leaves the field at 0 until task 6 is fixed
+---- P2-A guard: PASS (0 failing contract(s))

@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–e+RF6a):**625 个命名用例 / 22 组**,**87 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>) |
+| 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**95 条登记 / 21 条活跃 / 43 条已索引 / 31 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -282,6 +282,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 14 轮 RF6a(主数据)** | 定位方案 §11 说的"两处重复"(两条表路由共享非泛型查找/多实例取大/失败分类,已逐项对照);抽出**可离线判定**的官方名规则 `src/Policy/MasterDataLabelPolicy.cs`(103 行,用源码里记录的**实测刻印夹具**做用例);表路由抽取因 IL2CPP 泛型无法离线编译而**明确延后**(理由与对照表已留档);591 用例 / 80 例负控 | [REFACTOR-BATCH-RF6A.md](<REFACTOR-BATCH-RF6A.md>) |
 | **第 15 轮 RF3c(链容差)** | R1/R2 的最后一项:composition 链自己的 5 个容差从裸字面量变为 `src/Policy/CompositionTolerancePolicy.cs`(53 行;Chain 11 处 + Crit 门 1 处,链内裸容差剩余 0);暴击上界**改为引用** `BattleClockPolicy.MaxFrameDelta`,不再写第二个 0.25;607 用例 / 84 例负控 | [REFACTOR-BATCH-RF3C.md](<REFACTOR-BATCH-RF3C.md>) |
 | **第 16 轮 RF4f(活动环)** | 第三族余下的顺序半边:`_calcEvents` 的 FIFO 与上限 64 迁到 `src/Runtime/CalcActivityLog.cs`(泛型,Count/可读写下标器/Add/Clear),**门面只改两处**,其余 14 处读写一行未动;清空仍在会话开始/软恢复/结算三处由调用方决定;625 用例 / 87 例负控 | [REFACTOR-BATCH-RF4F.md](<REFACTOR-BATCH-RF4F.md>) |
+| **第 17 轮 RF7b(工具判定)** | 43 条脚本按**机械证据**判定为 `indexed`(无流水线/无导入者/当前文档未点名),未判定上限 74 → **31**;守卫新增 **G**:`indexed` 必须真的没有导入者且不在流水线,否则变红(声明被复核而不是被信任);注册表报告重新生成;插件源码零变化 | [REFACTOR-BATCH-RF7B.md](<REFACTOR-BATCH-RF7B.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
