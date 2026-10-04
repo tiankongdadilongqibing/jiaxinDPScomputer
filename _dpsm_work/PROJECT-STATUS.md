@@ -295,6 +295,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 27 轮(全面复核,无代码改动)** | 对已达成的部分做一次端到端复核:**部署 DLL** 387,072 B / `36EC96D4…8BC42`(15–27 轮未替换);验收 **37 条命令 / 69 条检查 / 0 项**;行为套件 **697 用例 0 失败**;变异负控 **100 例 0 失败**;`refactor_final_check` blocks=0;文档收敛 **0/12**;docs123 62 份 0 损伤;工具注册表 PASS;布局守卫 35 份 0 违规;证据哈希索引 PASS;`repo_manifest --verify` drift=0;git 干净于 `4c92e10` | 本轮无产物;证据见本行与 [HANDOFF.md](<HANDOFF.md>) |
 | **第 28 轮 RF7e(工具判定续)** | 31 条被引用脚本中证据明确的三条:`batch_snapshot.py` → active(它是 `batch_inputs/rf0` 的来源),`compare_comps.py` / `atkadd_sensitivity.py` → indexed(docstring 证明是历史研究);判定证据固定为"导入者/流水线/文档点名 + **脚本自己的 docstring**";未判定上限 31 → **28**;并写明剩下 28 条需要**先扩展守卫 G 到"活跃导入者"**才能判(独立规则改动) | [REFACTOR-BATCH-RF7E.md](<REFACTOR-BATCH-RF7E.md>) |
 | **第 29 轮 RF7f(G 放宽 + J)** | 守卫 G 由"任何导入者都没有"改为**传递性活跃**(种子 = active ∪ 流水线),并配两个对照(被活跃脚本导入⇒红;只被已死脚本导入⇒不报);新增 **J**:被索引者不得出现在 `n0_acceptance.py` 文本里。**一次被自己抓住的错误**:按"仅认 import"批量判定时把 `n0_acceptance.py` 与 `tests/negative_control.py` 判成"没人依赖",已从 git 还原注册表——这证明了**按名字调用**才是本仓库的主要使用方式,`imports_local` 不足以判定存活;未判定数仍为 28 | [REFACTOR-BATCH-RF7F.md](<REFACTOR-BATCH-RF7F.md>) |
+| **第 30 轮 RF7g(证据表)** | 新增 `tool_census.py --invokers`:对 28 条未判定脚本列出"哪些已登记脚本的**源码文本**里出现它的名字",并单独标出其中的 active 者;**刻意不是闸门**(名字可能只是注释,做成硬规则会因一句注释变红,故先做给人看的证据表);首轮即定一条:`contrib/report_json.py` 被两个 active 脚本点名,不应判为"无人依赖";未判定仍 28 | [REFACTOR-BATCH-RF7G.md](<REFACTOR-BATCH-RF7G.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

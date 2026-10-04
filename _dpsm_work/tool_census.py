@@ -172,7 +172,40 @@ def seed():
     return 0
 
 
+def invokers(argv):
+    """RF7g (evidence sheet, NOT a gate): who NAMES each unclassified script in their own text?
+
+    The lesson from round 29 is that this repository mostly runs its tools by NAME (the pipeline invokes them
+    through subprocess), so "nobody imports it" says nothing about liveness. This prints, for every
+    unclassified registry entry, the registered scripts whose SOURCE TEXT contains its basename -- the raw
+    evidence a human needs to judge each one. It deliberately does not decide anything and is not wired into
+    the acceptance: a mention can be a real call or a comment, and only a reader can tell them apart.
+    """
+    reg = load_registry()
+    ents = reg.get("entries", {})
+    todo = sorted(r for r, e in ents.items() if e.get("status") == "unclassified")
+    alive = sorted(r for r, e in ents.items() if e.get("status") == "active")
+    texts = {}
+    for rel in sorted(ents):
+        p = os.path.join(REPO, rel)
+        try:
+            with io.open(p, "r", encoding="utf-8", errors="replace") as fh:
+                texts[rel] = fh.read()
+        except Exception:
+            texts[rel] = ""
+    print("invoker sheet: unclassified=%d active=%d" % (len(todo), len(alive)))
+    for rel in todo:
+        base = os.path.basename(rel)
+        named = sorted(s for s, t in texts.items() if s != rel and base in t)
+        live_named = sorted(s for s in named if ents.get(s, {}).get("status") == "active")
+        print("  %s" % rel)
+        print("     named-by(all)=%s" % (", ".join(named) if named else "none"))
+        print("     named-by(ACTIVE)=%s" % (", ".join(live_named) if live_named else "none"))
+    return 0
+
 def main(argv):
+    if "--invokers" in argv:
+        return invokers(argv)
     if "--seed" in argv:
         return seed()
     fresh = scan()
