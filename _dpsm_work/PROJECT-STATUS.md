@@ -309,6 +309,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 42 轮(R42 快照)** | 把用户这一场冻成批次 **r42**(方案自带 `batch_snapshot.py`,硬链接,`--verify` drift=0):**46 文件 / 628.7 MB**;新那一场的任务号属于**训练场**类、带贡献段、`schemaVersion 1.1`——按 R6 既有判定,该类别**不参与可比基线**;同一时间戳刷新的 **masterdata 转储**才是 `MasterDataAccess`(§11)实机验证缺的那一半;本轮**不含插件改动** | [REFACTOR-BATCH-R42.md](<REFACTOR-BATCH-R42.md>) |
 | **第 43 轮(MasterDataAccess 设计)** | 按方案 §11"先定位调用方并读全上下文"复核两处重复(标签路由 MasterDataNames.cs:292/:329;转储路由 MasterDataDump.cs:389,19 个调用点),把方案点名的**七条必须保持的行为**逐条对应到代码位置与处置(非泛型集合路径、判空差异不得统一、解密只调用、布局/计数/重试留在转储侧、存活检查时机不变),并定死下一轮验证法(以 r42 转储逐键逐字段对照,差异须为 0);本轮不含代码改动 | [REFACTOR-BATCH-R43.md](<REFACTOR-BATCH-R43.md>) |
 | **第 44 轮(masterdata 基准冻结)** | 确认 r42 快照只含导出(46 战斗文件)不含 masterdata,故把活目录的转储**只读复制**冻结为对照基准:_dpsm_work/batch_inputs/r42-masterdata/ + 带 SHA256 的清单 masterdata-baseline-r42.json,**20 份 / 410,594 字节**;源目录未修改。此后抽取轮只读仓库内副本,不再需要读活目录;插件源码零变化 | [REFACTOR-BATCH-R44.md](<REFACTOR-BATCH-R44.md>) |
+| **第 45 轮(重复点精确定位)** | 读全上下文后把"两处重复"精确到**两个具名方法**:MasterDataNames.FindBest(290 行)+ Rows(327 行) <-> MasterDataDump.Table 的内联循环(416 行起);共享的是三条来之不易的知识(非泛型 AOT 安全查找、扫全部实例取行数最多者、逐元素 try/catch 与计数),两侧各自的计数器/布局/重试保留;抽取动作已收敛为"搬运这两个方法 + 两侧改调用 + 以 r42 基准逐键对照";**本轮仍不含代码改动**(读取路径改动需实机验证) | [REFACTOR-BATCH-R45.md](<REFACTOR-BATCH-R45.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
