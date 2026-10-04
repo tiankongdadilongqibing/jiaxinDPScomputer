@@ -95,21 +95,51 @@ def verify(reg, fresh, pipe, repo=None):
         if ent.get("kind") in (None, "", "unclassified"):
             fail.append("E active entry has no kind: " + rel)
 
-    # G (RF7b): a script registered as `indexed` claims nothing live depends on it, so it must not be
-    # imported by another script and must not be in the pipeline. That claim is COMPUTED here rather than
-    # trusted: classifying a script as indexed is only valid while this stays true.
-    imported = set()
+    # G (RF7b, refined in RF7f): an `indexed` entry claims "nothing LIVE depends on it", and LIVENESS is the
+    # transitive closure of imports starting from the seeds that are live by definition -- the ACTIVE entries
+    # and whatever the pipeline runs. So a script imported only by other indexed (dead) scripts is itself dead
+    # and may be indexed; one imported by a live script may not. The earlier rule ("no importer at all") was
+    # STRICTER than the claim it checked, which is why a whole dead subtree could not be classified at all.
+    live = set(rel for rel, ent in entries.items()
+               if ent.get("status") == "active" or ent.get("in_pipeline") or rel in pipe)
+    changed = True
+    while changed:
+        changed = False
+        for rel in sorted(live):
+            for dep in (entries.get(rel, {}).get("imports_local") or []):
+                if dep not in live:
+                    live.add(dep)
+                    changed = True
+    live_importer = {}
     for rel, ent in entries.items():
+        if rel not in live:
+            continue
         for dep in (ent.get("imports_local") or []):
-            imported.add(dep)
+            live_importer.setdefault(dep, rel)
     for rel in sorted(entries):
         ent = entries[rel]
         if ent.get("status") != "indexed":
             continue
         if ent.get("in_pipeline") or rel in pipe:
             fail.append("G marked indexed but the pipeline runs it: " + rel)
-        if rel in imported:
-            fail.append("G marked indexed but another script imports it: " + rel)
+        if rel in live_importer:
+            fail.append("G marked indexed but a LIVE script imports it (%s): %s" % (live_importer[rel], rel))
+    # J (RF7f): the liveness closure above follows IMPORTS, and imports are not how this repository mostly
+    # runs things -- the tools are CLIs invoked from the pipeline script and from each other by name. Relying
+    # on imports alone marked n0_acceptance.py and tests/negative_control.py as dead when I first computed it,
+    # which is why this check exists: an `indexed` entry must not be NAMED inside the pipeline script's text.
+    try:
+        with io.open(os.path.join(tool_census.REPO, "_dpsm_work", "n0_acceptance.py"),
+                     "r", encoding="utf-8") as fh:
+            n0_text = fh.read()
+    except Exception:
+        n0_text = ""
+    for rel in sorted(entries):
+        if entries[rel].get("status") != "indexed":
+            continue
+        base = os.path.basename(rel)
+        if base and base in n0_text:
+            fail.append("J marked indexed but the pipeline script names it: " + rel)
     # F: the unclassified count may only go down
     unclassified = len([1 for e in entries.values() if e.get("status") == "unclassified"])
     pin = reg.get("pins", {}).get("unclassified_max")
@@ -176,6 +206,7 @@ def selftest():
     entries = reg["entries"]
     pipe_rel = sorted(pipe)[0]
     other_rel = sorted(set(fresh) - pipe)[0]
+    indexed_rels = sorted(r for r, e in entries.items() if e.get("status") == "indexed")
     fails = []
 
     def case(name, mutate, want):
@@ -214,6 +245,28 @@ def selftest():
     def _no_outputs(reg2):
         reg2["entries"][pipe_rel]["outputs"] = []
     case("an active entry without declared outputs is caught (E)", _no_outputs, "E active entry declares no outputs")
+
+    # RF7f: G needs its own falsifiers, and the second one is the point of the refinement -- a DEAD script
+    # importing another dead script must not be reported, or the rule would block the very classification it
+    # exists to police.
+    def _live_imports_indexed(reg2):
+        reg2["entries"][pipe_rel]["imports_local"] = [indexed_rels[0]]
+    case("an indexed script imported by a LIVE script is caught (G)", _live_imports_indexed,
+         "G marked indexed but a LIVE script imports it")
+
+    def _dead_imports_indexed(reg2):
+        reg2["entries"][indexed_rels[0]]["imports_local"] = [indexed_rels[1]]
+
+    def case_absent(name, mutate, unjust):
+        tampered = json.loads(json.dumps(reg))
+        mutate(tampered)
+        got = verify(tampered, fresh, pipe)
+        ok = not any(unjust in f for f in got)
+        print("  [%s] %s" % ("PASS" if ok else "FAIL", name))
+        if not ok:
+            fails.append(name)
+    case_absent("an indexed script imported only by a DEAD script is NOT reported (G)", _dead_imports_indexed,
+                "G marked indexed but a LIVE script imports it")
 
     def _pin_down(reg2):
         reg2["pins"]["unclassified_max"] = 0
