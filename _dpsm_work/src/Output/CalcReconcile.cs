@@ -111,7 +111,7 @@ internal static class CalcReconcile
 		public int TheoryExceeds;
 		/// <summary>How much damage was absorbed / nullified before reaching 耐久, summed over the battle.
 		///
-		/// Taken from the EVENTS (nominal − amount), not from Aggregator's AbsorbedTotal, for the same
+		/// Taken from the EVENTS (nominal − amount), not from Aggregator's Rt.AbsorbedTotal, for the same
 		/// reason the rest of this block is derived from the events: one source of truth.
 		///
 		/// It matters because the GAME's own damage statistic counts the PRE-absorption figure (measured:

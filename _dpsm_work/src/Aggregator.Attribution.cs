@@ -215,18 +215,18 @@ public static partial class Aggregator
 		if (calc == null) return;
 		try
 		{
-			if (blocker == null) { try { blocker = calc.m_blocker; } catch { HitDetailErrors++; } }
+			if (blocker == null) { try { blocker = calc.m_blocker; } catch { Rt.HitDetailErrors++; } }
 			var src = DamageSource.Unknown;
-			try { src = calc.m_damageSource; } catch { HitDetailErrors++; }
+			try { src = calc.m_damageSource; } catch { Rt.HitDetailErrors++; }
 			int ht = -1;
-			try { ht = (int)calc.m_hitType; } catch { HitDetailErrors++; }
+			try { ht = (int)calc.m_hitType; } catch { Rt.HitDetailErrors++; }
 			int eff = 0;
-			try { eff = calc.m_effectId; } catch { HitDetailErrors++; }
+			try { eff = calc.m_effectId; } catch { Rt.HitDetailErrors++; }
 			BattleObject atk = null;
-			try { atk = calc.Attacker; } catch { HitDetailErrors++; }
+			try { atk = calc.Attacker; } catch { Rt.HitDetailErrors++; }
 			RecordHitDetail(atk, blocker, damage, src, (eDamageCalcType)ht, eff, CompositionProbe.ObservedCrit(blocker));
 		}
-		catch { HitDetailErrors++; }
+		catch { Rt.HitDetailErrors++; }
 	}
 
 	public static void RecordHitDetail(BattleObject attacker, BattleObject blocker, int damage, DamageSource source, eDamageCalcType hitType, int effectId, byte critObserved)
@@ -246,16 +246,16 @@ public static partial class Aggregator
 					CritObserved = critObserved,
 					T = Session.ActiveSeconds
 				});
-				HitDetailProduced++;
+				Rt.HitDetailProduced++;
 				// RF3: the cap is BattleSession.MaxPending, not a second copy of the number.
 				if (Session.PendingHits.Count > BattleSession.MaxPending)
 				{
 					int n = Session.PendingHits.Count - BattleSession.MaxPending;
 					Session.PendingHits.RemoveRange(0, n);
-					HitDetailTrimmed += n;
+					Rt.HitDetailTrimmed += n;
 				}
 			}
-			catch { HitDetailErrors++; }
+			catch { Rt.HitDetailErrors++; }
 		}
 	}
 

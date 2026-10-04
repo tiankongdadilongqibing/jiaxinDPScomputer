@@ -64,11 +64,11 @@ public static partial class Aggregator
 			}
 		}
 		sb.Append($"  TOTALS dealt={battleSummary.TotalDealt} taken={battleSummary.TotalTaken} healing={battleSummary.TotalHealing}");
-		if (AbsorbedHits > 0)
+		if (Rt.AbsorbedHits > 0)
 		{
 			// The reconciliation line: our taken total is the damage that reached 耐久, the game's own
 			// counter adds everything that was absorbed on the way, so taken + absorbed must equal it.
-			sb.Append($"\n  >>> 被吸收/无效化 {AbsorbedTotal} / {AbsorbedHits} hits  (taken {battleSummary.TotalTaken} + 吸收 {AbsorbedTotal} = 游戏口径 {battleSummary.TotalTaken + AbsorbedTotal})");
+			sb.Append($"\n  >>> 被吸收/无效化 {Rt.AbsorbedTotal} / {Rt.AbsorbedHits} hits  (taken {battleSummary.TotalTaken} + 吸收 {Rt.AbsorbedTotal} = 游戏口径 {battleSummary.TotalTaken + Rt.AbsorbedTotal})");
 		}
 		string text = sb.ToString();
 		Plugin.LogSource.LogInfo(text);

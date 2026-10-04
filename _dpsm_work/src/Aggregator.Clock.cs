@@ -132,7 +132,7 @@ public static partial class Aggregator
 		GameResult gameResult = val.GameResult;
 		if ((int)gameResult != 0 && (int)Session.Result == 0) { EndSession(gameResult); return; }
 
-		if (_eventCount > 0)
+		if (Rt.EventCount > 0)
 		{
 			try
 			{
@@ -170,13 +170,13 @@ public static partial class Aggregator
 				if (Plugin.CfgAbilityDump != null && Plugin.CfgAbilityDump.Value)
 				{
 					double wall = (DateTime.Now - Session.StartWallClock).TotalSeconds;
-					if (wall - _lastTimeLog >= 2.0)
+					if (wall - Rt.LastTimeLog >= 2.0)
 					{
-						_lastTimeLog = wall;
+						Rt.LastTimeLog = wall;
 						int g = 0;
 						try { g = val.GameTime; } catch { }
 						RuntimeLog.Write("[TIME] wall=" + wall.ToString("F1") + "s gameTime=" + g
-							+ " dGameTime=" + (g - _gameTimeAtStart)
+							+ " dGameTime=" + (g - Rt.GameTimeAtStart)
 							+ " frame=" + Time.frameCount
 							+ " scale=" + Time.timeScale.ToString("F2")
 							+ " paused=" + (paused ? 1 : 0)
@@ -191,8 +191,8 @@ public static partial class Aggregator
 							// This fires if a future change makes the applied delta disappear (the bug
 							// fixed in 1.0.36: the delta was computed before the once-per-frame guard, so
 							// the call carrying the game's increment was the one dropped by the guard).
-							+ ((_eventCount > 0 && Session.ActiveSeconds < 0.05) ? "  !!! 时钟未推进" : "")
-							+ " hits=" + _eventCount);
+							+ ((Rt.EventCount > 0 && Session.ActiveSeconds < 0.05) ? "  !!! 时钟未推进" : "")
+							+ " hits=" + Rt.EventCount);
 						// Which clock is the game's own? Prints every candidate raw value + its rate.
 						string probe = TimeProbe.Line(val, wall, Session);
 						if (!string.IsNullOrEmpty(probe)) RuntimeLog.Write(probe);
@@ -213,16 +213,16 @@ public static partial class Aggregator
 		// arrived, which then opened a fragment session starting at t=0 (what F6 used to show).
 		// RF3b: the idle rule is a policy decision (paused frames can never close a session, and the
 		// silence is measured on the no-pause clock).
-		if (SessionTransitionPolicy.ShouldCloseIdle(val.IsPaused, _eventCount, Session.IdleCombatSeconds,
+		if (SessionTransitionPolicy.ShouldCloseIdle(val.IsPaused, Rt.EventCount, Session.IdleCombatSeconds,
 		                                            SessionTransitionPolicy.IdleSeconds))
 		{
 			FinalizeLocked(Session, ((int)val.GameResult != 0) ? val.GameResult : (GameResult)0, "idle");
 			Session = null;
 		}
-		else if (Session.ActiveSeconds - _lastSummaryLog >= 5.0)
+		else if (Session.ActiveSeconds - Rt.LastSummaryLog >= 5.0)
 		{
-			_lastSummaryLog = Session.ActiveSeconds;
-			StringBuilder sb = new StringBuilder($"[DpsMeter] t={BattleTime.Seconds(Session.ActiveSeconds)} hits={_eventCount}");
+			Rt.LastSummaryLog = Session.ActiveSeconds;
+			StringBuilder sb = new StringBuilder($"[DpsMeter] t={BattleTime.Seconds(Session.ActiveSeconds)} hits={Rt.EventCount}");
 			foreach (ActorStats orderedActor in Session.OrderedActors)
 			{
 				if ((int)orderedActor.Team == 1 && orderedActor.DamageDealt > 0L)

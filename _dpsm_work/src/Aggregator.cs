@@ -15,20 +15,13 @@ public static partial class Aggregator
 
 	public const int MaxHistory = 20;
 
-	private static double _lastSummaryLog;
-	private static double _lastTimeLog;
-
-	/// <summary>GameSystem.GameTime when the current battle session started. Diagnostic only: GameTime
-	/// is an update/frame counter that keeps counting across battles, not a clock.</summary>
-	private static int _gameTimeAtStart;
-
-	private static int _eventCount;
-
-	/// <summary>Damage that never reached 耐久 (BattleObject.Damage 入参 − 返回值). Diagnostics + UI only:
-	/// the headline totals stay on the applied damage, and this figure is what reconciles them with the
-	/// game's own CharacterStatistics.TakenDamage (game口径 = taken + absorbed).</summary>
-	private static long AbsorbedTotal;
-	private static int AbsorbedHits;
+	/// <summary>
+	/// RF4, third family: the per-battle counters. Their state, their doc-level ownership and their reset
+	/// transitions live in <see cref="BattleRuntimeCounters"/>; every former bare field is now `Rt.X`.
+	/// A finalisation does NOT clear them (the export reads them), a soft resume does not either, and
+	/// F9 clears only the event count -- all three are cases in tests/BehaviorTests (runtime/counters).
+	/// </summary>
+	internal static readonly BattleRuntimeCounters Rt = new BattleRuntimeCounters();
 
 	private static int _lastTickFrame = -1;
 
@@ -114,21 +107,8 @@ public static partial class Aggregator
 		return CharacterInfo.KindText(a.Kind);
 	}
 
-	// ---- 1.5.0 (A2): the damage-detail channel, and its self-report ----
-	// These counters exist because the failure this channel had was SILENT: it had no producer at all, so
-	// `source`/`crit` were constants and nothing anywhere said so. Every new read reports what it did.
-	/// <summary>Pending damage figures produced by the four damage-returning hooks.</summary>
-	internal static int HitDetailProduced;
-	/// <summary>Records dropped by the BattleSession.MaxPending cap (never silent).</summary>
-	internal static int HitDetailTrimmed;
-	/// <summary>Field reads / plumbing failures while producing a record.</summary>
-	internal static int HitDetailErrors;
-	/// <summary>Damage records matched to a pending figure with the SAME damage value.</summary>
-	internal static int HitMatchExact;
-	/// <summary>Matched by (attacker, target) only, damage differing -- best effort, counted separately.</summary>
-	internal static int HitMatchPair;
-	/// <summary>Damage records with no pending figure at all (field stays Unknown).</summary>
-	internal static int HitMatchNone;
+	// 1.5.0 (A2) damage-detail self-report counters: moved to BattleRuntimeCounters (RF4 third family).
+	// They are read by ExportService and incremented from the hit-detail channel; see Rt.
 
 	internal static string Desc(BattleObject bo)
 	{

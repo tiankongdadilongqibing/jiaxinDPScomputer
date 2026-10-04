@@ -64,9 +64,8 @@ public static partial class Aggregator
 			RunPrevWhy = marker.PrevWhy,
 			RunPrevResult = marker.PrevResult
 		});
-		_eventCount = 0;
-		_lastSummaryLog = 0.0;
-		_lastTimeLog = 0.0;
+		// RF4 third family: one call replaces the twelve inline resets (their rules are the container's).
+		Rt.OnSessionStart();
 		_calcEvents.Clear();
 		// 1.5.0 (A2): the active calc and the pending damage figures are PER BATTLE. `_activeCalc` was
 		// only cleared when a session was resumed, never when one started, so a calc from the previous
@@ -74,17 +73,10 @@ public static partial class Aggregator
 		// stale figures across the boundary too.
 		_activeCalc = null;
 		_activeCalcT = -1.0;
-		HitDetailProduced = 0;
-		HitDetailTrimmed = 0;
-		HitDetailErrors = 0;
-		HitMatchExact = 0;
-		HitMatchPair = 0;
-		HitMatchNone = 0;
-		AbsorbedTotal = 0L;
-		AbsorbedHits = 0;
 		// diagnostic only: GameTime keeps counting across battles, so remember where this one started
-		// (the battle clock itself is accumulated from dt in Tick -- GameTime is a frame counter)
-		try { _gameTimeAtStart = (val != null) ? val.GameTime : 0; } catch { _gameTimeAtStart = 0; }
+		// (the battle clock itself is accumulated from dt in Tick -- GameTime is a frame counter).
+		// Native read -> it stays here and is written INTO the container.
+		try { Rt.GameTimeAtStart = (val != null) ? val.GameTime : 0; } catch { Rt.GameTimeAtStart = 0; }
 		Probe.Reset();
 		CompositionProbe.Reset();
 		StatusDeltaProbe.Reset();
@@ -98,7 +90,7 @@ public static partial class Aggregator
 		TalentRuntime.ResetSession();
 		OverlayUGUI.LogSessionStart(battleSession.QuestId);
 		string text = $"[DpsMeter] Battle session started (quest={battleSession.QuestId})"
-			+ $" gameTimeAtStart={_gameTimeAtStart} run=#{runIdNow}.{runSeq}"
+			+ $" gameTimeAtStart={Rt.GameTimeAtStart} run=#{runIdNow}.{runSeq}"
 			+ (runSeq > 0
 				? $" gap={marker.RunGap:F2}s prev={marker.PrevWhy}/{marker.PrevResult}"
 				: " (run start)");
@@ -187,7 +179,7 @@ public static partial class Aggregator
 		if (Session != null && Session.InBattle)
 		{
 			Session.ResetActors();
-			_eventCount = 0;
+			Rt.OnManualReset();
 			string text = "[DpsMeter] Manual reset";
 			Plugin.LogSource.LogInfo(text);
 			RuntimeLog.Write(text);

@@ -77,12 +77,12 @@ public static class ExportService
 			// channel can no longer be silently dead: "produced=0" is a visible failure, whereas the old
 			// state of affairs was a `source` column that was constant in 510,735 of 510,735 events and
 			// said nothing about it.
-			string hline = "[DpsMeter][HITDET] 产出=" + Aggregator.HitDetailProduced
-				+ " 丢弃=" + Aggregator.HitDetailTrimmed
-				+ " 错=" + Aggregator.HitDetailErrors
-				+ " 匹配精确=" + Aggregator.HitMatchExact
-				+ " 匹配弱=" + Aggregator.HitMatchPair
-				+ " 未匹配=" + Aggregator.HitMatchNone
+			string hline = "[DpsMeter][HITDET] 产出=" + Aggregator.Rt.HitDetailProduced
+				+ " 丢弃=" + Aggregator.Rt.HitDetailTrimmed
+				+ " 错=" + Aggregator.Rt.HitDetailErrors
+				+ " 匹配精确=" + Aggregator.Rt.HitMatchExact
+				+ " 匹配弱=" + Aggregator.Rt.HitMatchPair
+				+ " 未匹配=" + Aggregator.Rt.HitMatchNone
 				// 1.5.2: the exported event count, printed NEXT TO the channel counters. On the 1.5.1
 				// battle these disagreed by ~151 (5220 consumed vs 5055 exported damage events) and the
 				// gap could not be attributed from the code -- the counters are static per session and
@@ -350,12 +350,12 @@ public static class ExportService
 		// 1.5.0 (A2): what the damage-detail channel actually did. This block exists because the channel's
 		// failure mode was SILENCE -- it had no producer at all, so `source` and `crit` were constants in
 		// every one of the 768 exported battles and nothing in the data said so. Counters, always emitted.
-		sb.Append(",\"hitDetail\":{\"produced\":").Append(Aggregator.HitDetailProduced)
-		  .Append(",\"trimmed\":").Append(Aggregator.HitDetailTrimmed)
-		  .Append(",\"errors\":").Append(Aggregator.HitDetailErrors)
-		  .Append(",\"matchExact\":").Append(Aggregator.HitMatchExact)
-		  .Append(",\"matchPair\":").Append(Aggregator.HitMatchPair)
-		  .Append(",\"matchNone\":").Append(Aggregator.HitMatchNone)
+		sb.Append(",\"hitDetail\":{\"produced\":").Append(Aggregator.Rt.HitDetailProduced)
+		  .Append(",\"trimmed\":").Append(Aggregator.Rt.HitDetailTrimmed)
+		  .Append(",\"errors\":").Append(Aggregator.Rt.HitDetailErrors)
+		  .Append(",\"matchExact\":").Append(Aggregator.Rt.HitMatchExact)
+		  .Append(",\"matchPair\":").Append(Aggregator.Rt.HitMatchPair)
+		  .Append(",\"matchNone\":").Append(Aggregator.Rt.HitMatchNone)
 		  .Append('}');
 		// 1.5.0 (B4): the full-resolution status/resistance change timeline, with its own legend and
 		// counters. Always emitted, so "nothing changed" cannot be confused with "the channel never ran".

@@ -1,0 +1,15 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\pairtrusted_impact.py --selftest
+[PASS] T1 A-variant matches plugin contribution section :: status=OK mismatches=0
+[PASS] T2 broken variant (atkAdd dropped) is rejected :: status=MISMATCH mismatches=64
+       first detected: diagnostics.poolTotal offline=141778213.69973457 plugin=162689426.8812
+[PASS] T1b A-variant matches contrib.aggregate.analyze :: core analyzable=190889625.0000 pool=162689426.8812 hist=6182 | mine analyzable=190889625.0000 pool=162689426.8812 hits=6182
+[PASS] T1c core cross-check on a 1.5.5 export (no contribution section) :: status=OK mismatches=0
+[PASS] T3 every 1.7.x NON-TRAINING export has zero IN-DOMAIN pairUntrustedHits (B is a no-op) :: checked=30 offenders=[]
+[PASS] T3b in-domain untrusted hits in pre-1.7 exports are training-ground only :: offenders=[('battle_9999_20261003_205129.json', 19), ('battle_9999_20261003_225530.json', 9), ('battle_9999_20261003_225647.json', 5), ('battle_9999_20261004_012138.json', 6)]
+[PASS] T3c in-domain untrusted hits occur only in pre-1.7 exports or the training ground :: all=[('battle_9999_20261003_205129.json', '1.5.3', 9999, 19), ('battle_9999_20261003_225530.json', '1.5.4', 9999, 9), ('battle_9999_20261003_225647.json', '1.5.4', 9999, 5), ('battle_9999_20261004_012138.json', '1.5.5', 9999, 6), ('battle_9999_20261004_135214.json', '1.7.8', 9999, 12), ('battle_9999_20261004_175957.json', '1.7.11', 9999, 7), ('battle_9999_20261004_194948.json', '1.7.11', 9999, 17)] outliers=[]
+[PASS] T4 training untrusted hits exist but are all OUT of domain (B no-op there too) :: out-of-domain=104 (with folds=104, would-be pool=1958.98) in-domain=0
+[PASS] T4c 1.7.8 training export: in-domain untrusted hits are measured and bounded :: in-domain=12 (with folds=7) B moves=62.7391 of poolA=842871.87 (0.007443%); quest=9999
+[PASS] T4b B moves exactly zero pool on 411001_115417 :: poolA=162689426.881162 poolB=162689426.881162
+[PASS] T5 criterion C retains <1%% of A's pool on 411001_115417 :: C pool=20986.30 A pool=162689426.88 retained=0.012900%
+selftest: 11/11 passed

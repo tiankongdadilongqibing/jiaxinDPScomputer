@@ -73,7 +73,7 @@ public static partial class Aggregator
 		int absorbed = nominal - damage;
 		EnsureSessionStartedFor(attacker, victim);
 		BeginTimingIfNeeded();
-		_eventCount++;
+		Rt.EventCount++;
 		Session.NoteEvent();
 
 		ActorStats victimStats = Session.GetActor(victim, create: true);
@@ -88,8 +88,8 @@ public static partial class Aggregator
 		}
 		if (absorbed > 0)
 		{
-			AbsorbedTotal += absorbed;
-			AbsorbedHits++;
+			Rt.AbsorbedTotal += absorbed;
+			Rt.AbsorbedHits++;
 			// Rare by nature, and the single most confusing row in the detail list, so it is always logged.
 			string l2 = $"[DpsMeter][ABSORB] {Desc(victim)} 被吸收/无效化 {absorbed}(游戏口径 {nominal} = 入耐久 {damage} + 吸收 {absorbed})";
 			Plugin.LogSource.LogInfo(l2);
@@ -153,8 +153,8 @@ public static partial class Aggregator
 		// label can never be mistaken for an authoritative one.
 		int hitHow;
 		HitRecord hitRecord = Session.ConsumePending(source, victim, damage, nominal, Session.ActiveSeconds, out hitHow);
-		if (hitRecord != null) { if (hitHow == 1) HitMatchExact++; else HitMatchPair++; }
-		else HitMatchNone++;
+		if (hitRecord != null) { if (hitHow == 1) Rt.HitMatchExact++; else Rt.HitMatchPair++; }
+		else Rt.HitMatchNone++;
 		if (hitRecord != null && actorStats != null)
 		{
 			// The crit tally only moves on an OBSERVED flag: a record with CritObserved == 0 says nothing
@@ -282,7 +282,7 @@ public static partial class Aggregator
 		if (actual <= 0 && nominal <= 0) return;
 		EnsureSessionStartedFor(healer, target);
 		BeginTimingIfNeeded();
-		_eventCount++;
+		Rt.EventCount++;
 		Session.NoteEvent();
 		ActorStats actor = Session.GetActor(target, create: true);
 		if (actor != null)

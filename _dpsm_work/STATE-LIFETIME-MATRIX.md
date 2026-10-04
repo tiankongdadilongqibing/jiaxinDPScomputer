@@ -17,12 +17,15 @@
 | 生命周期 | 应包含的状态 | 迁移约束 | 本批状态 |
 |---|---|---|---|
 | 单击 / 攻击快照 | 状态、耐久、构成上下文 | 攻击开始采样与 `finally` 清理保持 | ⏳ 未迁移(`_activeCalc` / `_calcEvents` / `_lastCalcSrc` / Crit 探针) |
-| 单场运行态 | 配对队列、当场计数、时钟游标 | 必须同时考虑 reset / soft close / resume,不只 Start/End | ⏳ 未迁移(见 §3,已列出全部字段) |
+| 单场运行态 | 配对队列、当场计数、时钟游标 | 必须同时考虑 reset / soft close / resume,不只 Start/End | ✅ **计数/自报片已迁**(RF4e:`Runtime/BattleRuntimeCounters`,12 字段;`OnSessionStart`/`OnManualReset` 可执行,resume 与 finalize 不清);⏳ 其余 `Session`/`_activeCalc`/`_calcEvents`/`_lastCalcSrc` |
 | **跨场衔接** | 最近关闭会话、run 标记、预登记全局规则 | **不按 End 一次性清空**;分别定义所有权 | ✅ "最近关闭 + run 标记 + 上次结束"已迁到 `Runtime/SessionContinuity.cs`(RF4a);✅ 预登记规则的**判据半**在 `Policy/GlobalRuleClassifier.cs`(RF4b),**状态半**在 `Runtime/GlobalRuleRegistry.cs`(RF4c:注册表所有权 + 结算不清表 + 只回收死持有者 + 枚举序) |
 | 进程级 | 稳定主数据、明确累计计数、历史容器 | 不强行挂在每场对象上 | ⏳ 未迁移(已确认它们**不该**按场销毁) |
 | 展示级 | 当前视图、缓存、筛选状态 | 不反向改变统计模型 | ⏳ 未迁移(RF5:`ContributionSession` 缓存 + `OverlayUGUI*`) |
 
 ## 3. `Aggregator` 门面的字段(逐字段)
+
+> **RF4e**:下表里的 12 个计数/自报字段(`_eventCount`、`AbsorbedTotal`/`AbsorbedHits`、6 个 `HitDetail*`、`_lastSummaryLog`/`_lastTimeLog`、`_gameTimeAtStart`)
+> 已迁到 `Runtime/BattleRuntimeCounters`(`Aggregator.Rt`)。下表保留为**迁移前的逐字段记录**(它是迁移的依据,不是现状描述)。
 
 | 字段 | 生命周期 | 创建 / 写入 | 重置 | 软恢复时 | 最终释放 | 读者 |
 |---|---|---|---|---|---|---|
@@ -116,7 +119,7 @@
 |---|---|---|---|
 | 1 | **跨场衔接** | 冷路径、状态少、判据已在 RF3 抽成纯函数 | ✅ 已完成(本批) |
 | 2 | 预登记全局规则 | 与 1 同为衔接状态,但涉及"注册早于结算"的时序 | ✅ **判据半**(RF4b)+ **状态半**(RF4c:容器 97 行/27 用例)+ **应用侧算术**(RF4d:`GlobalRuleApplyPolicy` 67 行:属性门取值、副本数、逐状态幂);**应用侧门梯**经论证**不再抽取**(§8) |
-| 3 | 单场运行态 | 热路径,字段多;迁移会碰每击一次的代码 | 先把"当场计数"的**读点**收敛(RF3 已把判据拿走),再考虑 `BattleSession` 承载 |
+| 3 | 单场运行态 | 热路径,字段多;迁移会碰每击一次的代码 | ✅ **第一片(计数/自报)已完成**(RF4e:读点已收敛到 `Rt.X`,转换规则有 23 个用例);余下部分需要"攻击开始→伤害→清理"的离线用例 |
 | 4 | 单击 / 攻击快照 | 与攻击开始/`finally` 清理耦合 | 需要一条"攻击开始→伤害→清理"的用例;当前只能靠差异审查 |
 | 5 | 进程级 | 它们**本来就不该**按场销毁,迁移只是"显式化所有者" | 低收益,可延后 |
 | 6 | 展示级(RF5) | 缓存语义要先决策(严格节流?最终快照?) | 先写 ADR,再改行为,再补负控 |
