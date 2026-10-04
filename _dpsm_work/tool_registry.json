@@ -1050,17 +1050,19 @@
    "status": "indexed"
   },
   "_dpsm_work/n0_acceptance.py": {
-   "evidence": "",
-   "expected_exit": "",
+   "evidence": "RF7j: entry point / gate invoked by the pipeline and by active scripts (RF7j); purpose from its own docstring",
+   "expected_exit": "0 ok / 1 findings",
    "has_selftest": true,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "cli",
    "lines": 715,
-   "outputs": [],
+   "outputs": [
+    "acceptance archive under --out (RESULTS.md, runs.json, corpus_manifest.json)"
+   ],
    "purpose": "N0 acceptance closure for the CONTRIBUTION-NEXT-PHASE-ROADMAP.md (section N0).",
-   "status": "unclassified"
+   "status": "active"
   },
   "_dpsm_work/pairtrusted_impact.py": {
    "evidence": "PROJECT-STATUS §5;第 3 轮把派生报告加入边界",
@@ -1199,17 +1201,19 @@
    "status": "indexed"
   },
   "_dpsm_work/tests/negative_control.py": {
-   "evidence": "",
-   "expected_exit": "",
+   "evidence": "RF7j: entry point / gate invoked by the pipeline and by active scripts (RF7j); purpose from its own docstring",
+   "expected_exit": "0 ok / 1 findings",
    "has_selftest": true,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "cli",
    "lines": 359,
-   "outputs": [],
+   "outputs": [
+    "stdout mutation report (no files written)"
+   ],
    "purpose": "RF1 negative control: the behaviour suite must be able to go RED. See REFACTOR-PLAN section 6.",
-   "status": "unclassified"
+   "status": "active"
   },
   "_dpsm_work/tests/rf2_split.py": {
    "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
@@ -1321,6 +1325,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 12
+  "unclassified_max": 10
  }
 }

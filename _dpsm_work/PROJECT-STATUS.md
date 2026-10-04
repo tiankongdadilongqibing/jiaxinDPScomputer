@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**697 个命名用例 / 27 组**,**100 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 25 条活跃 / 59 条已索引 / 12 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 27 条活跃 / 59 条已索引 / 10 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -298,6 +298,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 30 轮 RF7g(证据表)** | 新增 `tool_census.py --invokers`:对 28 条未判定脚本列出"哪些已登记脚本的**源码文本**里出现它的名字",并单独标出其中的 active 者;**刻意不是闸门**(名字可能只是注释,做成硬规则会因一句注释变红,故先做给人看的证据表);首轮即定一条:`contrib/report_json.py` 被两个 active 脚本点名,不应判为"无人依赖";未判定仍 28 | [REFACTOR-BATCH-RF7G.md](<REFACTOR-BATCH-RF7G.md>) |
 | **第 31 轮 RF7h(判定第一批)** | 按第 30 轮证据表判定**证据三面全空**的一批:14 条 → `indexed`,未判定 **28 → 14**(上限同步收紧);保留的 14 条各有机械理由(其中 `n0_acceptance.py` 被 2 个 active 脚本点名,上一轮的错误现被结构性挡住);G+J 复核 PASS;插件源码零变化 | [REFACTOR-BATCH-RF7H.md](<REFACTOR-BATCH-RF7H.md>) |
 | **第 32 轮 RF7i(闭包内两条)** | `contribution_gate.py`(被 3 个 active 脚本导入)与 `identity_map.py`(两个导入者本身就是 active)判为 **active**,用途取自各自 docstring;未判定 14 → **12**;过程被守卫纠正两次:输出字段约定(`["none (read-only)"]`)与**我自己的证据字符串不实**(曾把"排序第一的导入者"当"活跃导入者",已改为先筛 active 导入者、否则退回未判定) | [REFACTOR-BATCH-RF7I.md](<REFACTOR-BATCH-RF7I.md>) |
+| **第 33 轮 RF7j(入口转正)** | `n0_acceptance.py`(验收入口)与 `tests/negative_control.py`(变异闸门)转为 **active**,输出按实际所见写清;未判定 12 → **10**;机械检查得到一个明确结论:**`contrib/` 包内没有任何成员被 active 脚本导入**——余下判定应以"整包读一次调用图"的方式进行,而非逐文件猜 | [REFACTOR-BATCH-RF7J.md](<REFACTOR-BATCH-RF7J.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

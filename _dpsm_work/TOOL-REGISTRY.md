@@ -7,8 +7,8 @@
 | 项 | 值 |
 |---|---|
 | 已注册脚本 | 96 |
-| 其中活跃(有 CLI、有预期退出码与输出声明) | 25 |
-| 尚未判定(只登记,计数只能下降) | 12 / 上限 12 |
+| 其中活跃(有 CLI、有预期退出码与输出声明) | 27 |
+| 尚未判定(只登记,计数只能下降) | 10 / 上限 10 |
 | 验收流水线实际运行的脚本 | 21 |
 
 ## 活跃工具
@@ -35,9 +35,11 @@
 | `_dpsm_work/contribution_gate.py` | cli | Contribution validation GATE: one status vocabulary and one exit-code contract. | 0 ok / 1 findings | none (read-only) | no | no |
 | `_dpsm_work/decision_report.py` | report | N5 decision report: from the audited comparison layer to a decision (roadmap N5). | 0 = 生成;1 = 数据不足 | --out 报告(MD/JSON) | yes | yes |
 | `_dpsm_work/identity_map.py` | cli | N3 / P1 stage-1 offline cross-battle identity mapping (read-only). | 0 ok / 1 findings | none (read-only) | yes | no |
+| `_dpsm_work/n0_acceptance.py` | cli | N0 acceptance closure for the CONTRIBUTION-NEXT-PHASE-ROADMAP.md (section N0). | 0 ok / 1 findings | acceptance archive under --out (RESULTS.md, runs.json, corpus_manifest.json) | yes | no |
 | `_dpsm_work/pairtrusted_impact.py` | report | P0-C: offline quantification of the PairTrusted / PairCorroborated effect on contribution. | 0 = 生成;1 = 数据不足 | pairtrusted_impact_report.json/.txt(已在 .gitignore 声明为派生) | yes | yes |
 | `_dpsm_work/refactor_final_check.py` | guard | Integrity + consistency check of the refactored source tree -- with REAL blocking (N1). | 0 = 无孤儿/无违规;1 = 有 blocks | none (read-only) | yes | yes |
 | `_dpsm_work/repo_manifest.py` | guard | RF0: the machine-readable half of the local Git baseline. | 0 = 无漂移(drift=0);1 = 有漂移 | baseline-manifest.json(--write) | no | yes |
+| `_dpsm_work/tests/negative_control.py` | cli | RF1 negative control: the behaviour suite must be able to go RED. See REFACTOR-PLAN section 6. | 0 ok / 1 findings | stdout mutation report (no files written) | yes | no |
 | `_dpsm_work/tool_census.py` | census | RF7 (plan section 12): the MECHANICAL half of the tool registry. | 0 = 扫描/合并完成 | tool_registry.json(--seed) | yes | no |
 | `_dpsm_work/v150_validate.py` | guard | 1.5.0 runtime validation -- one command for the next battle. | 0 = 无问题;1 = 有需人工看的项 | --out 报告 | yes | yes |
 
@@ -101,7 +103,6 @@
 | `_dpsm_work/evidence_why_lower8.py` | 23 |  |  |
 | `_dpsm_work/evidence_why_lower9.py` | 42 | madnessRatio field |  |
 | `_dpsm_work/madness_owner_check.py` | 32 | Who is mad on OUR side, and are the guest-unreadable hook rows that same unit (self-application)? |  |
-| `_dpsm_work/n0_acceptance.py` | 715 | N0 acceptance closure for the CONTRIBUTION-NEXT-PHASE-ROADMAP.md (section N0). |  |
 | `_dpsm_work/probe_contrib_struct.py` | 55 | Structural probe for the contribution-attribution question: what identity/source info does a |  |
 | `_dpsm_work/probe_join_detail.py` | 66 | Detail probe: (a) all (talentType,param) pairs in actors, (b) ambiguous ability names -> holders, |  |
 | `_dpsm_work/probe_recent.py` | 54 | Summary of recent battles + 1.5.4 channel verification. ASCII stdout; UTF-8 report file. |  |
@@ -109,7 +110,6 @@
 | `_dpsm_work/rules_census.py` | 72 | Per-rule fold-mass census for two battles + the differing units' ability lists. |  |
 | `_dpsm_work/sample_intake.py` | 34 | Probe the two newest exports (round 6 intake). Read-only; prints ASCII facts. |  |
 | `_dpsm_work/tests/il_equiv.py` | 87 | RF2 evidence: token-independent comparison of two IlDump transcripts. |  |
-| `_dpsm_work/tests/negative_control.py` | 359 | RF1 negative control: the behaviour suite must be able to go RED. See REFACTOR-PLAN section 6. |  |
 | `_dpsm_work/tests/rf2_split.py` | 148 | RF2: mechanical split of src/Aggregator.cs into partial files. |  |
 | `_dpsm_work/umima_check.py` | 50 | What exactly is 海魔の残滓 in comp B, and how does 母なる変異の飛沫 compare? |  |
 | `_dpsm_work/verify_155.py` | 45 | 1.5.5 acceptance: self-applied madness attribution + give-applier hook. |  |
