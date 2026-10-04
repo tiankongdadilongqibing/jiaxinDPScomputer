@@ -101,7 +101,14 @@
 ### 6-4 三类缓存都是展示级,且都有自己的失效规则
 
 `ContributionSession`(7 字段,四路 OR 失效)、`OverlayUGUI` 的 `_prevSummary*` 三件套、`OverlayChart.UsePerSecond`。
-它们**不能**塞进按局销毁的容器(切换视图/查看上一场都要读它们),属 RF5;两条已被用例钉住的既有行为(见 RF3 记录)在改动前必须重新定义预期。
+它们**不能**塞进按局销毁的容器(切换视图/查看上一场都要读它们),属 RF5;两条已被用例钉住的既有行为在改动前必须重新定义预期。
+
+**RF5a 补齐的事实**(判据已抽到 `Policy/ContributionCachePolicy.cs`,行为不变):
+- 四路 OR **不是节流**:源码注释说"至多一秒一次",但计数一变就立刻重算,一秒只作最长复用期;
+- `_cacheUsedFolds != useFolds` 这一支从门面**不可达**(折叠开关为假时 `Get` 提前返回);
+- `ContributionSession.Invalidate()` 在生产里**没有调用者**(只有注释与测试提到它)—— 而 `F9` 正是它该被调用的地方;
+- 方案要求的"暂存摘要 vs 最终摘要"分离**已存在于展示层**:`ResolveContributionView` 对"上一场"从 `History[0].Session` 重算并备忘,缓存只作回退。
+决策与选项见 [CACHE-SEMANTICS-ADR.md](<CACHE-SEMANTICS-ADR.md>)。
 
 ## 7. 其余族的迁移顺序与前置
 

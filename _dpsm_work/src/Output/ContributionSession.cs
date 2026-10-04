@@ -164,8 +164,8 @@ public static class ContributionSession
 	// is about keeping the frame budget honest rather than about the cost being large today.
 	// ---------------------------------------------------------------------------------------------
 
-	private const double RefreshSeconds = 1.0;
-
+	// RF5: RefreshSeconds moved to Policy/ContributionCachePolicy.cs, together with the staleness rule and
+	// the four reason strings. The STATE (below) stays here: it is display-level cache state.
 	private static ContributionResult _cache;
 	private static object _cacheSession;
 	private static int _cacheEvents = -1;
@@ -188,22 +188,14 @@ public static class ContributionSession
 		bool live = s != null && s.InBattle;
 		if (live)
 		{
-			if (!useFolds)
-			{
-				return new ContributionView
-				{
-					Live = true, Usable = false,
-					Unavailable = "未识别倍率:ReconcileCalc 已关闭(没有折叠就没有归属)",
-				};
-			}
-			if (s.Events == null || s.Events.Count == 0)
-				return new ContributionView { Live = true, Usable = false, Unavailable = "尚无伤害事件" };
+			if (!useFolds) return Unavailable(true, CacheUnavailable.LiveNoFolds);
+			if (s.Events == null || s.Events.Count == 0) return Unavailable(true, CacheUnavailable.LiveNoEvents);
 
 			double now = Time.unscaledTime;
-			bool stale = !ReferenceEquals(_cacheSession, s)
-				|| _cacheEvents != s.Events.Count
-				|| _cacheUsedFolds != useFolds
-				|| now - _cacheAt > RefreshSeconds;
+			// RF5: the four-way staleness rule is the policy's; session identity is still compared here.
+			bool stale = ContributionCachePolicy.IsStale(ReferenceEquals(_cacheSession, s), _cacheEvents,
+			                                             s.Events.Count, _cacheUsedFolds, useFolds, _cacheAt, now,
+			                                             ContributionCachePolicy.RefreshSeconds);
 			if (stale)
 			{
 				_cache = Compute(s, useFolds);
@@ -218,12 +210,14 @@ public static class ContributionSession
 		}
 
 		// Not in a battle: show the last computed result, clearly labelled as the previous battle.
-		if (_cache != null)
+		if (ContributionCachePolicy.SelectSource(false, _cache != null) == ViewSource.History)
 			return new ContributionView { Result = _cache, Live = false, Usable = true, QuestId = _cacheQuest, Seconds = _cacheSeconds };
-		return new ContributionView
-		{
-			Live = false, Usable = false,
-			Unavailable = useFolds ? "暂无战斗数据" : "未识别倍率:ReconcileCalc 已关闭",
-		};
+		return Unavailable(false, useFolds ? CacheUnavailable.HistoryNone : CacheUnavailable.HistoryNoneNoFolds);
+	}
+
+	/// <summary>An unusable view, with the reason text from the policy (one definition per string).</summary>
+	private static ContributionView Unavailable(bool live, CacheUnavailable reason)
+	{
+		return new ContributionView { Live = live, Usable = false, Unavailable = ContributionCachePolicy.ReasonText(reason) };
 	}
 }
