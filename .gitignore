@@ -47,6 +47,19 @@
 !/_dpsm_work/review_contrib_core/
 !/_dpsm_work/acceptance_1.7.11/
 !/_dpsm_work/acceptance_rf2/
+!/_dpsm_work/acceptance_rf3/
+
+# Derived, multi-MB analysis outputs inside a batch archive. They are reproducible from the frozen
+# snapshot by the tracked tools, so the archive keeps its EVIDENCE (RESULTS.md, corpus_manifest.json,
+# runs.json, applicability.json, the guard transcripts) and not a 4 MB re-derivation: committing them
+# made one round 155,906 inserted lines for a 5 MB artifact. acceptance_1.7.11 (round 6) predates this
+# rule and stays complete as history; the files remain on disk either way.
+/_dpsm_work/acceptance_*/pairtrusted_impact_report.json
+/_dpsm_work/acceptance_*/pairtrusted_impact_report.txt
+
+# Scratch files under tests/ (commit messages, throwaway harnesses). tests/ is re-included above, so
+# without this rule a `git add -A` picks a temporary file up and the next commit deletes it again.
+/_dpsm_work/tests/_*.tmp
 
 # --- derived output / caches, anywhere ---
 bin/

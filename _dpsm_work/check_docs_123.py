@@ -56,6 +56,7 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\baseline-manifest.json',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch-inputs-rf0.json',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF0-RF2.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF3.md',
 ]
 
 

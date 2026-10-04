@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 174;
+	public const int ExpectedCases = 269;
 
 	private static int Main(string[] args)
 	{
@@ -22,6 +22,9 @@ internal static class Program
 		Cases.Series(r);
 		Cases.Cache(r);
 		Cases.Tiered(r);
+		// RF3: the extracted pure policies, plus grid sweeps against oracles transcribed from the
+		// pre-extraction source (git 8f3aafd).
+		Cases.Policy(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

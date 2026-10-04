@@ -46,12 +46,12 @@ public static partial class Aggregator
 		// marking them lets offline analysis add the fragments up itself, without this code ever risking
 		// the silent merge that a relaxed resume rule would cause.
 		double runGap = _hasEnded ? (DateTime.Now - _lastEndWall).TotalSeconds : -1.0;
-		bool runContinues = _hasEnded
-			&& _lastEndResult == 0                     // previous session was NOT a finished battle
-			&& _lastEndQuest == questId                // same quest
-			&& runGap >= 0.0 && runGap <= RunJoinSeconds;
-		if (runContinues) _runSeq++;
-		else { _runId++; _runSeq = 0; }
+		// RF3: the grouping rule and the marker transition are decisions (SessionTransitionPolicy); the
+		// wall-clock read and the remembered previous-end state stay here.
+		bool runContinues = SessionTransitionPolicy.RunContinues(_hasEnded, _lastEndResult, _lastEndQuest,
+		                                                         questId, runGap,
+		                                                         SessionTransitionPolicy.RunJoinSeconds);
+		SessionTransitionPolicy.NextRun(runContinues, ref _runId, ref _runSeq);
 		int runSeq = _runSeq;
 		long runIdNow = _runId;
 		double runGapNow = runContinues ? runGap : -1.0;
@@ -142,14 +142,14 @@ public static partial class Aggregator
 		try
 		{
 			BattleSession s = _lastClosed;
-			if (s == null) return false;
-			double gap = (DateTime.Now - _lastClosedWall).TotalSeconds;
-			if (gap > ResumeWindowSeconds)
-			{
-				_lastClosed = null;
-				return false;
-			}
-			if (_lastClosedWhy != "idle") return false;      // a real battle end is a real end
+			double gap = (s != null) ? (DateTime.Now - _lastClosedWall).TotalSeconds : -1.0;
+			// RF3: the window/reason gates are a decision. ONLY an expired window forgets the remembered
+			// session -- a non-idle close or an unknown actor leaves it, so a later event can still rejoin.
+			ResumeGate gate = SessionTransitionPolicy.ClosedSessionGate(
+				s != null, gap, SessionTransitionPolicy.ResumeWindowSeconds, _lastClosedWhy);
+			if (gate == ResumeGate.WindowExpired) _lastClosed = null;
+			if (gate != ResumeGate.Eligible) return false;
+			// The native actor check stays in the facade and runs only after the gates (it reads objects).
 			bool known = (!GameRef.IsNull(a) && s.Actors.ContainsKey(a))
 				|| (!GameRef.IsNull(b) && s.Actors.ContainsKey(b));
 			if (!known) return false;                        // unknown units -> this is the next battle

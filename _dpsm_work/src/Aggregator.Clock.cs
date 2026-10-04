@@ -18,10 +18,10 @@ public static partial class Aggregator
 	/// </summary>
 	internal static double GameUnitsPerSecond()
 	{
-		double units = 0.0;
-		if (Plugin.CfgGameUnitsPerSecond != null) units = Plugin.CfgGameUnitsPerSecond.Value;
-		if (units <= 0.0) units = (TimeProbe.UnitsPerGameSecond > 0.0) ? TimeProbe.UnitsPerGameSecond : 30.0;
-		return units;
+		// RF3: the fallback chain (config -> measured skill data -> 30.0) is a policy decision.
+		double configured = (Plugin.CfgGameUnitsPerSecond != null) ? Plugin.CfgGameUnitsPerSecond.Value : 0.0;
+		return BattleClockPolicy.ResolveUnitsPerGameSecond(configured, TimeProbe.UnitsPerGameSecond,
+		                                                   BattleClockPolicy.DefaultUnitsPerGameSecond);
 	}
 
 	/// <summary>
@@ -40,16 +40,13 @@ public static partial class Aggregator
 	/// </summary>
 	private static double FrameDelta(GameSystem val)
 	{
-		string source = (Plugin.CfgClockSource != null) ? Plugin.CfgClockSource.Value.Trim().ToLowerInvariant() : "";
-		if (source != "real" && source != "engine" && source != "game")
-		{
-			// Unset / misspelled: honour the legacy bool if it was turned on, else the default.
-			// NOTE for the next default change: BepInEx keeps the value already present in
-			// BepInEx\config\dev.dpsmeter.cfg, so changing the default in code does NOT migrate an
-			// installed config -- the [CLOCK]/[TIME] lines print `source=` so the effective value is
-			// always visible in the log.
-			source = (Plugin.CfgTimerUsesGameTime != null && Plugin.CfgTimerUsesGameTime.Value) ? "engine" : "game";
-		}
+		// RF3: "which source" is a policy decision and was implemented TWICE (here and ClockSourceName).
+		// NOTE for the next default change: BepInEx keeps the value already present in
+		// BepInEx\config\dev.dpsmeter.cfg, so changing the default in code does NOT migrate an installed
+		// config -- the [CLOCK]/[TIME] lines print `source=` so the effective value is always visible.
+		string source = BattleClockPolicy.ResolveSource(
+			(Plugin.CfgClockSource != null) ? Plugin.CfgClockSource.Value : null,
+			Plugin.CfgTimerUsesGameTime != null && Plugin.CfgTimerUsesGameTime.Value);
 		if (source == "engine")
 		{
 			// The engine's scaled delta: 0 while the game is paused.
@@ -60,24 +57,19 @@ public static partial class Aggregator
 			// The game's own clock: update steps / units-per-second (measured 30.0 from the skill data).
 			int steps = 0;
 			try { steps = val.GameTime; } catch { }
-			int dSteps = _hasLastSteps ? (steps - _lastGameSteps) : 0;
-			_lastGameSteps = steps;
-			_hasLastSteps = true;
-			return (dSteps > 0) ? dSteps / GameUnitsPerSecond() : 0.0;
+			return BattleClockPolicy.GameDelta(steps, ref _lastGameSteps, ref _hasLastSteps, GameUnitsPerSecond());
 		}
 		// Real seconds from the monotonic stopwatch (see the Clock field).
-		double now = Clock.Elapsed.TotalSeconds;
-		double delta = (_lastTickClock < 0.0) ? 0.0 : now - _lastTickClock;
-		_lastTickClock = now;
-		return delta;
+		return BattleClockPolicy.RealDelta(Clock.Elapsed.TotalSeconds, ref _lastTickClock);
 	}
 
 	/// <summary>Effective clock source name, for the diagnostics.</summary>
 	internal static string ClockSourceName()
 	{
-		string source = (Plugin.CfgClockSource != null) ? Plugin.CfgClockSource.Value.Trim().ToLowerInvariant() : "";
-		if (source == "real" || source == "engine" || source == "game") return source;
-		return (Plugin.CfgTimerUsesGameTime != null && Plugin.CfgTimerUsesGameTime.Value) ? "engine" : "game";
+		// RF3: the same policy the applied delta uses, so the reported source cannot drift from it.
+		return BattleClockPolicy.ResolveSource(
+			(Plugin.CfgClockSource != null) ? Plugin.CfgClockSource.Value : null,
+			Plugin.CfgTimerUsesGameTime != null && Plugin.CfgTimerUsesGameTime.Value);
 	}
 
 	/// <summary>
@@ -116,12 +108,12 @@ public static partial class Aggregator
 		// How much did the clock advance for this frame. Computed only in the call that actually applies
 		// it (i.e. after the guard), because only this call may advance the "last seen" state.
 		double dt = FrameDelta(val);
-		if (dt < 0.0) dt = 0.0;
 		// A stalled frame (blocked main thread, OS suspend, blocked scene load) delivers the entire stall
 		// as ONE delta -- measured 2.9 s in a single frame. Clamp it: the battle clock must not jump, and
 		// an unclamped stall is by itself enough to trip the idle timeout in the very same step (that is
 		// how one battle got split in two: logged dur 9.3 s -> 12.2 s with no event in between).
-		if (dt > MaxFrameDelta) dt = MaxFrameDelta;
+		// RF3: the negative guard and the clamp are the policy's decision, at the policy's bound.
+		dt = BattleClockPolicy.ClampFrameDelta(dt, BattleClockPolicy.MaxFrameDelta);
 
 		long num;
 		try { num = (long)((Il2CppObjectBase)val).Pointer; }

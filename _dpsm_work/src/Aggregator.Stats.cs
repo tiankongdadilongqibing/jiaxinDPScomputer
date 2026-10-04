@@ -187,7 +187,10 @@ public static partial class Aggregator
 				// hits -- and `_activeCalc` was not even cleared when a session started (fixed in
 				// StartSession below). The composition path was protected; this one was not.
 				double age = Session.ActiveSeconds - _activeCalcT;
-				if (age >= -0.05 && age <= 0.20 && GameRef.Same(_activeCalc.Attacker, source))
+				// RF3: literally the same window as the composition pairing now, via one definition.
+				if (AttributionPolicy.LiveAgeEligible(age, AttributionPolicy.LivePairMinAge,
+				                                      AttributionPolicy.LivePairMaxAge)
+					&& GameRef.Same(_activeCalc.Attacker, source))
 				{
 					int effectId = _activeCalc.m_effectId;
 					if (effectId != 0)

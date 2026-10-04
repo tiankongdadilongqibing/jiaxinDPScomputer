@@ -62,13 +62,16 @@ public static partial class Aggregator
 			if (live != null && _activeCalcT >= 0.0)
 			{
 				double age = now - _activeCalcT;
-				if (age >= -0.05 && age <= 0.20)
+				// RF3: the live-pairing window is a policy decision (AttributionPolicy); the native blocker
+				// read stays inside the window check, exactly where it was.
+				if (AttributionPolicy.LiveAgeEligible(age, AttributionPolicy.LivePairMinAge,
+				                                      AttributionPolicy.LivePairMaxAge))
 				{
 					BattleObject lb = null;
 					try { lb = live.m_blocker; } catch { }
 					bool sameTarget = !GameRef.IsNull(lb)
 						&& GameRef.Same(lb, victim);
-					if (sameTarget || age <= 0.08)
+					if (AttributionPolicy.LiveTargetAdmitted(age, sameTarget, AttributionPolicy.LiveBlindAge))
 					{
 						CompositionProbe.BuildChainParts(live, victim, damage, out string la, out string l2, out string l3, out string l4, absorbed, out CalcBreakdown lbrk);
 						if (!string.IsNullOrEmpty(la))
@@ -90,7 +93,7 @@ public static partial class Aggregator
 								b += " · 配对未获结算对象佐证(计算威力仅供参考)";
 							c = l3;
 							d = l4;
-							lbrk.Pair = sameTarget ? "live-same" : "live-age";
+							lbrk.Pair = AttributionPolicy.PairLabel(AttributionPolicy.LivePairKind(sameTarget));
 							lbrk.PairCorroborated = corroborated;
 							brk = lbrk;
 							return;
@@ -100,28 +103,29 @@ public static partial class Aggregator
 			}
 
 			int best = -1;
-			bool exact = false;
-			// ---- 1) same victim AND same damage value ----
+			PairKind choice = PairKind.None;
+			// ---- 1) same victim AND same damage value: newest first, window from the policy ----
 			for (int i = _calcEvents.Count - 1; i >= 0; i--)
 			{
 				CalcActivity cc = _calcEvents[i];
-				if (now - cc.T > 0.80) break;
+				if (now - cc.T > AttributionPolicy.ExactValueWindow) break;
 				if (cc.Used) continue;
 				if (!GameRef.Same(cc.B, victim)) continue;
 				if (cc.Calc == null) continue;
-				if (cc.Dmg == damage || (nominal > 0 && cc.Dmg == nominal)) { best = i; exact = true; break; }
+				if (AttributionPolicy.DmgMatches(cc.Dmg, damage, nominal)) { best = i; choice = PairKind.ExactValue; break; }
 			}
-			// ---- 2) oldest unused calc for this victim ----
+			// ---- 2) oldest unused calc for this victim (FIFO keeps multi-hit bursts in order) ----
 			if (best < 0)
 			{
 				for (int i = 0; i < _calcEvents.Count; i++)
 				{
 					CalcActivity cc = _calcEvents[i];
-					if (now - cc.T > 0.60) continue;
+					if (now - cc.T > AttributionPolicy.FifoWindow) continue;
 					if (cc.Used) continue;
 					if (!GameRef.Same(cc.B, victim)) continue;
 					if (cc.Calc == null) continue;
 					best = i;
+					choice = PairKind.Fifo;
 					break;
 				}
 			}
@@ -130,11 +134,12 @@ public static partial class Aggregator
 			hit.Used = true;
 			_calcEvents[best] = hit;
 			CompositionProbe.BuildChainParts(hit.Calc, hit.B, damage, out a, out b, out c, out d, absorbed, out brk);
-			if (!exact && !string.IsNullOrEmpty(b)) b += " · 按时间顺序配对";
+			if (choice != PairKind.ExactValue && !string.IsNullOrEmpty(b)) b += " · 按时间顺序配对";
+			// RF3: the reason code is explicit and its string has ONE definition (AttributionPolicy).
 			// "value" = a recorded calc for this victim whose damage equals this hit (corroborated);
-			// "fifo" = oldest unused calc for this victim (pure time order, NOT corroborated).
-			brk.Pair = exact ? "value" : "fifo";
-			brk.PairCorroborated = exact;
+			// "fifo"  = oldest unused calc for this victim (pure time order, NOT corroborated).
+			brk.Pair = AttributionPolicy.PairLabel(choice);
+			brk.PairCorroborated = (choice == PairKind.ExactValue);
 		}
 		catch { }
 	}
@@ -165,8 +170,8 @@ public static partial class Aggregator
 				CalcActivity cc = _calcEvents[i];
 				if (PtrOf(cc.Calc) != want) continue;
 				if (!GameRef.Same(cc.B, victim)) continue;
-				if (cc.Dmg == damage) return true;
-				if (nominal > 0 && cc.Dmg == nominal) return true;
+				// RF3: the same predicate as the pairing scan (this was a second copy of the condition).
+				if (AttributionPolicy.DmgMatches(cc.Dmg, damage, nominal)) return true;
 			}
 		}
 		catch { }
@@ -181,12 +186,17 @@ public static partial class Aggregator
 			for (int i = _calcEvents.Count - 1; i >= 0; i--)
 			{
 				CalcActivity c = _calcEvents[i];
-				if (now - c.T > 0.45) continue;
+				if (now - c.T > AttributionPolicy.CalcSourceWindow) continue;
 				if (!GameRef.Same(c.B, victim)) continue;
-				// prefer explicit attacker, then summon owner; tiny damage ignored
-				if (!GameRef.IsNull(c.A)) { _lastCalcSrc = "calcA"; return c.A; }
-				if (!GameRef.IsNull(c.O)) { _lastCalcSrc = "calcO"; return c.O; }
-				_lastCalcSrc = "calc?";
+				// prefer explicit attacker, then summon owner; tiny damage ignored.
+				// RF3: the preference order and the src= tag are a policy decision; the native reads stay
+				// short-circuited exactly as before (the owner is read only when the attacker is null).
+				bool hasA = !GameRef.IsNull(c.A);
+				bool hasO = hasA ? false : !GameRef.IsNull(c.O);
+				CalcSourceKind kind = AttributionPolicy.CalcSourcePriority(hasA, hasO);
+				_lastCalcSrc = AttributionPolicy.CalcSourceTag(kind);
+				if (kind == CalcSourceKind.Attacker) return c.A;
+				if (kind == CalcSourceKind.Owner) return c.O;
 				return null;
 			}
 		}
@@ -241,9 +251,10 @@ public static partial class Aggregator
 					T = Session.ActiveSeconds
 				});
 				HitDetailProduced++;
-				if (Session.PendingHits.Count > 2048)
+				// RF3: the cap is BattleSession.MaxPending, not a second copy of the number.
+				if (Session.PendingHits.Count > BattleSession.MaxPending)
 				{
-					int n = Session.PendingHits.Count - 2048;
+					int n = Session.PendingHits.Count - BattleSession.MaxPending;
 					Session.PendingHits.RemoveRange(0, n);
 					HitDetailTrimmed += n;
 				}

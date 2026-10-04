@@ -18,13 +18,13 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**70 个 .cs / 21,270 行**(不含 obj/bin;RF2 把 `Aggregator` 拆成 6 个 partial,文件 65 → 70);守卫口径 **83** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**73 个 .cs / 21,539 行**(不含 obj/bin;RF2 把 `Aggregator` 拆成 6 个 partial,RF3 新增 `src/Policy/` **3 个纯策略文件**);守卫口径 **87** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1):**174 个命名用例 / 6 组**,10 例变异负控;**执行生产源码**,不是复制公式 |
-| 离线守卫 | **33 条命令 / 65 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `acceptance_rf2`);**终轮 65/65 全绿**;基线轮 59 ok / 4 项(3 项见 §12,第 4 项是本轮工具自身产物) |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3):**269 个命名用例 / 7 组**,**20 例变异负控**;**执行生产源码**(含 `src/Policy/`),不是复制公式 |
+| 离线守卫 | **33 条命令 / 65 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `acceptance_rf2`);**RF0–RF2 与 RF3 两轮终验收都是 65/65 全绿**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -88,8 +88,9 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | 层 | 文件 | 行数 | 依赖 | 能不能离线测 |
 |---|---|---|---|---|
 | 纯函数/模型 | `Model/StatusKey.cs`、`Model/ClauseStatusRun.cs`、`Model/FoldStep.cs`、`Model/BattleTime.cs`、`Composition/TieredModifier.cs` | 约 1.1k | **不依赖 IL2CPP / Plugin** | **能**:`recon_probe` 直接编译执行 |
+| **纯判据(RF3)** | `Policy/`(3:时钟 / 会话转换 / 归属) | 270 | **不依赖 IL2CPP / Plugin / 时钟源 / 配置** | **能**:`tests/BehaviorTests` 直接编译执行(RF3 起) |
 | 数据模型 | `Model/`(12 文件) | 1,958 | 无逻辑 | 部分 |
-| 中枢/组合根 | `src` 根(10 文件:Plugin、GameRef、GameSystemAccess、BuildInfo + **Aggregator 6 个 partial**) | 1,971 | 单例 + 静态 | 否(聚合根已按职责分文件,见 §12) |
+| 中枢/组合根 | `src` 根(10 文件:Plugin、GameRef、GameSystemAccess、BuildInfo + **Aggregator 6 个 partial**) | 1,970 | 单例 + 静态 + 时间源 | 否(编排留在门面;判据已下沉到 `Policy/`) |
 | 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,692 | IL2CPP | 否(每个探针一个开关) |
 | 判定核心 | `Composition/`(14,含 10 个 `CompositionProbe*` partial) | 6,762 | IL2CPP | 否 |
 | 主数据 | `MasterData/`(2) | 1,204 | IL2CPP + 反编译件 | 否 |
@@ -180,7 +181,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 |---|---|---|
 | **R0 前置** | ~~①纳入版本控制~~ **已完成(RF0:本地 git,标签 `baseline-1.7.11`)**,并补上仓库边界 / 基线清单 / 冻结输入快照 / 输出隔离;②把 `evidence_*`/`probe_*`/旧验证目录打包归档(**仍未做**,属 RF7,只索引不删除);~~③文档集加自测~~ 已完成(现 32 份 + 6 例自测) | `repo_manifest --verify` drift=0 + `n0_acceptance.py` 33 命令 / 65 检查全绿 |
 | **R1 无风险拆分** | ~~`Aggregator` 拆 partial~~ **已完成(RF2:6 文件,IL 级等价,见 §12)**;时间窗提为命名常量**仍未做** | 构建 0 警 0 错 + 174 用例 + `recon_probe` + IL 等价 |
-| **R2 纯函数下沉** | 把仍可离线的逻辑(归属时间窗判定、残差分层键)从 IL2CPP 侧搬到可被探针执行的纯函数,并**先补断言再搬** | `recon_probe` 断言数上升 + 新旧输出逐位一致 |
+| **R2 纯函数下沉** | ~~时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口~~ **已完成(RF3:3 个策略文件,269 用例,20 例负控,见 §12)**;仍留:composition 链自身窗口、`IdleSeconds`、候选扫描(读原生对象) | 用例 + 网格对照 + 变异负控 |
 | **R3 界面** | `OverlayUGUI.Rows` 按"测量/截断/行构造"拆,列宽算术只留一处 | 布局守卫 634 行 0 违规 + 目视 |
 | **R4 数据侧** | `MasterDataAccess` 合并两处表查找;`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
 
@@ -259,6 +260,18 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 - **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
 - **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"33 条命令 / 65 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
 
-## 12. 本轮(RF0–RF2)记录
+## 12. 重构批次记录(按 REFACTOR-PLAN-POST-1.7.11.md)
+
+| 批次 | 内容 | 记录 |
+|---|---|---|
+| **第 1 轮 RF0–RF2** | 本地 git 基线 + 仓库边界 + 基线清单 + 冻结批次输入 + 输出隔离 + 文档勘误;174 用例的规范化行为测试 + 10 例变异负控;`Aggregator` 机械拆成 6 个 partial(IL 级等价) | [REFACTOR-BATCH-RF0-RF2.md](<REFACTOR-BATCH-RF0-RF2.md>) |
+| **第 2 轮 RF3** | 时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口下沉为 `src/Policy/` 3 个纯文件;四处重复(来源规则、伤害匹配条件、存活窗口、pending 上限)各归一处;269 用例 + 20 例负控 + 7 组"旧式表达式"网格对照 | [REFACTOR-BATCH-RF3.md](<REFACTOR-BATCH-RF3.md>) |
+| **未做** | RF3b(composition 链自身窗口 / `IdleSeconds` / 候选扫描)、RF4 状态生命周期、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
+
+三条要点:
+
+1. **部署始终未变**:DLL 仍 1.7.11 / 387,072 B / `36EC96D4…`;RF0 已经证明"用 `src` 重建得到的产物与部署逐字节相同"。
+2. **判据现在可以离线执行**:`tests/BehaviorTests` 的 `<Compile>` 清单包含 `src/Policy/*.cs`,所以任何让策略层依赖 Unity/IL2CPP/配置的改动会**构建失败**,而不是悄悄漂移。
+3. **未覆盖的要写下来**:门面(编排、原生读取、热路径候选扫描)没有任何离线测试覆盖;策略用例证明的是"判据正确",不是"调用点正确" —— 调用点靠差异审查 + 构建 + 真实导出回归。
 
 

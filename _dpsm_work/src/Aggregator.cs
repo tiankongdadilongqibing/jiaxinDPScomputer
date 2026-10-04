@@ -55,11 +55,8 @@ public static partial class Aggregator
 	/// clock's own unit: 8 game seconds ~= 5.3 real seconds while the game runs at 1.5x.</summary>
 	private const double IdleSeconds = 8.0;
 
-	/// <summary>A stalled frame (blocked main thread, OS suspend, blocked scene load) hands the whole
-	/// stall to us as ONE delta. Measured 2.9 s in a single frame, which jumped the battle clock
-	/// (9.3 s -> 12.2 s with no event in between) and was enough to trip the idle timeout in the same
-	/// step. Clamped in Tick.</summary>
-	private const double MaxFrameDelta = 0.25;
+	// MaxFrameDelta moved to Policy/BattleClockPolicy.cs (RF3): the clamp rule and its bound now live in
+	// one place and are executed by the behaviour tests at the boundary.
 
 	/// <summary>Most recently finalised session, with how/when it closed, so late events that clearly
 	/// belong to it can be folded back in instead of opening a fragment session.</summary>
@@ -67,8 +64,7 @@ public static partial class Aggregator
 	private static DateTime _lastClosedWall;
 	private static string _lastClosedWhy = "";
 
-	/// <summary>How long after a SOFT (idle) close a late event may still rejoin its session.</summary>
-	private const double ResumeWindowSeconds = 5.0;
+	// ResumeWindowSeconds moved to Policy/SessionTransitionPolicy.cs (RF3).
 
 	/// <summary>
 	/// Grouping marker state (1.3.3). Descriptive ONLY -- it does not change the session boundary, the
@@ -82,10 +78,7 @@ public static partial class Aggregator
 	private static int _lastEndResult;
 	private static string _lastEndWhy = "";
 
-	/// <summary>Two sessions belong to the same "run" (one continuous stretch of play) when the previous
-	/// one ended without a result, on the same quest, within this many seconds. A finished battle
-	/// (result != 0) NEVER joins the next session, so a marker can never silently absorb a real battle.</summary>
-	private const double RunJoinSeconds = 2.0;
+	// RunJoinSeconds moved to Policy/SessionTransitionPolicy.cs (RF3).
 
 	private static long _lastGsPointer;
 
@@ -141,7 +134,7 @@ public static partial class Aggregator
 	// `source`/`crit` were constants and nothing anywhere said so. Every new read reports what it did.
 	/// <summary>Pending damage figures produced by the four damage-returning hooks.</summary>
 	internal static int HitDetailProduced;
-	/// <summary>Records dropped by the 2048-entry cap (never silent).</summary>
+	/// <summary>Records dropped by the BattleSession.MaxPending cap (never silent).</summary>
 	internal static int HitDetailTrimmed;
 	/// <summary>Field reads / plumbing failures while producing a record.</summary>
 	internal static int HitDetailErrors;

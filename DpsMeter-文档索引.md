@@ -21,12 +21,12 @@
 | 版本 | **1.7.11(已部署)**(F5 表 1 改为 `自身 \| 他人因你 \| 被队友分走`,`自身 = 基础 + 自身规则`;`receivedAssist` 首次进表;两条逐角色恒等式进 `check_export_schema`;版面守卫新增「渲染器↔副本漂移」检查;`check_live_log` 两处误判修复;§7.2.100)。前一版 **1.7.10**(§7.2.99:验证闸门 `give_section_reasons` 读错对象而**从未真正运行** —— 改读 `rosterAudit` + 真实文件负控;`[COMP]` 重算遵守 GivenTalent / Madness / MadnessVictim 三个开关)。更前一版 **1.7.9**(§7.2.98:GivenTalent 开关下传 + `calc.givenFoldOn`;`giveApplied` 双计修复 + `rosterAudit.giveFoldHits`;UI-DIAG `unattrRow`;`check_live_log.py`);备份 `.1.7.9.bak`(1.7.9 现网 DLL)/ `.1.7.7.bak` / `.1.7.6.bak` / `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` |
 | DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`(**387,072 字节**,1.7.11,`36EC96D4…`);回退链 `.1.7.10.bak`(`BF2F174A…`)/ `.1.7.9.bak`(`F3F73C81…`)/ `.1.7.8.bak`(`0B339836…`)/ `.1.7.7.bak`(`7425139C…`)/ `.1.7.6.bak`(`BB96DA65…`)/ `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` / `.1.6.1.bak` / `.1.6.0.bak` / `.1.5.5-verified.bak` |
 | SHA256 | `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42`(1.7.11;1.7.10 = `BF2F174A4059125376946ABCB0E3E4A9176E6B360CAB209078F219A95389AE85`;1.7.9 = `F3F73C81FF3D9CE0B903E5B4BB9C3F60062BF20F93118A853DBB9DCC34E7DBCB`;1.7.8 = `0B33983646280E246AA9E5911AEAB0EC499FC22C6C796460299BD4BDC4B34880`,1.7.7 = `7425139C…`) |
-| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**70 个 .cs / 21,270 行**,排除 obj;RF2 把 `Aggregator` 拆成 6 个 partial;守卫口径 **83**(含 `tests/`);最大的几个文件见 PROJECT-STATUS §5) |
+| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**73 个 .cs / 21,539 行**,排除 obj;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src\Policy\` 3 个纯策略文件;守卫口径 **87**(含 `tests/`);最大的几个文件见 PROJECT-STATUS §5) |
 | 回滚档案 | `DpsMeter.dll.1.4.1.bak` / `1.5.0–1.5.4-verified.bak` 等(**102 个 .bak**(其中 `DpsMeter.dll.*.bak` 34 个,实测 2026-10-04));⚠ `1.0.48/1.0.49-crash.bak` **绝不回滚** |
 | 开关 | `BepInEx\config\dev.dpsmeter.cfg`(DamageComposition/Forensics/ReconcileCalc/GivenTalent/StatusResist/Madness/StateTimeline/FactStore/MadnessApplier/GivenGiverHook/**Contribution/ShowContribution** 全 true) |
 | 导出 | **冻结快照 35 份**(`_dpsm_work\batch-inputs-rf0.json`;`exports\` 本身是活的):411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;其中 **22 份含 `contribution` 段**(schema 1.1 ×9 = 1.7.8×3 + 1.7.10×1 + 1.7.11×5;schema 1.0 ×13),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算 |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动被删,只留最新一场) |
-| 验收 | `python n0_acceptance.py` → **33 条命令 / 65 条检查**(默认读冻结快照、写 `acceptance_rf2`);**终轮 65 ok / 0 项**;基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
+| 验收 | `python n0_acceptance.py` → **33 条命令 / 65 条检查**(默认读冻结快照、写 `acceptance_rf2`);RF0–RF2 与 RF3 两轮终轮均 **65 ok / 0 项**;RF0–RF2 基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
 | 契约 | `log-share/1` / `ComparisonEligibility/1` / `compare/2` / `decision/1` / `budget-census/1` / 身份映射;入口与退出码见 PROJECT-STATUS §3 |
 
 ## 3. 已验证的能力(全部实机)
@@ -190,7 +190,8 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 | `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(174 用例 / 6 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
 | `_dpsm_work\tests\`(IlDump / il_equiv.py / negative_control.py / rf2_split.py) | RF2 等价证据与拆分器、RF1 变异负控 |
 | [`REPO-BOUNDARY.md`](<REPO-BOUNDARY.md>) · [`_dpsm_work\baseline-manifest.json`](<_dpsm_work/baseline-manifest.json>) · [`_dpsm_work\batch-inputs-rf0.json`](<_dpsm_work/batch-inputs-rf0.json>) | 仓库边界 / 基线清单(源码·工具·配置·语料·外部程序集)/ 本批冻结输入清单 |
-| [`_dpsm_work\REFACTOR-BATCH-RF0-RF2.md`](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>) | **本轮重构批次记录**:RF0–RF2 的文件清单 / 证据 / 未覆盖项 / 回滚 |
+| [`_dpsm_work\REFACTOR-BATCH-RF0-RF2.md`](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>) | **重构第 1 轮记录**:RF0–RF2 的文件清单 / 证据 / 未覆盖项 / 回滚 |
+| [`_dpsm_work\REFACTOR-BATCH-RF3.md`](<_dpsm_work/REFACTOR-BATCH-RF3.md>) | **重构第 2 轮记录**:RF3 纯判据下沉(抽了什么 / 四处去重 / 行为保持手段 / 未做) |
 | `_dpsm_work\recon_probe\` | 离线断言工程(改对账/Fold/JSON/StatusKey 语义时必须加断言) |
 | `_dpsm_work\check_*.py` / `refactor_final_check.py` | 五个守卫(编码/导出 schema/FACT 签名/源码结构/v150 通道) |
 
