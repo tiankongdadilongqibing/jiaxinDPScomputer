@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**697 个命名用例 / 27 组**,**100 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**95 条登记 / 21 条活跃 / 43 条已索引 / 31 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 23 条活跃 / 45 条已索引 / 28 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -293,6 +293,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 25 轮 RF7d(索引接入)** | 把第 24 轮刻意留在流水线外的 `archive_index.py` 接进来(2 条 run:校验 + 自测),命令/检查数 **35/67 → 37/69** 并同步四处文档说法;自测只改临时副本,故可安全入线;插件源码零变化 | [REFACTOR-BATCH-RF7D.md](<REFACTOR-BATCH-RF7D.md>) |
 | **第 26 轮 RF5h(内联格式收尾)** | `DisplayFormat.Whole`(F0,**不带千分位**,刻意不是 `Num`)接入 3 处"秒伤",行内 `:F0` 剩余 0;697 用例 / 100 例负控。**更正**:此前"除一处外已无直接 `:N0`/`:F2`"的说法不准确——`OverlayUGUI.Chart.cs` 仍有 4 处,统一它们会改变用户所见,需一次**决定**;另记录一次 shell 重写源码导致 167 个错误、已还原并用定点编辑重做 | [REFACTOR-BATCH-RF5H.md](<REFACTOR-BATCH-RF5H.md>) |
 | **第 27 轮(全面复核,无代码改动)** | 对已达成的部分做一次端到端复核:**部署 DLL** 387,072 B / `36EC96D4…8BC42`(15–27 轮未替换);验收 **37 条命令 / 69 条检查 / 0 项**;行为套件 **697 用例 0 失败**;变异负控 **100 例 0 失败**;`refactor_final_check` blocks=0;文档收敛 **0/12**;docs123 62 份 0 损伤;工具注册表 PASS;布局守卫 35 份 0 违规;证据哈希索引 PASS;`repo_manifest --verify` drift=0;git 干净于 `4c92e10` | 本轮无产物;证据见本行与 [HANDOFF.md](<HANDOFF.md>) |
+| **第 28 轮 RF7e(工具判定续)** | 31 条被引用脚本中证据明确的三条:`batch_snapshot.py` → active(它是 `batch_inputs/rf0` 的来源),`compare_comps.py` / `atkadd_sensitivity.py` → indexed(docstring 证明是历史研究);判定证据固定为"导入者/流水线/文档点名 + **脚本自己的 docstring**";未判定上限 31 → **28**;并写明剩下 28 条需要**先扩展守卫 G 到"活跃导入者"**才能判(独立规则改动) | [REFACTOR-BATCH-RF7E.md](<REFACTOR-BATCH-RF7E.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

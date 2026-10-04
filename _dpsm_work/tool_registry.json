@@ -16,30 +16,32 @@
    "status": "active"
   },
   "_dpsm_work/atkadd_sensitivity.py": {
-   "evidence": "",
+   "evidence": "RF7e: nobody imports it, no pipeline entry, and the doc mention is a study reference, not a workflow step",
    "expected_exit": "",
    "has_selftest": true,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 909,
    "outputs": [],
-   "purpose": "atkadd sensitivity study (N4 / P1) -- READ-ONLY, offline.",
-   "status": "unclassified"
+   "purpose": "atkadd sensitivity study (N4/P1), read-only and offline.",
+   "status": "indexed"
   },
   "_dpsm_work/batch_snapshot.py": {
-   "evidence": "",
-   "expected_exit": "",
+   "evidence": "RF7e: named twice in the current docs; it is how batch_inputs/rf0 was made; nobody imports it",
+   "expected_exit": "0 ok / 1 error",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
-   "input_versions": "",
-   "kind": "unclassified",
+   "input_versions": "exports/ (whatever is present at freeze time)",
+   "kind": "cli",
    "lines": 136,
-   "outputs": [],
-   "purpose": "RF0 section 5.5: freeze ONE batch's input list, independent of a live game session.",
-   "status": "unclassified"
+   "outputs": [
+    "batch_inputs/<name> (hard-linked snapshot)"
+   ],
+   "purpose": "RF0 section 5.5: freeze ONE batch input list as a hard-linked snapshot, independent of a live game session.",
+   "status": "active"
   },
   "_dpsm_work/budget_census.py": {
    "evidence": "第 4 轮把自测夹具从活目录改为 --exports",
@@ -196,17 +198,17 @@
    "status": "active"
   },
   "_dpsm_work/compare_comps.py": {
-   "evidence": "",
+   "evidence": "RF7e: nobody imports it, no pipeline entry, and the only doc mention is a historical 1.5.4 reference",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 54,
    "outputs": [],
    "purpose": "Compare the 1.5.4 real battles: totals, boss HP, madness uptime, per-character output.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/comparison_eligibility.py": {
    "evidence": "PROJECT-STATUS §5(可比性)",
@@ -1315,6 +1317,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 31
+  "unclassified_max": 28
  }
 }
