@@ -46,6 +46,7 @@
 !/_dpsm_work/contrib_cs/
 !/_dpsm_work/review_contrib_core/
 !/_dpsm_work/acceptance_1.7.11/
+!/_dpsm_work/acceptance_rf2/
 
 # --- derived output / caches, anywhere ---
 bin/

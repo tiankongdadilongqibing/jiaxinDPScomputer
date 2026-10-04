@@ -305,7 +305,7 @@ def run(log_path):
                             known.add((json.load(fh).get('contribution') or {}).get('unattributedDamage'))
                     except Exception:
                         pass
-            if val in known:
+            if _matches_in_domain(val, known):
                 n_ok += 1
             elif not pairs:
                 warnings.append('overlay frame printed %r but the log names no exported battle, so nothing '
@@ -325,6 +325,23 @@ def run(log_path):
     if status == gate.PASS and warnings:
         status = gate.WARNING
     return (status, notes, problems, notes, warnings)
+
+def _matches_in_domain(val, known):
+    """The panel prints this figure ROUNDED to an integer ("9,326,541") while the export carries a double
+    ("9326541.024"), so an exact membership test rejects a value the panel printed correctly. MEASURED
+    2026-10-04: 102 frames of one live battle were reported as ERROR for exactly that reason, while the
+    export value was present in the known set all along. The tolerance is the rounding interval, +/-0.5,
+    and nothing wider -- a real disagreement is orders of magnitude larger."""
+    for c in known:
+        if c is None:
+            continue
+        try:
+            if abs(float(val) - float(c)) <= 0.5:
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
+
 
 def selftest():
     tmp = tempfile.mkdtemp(prefix='livelog_')
@@ -383,6 +400,16 @@ def selftest():
     case('unattrrow_agrees', base_log, base_doc, gate.PASS)
     badf = base_log.replace('257056(x73)', '999999(x73)')
     case('unattrrow_mismatch', badf, base_doc, gate.ERROR)
+    # 2026-10-04: the panel prints the in-domain figure rounded, the export carries a double. An exact
+    # membership test turned 102 live frames into false ERRORs, so the control is now paired:
+    in_ok = base_log.replace("unattrRow='! %s 257056(x73)'" % M_OUT,
+                             "unattrRow='\u5408\u8ba1 194,697,612   \u672a\u5f52\u56e0 9,326,541(4.75%)'")
+    case('in_domain_row_rounds_to_the_export', in_ok, base_doc, gate.PASS,
+         tamper=lambda d: d['contribution'].__setitem__('unattributedDamage', 9326541.024))
+    in_bad = base_log.replace("unattrRow='! %s 257056(x73)'" % M_OUT,
+                              "unattrRow='\u5408\u8ba1 194,697,612   \u672a\u5f52\u56e0 9,326,600(4.75%)'")
+    case('in_domain_row_beyond_rounding_is_an_error', in_bad, base_doc, gate.ERROR,
+         tamper=lambda d: d['contribution'].__setitem__('unattributedDamage', 9326541.024))
     # 1.7.11: the REAL F6 summary row -- a bigger number (合计) precedes the 未归因 marker. Parsing the
     # first number in the row made this a false ERROR on a live log; the export below carries 0.
     f6row = ('\u5408\u8ba1 194,697,612   \u672a\u5f52\u56e0 0(0.00%)   \u547d\u4e2d 5,493   '

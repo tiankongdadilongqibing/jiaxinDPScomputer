@@ -1,0 +1,222 @@
+{
+ "count": 35,
+ "created": "2026-10-04T18:20:35",
+ "files": [
+  {
+   "bytes": 22099027,
+   "file": "battle_411001_20261003_205449.json",
+   "linked": true,
+   "sha256": "6784F00C8948A1A0230A8F4BFC6C129CEDF93DB939E5C3D959B6F643CEA1CFE4"
+  },
+  {
+   "bytes": 21024858,
+   "file": "battle_411001_20261003_230040.json",
+   "linked": true,
+   "sha256": "5349C329880394746C65FA99C8558B4F3D71B8A2EDB047ED6F1629416FCB780C"
+  },
+  {
+   "bytes": 21674665,
+   "file": "battle_411001_20261003_230311.json",
+   "linked": true,
+   "sha256": "A5D6AF9EE4A9106B78AC31E818609FF78E053C266198DFF60738C1E12278CB0B"
+  },
+  {
+   "bytes": 21858359,
+   "file": "battle_411001_20261003_230615.json",
+   "linked": true,
+   "sha256": "983D039421F076215DC30ACD006BABEB2E9032CE892DD5F652D2C37F4828BC4C"
+  },
+  {
+   "bytes": 21690543,
+   "file": "battle_411001_20261003_231044.json",
+   "linked": true,
+   "sha256": "514F2CD560E870B93CCE5DEF99C3688415615F701D0C8A353B558238201A64C7"
+  },
+  {
+   "bytes": 22091439,
+   "file": "battle_411001_20261003_231340.json",
+   "linked": true,
+   "sha256": "CD52A4C83652CA1928A1B5CD443300B12A590DBA20FA64C9203EBCFFD6FBDDE1"
+  },
+  {
+   "bytes": 22964452,
+   "file": "battle_411001_20261003_235204.json",
+   "linked": true,
+   "sha256": "C51B38512EE3812CCB9282D091782AA0597EA67F538A5E02AF8476089D7F91B0"
+  },
+  {
+   "bytes": 22775413,
+   "file": "battle_411001_20261004_012328.json",
+   "linked": true,
+   "sha256": "32A429BB667E3BEDBD0F68555D36F4C66A1664B72B467F7DC96191F7C5A40D55"
+  },
+  {
+   "bytes": 22357790,
+   "file": "battle_411001_20261004_015919.json",
+   "linked": true,
+   "sha256": "70D11547448BE0C9681CB1DCD634469BA1650C1CED0492B07F0DE1BA1D78BA87"
+  },
+  {
+   "bytes": 22758572,
+   "file": "battle_411001_20261004_021914.json",
+   "linked": true,
+   "sha256": "510CA1AF15690CDB4DEC90392B9D14D7ED8447BFA2C1EB9DD8266678C1AB54BD"
+  },
+  {
+   "bytes": 23076813,
+   "file": "battle_411001_20261004_023627.json",
+   "linked": true,
+   "sha256": "41CBDAC7C5DFABC92E29C276987E48E67371A042648A41E69CF323EFA9026FAD"
+  },
+  {
+   "bytes": 22985344,
+   "file": "battle_411001_20261004_033231.json",
+   "linked": true,
+   "sha256": "B9A86752266BA18451D2649A134FD0E29A9DACE1E521DBE61B4AEAF07431092F"
+  },
+  {
+   "bytes": 23070034,
+   "file": "battle_411001_20261004_035437.json",
+   "linked": true,
+   "sha256": "55268089423019B97ACC4E0B7349288973056F10B8C2877AC3ACCFD98AD708D6"
+  },
+  {
+   "bytes": 24953593,
+   "file": "battle_411001_20261004_041309.json",
+   "linked": true,
+   "sha256": "D8347BC90EACE27C5BD9D8D62538D9BF0FEEC095B76D010AAB612A2326F1A750"
+  },
+  {
+   "bytes": 24909334,
+   "file": "battle_411001_20261004_042637.json",
+   "linked": true,
+   "sha256": "9A74BA7B167DC8167EF19FC717E26CC7CC65E5521823B0B92F5450DD8E34F40D"
+  },
+  {
+   "bytes": 24729057,
+   "file": "battle_411001_20261004_042844.json",
+   "linked": true,
+   "sha256": "2CC436A37736818A620D29E4A5832667A304E9B11CC35429F1D66DCC5F557D68"
+  },
+  {
+   "bytes": 24783043,
+   "file": "battle_411001_20261004_113553.json",
+   "linked": true,
+   "sha256": "8535CAC80AE048A9FB210A94B3DE6B3EDF8188CD5F8C871DB6C27B2A76FA0714"
+  },
+  {
+   "bytes": 25003256,
+   "file": "battle_411001_20261004_115024.json",
+   "linked": true,
+   "sha256": "9F80DA9A83B1366475ED33C67CE1E051B1A081BD61276637BAE7CA94CECE7DDA"
+  },
+  {
+   "bytes": 24445538,
+   "file": "battle_411001_20261004_115417.json",
+   "linked": true,
+   "sha256": "C4E6E80687CD03F30D842830CBC8A278F174D6D3BAF949817DC8DF8D303F8A17"
+  },
+  {
+   "bytes": 24661228,
+   "file": "battle_411001_20261004_134524.json",
+   "linked": true,
+   "sha256": "0863AE08E924A184D51F20C04F19B52AF07649FADCADA63156DFFF9501D14A84"
+  },
+  {
+   "bytes": 25066069,
+   "file": "battle_411001_20261004_134853.json",
+   "linked": true,
+   "sha256": "DB1C80B48F550D3CC9293BEB991BBEBD3A3B04FD29B0F79ABE1B4BBD9C02C262"
+  },
+  {
+   "bytes": 24931325,
+   "file": "battle_411001_20261004_144548.json",
+   "linked": true,
+   "sha256": "20B4ADC14BEBD5E101C45B56B79DB54D203B65A5D0FE40D21073638D60C50CA7"
+  },
+  {
+   "bytes": 25446800,
+   "file": "battle_411001_20261004_170157.json",
+   "linked": true,
+   "sha256": "9B20FFE32E3CE53DAC2CE951DD1B73E7B8C4CB1D255FF51B728CDF7E9A02D4CA"
+  },
+  {
+   "bytes": 25051231,
+   "file": "battle_411001_20261004_180353.json",
+   "linked": true,
+   "sha256": "50B518FF3945484863852767745FB8777D3223FD6526D551E112B3624DA62C6E"
+  },
+  {
+   "bytes": 21674594,
+   "file": "battle_411001_20261004_180834.json",
+   "linked": true,
+   "sha256": "E6624B99CCE59423A7480A78E817121ED538D4E0F597A7C6BEEF60FEC791B563"
+  },
+  {
+   "bytes": 867383,
+   "file": "battle_700817_20261004_114821.json",
+   "linked": true,
+   "sha256": "83A558F61F5093C2520F6093D45E135EE9E15A5B998FA832AAED22F0A76D079A"
+  },
+  {
+   "bytes": 2986347,
+   "file": "battle_9999_20261003_205129.json",
+   "linked": true,
+   "sha256": "ACDB30DC4115B923F5734BF2EFF2FC8CA936391B050F60EFA6482A75B5BD88C2"
+  },
+  {
+   "bytes": 496159,
+   "file": "battle_9999_20261003_225530.json",
+   "linked": true,
+   "sha256": "776CB73144750C22A8F9E192FAA2E31AB0B96B65E4C4F68D7AE2FA4EF03180BF"
+  },
+  {
+   "bytes": 672530,
+   "file": "battle_9999_20261003_225647.json",
+   "linked": true,
+   "sha256": "19FDA06C775CB325C3DEA606981E74B7AC0330037B4172A70377BD71EE89EC60"
+  },
+  {
+   "bytes": 773610,
+   "file": "battle_9999_20261003_225905.json",
+   "linked": true,
+   "sha256": "DA469A0E32BB5CBBF529437AE4C4039812C561C17C559D5B1C9FEF61CC30F751"
+  },
+  {
+   "bytes": 520778,
+   "file": "battle_9999_20261004_012138.json",
+   "linked": true,
+   "sha256": "58555A9E2C8887A6325DD2687A6FF773210E340986C876634217B727EBD98FB4"
+  },
+  {
+   "bytes": 2496398,
+   "file": "battle_9999_20261004_042458.json",
+   "linked": true,
+   "sha256": "364B60F610468E52C27202C92CD0AD85BF18F3C2A731A0DDE43111FBCE73CA56"
+  },
+  {
+   "bytes": 3822792,
+   "file": "battle_9999_20261004_135214.json",
+   "linked": true,
+   "sha256": "D17A5A5BFD38EC6EEDDC7B32171C91255FEC63220871392AEF7A4E11E894A6BD"
+  },
+  {
+   "bytes": 681150,
+   "file": "battle_9999_20261004_165952.json",
+   "linked": true,
+   "sha256": "FAD510DA62B6C8F4EC84A23EA96C69001A5E74D860FF1D3F21877DA856EC8774"
+  },
+  {
+   "bytes": 866539,
+   "file": "battle_9999_20261004_175957.json",
+   "linked": true,
+   "sha256": "51B12F51FC5E6BEFC25B37431D2D650E88438326B3533A2A0CE8A11380529FBE"
+  }
+ ],
+ "linkDir": "_dpsm_work/batch_inputs/rf0",
+ "name": "rf0",
+ "note": "the source directory is LIVE (the running game appends to it); this list is the batch's frozen input and is checked by n0_acceptance.py input_freeze",
+ "schema": "batch-inputs-1",
+ "sourceDir": "BepInEx/plugins/DpsMeter/exports",
+ "tool": "batch_snapshot"
+}

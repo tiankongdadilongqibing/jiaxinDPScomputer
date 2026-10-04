@@ -18,21 +18,21 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**65 个 .cs / 21,228 行**(不含 obj/bin);最大 3 个文件见 §5 |
+| 源码规模 | `_dpsm_work/src`:**70 个 .cs / 21,270 行**(不含 obj/bin;RF2 把 `Aggregator` 拆成 6 个 partial,文件 65 → 70);守卫口径 **83** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
-| 语料 | `BepInEx\plugins\DpsMeter\exports\`:32 份,合计约 502 MB(v1.7.11 前一次全量统计) |
-| 导出段 schema | `contribution.schemaVersion` = **1.1**(19 份带段:1.0 ×13 / 1.1 ×6);方法 `log-share/1` |
-| 版本控制 | **无**(没有 .git);一切结论靠 SHA256 + 验收 manifest + 报告追认 |
-| C# 测试工程 | **无**;离线断言靠 `recon_probe`(dotnet,**ALL CHECKS PASSED**) |
-| 离线守卫 | 30 条命令的验收流水线(`n0_acceptance.py`),**51/51 检查通过**,486.3 s |
+| 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
+| 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
+| 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
+| C# 测试工程 | `tests/BehaviorTests`(RF1):**174 个命名用例 / 6 组**,10 例变异负控;**执行生产源码**,不是复制公式 |
+| 离线守卫 | **33 条命令 / 65 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `acceptance_rf2`);**终轮 65/65 全绿**;基线轮 59 ok / 4 项(3 项见 §12,第 4 项是本轮工具自身产物) |
 
-## 2. 语料现状(32 份)
+## 2. 语料现状(35 份,冻结快照)
 
 | 维度 | 分布 |
 |---|---|
-| 按任务 | 411001 ×23 / 训练场 9999 ×8 / 700817 ×1 |
-| 按版本 | 1.5.3, 1.5.4×4, 1.5.5×2, 1.6.0, 1.6.1, 1.7.0, 1.7.2–1.7.6, 1.7.8×2, 1.7.10, **1.7.11×2** |
-| 带 `contribution` 段 | **19/32**(1.0 ×13 / 1.1 ×6);无段 13 份 = 1.5.3–1.5.5 / 1.6.0(段前版本) |
+| 按任务 | 411001 ×**25** / 训练场 9999 ×**9** / 700817 ×1 |
+| 按版本 | 1.5.3×2, 1.5.4×8, 1.5.5×3, 1.6.0, 1.6.1, 1.7.0, 1.7.2–1.7.4, 1.7.5×4, 1.7.6×3, 1.7.8×3, 1.7.10, **1.7.11×5** |
+| 带 `contribution` 段 | **22/35**(schema 1.0 ×13 / 1.1 ×9);无段 13 份 = 1.5.3–1.5.5(**1.6.0 有段**,它是坏样本不是段前版本) |
 | `crosscheck --batch` | ERROR **1**(已知坏样本)/ LEGACY_NOT_APPLICABLE 16 / PASS 12 / WARNING 3 |
 | 适用性(模型) | full **14** / partial 9 / not_comparable **9**(9999 训练场一律 not_comparable) |
 | 准入(actor_credit / rule_coverage) | 各 **18/32** 可准入;整体没有可排名指标 ⇒ CLI exit 4 |
@@ -63,7 +63,13 @@
 ```
 PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
 
-验收(最全,29 条命令 / 50 条检查)   python n0_acceptance.py
+验收(最全,33 条命令 / 65 条检查)   python n0_acceptance.py
+冻结批次输入                      python batch_snapshot.py --name rf0 --verify
+基线清单核对                      python repo_manifest.py --verify --exports batch_inputs\rf0
+C# 行为测试                       dotnet run --project tests\BehaviorTests\BehaviorTests.csproj -c Release -- --quiet
+变异负控(--list 看全部 10 例)      python tests\negative_control.py
+IL 等价比较                       python tests\il_equiv.py <pre.txt> <post.txt> <report.txt>
+RF2 拆分器(含 LOSS CHECK)         python tests\rf2_split.py
 验收负控                          python n0_acceptance.py --selftest
 比较器                            python -m contrib.compare --applicability acceptance_1.7.11\applicability.json --out contrib\reports\compare2_411001
 配队决策                          python decision_report.py --compare contrib\reports\compare2_411001.json
@@ -83,16 +89,19 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 |---|---|---|---|---|
 | 纯函数/模型 | `Model/StatusKey.cs`、`Model/ClauseStatusRun.cs`、`Model/FoldStep.cs`、`Model/BattleTime.cs`、`Composition/TieredModifier.cs` | 约 1.1k | **不依赖 IL2CPP / Plugin** | **能**:`recon_probe` 直接编译执行 |
 | 数据模型 | `Model/`(12 文件) | 1,958 | 无逻辑 | 部分 |
-| 中枢/组合根 | `src` 根(Plugin、Aggregator、GameRef、GameSystemAccess、BuildInfo) | 1,911 | 单例 + 静态 | 否 |
-| 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,694 | IL2CPP | 否(每个探针一个开关) |
-| 判定核心 | `Composition/`(14,含 10 个 `CompositionProbe*` partial) | 6,777 | IL2CPP | 否 |
+| 中枢/组合根 | `src` 根(10 文件:Plugin、GameRef、GameSystemAccess、BuildInfo + **Aggregator 6 个 partial**) | 1,971 | 单例 + 静态 | 否(聚合根已按职责分文件,见 §12) |
+| 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,692 | IL2CPP | 否(每个探针一个开关) |
+| 判定核心 | `Composition/`(14,含 10 个 `CompositionProbe*` partial) | 6,762 | IL2CPP | 否 |
 | 主数据 | `MasterData/`(2) | 1,204 | IL2CPP + 反编译件 | 否 |
 | 输出 | `Output/`(7) | 2,274 | 读会话状态 | `JsonCheck` 由 recon_probe 反向验证 |
-| 界面 | `Ui/`(7) | 2,915 | Unity(uGUI + IMGUI 两套) | 否(靠布局守卫离线复算 634 行) |
+| 界面 | `Ui/`(7) | 2,914 | Unity(uGUI + IMGUI 两套) | 否(靠布局守卫离线复算 634 行) |
 
-**最大的 6 个文件**(拆分候选,按行数):`Ui/OverlayUGUI.Rows.cs` **1,376**、`Aggregator.cs` **1,359**、
-`Composition/CompositionProbe.Chain.cs` **1,194**、`Composition/CompositionProbe.Talents.cs` **852**、
-`MasterData/MasterDataDump.cs` **828**、`Composition/AbilityRoster.cs` **791**、`Output/ExportService.cs` **708**。
+**最大的 7 个文件**(拆分候选,按行数):`Ui/OverlayUGUI.Rows.cs` **1,375**、
+`Composition/CompositionProbe.Chain.cs` **1,191**、`Composition/CompositionProbe.Talents.cs` **847**、
+`MasterData/MasterDataDump.cs` **828**、`Composition/AbilityRoster.cs` **791**、`Output/ExportService.cs` **708**、
+`Composition/CompositionProbe.Diagnostics.cs` **684**。
+
+**`Aggregator` 已不在榜上**:RF2 把它拆成 6 个文件,最大的一块是 `Aggregator.Stats.cs` 340 行。
 
 **依赖方向(重构时必须保住)**
 
@@ -158,7 +167,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 
 ### 7.2 高危耦合热点
 
-1. **`Aggregator.cs`(1,359 行)**:会话生命周期/时钟/攻击者归属/统计/结算/导出触发混在一起,且硬编码时间窗(0.80/0.60/0.45/0.20/0.08 s)散在归属逻辑里。
+1. ~~**`Aggregator.cs`(1,359 行)**~~ **已按职责拆成 6 个 partial(RF2,见 §12)**;仍在的债务:硬编码时间窗(0.80/0.60/0.45/0.20/0.08 s)仍散在 `Aggregator.Attribution.cs` / `CompositionProbe*` 里 —— 提常量与判据下沉属 RF3。
 2. **`Ui/OverlayUGUI.Rows.cs`(1,376 行)**:表格行渲染与列宽算术;**布局守卫直接解析这个文件的列标签/宽度**,改它必须同步跑布局守卫。
 3. **`CompositionProbe*`(10 partial / 6.8k 行)**:判定链的单点裁决;拆分时最容易把"单一裁决点"拆成两处而静默改变折叠加法顺序。
 4. **静态可变状态**:`Aggregator.Session` / `CompositionProbe._globalRules` / `OverlayUGUI` statics —— 跨场污染型 bug 只会以日志形式出现。
@@ -169,8 +178,8 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 
 | 批次 | 内容 | 出口验证 |
 |---|---|---|
-| **R0 前置** | ①把 `_dpsm_work/src` + 守卫脚本纳入版本控制(哪怕只是本地 git);②把 `evidence_*`/`probe_*`/旧验证目录打包归档;~~③给 `check_docs_123.py` 扩到当前文档集并加自测~~ **已在第 6 轮完成**(17 → 29 份文档,6 例自测) | `n0_acceptance.py` 全绿且工具哈希零漂移(当前 51/51) |
-| **R1 无风险拆分** | `Aggregator` 按 Session / Attribution / Stats / Finalize 拆 partial,时间窗提为命名常量 | 构建 0 警 0 错 + `recon_probe` + 五守卫 + 实机一场 |
+| **R0 前置** | ~~①纳入版本控制~~ **已完成(RF0:本地 git,标签 `baseline-1.7.11`)**,并补上仓库边界 / 基线清单 / 冻结输入快照 / 输出隔离;②把 `evidence_*`/`probe_*`/旧验证目录打包归档(**仍未做**,属 RF7,只索引不删除);~~③文档集加自测~~ 已完成(现 32 份 + 6 例自测) | `repo_manifest --verify` drift=0 + `n0_acceptance.py` 33 命令 / 65 检查全绿 |
+| **R1 无风险拆分** | ~~`Aggregator` 拆 partial~~ **已完成(RF2:6 文件,IL 级等价,见 §12)**;时间窗提为命名常量**仍未做** | 构建 0 警 0 错 + 174 用例 + `recon_probe` + IL 等价 |
 | **R2 纯函数下沉** | 把仍可离线的逻辑(归属时间窗判定、残差分层键)从 IL2CPP 侧搬到可被探针执行的纯函数,并**先补断言再搬** | `recon_probe` 断言数上升 + 新旧输出逐位一致 |
 | **R3 界面** | `OverlayUGUI.Rows` 按"测量/截断/行构造"拆,列宽算术只留一处 | 布局守卫 634 行 0 违规 + 目视 |
 | **R4 数据侧** | `MasterDataAccess` 合并两处表查找;`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
@@ -232,6 +241,8 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | [`CONTRIBUTION-DATA-DICTIONARY.md`](<CONTRIBUTION-DATA-DICTIONARY.md>) | 口径/公式/字段字典(schema 1.1) | ✅ 当前 |
 | [`ARCHITECTURE.md`](<ARCHITECTURE.md>) · [`ARCH-REVIEW-1.5.md`](<ARCH-REVIEW-1.5.md>) | 架构 / 1.5 时代审视 | 🟡 结构仍准;**§7 债务清单需逐条复核**(见 §9D) |
 | [`IDENTITY-CENSUS.md`](<IDENTITY-CENSUS.md>) · [`IDENTITY-METADATA-DESIGN.md`](<IDENTITY-METADATA-DESIGN.md>) · [`ATKADD-MODEL-AUDIT.md`](<ATKADD-MODEL-AUDIT.md>) · [`atkadd_sensitivity_result.md`](<atkadd_sensitivity_result.md>) | 30 份时的身份/atkadd 研究 | 🟡 **当时快照**(30 份),结论可用、计数不可当现状 |
+| [`REFACTOR-BATCH-RF0-RF2.md`](<REFACTOR-BATCH-RF0-RF2.md>) | **本轮重构批次记录**(RF0–RF2:文件清单 / 证据 / 未覆盖项 / 回滚) | ✅ 当前(该批次) |
+| [`../../REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) · [`baseline-manifest.json`](<baseline-manifest.json>) · [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>) | 仓库边界 / 基线清单 / 本批输入清单 | ✅ 当前(每次输入变化要重新 `--write`) |
 | [`CONTRIBUTION-TABLE-REPORT.md`](<CONTRIBUTION-TABLE-REPORT.md>) | 贡献表完整报告(26/29 份时代) | 🟡 历史报告:只改了当前状态句,历史段落保持原样 |
 | [`SESSION-STATE.md`](<SESSION-STATE.md>)(377 KB) | 主档:§1–§6 API/限制、§7.2.x 逐版决策 | 🟡 **逐版决策档案**,不是现状摘要 |
 | [`P0-A-VALIDATION-GATE-REPORT.md`](<P0-A-VALIDATION-GATE-REPORT.md>) · [`CONTRIBUTION-APPLICABILITY-P0D.md`](<CONTRIBUTION-APPLICABILITY-P0D.md>) · [`PAIRTRUSTED-IMPACT-REPORT.md`](<PAIRTRUSTED-IMPACT-REPORT.md>) · [`CONTRIBUTION-REVIEW-NEXT-STEPS.md`](<CONTRIBUTION-REVIEW-NEXT-STEPS.md>) | 历史验收/审查报告 | 🟡 历史快照 |
@@ -244,6 +255,10 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 
 - **本文件与索引一起更新**:任何一轮结束时,先更新本文件的事实表,再更新索引指针;历史段落不重写。
 - 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
-- 每次改动后跑:`python n0_acceptance.py`(全绿且工具哈希零漂移);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
+- 每次改动后跑:`python n0_acceptance.py`(33 命令 / 65 检查,全绿);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
+- **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
+- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"33 条命令 / 65 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
+
+## 12. 本轮(RF0–RF2)记录
 
 

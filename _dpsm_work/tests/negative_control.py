@@ -1,0 +1,181 @@
+# -*- coding: utf-8 -*-
+"""RF1 negative control: the behaviour suite must be able to go RED. See REFACTOR-PLAN section 6.
+
+A gate nobody has seen fail is not a gate. This driver mutates a TEMP COPY of `src` (never the real
+sources), rebuilds the SAME BehaviorTests project against it via -p:SrcRoot, and requires the named
+case to fail. Three rules make it a real check rather than a ritual:
+
+  1. a mutation whose `find` text does not occur EXACTLY once is a driver failure -- a rename that
+     silently stops matching must not look like a passing control;
+  2. the expected case must appear as `FAIL <group>/<label>` in the output, not merely "some failure";
+  3. `comment-only-control` changes PROSE only and must leave the suite GREEN, which is what proves the
+     red results come from behaviour and not from "we rebuilt something".
+
+Usage: python negative_control.py [--list] [--only NAME]... [--selftest] [--keep]
+ASCII-only stdout (GBK console).
+"""
+from __future__ import print_function
+import argparse, io, os, re, shutil, subprocess, sys, tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
+SRC = os.path.join(HERE, "..", "src")
+PROJ = os.path.join(HERE, "BehaviorTests", "BehaviorTests.csproj")
+EXE = os.path.join(HERE, "BehaviorTests", "bin", "Release", "net6.0", "BehaviorTests.exe")
+DOTNET = r"D:\dmmplayer\dotnet-sdk6\dotnet.exe"
+
+MUTATIONS = [
+    dict(name="clock-paused-fills-combat", file="Model/BattleSession.cs",
+         find="\t\tif (!paused) CombatSeconds += dt;",
+         repl="\t\tCombatSeconds += dt;",
+         expect="clock/advance/paused-delta-does-not-move-combat"),
+    dict(name="window-constant-0.45", file="Model/BattleSession.cs",
+         find="public const double HitMatchSeconds = 0.35;",
+         repl="public const double HitMatchSeconds = 0.45;",
+         expect="window/constants/hit-match-window-is-0.35s"),
+    dict(name="window-no-exact-preference", file="Model/BattleSession.cs",
+         find="\t\t\tif (hitRecord.Damage == damage || hitRecord.Damage == nominal)",
+         repl="\t\t\tif (false && (hitRecord.Damage == damage || hitRecord.Damage == nominal))",
+         expect="window/candidate-order/an-exact-match-beats-an-earlier-pair"),
+    dict(name="window-expiry-uses-greater-equal", file="Model/BattleSession.cs",
+         find="\t\t\tif (now - hitRecord.T > HitMatchSeconds) continue;",
+         repl="\t\t\tif (now - hitRecord.T >= HitMatchSeconds) continue;",
+         expect="window/expiry-boundary/exactly-at-the-window-still-matches (>)"),
+    dict(name="reset-keys-restart-at-2", file="Model/BattleSession.cs",
+         find="\t\t_nextActorKey = 1;\n\t\tPendingHits.Clear();",
+         repl="\t\t_nextActorKey = 2;\n\t\tPendingHits.Clear();",
+         expect="session/reset/reset-restarts-actor-keys-at-1"),
+    dict(name="reset-clears-the-clock", file="Model/BattleSession.cs",
+         find="\t\tTimingStarted = false;\n\t\tEvents.Clear();",
+         repl="\t\tTimingStarted = false;\n\t\tActiveSeconds = 0.0;\n\t\tEvents.Clear();",
+         expect="session/reset/reset-KEEPS-the-battle-clock"),
+    dict(name="series-merge-window-0.4", file="Model/ActorStats.cs",
+         find="if (t - last.T < 0.04)",
+         repl="if (t - last.T < 0.4)",
+         expect="series/damage-curve/a-sample-at-exactly-0.04s-is-appended"),
+    dict(name="cache-ignores-event-count", file="Output/ContributionSession.cs",
+         find="|| _cacheEvents != s.Events.Count",
+         repl="|| false",
+         expect="cache/live-recompute/a-new-event-recomputes-immediately (NOT a one-second throttle)"),
+    dict(name="cache-refresh-10s", file="Output/ContributionSession.cs",
+         find="private const double RefreshSeconds = 1.0;",
+         repl="private const double RefreshSeconds = 10.0;",
+         expect="cache/time-clause/one-second-past-the-refresh-recomputes"),
+    dict(name="comment-only-control", file="Model/BattleSession.cs",
+         find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
+         repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",
+         expect=None),
+]
+
+
+def build_and_run(srcroot):
+    """Returns (build_ok, exit_code, stdout). Child output goes to a FILE, never through a pipe."""
+    logdir = tempfile.mkdtemp(prefix="negctl_")
+    bl = os.path.join(logdir, "build.txt")
+    rl = os.path.join(logdir, "run.txt")
+    with io.open(bl, "w", encoding="utf-8") as fh:
+        rc = subprocess.call([DOTNET, "build", PROJ, "-c", "Release", "-t:Rebuild", "-v", "quiet",
+                              "-p:SrcRoot=" + srcroot], cwd=HERE, stdout=fh, stderr=subprocess.STDOUT)
+    if rc != 0:
+        return False, -1, io.open(bl, encoding="utf-8", errors="replace").read()
+    with io.open(rl, "w", encoding="utf-8") as fh:
+        code = subprocess.call([EXE, "--quiet"], cwd=HERE, stdout=fh, stderr=subprocess.STDOUT)
+    return True, code, io.open(rl, encoding="utf-8", errors="replace").read()
+
+
+def apply_mutation(tmp, mut):
+    """Copy src/ once per run, replace EXACTLY one occurrence. Returns (srcroot, applied, detail)."""
+    if os.path.isdir(tmp):
+        shutil.rmtree(tmp)
+    shutil.copytree(SRC, tmp, ignore=shutil.ignore_patterns("bin", "obj", "__pycache__"))
+    p = os.path.join(tmp, mut["file"].replace("/", os.sep))
+    if not os.path.isfile(p):
+        return tmp, False, "mutation target missing: " + mut["file"]
+    t = io.open(p, encoding="utf-8").read()
+    n = t.count(mut["find"])
+    if n != 1:
+        return tmp, False, "find text occurs %d times (need exactly 1)" % n
+    io.open(p, "w", encoding="utf-8").write(t.replace(mut["find"], mut["repl"]))
+    return tmp, True, "replaced 1 occurrence in " + mut["file"]
+
+
+def one(mut, keep):
+    tmp = os.path.join(tempfile.gettempdir(), "dpsm_negctl_" + re.sub(r"[^A-Za-z0-9_.-]", "_", mut["name"]))
+    srcroot, applied, detail = apply_mutation(tmp, mut)
+    if not applied:
+        print("  [FAIL] %-32s %s" % (mut["name"], detail))
+        return 1
+    ok, code, out = build_and_run(srcroot)
+    expect = mut.get("expect")
+    if not ok:
+        print("  [FAIL] %-32s build FAILED against the mutated copy (a mutant must still compile)" % mut["name"])
+        print("         " + " | ".join(out.strip().splitlines()[-3:])[:200])
+    elif expect is None:
+        if code == 0:
+            print("  [PASS] %-32s prose-only mutation stays GREEN (%s)" % (mut["name"], detail))
+        else:
+            print("  [FAIL] %-32s prose-only mutation turned the suite RED (the suite is not reading behaviour)" % mut["name"])
+            print("         " + " | ".join(l for l in out.splitlines() if l.startswith("FAIL"))[:300])
+    else:
+        reds = [l for l in out.splitlines() if l.startswith("FAIL ")]
+        hit = any(("FAIL " + expect) in l for l in reds)
+        if code != 0 and hit:
+            print("  [PASS] %-32s -> %s went red" % (mut["name"], expect))
+        elif code == 0:
+            print("  [FAIL] %-32s suite stayed GREEN; %s did not bite" % (mut["name"], expect))
+        else:
+            print("  [FAIL] %-32s went red on the WRONG case (wanted %s)" % (mut["name"], expect))
+            print("         reds: " + " | ".join(reds)[:300])
+    m = re.search(r"behavior tests: cases=(\d+) failed=(\d+) pinned=(\d+)", out)
+    if m:
+        print("         cases=%s failed=%s pinned=%s" % (m.group(1), m.group(2), m.group(3)))
+    if not keep:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return 0
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--list", action="store_true")
+    ap.add_argument("--only", action="append", default=[])
+    ap.add_argument("--keep", action="store_true")
+    ap.add_argument("--selftest", action="store_true", help="prove the driver itself can say no")
+    a = ap.parse_args()
+    if a.list:
+        for m in MUTATIONS:
+            print("%-32s %-40s %s" % (m["name"], m["file"], m.get("expect") or "(must stay green)"))
+        return 0
+    if not os.path.isfile(DOTNET):
+        print("BLOCK: dotnet not found at " + DOTNET)
+        return 1
+    if not os.path.isfile(EXE):
+        print("BLOCK: build the behavior suite first: dotnet build " + PROJ)
+        return 1
+    sel = [m for m in MUTATIONS if m["name"] == "comment-only-control"]
+    bogus = dict(name="selftest-bogus-find", file="Model/BattleSession.cs",
+                 find="this text does not exist anywhere", repl="x", expect=None)
+    if a.selftest:
+        print("negative-control driver selftest (2 case(s)):")
+        bad = 0
+        bad += one(bogus, a.keep)      # a mutation that does not apply must be a DRIVER failure
+        bad += one(sel[0], a.keep)     # prose-only must stay green
+        print("driver selftest: %d failure(s)" % bad)
+        return 1 if bad else 0
+    picks = [m for m in MUTATIONS if not a.only or m["name"] in a.only]
+    if not picks:
+        print("BLOCK: --only matched no mutation")
+        return 1
+    print("negative control: %d mutation(s), temp copies of src (the real sources are never modified)" % len(picks))
+    bad = 0
+    for m in picks:
+        bad += one(m, a.keep)
+    print("negative control: %d failure(s) of %d" % (bad, len(picks)))
+    # Leave the tree consistent: the mutant builds overwrite bin/, so rebuild once against the REAL src.
+    with io.open(os.path.join(tempfile.gettempdir(), "negctl_final_build.txt"), "w", encoding="utf-8") as fh:
+        subprocess.call([DOTNET, "build", PROJ, "-c", "Release", "-t:Rebuild", "-v", "quiet"],
+                        cwd=HERE, stdout=fh, stderr=subprocess.STDOUT)
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -19,7 +19,8 @@ USAGE
     python check_export_schema.py --selftest        # prove the checker can reject
 
 No argument: the newest export under BepInEx/plugins/DpsMeter/exports is used.
-Writes a UTF-8 report to _dpsm_work/export_schema_report.txt and prints ASCII-only summary lines
+Writes a UTF-8 report to _dpsm_work/export_schema_report.txt (override with --report PATH) and
+prints ASCII-only summary lines
 (this console is GBK -- printing CJK to stdout mangles it).
 """
 
@@ -1141,8 +1142,20 @@ def selftest():
 
 
 def main(argv):
+    global REPORT
     if '--selftest' in argv:
         return 1 if selftest() else 0
+    argv = list(argv)
+    # RF0 section 5.4 (output isolation): the report used to be written to a FIXED path inside
+    # _dpsm_work, so an acceptance batch rewrote a file outside its own directory. --report lets the
+    # caller send it into the batch archive; the default is unchanged for standalone use.
+    if '--report' in argv:
+        i = argv.index('--report')
+        if i + 1 >= len(argv):
+            print('--report needs a path')
+            return 2
+        REPORT = os.path.abspath(argv[i + 1])
+        del argv[i:i + 2]
     paths = [a for a in argv[1:] if not a.startswith('--')]
     if not paths:
         allf = sorted(glob.glob(os.path.join(EXPORTS, '*.json')), key=os.path.getmtime)

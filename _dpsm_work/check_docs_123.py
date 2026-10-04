@@ -50,6 +50,12 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\ATKADD-MODEL-AUDIT.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\atkadd_sensitivity_result.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\ROLLBACK-1.7.11.md',
+
+	# 2026-10-04 RF0/RF1:仓库边界、基线清单、批次输入快照(都有 CJK,都必须保持可读)
+	r'D:\dmmplayer\rlyehshoujotaix_cl\REPO-BOUNDARY.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\baseline-manifest.json',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch-inputs-rf0.json',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF0-RF2.md',
 ]
 
 

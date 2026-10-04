@@ -13,6 +13,9 @@ CLI (not a flat function):
   BLOCK (exit 1): a .cs that is not valid UTF-8 | a U+FFFD in a .cs | a REQUIRED source file missing |
                   BuildInfo.Version != csproj <Version> | a partial CLASS GROUP whose member does not
                   declare `partial`, or that is empty | a dead-symbol REFERENCE IN CODE
+
+The scanned roots include tests/ (RF1): the behaviour suite compiles production sources, so a corrupted
+test file is a broken test, not a harmless one.
   WARN  (exit 0): mojibake suspects -- the heuristic matches legitimate Latin-1-ish text, so it is a
                   review item, never a verdict | a dead-symbol name that appears ONLY in comments or
                   string literals (prose, not a reference)
@@ -29,7 +32,11 @@ DEAD = re.compile("StatsGivenDamageHook|StatsTakenDamageHook|StatsGivenHealHook|
                   "|StatsAttackHook|DamageTakeOverHook|ChangeLifeHook|ObscuredToInt")
 REQUIRED = ["src/BuildInfo.cs", "src/DpsMeter.csproj", "src/Composition/CharacterNames.cs", "src/Plugin.cs"]
 PARTIAL_GROUPS = (("src/Composition/CompositionProbe*.cs", "CompositionProbe"),
-                  ("src/Ui/OverlayUGUI*.cs", "OverlayUGUI"))
+                  ("src/Ui/OverlayUGUI*.cs", "OverlayUGUI"),
+                  # RF2: Aggregator was split into a facade plus five responsibility partials. The group is
+                  # checked by the SAME rule as the other two, so a new part that forgets `partial`, or a
+                  # part that ends up empty, blocks instead of compiling only by accident.
+                  ("src/Aggregator*.cs", "Aggregator"))
 
 
 def code_only(t):
@@ -76,7 +83,9 @@ def check(root):
     files = 0
     cjk = 0
     unreadable, fffd, moji, dead_code, dead_prose = [], [], [], [], []
-    for top in ("src", "recon_probe", "test"):
+    # RF1 added tests/BehaviorTests: new production-executing sources must be under the same
+    # encoding/dead-symbol guard as src, or the next PowerShell rewrite of a test file is invisible here.
+    for top in ("src", "recon_probe", "test", "tests"):
         d = os.path.join(root, top)
         if not os.path.isdir(d):
             continue
@@ -249,6 +258,19 @@ def selftest():
     io.open(p, "w", encoding="utf-8").write(t)
     rc, txt = run(d, "partial")
     case("a partial part that forgot `partial` blocks", rc == 1 and "partial declaration missing" in txt, "rc=%s" % rc)
+
+    d = fresh("aggpartial")
+    p = os.path.join(d, "src", "Aggregator.Clock.cs")
+    if os.path.isfile(p):
+        t = io.open(p, encoding="utf-8").read().replace("public static partial class Aggregator",
+                                                       "public static class Aggregator", 1)
+        io.open(p, "w", encoding="utf-8").write(t)
+        rc, txt = run(d, "aggpartial")
+        case("an Aggregator partial that forgot `partial` blocks",
+             rc == 1 and "partial declaration missing" in txt, "rc=%s" % rc)
+    else:
+        case("an Aggregator partial that forgot `partial` blocks", False,
+             "src/Aggregator.Clock.cs is missing -- the RF2 group cannot be tampered")
 
     d = fresh("deadcode")
     p = os.path.join(d, "src", "Plugin.cs")

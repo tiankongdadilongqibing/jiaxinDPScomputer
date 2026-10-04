@@ -6,10 +6,20 @@ version instead of "the deployed DLL is X" plus a 29-file snapshot from an earli
 this script writes is bound to input hashes (every export, the deployed DLL, the live config, the guard
 scripts themselves) and to the exact command lines, so a reader can re-run it and diff.
 
-Outputs (all inside an INDEPENDENT directory, default _dpsm_work/acceptance_1.7.11):
+Outputs (all inside an INDEPENDENT PER-BATCH directory, default _dpsm_work/acceptance_rf0; the round-6
+archive stays untouched in acceptance_1.7.11, and that is enforced -- see output_isolation below):
   corpus_manifest.json   per-file sha256/size/version/quest/section/schema + observed verdicts
   runs.json              every command, its exit code, and where its raw stdout/stderr was kept
   RESULTS.md             the human summary: four status columns, expected-vs-observed, gaps
+
+Two checks keep the batch honest about its INPUTS and its SIDE EFFECTS (RF0 sections 5.4 and 5.5):
+  input_freeze      the export set must be EXACTLY the frozen list below. Two battles were played after
+                    the round-6 archive closed, so those two files start a NEW input snapshot rather
+                    than silently changing the old baseline: a file appearing or disappearing mid-batch
+                    is a red check, not a new total.
+  output_isolation  a batch directory is only independent if nothing else moves. Every file these runs
+                    rewrite outside --out must be on the declared CURRENT-OUTPUT list, and the historical
+                    archive directories are watched and must not change at all.
 
 ASCII-only stdout (this console is GBK). Child stdout goes to FILES, never through a pipe.
 
@@ -22,6 +32,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 PY = sys.executable
 DEF_EXPORTS = os.path.join(ROOT, "BepInEx", "plugins", "DpsMeter", "exports")
+# The export directory is written by the RUNNING game (a battle finished at 18:16 while this batch was
+# being prepared). A batch therefore reads the frozen hard-linked snapshot when one exists, so the input
+# set cannot change under it.
+DEF_INPUTS = os.path.join(HERE, "batch_inputs", "rf0")
 DEF_DLL = os.path.join(ROOT, "BepInEx", "plugins", "DpsMeter", "DpsMeter.dll")
 DEF_CFG = os.path.join(ROOT, "BepInEx", "config", "dev.dpsmeter.cfg")
 DEF_LOG = os.path.join(ROOT, "BepInEx", "LogOutput.log")
@@ -44,15 +58,24 @@ SNAPSHOT_30 = {"files": 30,
                                        "WARNING": 3, "ERROR": 1},
                "applicability": {"full": 13, "partial": 9, "not_comparable": 8},
                "as_of": "round 5 N0 run (acceptance_1.7.11/corpus_manifest.json, 14/14 checks)"}
+# The 32-file snapshot of round 6, verified in acceptance_1.7.11 (51/51 checks). Kept as the derivation
+# base for the current pins, and as a record that a batch is always described by the batch it ran in.
+SNAPSHOT_32 = {"files": 32,
+               "crosscheck_batch": {"ERROR": 1, "LEGACY_NOT_APPLICABLE": 16, "PASS": 12, "WARNING": 3},
+               "crosscheck_embedded": {"NOT_RUN": 13, "LEGACY_NOT_APPLICABLE": 3, "PASS": 12,
+                                       "WARNING": 3, "ERROR": 1},
+               "applicability": {"full": 14, "partial": 9, "not_comparable": 9},
+               "as_of": "round 6 run (acceptance_1.7.11/RESULTS.md, 51/51 checks)"}
 # Per-file pins. EVERY entry here is compared in write_out(): an aggregate bucket that still adds up while
-# two files swap PASS<->WARNING must go red. The 144548 pin is kept as history and is re-checked too.
-# The 16:59/17:01 exports (round 6) are pinned from SNAPSHOT_30 plus one explicit rule each -- written
-# BEFORE the round-6 acceptance run:
-#   * battle_411001_20261004_170157.json: version 1.7.11, quest 411001, schema 1.1, has a contribution
-#     section, same deployed DLL as 144548 => predict batch PASS + applicability full.
-#   * battle_9999_20261004_165952.json: quest 9999 is the training mode; every 9999 sample that carries a
-#     contribution section (042458 = 1.7.5/1.0, 135214 = 1.7.8/1.1) was LEGACY_NOT_APPLICABLE for
-#     `crosscheck --batch` and not_comparable for the applicability report => predict the same pair.
+# two files swap PASS<->WARNING must go red. The older pins are kept as history and are re-checked too.
+# The two files below (17:59 and 18:03, both 1.7.11, played after the round-6 archive closed) are pinned
+# from SNAPSHOT_32 plus one explicit rule each -- written BEFORE this batch's acceptance run:
+#   * battle_411001_20261004_180353.json: version 1.7.11, quest 411001, schema 1.1, same deployed DLL as
+#     the other three 1.7.11 samples => predict batch PASS + applicability full.
+#   * battle_9999_20261004_175957.json: quest 9999 is the training ground; every 9999 sample that carries
+#     a contribution section (042458 = 1.7.5/1.0, 135214 = 1.7.8/1.1, 165952 = 1.7.11/1.1) was
+#     LEGACY_NOT_APPLICABLE for `crosscheck --batch` and not_comparable for the applicability report
+#     => predict the same pair.
 NEW_FILES_EXPECTED = {
     "battle_411001_20261004_144548.json": {"crosscheck": "PASS", "applicability": "full",
                                            "why": "first 1.7.10 real battle: PASS + full is the N0 sample verdict"},
@@ -60,16 +83,26 @@ NEW_FILES_EXPECTED = {
                                            "why": "1.7.11 normal 411001 with schema 1.1, same DLL as 144548"},
     "battle_9999_20261004_165952.json": {"crosscheck": "LEGACY_NOT_APPLICABLE", "applicability": "not_comparable",
                                          "why": "training quest: excluded from crosscheck, not comparable"},
+    "battle_411001_20261004_180353.json": {"crosscheck": "PASS", "applicability": "full",
+                                           "why": "1.7.11 normal 411001, schema 1.1, same DLL as 170157"},
+    "battle_9999_20261004_175957.json": {"crosscheck": "LEGACY_NOT_APPLICABLE", "applicability": "not_comparable",
+                                         "why": "training quest, same rule as the other three 9999 samples"},
+    "battle_411001_20261004_180834.json": {"crosscheck": "PASS", "applicability": "full",
+                                           "why": "1.7.11 normal 411001, schema 1.1, same DLL as 180353"},
 }
-# EXPECT_* = SNAPSHOT_30 + the pinned verdict of the two files that are NOT part of it:
-#   battle_9999_20261004_165952.json   -> batch LEGACY (+1), embedded LEGACY (+1), app not_comparable (+1)
-#   battle_411001_20261004_170157.json -> batch PASS (+1),     embedded PASS (+1),   app full (+1)
-EXPECT_BATCH = {"ERROR": 1, "LEGACY_NOT_APPLICABLE": 16, "PASS": 12, "WARNING": 3}
+# EXPECT_* = SNAPSHOT_32 + the pinned verdict of the THREE files that are NOT part of it. 180834 was
+# written at 18:16, i.e. while this batch was already being prepared, and is the reason the batch runs
+# against a frozen hard-linked input snapshot instead of the live directory (see FROZEN_MANIFEST).
+#   175957 -> batch LEGACY (+1), embedded LEGACY (+1), app not_comparable (+1)
+#   180353 -> batch PASS   (+1), embedded PASS   (+1), app full           (+1)
+#   180834 -> batch PASS   (+1), embedded PASS   (+1), app full           (+1)
+EXPECT_BATCH = {"ERROR": 1, "LEGACY_NOT_APPLICABLE": 17, "PASS": 14, "WARNING": 3}
 # applicability.json reports its OWN embedded crosscheck status per file; it says NOT_RUN (not LEGACY) for a
 # file with no contribution section, so its histogram is a different one. Both are recorded and the
 # divergence is checked as an identity -- a silent vocabulary split is exactly what confuses a reader.
-EXPECT_EMBEDDED = {"NOT_RUN": 13, "LEGACY_NOT_APPLICABLE": 3, "PASS": 12, "WARNING": 3, "ERROR": 1}
-EXPECT_APP = {"full": 14, "partial": 9, "not_comparable": 9}
+# NOT_RUN stays 13: both new files DO carry the section, so neither is added to that bucket.
+EXPECT_EMBEDDED = {"NOT_RUN": 13, "LEGACY_NOT_APPLICABLE": 4, "PASS": 14, "WARNING": 3, "ERROR": 1}
+EXPECT_APP = {"full": 16, "partial": 9, "not_comparable": 10}
 # A guard run that exits non-zero must FAIL the acceptance. Before this, RESULTS.md printed the exit code
 # and nothing went red, so a guard could start failing and the run would still read "checks: N ok".
 # Exactly one run is allowed to be non-zero, and the allowance is named with its reason; a stale entry
@@ -85,8 +118,45 @@ KNOWN_BAD = {"battle_411001_20261004_015919.json": "the 1.6.0 sample (58 factor-
 LABELING_DIVERGENCE = ("a file with no contribution section is LEGACY_NOT_APPLICABLE to `crosscheck --batch` "
                        "and NOT_RUN to the applicability report: same fact, two words. Tracked by N1 (an absent "
                        "section must not pass as legacy-ok).")
+# RF0 section 5.5: the batch's INPUT LIST comes from a FROZEN SNAPSHOT (batch_snapshot.py), not from the
+# export directory. The directory is LIVE: during the first RF0 attempt the running game appended a battle
+# in the middle of the batch and moved every corpus total, histogram and crosscheck bucket. Counts alone
+# would not catch that either -- they still add up when one file is replaced by another. The manifest is
+# committed (batch-inputs-rf0.json); the hard-linked JSON files are not, and do not need to be.
+FROZEN_MANIFEST = os.path.join(HERE, "batch-inputs-rf0.json")
 
 
+def load_frozen(path):
+    """(sorted file names, where they came from). An EMPTY list is a red check, never a skip: a batch
+    that cannot name its inputs is not a baseline."""
+    if path and os.path.isfile(path):
+        try:
+            m = json.load(io.open(path, encoding="utf-8"))
+        except Exception as ex:
+            return [], "unreadable manifest %s (%r)" % (path, ex)
+        return (sorted(e["file"] for e in (m.get("files") or [])),
+                os.path.relpath(path, ROOT).replace(os.sep, "/"))
+    return [], "no manifest at %s" % path
+
+
+# Paths a run must not touch, and how deep to look: (dir, 1 = files directly inside only, -1 = recursive).
+WATCH = [(HERE, 1),
+         (ROOT, 1),
+         (os.path.join(HERE, "acceptance_1.7.11"), -1),
+         (os.path.join(HERE, "contrib", "reports"), -1)]
+# Files a guard run legitimately rewrites at a FIXED path (i.e. NOT through --out). Every entry needs a
+# reason, and the list is filled from OBSERVED behaviour rather than from reading the guards: an
+# undeclared change is a red check, so this is the record of what was actually isolated.
+ALLOWED_CURRENT_OUTPUTS = {
+    # Keys are REPO-relative (the same space changed_paths() reports), which the first run caught: the
+    # first version used script-relative names and every one of them was reported as undeclared.
+    "_dpsm_work/export_schema_selftest.txt": "check_export_schema.py --selftest spills its transcript next "
+                                            "to the script; the RUN report is redirected via --report",
+    "_dpsm_work/fact_signature_selftest.txt": "check_fact_signature.py --selftest spills its transcript "
+                                             "next to the script; the RUN report goes to --outdir",
+    "_dpsm_work/v150_validate.txt": "v150_validate.py writes its report to a fixed path next to the "
+                                    "script (this pipeline has no --out for it yet)",
+}
 def sha256_file(path, chunk=1 << 20):
     h = hashlib.sha256()
     with io.open(path, "rb") as fh:
@@ -96,6 +166,68 @@ def sha256_file(path, chunk=1 << 20):
                 break
             h.update(b)
     return h.hexdigest().upper()
+
+
+def _rel(p):
+    return os.path.relpath(p, ROOT).replace(os.sep, "/")
+
+
+def snapshot_roots():
+    """(repo-relative path -> (size, mtime_ns)) for every file a run must not rewrite.
+
+    size+mtime rather than a hash: this is a "did anything touch it" tripwire and it has to stay cheap
+    enough to take twice per batch over the repo root. A rewrite with identical content still trips it,
+    which is the fail-safe direction."""
+    out = {}
+    for base, depth in WATCH:
+        if not os.path.isdir(base):
+            continue
+        for r, dirs, fns in os.walk(base):
+            for fn in fns:
+                p = os.path.join(r, fn)
+                try:
+                    st = os.stat(p)
+                except Exception:
+                    continue
+                out[_rel(p)] = (st.st_size, st.st_mtime_ns)
+            if depth == 1:
+                dirs[:] = []
+    return out
+
+
+def changed_paths(before, after):
+    keys = set(list(before) + list(after))
+    return sorted(k for k in keys if before.get(k) != after.get(k))
+
+
+def input_freeze_checks(corpus, frozen):
+    """Two rows: the COUNT and the SET. A count alone cannot see a swap, so both are compared."""
+    names = set(e["file"] for e in corpus)
+    want = set(frozen)
+    missing = sorted(want - names)
+    extra = sorted(names - want)
+    return [
+        {"kind": "input_freeze", "bucket": "file count", "expected": len(want), "observed": len(names),
+         "ok": len(want) == len(names)},
+        {"kind": "input_freeze", "bucket": "file set", "expected": "0 missing / 0 extra",
+         "observed": "%d missing / %d extra%s" % (len(missing), len(extra),
+                                                  ("  " + ", ".join((missing + extra)[:4])) if (missing or extra) else ""),
+         "ok": not missing and not extra},
+    ]
+
+
+def isolation_checks(changed, allowed, outdir):
+    """One aggregate row plus one informational row per declared fixed-path output."""
+    outrel = _rel(os.path.abspath(outdir))
+    undeclared = [p for p in changed
+                  if not p.startswith(outrel + "/") and p not in allowed]
+    checks = [{"kind": "output_isolation", "bucket": "changes outside --out", "expected": "0 undeclared",
+               "observed": ("%d undeclared: %s" % (len(undeclared), ", ".join(undeclared[:6]))) if undeclared else "0 undeclared",
+               "ok": not undeclared}]
+    for p in sorted(set(changed) & set(allowed)):
+        checks.append({"kind": "current_output", "bucket": p, "expected": "declared", "observed": "written",
+                       "ok": True, "why": allowed[p]})
+    return checks
 
 
 def read_head_tail(path, head_bytes=4096, tail_bytes=400000):
@@ -166,11 +298,15 @@ class Runner(object):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--exports", default=DEF_EXPORTS)
-    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_1.7.11"))
+    ap.add_argument("--exports", default=DEF_INPUTS if os.path.isdir(DEF_INPUTS) else DEF_EXPORTS)
+    # Per-batch output directory. The default names the CURRENT batch, so a plain run reproduces the
+    # archive the documents describe; the round-6 archive stays frozen in acceptance_1.7.11 (watched).
+    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_rf2"))
     ap.add_argument("--dll", default=DEF_DLL)
     ap.add_argument("--cfg", default=DEF_CFG)
     ap.add_argument("--log", default=DEF_LOG)
+    ap.add_argument("--frozen", default=FROZEN_MANIFEST,
+                    help="batch snapshot manifest = the frozen input list (default batch-inputs-rf0.json)")
     ap.add_argument("--skip-heavy", action="store_true", help="skip recon_probe and the batch crosscheck")
     ap.add_argument("--quick", action="store_true", help="corpus + build hashes only (no guard runs)")
     ap.add_argument("--selftest", action="store_true", help="negative control for the run_exit checks only")
@@ -181,7 +317,8 @@ def main():
         os.makedirs(args.out)
     exports_dir = os.path.abspath(args.exports)
     corpus = collect_corpus(exports_dir)
-    print("corpus files=%d" % len(corpus))
+    frozen, frozen_source = load_frozen(args.frozen)
+    print("corpus files=%d  frozen list=%d (%s)" % (len(corpus), len(frozen), frozen_source))
 
     buildinfo = os.path.join(HERE, "src", "BuildInfo.cs")
     src_version = None
@@ -200,7 +337,12 @@ def main():
                   "check_live_log.py", "check_doc_convergence.py", "check_docs_123.py",
                   "check_given_fold_coupling.py", "check_fact_signature.py", "check_p2a_summary_and_lastbattle.py",
                   "contribution_applicability.py", "pairtrusted_impact.py", "refactor_final_check.py",
-                  "contribution_gate.py", "contrib/crosscheck.py", "contrib/compare.py"]
+                  "contribution_gate.py", "contrib/crosscheck.py", "contrib/compare.py",
+                  "repo_manifest.py", "tests/negative_control.py"]
+    tool_files += ["tests/BehaviorTests/" + n for n in
+                   ("BehaviorTests.csproj", "Program.cs", "Runner.cs", "Stubs.cs", "Cases.Clock.cs",
+                    "Cases.HitWindow.cs", "Cases.SessionState.cs", "Cases.Series.cs", "Cases.Cache.cs",
+                    "Cases.Tiered.cs")]
     tools = git_free_code_hash([os.path.join(HERE, t) for t in tool_files])
 
     meta = {
@@ -209,13 +351,17 @@ def main():
         "source_version_BuildInfo": src_version, "deployed_dll": os.path.relpath(args.dll, ROOT).replace("\\", "/"),
         "deployed_dll_sha256": dll_sha, "config": os.path.relpath(args.cfg, ROOT).replace("\\", "/"),
         "config_sha256": cfg_sha, "config_switches": cfg_switches, "tool_sha256": tools,
-        "python": PY, "notes": ["logs are associated only when the log names the export path",
+        "frozen_input": {"source": frozen_source, "count": len(frozen)}, "python": PY,
+        "notes": ["logs are associated only when the log names the export path",
                               "no historical export, DLL, config or evidence file is modified by this script"],
     }
 
+    # Taken BEFORE the first child process: everything these runs write outside --out shows up as a
+    # change, and the historical archives must show up as NO change at all.
+    before = snapshot_roots()
     runner = Runner(args.out)
     if args.quick:
-        write_out(args.out, meta, corpus, runner.runs, {}, {}, checks_enabled=False)
+        write_out(args.out, meta, corpus, runner.runs, {}, {}, checks_enabled=False, frozen=frozen)
         print("quick mode: wrote corpus + hashes (no guard runs, no verdicts)")
         return 0
 
@@ -227,16 +373,21 @@ def main():
                                       "--exports", exports_dir, "--json", app_json], cwd=HERE)
     cc_dir = os.path.join(args.out, "crosscheck")
     if not args.skip_heavy:
-        runner.run("crosscheck(batch)", [PY, "-m", "contrib.crosscheck", "--batch", "battle_*.json",
+        # An ABSOLUTE glob: contrib/crosscheck.py resolves a bare pattern against the LIVE export dir,
+        # which grows while the game runs.
+        runner.run("crosscheck(batch)", [PY, "-m", "contrib.crosscheck",
+                                         "--batch", os.path.join(exports_dir, "battle_*.json"),
                                          "--outdir", cc_dir], cwd=HERE)
     runner.run("pairtrusted(all)", [PY, os.path.join(HERE, "pairtrusted_impact.py"), "--files"] + names +
                ["--out-json", os.path.join(args.out, "pairtrusted_impact_report.json"),
                 "--out-txt", os.path.join(args.out, "pairtrusted_impact_report.txt")], cwd=HERE)
-    runner.run("export_schema(all)", [PY, os.path.join(HERE, "check_export_schema.py")] + paths, cwd=HERE)
-    for src, dst in (("export_schema_report.txt", "export_schema_report.txt"),):
-        sp = os.path.join(HERE, src)
-        if os.path.isfile(sp):
-            io.open(os.path.join(args.out, dst), "w", encoding="utf-8").write(io.open(sp, encoding="utf-8").read())
+    # Output isolation (RF0 section 5.4). Both of these guards default to a FIXED report path inside
+    # _dpsm_work, so a batch run would rewrite files outside --out and the previous archive could be
+    # confused with the new one. Both accept a destination, so the batch writes its own copy and the
+    # fixed path is left to standalone use.
+    runner.run("export_schema(all)", [PY, os.path.join(HERE, "check_export_schema.py"),
+                                      "--report", os.path.join(args.out, "export_schema_report.txt")] + paths,
+               cwd=HERE)
     runner.run("layout(all)", [PY, os.path.join(HERE, "check_contribution_layout.py"), "--dir", exports_dir], cwd=HERE)
     if os.path.isfile(args.log):
         runner.run("live_log", [PY, os.path.join(HERE, "check_live_log.py"), "--log", args.log], cwd=HERE)
@@ -246,15 +397,21 @@ def main():
             ("selftest/layout", [PY, os.path.join(HERE, "check_contribution_layout.py"), "--selftest"]),
             ("selftest/schema", [PY, os.path.join(HERE, "check_export_schema.py"), "--selftest"]),
             ("selftest/live_log", [PY, os.path.join(HERE, "check_live_log.py"), "--selftest"]),
-            ("doc_convergence", [PY, os.path.join(HERE, "check_doc_convergence.py")]),
-            ("selftest/doc_convergence", [PY, os.path.join(HERE, "check_doc_convergence.py"), "--selftest"]),
+            # Both point at the BATCH inputs: the doc totals must describe what this batch ran on, and the
+            # fixed-path applicability report is stale by construction (n0 writes --json into --out).
+            ("doc_convergence", [PY, os.path.join(HERE, "check_doc_convergence.py"),
+                                "--applicability", os.path.join(args.out, "applicability.json"),
+                                "--exports", exports_dir]),
+            ("selftest/doc_convergence", [PY, os.path.join(HERE, "check_doc_convergence.py"), "--selftest",
+                                          "--applicability", os.path.join(args.out, "applicability.json"),
+                                          "--exports", exports_dir]),
             ("docs123", [PY, os.path.join(HERE, "check_docs_123.py")]),
             ("selftest/docs123", [PY, os.path.join(HERE, "check_docs_123.py"), "--selftest"]),
             ("test_gate", [PY, "-m", "contrib.tests.test_gate"]),
             ("given_coupling", [PY, os.path.join(HERE, "check_given_fold_coupling.py")]),
             ("selftest/given_coupling", [PY, os.path.join(HERE, "check_given_fold_coupling.py"), "--selftest"]),
             ("p2a", [PY, os.path.join(HERE, "check_p2a_summary_and_lastbattle.py")]),
-            ("factsig", [PY, os.path.join(HERE, "check_fact_signature.py")]),
+            ("factsig", [PY, os.path.join(HERE, "check_fact_signature.py"), "--outdir", args.out]),
             ("selftest/applicability", [PY, os.path.join(HERE, "contribution_applicability.py"), "--selftest"]),
             ("selftest/pairtrusted", [PY, os.path.join(HERE, "pairtrusted_impact.py"), "--selftest"]),
             ("refactor_final_check", [PY, os.path.join(HERE, "refactor_final_check.py")]),
@@ -265,11 +422,21 @@ def main():
             ("selftest/eligibility_e2e", [PY, os.path.join(HERE, "comparison_eligibility.py"), "--selftest-e2e"]),
             ("selftest/compare", [PY, "-m", "contrib.compare", "--selftest"]),
             ("selftest/decision", [PY, os.path.join(HERE, "decision_report.py"), "--selftest"]),
-            ("selftest/budget", [PY, os.path.join(HERE, "budget_census.py"), "--selftest"])]:
+            ("selftest/budget", [PY, os.path.join(HERE, "budget_census.py"), "--selftest"]),
+            ("repo_manifest_verify", [PY, os.path.join(HERE, "repo_manifest.py"), "--verify",
+                                      "--exports", exports_dir])]:
         runner.run(nm, argv, cwd=HERE)
     if not args.skip_heavy and os.path.isfile(DOTNET):
         runner.run("recon_probe", [DOTNET, "run", "--project", os.path.join(HERE, "recon_probe", "ReconProbe.csproj"),
                                    "-c", "Release", "-v", "quiet", "--", os.path.join(args.out, "recon_probe_out.json")], cwd=HERE)
+        # RF1: the normalised behaviour suite, then a two-mutation negative control that has to make it
+        # go RED. Both execute the real production sources; the control proves the suite can say no.
+        runner.run("csharp_behavior", [DOTNET, "run", "--project",
+                                       os.path.join(HERE, "tests", "BehaviorTests", "BehaviorTests.csproj"),
+                                       "-c", "Release", "-v", "quiet", "--", "--quiet"], cwd=HERE)
+        runner.run("csharp_behavior_negctl", [PY, os.path.join(HERE, "tests", "negative_control.py"),
+                                              "--only", "window-constant-0.45",
+                                              "--only", "comment-only-control"], cwd=HERE)
 
     # per-file verdicts from the applicability run
     verdicts = {}
@@ -289,12 +456,17 @@ def main():
             m = re.search(r'batch: \d+ file\(s\) (\{[^}]*\})', r["tail"])
             if m:
                 cc_summary = m.group(1)
-    write_out(args.out, meta, corpus, runner.runs, verdicts, {"crosscheckSummary": cc_summary})
+    changed = changed_paths(before, snapshot_roots())
+    isolation = {"checks": isolation_checks(changed, ALLOWED_CURRENT_OUTPUTS, args.out),
+                 "changed": changed}
+    write_out(args.out, meta, corpus, runner.runs, verdicts, {"crosscheckSummary": cc_summary},
+              frozen=frozen, isolation=isolation)
     print("wrote %s" % args.out)
     return 0
 
 
-def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True):
+def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True, frozen=None,
+              isolation=None):
     for e in corpus:
         v = verdicts.get(e["file"]) or {}
         e.update(v)
@@ -354,6 +526,10 @@ def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True):
                 obs = row.get(key) or "(missing)"
                 checks.append({"kind": "per_file", "bucket": "%s.%s" % (f, key),
                                "expected": exp[key], "observed": obs, "ok": obs == exp[key]})
+        # Input freeze + output isolation. Both are checks, not notes: write_out is the only place that
+        # can turn them red, and --selftest drives these same functions with tampered inputs.
+        checks.extend(input_freeze_checks(corpus, frozen if frozen is not None else FROZEN_CORPUS))
+        checks.extend((isolation or {}).get("checks") or [])
         not_run = sorted(e["file"] for e in corpus if e.get("crosscheck") == "NOT_RUN")
     else:
         not_run = []
@@ -364,6 +540,10 @@ def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True):
                 "observed": {"crosscheck_batch": obs_batch, "crosscheck_embedded": obs_emb,
                              "applicability": obs_app},
                 "labelingDivergence": {"files": not_run, "note": LABELING_DIVERGENCE},
+                "inputFreeze": {"frozen": sorted(frozen if frozen is not None else FROZEN_CORPUS)},
+                "outputIsolation": {"watch": [{"dir": _rel(b), "depth": d} for b, d in WATCH],
+                                    "changed": (isolation or {}).get("changed") or [],
+                                    "allowed": ALLOWED_CURRENT_OUTPUTS},
                 "checks": checks, "corpus": corpus}
     io.open(os.path.join(outdir, "corpus_manifest.json"), "w", encoding="utf-8").write(
         json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=True))
@@ -385,7 +565,7 @@ def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True):
     if not checks_enabled:
         L.append("(quick mode: no guard runs and no per-file verdicts were collected)")
         L.append("")
-    L.append("Expectation = the verified 30-file snapshot + the verdict pinned per new file; every pin is compared.")
+    L.append("Expectation = the verified 32-file snapshot + the verdict pinned per file added since; every pin is compared.")
     L.append("")
     L.append("| kind | bucket | expected | observed | ok |")
     L.append("|---|---|---|---|---|")
@@ -400,6 +580,15 @@ def write_out(outdir, meta, corpus, runs, verdicts, extra, checks_enabled=True):
         L.append("| embedded | %s | %d | %d |" % (k, EXPECT_EMBEDDED.get(k, 0), obs_emb.get(k, 0)))
     L.append("")
     L.append("**Labeling divergence (documented, tracked by N1):** %s" % LABELING_DIVERGENCE)
+    L.append("")
+    L.append("**Batch inputs and side effects.** The input list is frozen by name (%d files); the watch"
+             % len(frozen if frozen is not None else FROZEN_CORPUS))
+    L.append("roots below are re-stat-ed around the whole run, so the historical archives must show no"
+             " change at all:")
+    L.append("")
+    for b, d in WATCH:
+        L.append("- %s (%s)" % (b.replace(ROOT, "").lstrip("\\").replace("\\", "/"),
+                               "files only" if d == 1 else "recursive"))
     L.append("")
     L.append("Files the applicability report labels NOT_RUN (%d): %s" % (len(not_run), ", ".join(not_run)))
     L.append("")
@@ -456,7 +645,7 @@ def selftest():
                 "config_sha256": "0" * 64, "config_switches": {}}
         corpus = [{"file": "synthetic.json", "size": 0, "sha256": "0" * 64, "version": "1.0",
                    "quest": 1, "hasContributionSection": False, "contributionSchemaVersion": None}]
-        write_out(outdir, meta, corpus, runs, {}, {}, checks_enabled=True)
+        write_out(outdir, meta, corpus, runs, {}, {}, checks_enabled=True, frozen=["synthetic.json"])
         man = json.load(io.open(os.path.join(outdir, "corpus_manifest.json"), encoding="utf-8"))
         got = {c["bucket"]: c["ok"] for c in man["checks"] if c["kind"] == "run_exit"}
         for name, w in sorted(want.items()):
@@ -480,6 +669,29 @@ def selftest():
              {"crosscheck(batch)": True})
         case("allowlisted_exit2", [nz("crosscheck(batch)", 2)], {"crosscheck(batch)": False},
              {"crosscheck(batch)": True})
+
+        # --- RF0: the input freeze and the output isolation must both be able to say no ---
+        base = ["a.json", "b.json"]
+        for label, names, want_ok in (("exact", base, True),
+                                      ("extra-file", base + ["c.json"], False),
+                                      ("missing-file", ["a.json"], False),
+                                      ("empty", [], False)):
+            ch = input_freeze_checks([{"file": n} for n in names], base)
+            got = all(c["ok"] for c in ch)
+            cases.append({"case": "input_freeze/" + label, "want_ok": want_ok, "got_ok": got,
+                          "pass": got == want_ok})
+        allowed = {"_dpsm_work/current.txt": "declared fixed-path output"}
+        acc = os.path.join(HERE, "acc")
+        for label, changed, alw, want_ok in (
+                ("clean", [], {}, True),
+                ("inside-out-is-fine", ["_dpsm_work/acc/corpus_manifest.json"], {}, True),
+                ("undeclared-outside", ["_dpsm_work/SESSION-STATE.md"], {}, False),
+                ("historical-archive-moved", ["_dpsm_work/acceptance_1.7.11/RESULTS.md"], {}, False),
+                ("declared-fixed-path", ["_dpsm_work/current.txt"], allowed, True)):
+            ch = isolation_checks(changed, alw, acc)
+            got = all(c["ok"] for c in ch)
+            cases.append({"case": "output_isolation/" + label, "want_ok": want_ok, "got_ok": got,
+                          "pass": got == want_ok})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     bad = [c for c in cases if not c["pass"]]

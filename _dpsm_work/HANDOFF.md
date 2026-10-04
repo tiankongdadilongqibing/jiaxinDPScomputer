@@ -34,9 +34,9 @@
 
 | 用途 | 路径 / 命令 |
 |---|---|
-| 插件源码 | `_dpsm_work\src\DpsMeter.csproj`(**65 个 .cs**;守卫脚本扫 src+recon_probe+test 共 68) |
+| 插件源码 | `_dpsm_work\src\DpsMeter.csproj`(**70 个 .cs**;RF2 拆出 6 个 `Aggregator*` partial;守卫脚本扫 src+recon_probe+test+tests 共 **83**) |
 | 部署目标 | `BepInEx\plugins\DpsMeter\DpsMeter.dll` |
-| 战斗导出 | `BepInEx\plugins\DpsMeter\exports\*.json`(**当前 32 份**:411001×23 / 试炼场 9999×8 / 700817×1;版本 1.5.3→1.7.11) |
+| 战斗导出 | `BepInEx\plugins\DpsMeter\exports\*.json`(**活的**:游戏在跑)。批次读冻结快照 **35 份**(`_dpsm_work\batch-inputs-rf0.json`:411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11) |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动游戏被删,只留最新一场的 `[RULE]/[STATE]/[PARAM]`) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` |
 | IL2CPP interop | `BepInEx\interop\Assembly-CSharp.dll`(**纯桩,没有方法体**) |
@@ -381,7 +381,7 @@
   1.6.1 改为往返精度输出(§7.2.87);**1.6.1 已于 2026-10-04 02:19 实机验收通过** ——
   `crosscheck` status=OK / mismatches=0,schema 与 v150 problems=0,**阶段 E 闭环完成**(§7.2.88)。
   (`.bak` 档案实测 2026-10-04:插件目录 **105** 项,其中 `.bak` **102** 个、`DpsMeter.dll.*.bak` **34** 个;回滚档案不是文档;**两个 crash.bak 绝不回滚/删除**)。
-* 导出 **32 份**(411001×23 / 试炼场 9999×8 / 700817×1;版本 1.5.3→1.7.11;**19 份含 `contribution` 段**(schema 1.0 ×13 / 1.1 ×6),13 份无段,1 份 1.6.0 不可复算;按 32 份重跑 = **full 14 / partial 9 / not_comparable 9**(29 份时为 12 / 9 / 8):新增四场(1.7.10×1、1.7.11×2)全部落进既有类别,9999 训练场一律 `not_comparable` —— **没有出现新类别**)。
+* **当前语料 = 冻结快照 35 份**(411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;**22 份含 `contribution` 段**(schema 1.0 ×13 / 1.1 ×9),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算;**快照外的场次不计入本批**。**历史口径**:按 32 份重跑 = full 14 / partial 9 / not_comparable 9(29 份时为 12 / 9 / 8):新增的 1.7.10/1.7.11 场次全部落进既有类别,9999 训练场一律 `not_comparable` —— **没有出现新类别**)。
   **B 组 5 场**(197.1–209.3M,均值 203.0),A 组 5 场(181.0–198.5M,均值 192.4),**区间重叠**(§7.2.88)。
 * 守卫 **17 项 Python 闸门**全 exit 0(export_schema / **check_contribution_layout** / **contrib.tests.test_gate** / **crosscheck --selftest** / fact_signature(含 --selftest)/ refactor_final_check / docs_123 / v150_validate / test_samples / golden155 / **phase_e_dryrun** / **contribution_applicability** / **pairtrusted_impact** / **check_p2a_summary_and_lastbattle**);
   `recon_probe` ALL CHECKS PASSED(179 个断言调用点);构建 0 警 0 错。

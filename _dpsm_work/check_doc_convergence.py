@@ -48,8 +48,12 @@ DOCS = [
     ("plan", os.path.join(HERE, "PROJECT-DIRECTION-AND-IMPLEMENTATION-PLAN.md")),
     ("handoff", os.path.join(HERE, "HANDOFF.md")),
     ("index", os.path.join(ROOT, "DpsMeter-\u6587\u6863\u7d22\u5f15.md")),
+    # RF0: PROJECT-STATUS.md answers "what is true NOW", so a contradiction in it is the worst kind.
+    # It was outside this guard until the plan (section 2) pointed at three wrong numbers inside it.
+    ("status", os.path.join(HERE, "PROJECT-STATUS.md")),
 ]
-STATUS_DOCS = ("index", "handoff", "report")
+STATUS_DOCS = ("index", "handoff", "report", "status")
+APPLICABILITY = os.path.join(HERE, "contribution_applicability_report.json")
 
 HIST = ["\u5386\u53f2", "\u5f53\u65f6", "\u62a5\u544a\u751f\u6210\u65f6", "\u62a5\u544a\u65f6",
         "\u6d3e\u53d1", "\u6b64\u524d", "\u66fe\u7ecf", "\u65f6\u70b9", "\u57fa\u7ebf", "\u524d\u4e00\u7248",
@@ -116,7 +120,53 @@ def known_limits(cs_text, py_text):
     return parse(grab(cs_text, "knownLimits")), parse(grab(py_text, "knownLimits"))
 
 
-def load_truth():
+def export_facts(exports_dir=None):
+    """version -> [files that CARRY the contribution section, total files of that version].
+
+    R10 needs this because the documents state a version DISTRIBUTION, and the old guard only counted
+    files: a line that called 1.6.0 a "pre-section version" sat next to a 1.6.0 file that carries the
+    section, and nothing noticed. Read-only, and the tail is read because the section is the last key.
+    """
+    out = {}
+    for p in glob.glob(os.path.join(exports_dir or EXPORTS, "battle_*.json")):
+        size = os.path.getsize(p)
+        head = io.open(p, "rb").read(4096).decode("utf-8", "replace")
+        m = re.search(r'"version"\s*:\s*"([0-9.]+)"', head)
+        v = m.group(1) if m else "?"
+        with io.open(p, "rb") as fh:
+            fh.seek(max(0, size - 400000))
+            tail = fh.read().decode("utf-8", "replace")
+        rec = out.setdefault(v, [0, 0])
+        rec[1] += 1
+        if '"contribution":{' in tail:
+            rec[0] += 1
+    return out
+
+
+def acceptance_facts():
+    """The NEWEST acceptance_*/ archive: the record of the pipeline's command and check counts.
+
+    The documents state a property of the TOOL, and an archive is where that property is written down.
+    During a batch the newest archive is still the previous batch's, which is exactly what makes R9
+    non-circular: a run cannot be judged against counts it has not written yet. The workflow is
+    "run the batch -> update the stated counts from the new archive -> re-run THIS guard alone"."""
+    best = None
+    for d in glob.glob(os.path.join(HERE, "acceptance_*")):
+        rj = os.path.join(d, "runs.json")
+        cj = os.path.join(d, "corpus_manifest.json")
+        if not (os.path.isfile(rj) and os.path.isfile(cj)):
+            continue
+        mt = os.path.getmtime(rj)
+        if best is None or mt > best[0]:
+            best = (mt, d)
+    if not best:
+        return None
+    runs = json.loads(read(os.path.join(best[1], "runs.json"))).get("runs") or []
+    checks = json.loads(read(os.path.join(best[1], "corpus_manifest.json"))).get("checks") or []
+    return {"dir": os.path.basename(best[1]), "runs": len(runs), "checks": len(checks)}
+
+
+def load_truth(app_path=None, exports_dir=None):
     b = read(os.path.join(HERE, "src", "BuildInfo.cs"))
     m = re.search(r'Version\s*=\s*"([0-9][0-9.]*)"', b)
     version = m.group(1) if m else None
@@ -128,14 +178,18 @@ def load_truth():
         with open(LIVE_DLL, "rb") as fh:
             sha = hashlib.sha256(fh.read()).hexdigest().upper()
     app = {}
-    rp = os.path.join(HERE, "contribution_applicability_report.json")
+    # RF0 output isolation: this used to read a FIXED path that the acceptance batch does not refresh,
+    # so R6 could be satisfied by a stale scan. --applicability points it at the batch's own file.
+    rp = app_path or APPLICABILITY
     if os.path.isfile(rp):
         for e in json.loads(read(rp)).get("exports", []):
             app.setdefault(str(e.get("quest")), set()).add(e.get("modelApplicability"))
     app = dict((k, sorted(v)) for k, v in app.items())
     return {"version": version, "schema": schema, "sha": sha,
-            "exports": len(glob.glob(os.path.join(EXPORTS, "battle_*.json"))),
-            "applicability": app,
+            "exports": len(glob.glob(os.path.join(exports_dir or EXPORTS, "battle_*.json"))),
+            "exportsDir": os.path.relpath(exports_dir or EXPORTS, ROOT).replace(os.sep, "/"),
+            "applicability": app, "applicabilitySource": os.path.relpath(rp, ROOT).replace(os.sep, "/"),
+            "sectionVersions": export_facts(exports_dir), "acceptance": acceptance_facts(),
             "knownLimits": known_limits(c, read(REPORT_JSON))}
 
 
@@ -213,11 +267,78 @@ def audit(docs, truth):
     same = bool(cs) and cs == py and len(cs) == M_EXPECTED_LIMITS
     add("R8 plugin and offline knownLimits are the same %d strings" % (len(cs) if cs else 0), same,
         "cs=%s py=%s" % (len(cs) if cs else None, len(py) if py else None))
+    # R9: the stated command/check counts. The plan (section 5.6) named this gap: the guard compared
+    # WORDS, so a document could say "29 commands / 50 checks" while the pipeline ran 30 and produced 51
+    # and nothing went red. No historical exemption here on purpose -- the line that states the counts
+    # legitimately contains the word 验收, so exempting it would exempt the only line that matters.
+    acc = truth.get("acceptance")
+    bad = []
+    if acc:
+        for n, t in docs.items():
+            for i, l in enumerate(lines_of(t)):
+                for m in re.finditer("([0-9]+)\\s*\\u6761\\u547d\\u4ee4", l):
+                    if int(m.group(1)) != acc["runs"]:
+                        bad.append("%s:%d claims %s commands, %s has %d" % (n, i + 1, m.group(1), acc["dir"], acc["runs"]))
+                for m in re.finditer("([0-9]+)\\s*/\\s*([0-9]+)\\s*\\u68c0\\u67e5", l):
+                    if int(m.group(2)) != acc["checks"]:
+                        bad.append("%s:%d claims %s checks, %s has %d" % (n, i + 1, m.group(2), acc["dir"], acc["checks"]))
+                for m in re.finditer("([0-9]+)\\s*\\u6761\\u68c0\\u67e5", l):
+                    if int(m.group(1)) != acc["checks"]:
+                        bad.append("%s:%d claims %s checks, %s has %d" % (n, i + 1, m.group(1), acc["dir"], acc["checks"]))
+    add("R9 the stated acceptance counts match the newest archive (%s)" % (acc["dir"] if acc else "none"),
+        not bad and acc is not None, "; ".join(bad[:4]))
+    # R10: "X files have no section" must be the real count, and the version list that IMMEDIATELY follows
+    # it must contain only versions that really have none. The list is not read from anywhere else on the
+    # line: a sentence can mention 无段 in passing and also mention 1.6.0/1.7.10/1.7.11 elsewhere, and none
+    # of those are claims. (The first version of this rule read every version on the line and flagged
+    # exactly that in HANDOFF.md:384 -- a guard that cries wolf gets disabled, so it was narrowed.)
+    sv = truth.get("sectionVersions") or {}
+    total = sum(v[1] for v in sv.values())
+    sectionless = total - sum(v[0] for v in sv.values())
+    bad = []
+    pat = re.compile("\\u65e0\\u6bb5\\s*([0-9]+)\\s*\\u4efd\\s*[=:\\uff1a]?\\s*"
+                     "((?:[0-9]+\\.[0-9]+(?:\\.[0-9]+)?(?:[\\u2013~-][0-9.]+)?)"
+                     "(?:\\s*/\\s*[0-9.]+(?:[\\u2013~-][0-9.]+)?)*)")
+    for n, t in docs.items():
+        for i, l in enumerate(lines_of(t)):
+            for m in pat.finditer(l):
+                if int(m.group(1)) != sectionless:
+                    bad.append("%s:%d says %s section-less files, the corpus has %d"
+                               % (n, i + 1, m.group(1), sectionless))
+                for tok in re.split("\\s*/\\s*", m.group(2).strip()):
+                    vers = re.findall("[0-9]+\\.[0-9]+(?:\\.[0-9]+)?", tok)
+                    if len(vers) >= 2 and re.search("[\\u2013~-]", tok):
+                        lo = tuple(int(x) for x in vers[0].split(".")[:2])
+                        hi = tuple(int(x) for x in vers[-1].split(".")[:2])
+                        cand = [v for v in sv if lo <= tuple(int(x) for x in v.split(".")[:2]) <= hi]
+                    else:
+                        cand = vers
+                    for v in cand:
+                        if v in sv and sv[v][0] > 0:
+                            bad.append("%s:%d calls %s section-less, but %d/%d of its files carry it"
+                                       % (n, i + 1, v, sv[v][0], sv[v][1]))
+    add("R10 a version called section-less really has none (and the count is exact)", not bad,
+        "; ".join(bad[:4]))
+    # R11: "the largest N files" must list exactly N. The paragraph wraps, so four lines are joined.
+    bad = []
+    for n, t in docs.items():
+        ls = lines_of(t)
+        for i, l in enumerate(ls):
+            m = re.search("\\u6700\\u5927\\u7684\\s*([0-9]+)\\s*\\u4e2a\\u6587\\u4ef6", l)
+            if not m:
+                continue
+            got = len(re.findall("\\*\\*[0-9][0-9,]*\\*\\*", chr(10).join(ls[i:i + 4])))
+            if got != int(m.group(1)):
+                bad.append("%s:%d says %s files, lists %d" % (n, i + 1, m.group(1), got))
+    add("R11 a largest-N-files list contains exactly N entries", not bad, "; ".join(bad[:4]))
     return out
 
 
-def selftest():
-    truth = load_truth()
+def selftest(app_path=None, exports_dir=None):
+    # The selftest must be green under the SAME inputs as the run: with the live export directory it sees
+    # a corpus the documents do not describe (the game is running), and the baseline check goes red for a
+    # reason that has nothing to do with the mutations under test.
+    truth = load_truth(app_path, exports_dir)
     base = dict((n, read(p)) for n, p in DOCS)
     res = audit(base, truth)
     bad = [r for r, ok, _d in res if not ok]
@@ -244,6 +365,15 @@ def selftest():
          lambda d: d.__setitem__("plan", d["plan"] + "\n9999 \u8bad\u7ec3\u573a\u53ef\u4f5c\u4e3a full \u57fa\u51c6\u3002\n")),
         ("M7 the unsplit attackPower claim returns", "R7",
          lambda d: d.__setitem__("plan", d["plan"] + "\nattackPower \u7684\u653b\u51fb\u529b\u52a0\u7b97\u672a\u62c6\u3002\n")),
+        # RF0 (plan section 5.6): the guard used to check WORDS, not numbers. These three mutations are
+        # the contradictions it could not see before: a stale command count, a version called
+        # section-less that has a section, and a largest-N list that lists a different number.
+        ("M9 a stated acceptance command count drifts", "R9",
+         lambda d: d.__setitem__("status", d["status"] + "\n\u9a8c\u6536 99 \u6761\u547d\u4ee4 / 999 \u68c0\u67e5\u3002\n")),
+        ("M10 a version that has a section is called section-less", "R10",
+         lambda d: d.__setitem__("status", d["status"] + "\n\u65e0\u6bb5 13 \u4efd = 1.5.3\u20131.5.5 / 1.6.0\u3002\n")),
+        ("M11 a largest-N list lists a different number", "R11",
+         lambda d: d.__setitem__("status", d["status"] + "\n\u6700\u5927\u7684 3 \u4e2a\u6587\u4ef6: a **111**\u3001b **222**\u3002\n")),
     ]
     fails = 0
     for label, rule, mutate in cases:
@@ -274,14 +404,19 @@ def selftest():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--applicability", default=None,
+                    help="applicability scan to check R6 against (default: the fixed current report)")
+    ap.add_argument("--exports", default=None,
+                    help="export directory the corpus totals describe (default: the live directory; a batch passes its frozen snapshot)")
     a = ap.parse_args()
     if a.selftest:
-        return selftest()
-    truth = load_truth()
+        return selftest(a.applicability, a.exports)
+    truth = load_truth(a.applicability, a.exports)
     docs = dict((n, read(p)) for n, p in DOCS)
     res = audit(docs, truth)
-    print("doc convergence: version=%s schema=%s exports=%d sha=%s applicability=%s"
-          % (truth["version"], truth["schema"], truth["exports"], (truth["sha"] or "?")[:8], truth["applicability"]))
+    print("doc convergence: version=%s schema=%s exports=%d (%s) sha=%s applicability=%s"
+          % (truth["version"], truth["schema"], truth["exports"], truth["exportsDir"],
+             (truth["sha"] or "?")[:8], truth["applicability"]))
     bad = 0
     for rule, ok, detail in res:
         print("  [%s] %s%s" % ("PASS" if ok else "FAIL", rule, ("  -- " + detail) if (detail and not ok) else ""))

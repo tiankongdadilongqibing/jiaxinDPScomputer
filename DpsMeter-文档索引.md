@@ -21,12 +21,12 @@
 | 版本 | **1.7.11(已部署)**(F5 表 1 改为 `自身 \| 他人因你 \| 被队友分走`,`自身 = 基础 + 自身规则`;`receivedAssist` 首次进表;两条逐角色恒等式进 `check_export_schema`;版面守卫新增「渲染器↔副本漂移」检查;`check_live_log` 两处误判修复;§7.2.100)。前一版 **1.7.10**(§7.2.99:验证闸门 `give_section_reasons` 读错对象而**从未真正运行** —— 改读 `rosterAudit` + 真实文件负控;`[COMP]` 重算遵守 GivenTalent / Madness / MadnessVictim 三个开关)。更前一版 **1.7.9**(§7.2.98:GivenTalent 开关下传 + `calc.givenFoldOn`;`giveApplied` 双计修复 + `rosterAudit.giveFoldHits`;UI-DIAG `unattrRow`;`check_live_log.py`);备份 `.1.7.9.bak`(1.7.9 现网 DLL)/ `.1.7.7.bak` / `.1.7.6.bak` / `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` |
 | DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`(**387,072 字节**,1.7.11,`36EC96D4…`);回退链 `.1.7.10.bak`(`BF2F174A…`)/ `.1.7.9.bak`(`F3F73C81…`)/ `.1.7.8.bak`(`0B339836…`)/ `.1.7.7.bak`(`7425139C…`)/ `.1.7.6.bak`(`BB96DA65…`)/ `.1.7.5.bak` / `.1.7.4.bak` / `.1.7.3.bak` / `.1.7.2.bak` / `.1.7.0.bak` / `.1.6.1.bak` / `.1.6.0.bak` / `.1.5.5-verified.bak` |
 | SHA256 | `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42`(1.7.11;1.7.10 = `BF2F174A4059125376946ABCB0E3E4A9176E6B360CAB209078F219A95389AE85`;1.7.9 = `F3F73C81FF3D9CE0B903E5B4BB9C3F60062BF20F93118A853DBB9DCC34E7DBCB`;1.7.8 = `0B33983646280E246AA9E5911AEAB0EC499FC22C6C796460299BD4BDC4B34880`,1.7.7 = `7425139C…`) |
-| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**65 个 .cs / 21,228 行**,排除 obj;守卫口径 68;最大的几个文件见 PROJECT-STATUS §5) |
+| 源码 | `_dpsm_work\src\DpsMeter.csproj`(**70 个 .cs / 21,270 行**,排除 obj;RF2 把 `Aggregator` 拆成 6 个 partial;守卫口径 **83**(含 `tests/`);最大的几个文件见 PROJECT-STATUS §5) |
 | 回滚档案 | `DpsMeter.dll.1.4.1.bak` / `1.5.0–1.5.4-verified.bak` 等(**102 个 .bak**(其中 `DpsMeter.dll.*.bak` 34 个,实测 2026-10-04));⚠ `1.0.48/1.0.49-crash.bak` **绝不回滚** |
 | 开关 | `BepInEx\config\dev.dpsmeter.cfg`(DamageComposition/Forensics/ReconcileCalc/GivenTalent/StatusResist/Madness/StateTimeline/FactStore/MadnessApplier/GivenGiverHook/**Contribution/ShowContribution** 全 true) |
-| 导出 | `BepInEx\plugins\DpsMeter\exports\`(**累计 32 份**:411001×23 / 试炼场 9999×8 / 700817×1;版本 1.5.3→1.7.11;其中 19 份含 `contribution` 段(6 份 schema 1.1 = 1.7.8×3 + 1.7.10×1 + 1.7.11×2;13 份 schema 1.0),1 份 1.6.0 不可复算) |
+| 导出 | **冻结快照 35 份**(`_dpsm_work\batch-inputs-rf0.json`;`exports\` 本身是活的):411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;其中 **22 份含 `contribution` 段**(schema 1.1 ×9 = 1.7.8×3 + 1.7.10×1 + 1.7.11×5;schema 1.0 ×13),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算 |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动被删,只留最新一场) |
-| 验收 | `python n0_acceptance.py` → **51/51 检查**(30 条命令,486.3 s);唯一的非零退出是 `crosscheck --batch`(=1,白名单里 1.6.0 已知坏样本) |
+| 验收 | `python n0_acceptance.py` → **33 条命令 / 65 条检查**(默认读冻结快照、写 `acceptance_rf2`);**终轮 65 ok / 0 项**;基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
 | 契约 | `log-share/1` / `ComparisonEligibility/1` / `compare/2` / `decision/1` / `budget-census/1` / 身份映射;入口与退出码见 PROJECT-STATUS §3 |
 
 ## 3. 已验证的能力(全部实机)
@@ -38,7 +38,7 @@
   ルゥ=ルルサ 给敌方 ×1.5)、赋予(マッドシーカー 的刻印授予 +10%)、全局规则(母なる変異の飛沫、海魔の残滓)。
 * **队伍贡献表**:每角色 自伤 / 自身规则 / 受队友赋能 / 为团队赋能(对数份额口径),**域内 creditedShare 100%(未归因池 0.0%)**;**整场覆盖率是 `overallAttributedCoverage`,并非 100%**。
 * **时间线**:受击方 18 抗性槽 + 10 状态位,只在变化时出行。
-* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **30 条命令的验收流水线**(`n0_acceptance.py`,**51/51 检查**,含桶分布 / 逐文件钉住 / 每条闸门的退出码),完整清单见 `_dpsm_work\PROJECT-STATUS.md` §6。
+* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **33 条命令 / 65 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **174 用例的 C# 行为测试**与 **10 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
 * **阶段 E(1.6.0 起,1.6.1 实机验收通过)**:导出新增 `contribution` 段 —— 每角色 基础/自身规则/辅助/总贡献、
   规则当量、提供者→受益者关系,全部由逐击折叠导出现算。**验收 = 与独立 Python 核心逐字段一致**
   (`contrib.crosscheck` status=OK / mismatches=0,11 角色/21 规则/20 关系);schema 与 v150 problems=0。
@@ -100,7 +100,9 @@
        python -m contrib.legacy_diff(回归证据:新核心 ↔ 旧 Stage-0 表逐列对照,裁决 MATCHES-LEGACY)
        python -m contrib.tests.test_golden_155(把已公布的 1.5.5 数字钉成回归测试;导出缺失时 SKIP)
        python -m contrib.rule115_census(8 场 1.15 生效次数普查:98.3% 对齐,多折 481 vs 少折 220)
-验收   python n0_acceptance.py(全量:29 条命令 / 50 条检查)/ python n0_acceptance.py --selftest(负控 11 例)
+验收   python n0_acceptance.py(全量:33 条命令 / 65 条检查;默认读冻结快照、写 `acceptance_rf2`)/ python n0_acceptance.py --selftest(负控 20 例)
+批次   python batch_snapshot.py --name rf0 --verify(冻结输入)/ python repo_manifest.py --verify --exports batch_inputs\rf0(基线清单)
+测试   python tests\negative_control.py(10 例变异负控)/ python tests\il_equiv.py <pre> <post> <report>(IL 等价)/ python tests\rf2_split.py(RF2 拆分器)
        python check_doc_convergence.py(--selftest)/ python check_docs_123.py(--selftest)/ python check_live_log.py --log ..\BepInEx\LogOutput.log
        python check_export_schema.py / python check_contribution_layout.py / python refactor_final_check.py / python v150_validate.py
 契约   python comparison_eligibility.py --applicability acceptance_1.7.11\applicability.json --json acceptance_1.7.11\eligibility.json
@@ -136,7 +138,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 
 1. **不要为了验证一个假设就让用户再打一场** —— 能离线判的必须离线判完;探针一次上齐。
 2. 每个数字都要能在磁盘上复算;文档标注**实测 / 离线重放 / 推断**。
-3. 改完立刻跑验收:`python n0_acceptance.py`(30 条命令 / 51 条检查,且工具哈希零漂移);只改文档至少跑
+3. 改完立刻跑验收:`python n0_acceptance.py`(33 条命令 / 65 条检查,且工具哈希零漂移);只改文档至少跑
    `check_doc_convergence.py` + `check_docs_123.py`;改插件还要构建 + `recon_probe`。
 4. 文件交换用编辑/写文件工具,**不要用 PowerShell 整文件读写含中文的文件**(控制台是 GBK)。
 5. **两个 crash.bak 绝不回滚/删除**;`.bak` 是回滚档案不是文档。可再生的 artifact(反编译 dumps、`__pycache__`)用完即删。
@@ -149,7 +151,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 |---|---|
 | `_dpsm_work\PROJECT-STATUS.md` | **现状快照 + 重构地图**:事实表 / 契约清单 / 可复现入口 / 代码与工具地图 / 护栏矩阵 / 重构批次与禁区 / 文档年龄表 |
 | `_dpsm_work\CONTRIBUTION-NEXT-PHASE-ROADMAP.md` | **下一阶段路线图 N0–N7** + 逐任务进度块(以 §0 进度表为准);§8 = 阶段完成定义 |
-| `_dpsm_work\RELEASE-1.7.11-ACCEPTANCE.md` | **1.7.11 验收记录**:§0–§9 = 30 份时;§10 = 32 份第 6 轮复验(50 条检查、两场新样本的运行前预测) |
+| `_dpsm_work\RELEASE-1.7.11-ACCEPTANCE.md` | **1.7.11 验收记录**:§0–§9 = 30 份时;§10 = 32 份第 6 轮复验(两场新样本的运行前预测;当时的检查数见该文件) |
 | `_dpsm_work\DECISION-REPORT-411001.md` | **配队决策报告**(预注册 + 五节结构 + 与 compare/2 的逐角色交叉校验) |
 | `_dpsm_work\BUDGET-CENSUS.md` | **数据预算普查**:丢步 / 溢出 / 读取失败 / 未知身份 / 残差分层 + 问题卡 |
 | `_dpsm_work\N7-PERF-AND-VISUAL-CHECKLIST.md` | **性能与目视记录**:§1–§4 离线耗时与体量;§5 九项目视清单;§7 第 6 轮实机日志证据 |
@@ -185,6 +187,10 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 | `_dpsm_work\evidence_*` | 复算脚本与输出(1.15² / 1.5.2 实机 / 1.5.3 实机 / 贡献联结 / 1.5.5 验收) |
 | `_dpsm_work\export_archive_20261003.zip` | 3 份证据战场(旧导出清空时留存) |
 | `_dpsm_work\doc_archive_20261003.zip` | 8 份逐版说明(1.4.0–1.5.5)归档 |
+| `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(174 用例 / 6 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
+| `_dpsm_work\tests\`(IlDump / il_equiv.py / negative_control.py / rf2_split.py) | RF2 等价证据与拆分器、RF1 变异负控 |
+| [`REPO-BOUNDARY.md`](<REPO-BOUNDARY.md>) · [`_dpsm_work\baseline-manifest.json`](<_dpsm_work/baseline-manifest.json>) · [`_dpsm_work\batch-inputs-rf0.json`](<_dpsm_work/batch-inputs-rf0.json>) | 仓库边界 / 基线清单(源码·工具·配置·语料·外部程序集)/ 本批冻结输入清单 |
+| [`_dpsm_work\REFACTOR-BATCH-RF0-RF2.md`](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>) | **本轮重构批次记录**:RF0–RF2 的文件清单 / 证据 / 未覆盖项 / 回滚 |
 | `_dpsm_work\recon_probe\` | 离线断言工程(改对账/Fold/JSON/StatusKey 语义时必须加断言) |
 | `_dpsm_work\check_*.py` / `refactor_final_check.py` | 五个守卫(编码/导出 schema/FACT 签名/源码结构/v150 通道) |
 
@@ -196,7 +202,8 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
   **唯一的当前状态索引**;记录见 §7.2.81。
 * **2026-10-04(第 6 轮,纯文档 + 工具)**:新增 [`PROJECT-STATUS.md`](<_dpsm_work/PROJECT-STATUS.md>)(现状快照 + 重构地图);
   本索引改为「现状数字在 §4 顶部、历史数字标注口径」;`check_docs_123.py` 的文档集由 17 份扩到 **29 份**并新增 `--selftest`(6 例,含 U+FFFD / mojibake / 非 UTF-8 / 缺失文件四种红灯),
-  同时进入验收流水线(29 → **30 条命令**)。**未删任何文件、未改插件。**
+  同时进入验收流水线(命令数 +1;**当时的计数见当时的 PROJECT-STATUS**,本行不重复写具体数字,因为"命令数"是流动的)。**未删任何文件、未改插件。**
+* **2026-10-04(重构第 1 轮 RF0–RF2,按 `REFACTOR-PLAN-POST-1.7.11.md`)**:建立**本地 git 基线**(`a2a09c2` / 标签 `baseline-1.7.11`,默认拒绝的 `.gitignore`)、**冻结批次输入快照** 35 份(hard-link,清单可提交)、**输出隔离**检查(历史档案必须一点不动);新增 **174 用例**的规范化行为测试 + 10 例变异负控;**`Aggregator` 拆成 6 个 partial**(IL 级等价);`check_docs_123.py` 文档集 29 → **32 份**,验收 **33 条命令 / 65 条检查**;顺手修掉活日志检查的取整误判与 `test_gate` 的 fixture 选择缺陷,并补 R9/R10/R11 让"文档数字与工具矛盾"会红。**未替换部署 DLL、未改任何历史证据。** 详见 [_dpsm_work\REFACTOR-BATCH-RF0-RF2.md](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>)。
 * **2026-10-03 深夜(阶段 A/B/C)**:新增贡献指标字典 + `contrib/` 离线核心(纯新增,未删任何文件;
   只删了自己刚生成的旧命名 `compare_all.*`);`check_docs_123.py` 的 FILES 追加 4 个新增 CJK 文件;
   记录见 §7.2.82。

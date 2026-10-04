@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    RF2 equivalence evidence: dump a canonical, order-independent fingerprint of the IL of an assembly.
+
+    A mechanical split of one class into partial files must not change ANY method body, and must not
+    change the static constructor, which is where the field-initialisation ORDER lives (the one thing a
+    partial split can break without any single method looking different. Comparing this dump before and
+    after the split turns "the move was mechanical" from a claim into a diff.
+
+    Usage: IlDump <assembly.dll> [typeNameFilter]
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>IlDump</AssemblyName>
+    <RootNamespace>IlDump</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Not in the implicit net6.0 reference set of this SDK install, but the shared framework ships it. -->
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>D:\dmmplayer\dotnet-sdk6\packs\Microsoft.NETCore.App.Ref\6.0.36\ref\net6.0\System.Reflection.Metadata.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

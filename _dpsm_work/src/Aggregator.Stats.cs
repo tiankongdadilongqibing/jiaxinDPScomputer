@@ -1,0 +1,340 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using Il2CppInterop.Runtime.InteropTypes;
+using UnityEngine;
+
+namespace DpsMeter;
+
+public static partial class Aggregator
+{
+
+	/// <summary>Same-team damage (heal reversal / self-damage) is not output.
+	/// Also used by the battle-wide debuff rules, which only affect a unit's ENEMIES.</summary>
+	internal static bool IsSameTeam(BattleObject attacker, BattleObject victim)
+	{
+		try
+		{
+			if (GameRef.IsNull(attacker)) return false;
+			if (GameRef.IsNull(victim)) return false;
+			return attacker.TeamType == victim.TeamType;
+		}
+		catch { return false; }
+	}
+
+	private static int TeamOf(BattleObject b)
+	{
+		try
+		{
+			if (!GameRef.IsNull(b)) return (int)b.TeamType;
+		}
+		catch { }
+		return 0;
+	}
+
+	/// <summary>Add a damage event to an actor's totals.
+	///
+	/// Same-team damage (回復反転 / self-damage) is ALWAYS tallied separately into DamageFriendly.
+	/// By default it also stays inside DamageDealt, because the game's own damage report counts it:
+	/// verified on a real battle, game_given == friendly + normal for the affected unit
+	/// (T.O.W.E.R.typeR: 5,252,510 + 1,921 == 5,254,431). Set FilterFriendlyFire=true to drop it
+	/// from the totals instead; either way the UI always labels it.</summary>
+	private static void Accumulate(ActorStats st, int damage, string attrMode, bool friendly)
+	{
+		if (st == null) return;
+		if (friendly)
+		{
+			st.DamageFriendly += damage;
+			st.FriendlyHits++;
+			bool filter = Plugin.CfgFilterFriendlyFire != null && Plugin.CfgFilterFriendlyFire.Value;
+			if (filter) return;
+		}
+		st.DamageDealt += damage;
+		st.HitCount++;
+		st.AttrMode = attrMode;
+		st.LastHitTime = Session.ActiveSeconds;
+		if (st.HitCount == 1) st.FirstHitTime = Session.ActiveSeconds;
+		// self-injury must not become the "biggest hit" of an attacker
+		if (!friendly && damage > st.MaxHitDamage) st.MaxHitDamage = damage;
+		st.AddSample(Session.ActiveSeconds, st.DamageDealt);
+		st.AddSecondDamage((int)Session.ActiveSeconds, damage);
+	}
+
+	/// <param name="nominal">
+	/// BattleObject.Damage's ARGUMENT: the damage the game accounted for (CharacterStatistics.TakenDamage).
+	/// <paramref name="damage"/> is its RETURN: what actually reached 耐久. nominal &gt; damage means part of
+	/// the hit was 被吸收/无效化. Passing 0 (the default) means "same as damage".
+	/// </param>
+	public static void RecordDamage(BattleObject victim, BattleObject attacker, BattleObject owner, int damage, int nominal = 0)
+	{
+		if (damage <= 0 && nominal <= 0) return;
+		if (nominal < damage) nominal = damage;
+		int absorbed = nominal - damage;
+		EnsureSessionStartedFor(attacker, victim);
+		BeginTimingIfNeeded();
+		_eventCount++;
+		Session.NoteEvent();
+
+		ActorStats victimStats = Session.GetActor(victim, create: true);
+		if (victimStats != null)
+		{
+			victimStats.DamageTaken += damage;
+			victimStats.DamageTakenNominal += nominal;
+			victimStats.DamageAbsorbed += absorbed;
+			victimStats.AddSecondTaken((int)Session.ActiveSeconds, damage);
+			if (CharacterInfo.IsAllyTeam(victimStats.Team))
+				Session.AddTeamTaken((int)Session.ActiveSeconds, damage);
+		}
+		if (absorbed > 0)
+		{
+			AbsorbedTotal += absorbed;
+			AbsorbedHits++;
+			// Rare by nature, and the single most confusing row in the detail list, so it is always logged.
+			string l2 = $"[DpsMeter][ABSORB] {Desc(victim)} 被吸收/无效化 {absorbed}(游戏口径 {nominal} = 入耐久 {damage} + 吸收 {absorbed})";
+			Plugin.LogSource.LogInfo(l2);
+			RuntimeLog.Write(l2);
+		}
+
+		BattleObject source = attacker;
+		string attrMode = "?";
+		if (GameRef.IsNull(source)) source = owner;
+		if (!GameRef.IsNull(attacker))
+			attrMode = (!GameRef.IsNull(owner) && !GameRef.Same(owner, attacker)) ? "A+O" : "A";
+		else if (!GameRef.IsNull(owner)) attrMode = "O";
+
+		// Damage dealt to the attacker's OWN team is not output: 回復反転 (heal reversal, wiki:
+		// damage = 20% of the heal value) and self-damage skills both land here. Team is read from
+		// the objects themselves, so identical names on both sides cannot fool this check --
+		// unlike the old name-based heuristics, which is why reversal damage used to be counted
+		// as the healer's DPS.
+		bool friendly = IsSameTeam(source, victim);
+
+		ActorStats actorStats = null;
+		if (!GameRef.IsNull(source))
+		{
+			actorStats = Session.GetActor(source, create: true);
+			if (actorStats != null) Accumulate(actorStats, damage, attrMode, friendly);
+		}
+		else
+		{
+			// Try to resolve the attacker from the recent damage-calculation activity
+			// (many enemy/area attacks carry no attacker/owner on BattleObject.Damage itself).
+			BattleObject resolved = TryResolveCalcSource(victim, damage);
+			if (!GameRef.IsNull(resolved))
+			{
+				// keep the event's attacker name in sync with the resolved source (used to stay "?")
+				source = resolved;
+				attrMode = "C:" + _lastCalcSrc;
+				bool friendlyResolved = IsSameTeam(resolved, victim);
+				actorStats = Session.GetActor(resolved, create: true);
+				if (actorStats != null) Accumulate(actorStats, damage, attrMode, friendlyResolved);
+				friendly = friendlyResolved;
+			}
+			else
+			{
+				Session.UnattributedDamage += damage;
+				Session.UnattributedHits++;
+				if (!GameRef.IsNull(victim))
+				{
+					try
+					{
+						string vn = CharacterInfo.DisplayName(victim);
+						Session.UnattributedByVictim.TryGetValue(vn, out var acc);
+						Session.UnattributedByVictim[vn] = acc + damage;
+					}
+					catch { }
+				}
+			}
+		}
+
+		// 1.5.0 (A2): the damage-detail match. `hitHow` says which kind of match was used (0 none,
+		// 1 exact by damage value, 2 by attacker+target only) and is exported per hit, so a best-effort
+		// label can never be mistaken for an authoritative one.
+		int hitHow;
+		HitRecord hitRecord = Session.ConsumePending(source, victim, damage, nominal, Session.ActiveSeconds, out hitHow);
+		if (hitRecord != null) { if (hitHow == 1) HitMatchExact++; else HitMatchPair++; }
+		else HitMatchNone++;
+		if (hitRecord != null && actorStats != null)
+		{
+			// The crit tally only moves on an OBSERVED flag: a record with CritObserved == 0 says nothing
+			// about crit, and counting it as "not a crit" is how a metric silently becomes a fiction.
+			if (hitRecord.CritObserved == 2)
+			{
+				actorStats.CritCount++;
+				actorStats.CritDamage += damage;
+			}
+			else
+			{
+				actorStats.NonCritDamage += damage;
+			}
+			if (hitRecord.EffectId != 0)
+			{
+				actorStats.SkillDamage.TryGetValue(hitRecord.EffectId, out var v1);
+				actorStats.SkillDamage[hitRecord.EffectId] = v1 + damage;
+				actorStats.SkillHits.TryGetValue(hitRecord.EffectId, out var v2);
+				actorStats.SkillHits[hitRecord.EffectId] = v2 + 1;
+			}
+			actorStats.SourceDamage.TryGetValue((int)hitRecord.Source, out var v3);
+			actorStats.SourceDamage[(int)hitRecord.Source] = v3 + damage;
+		}
+		else if (actorStats != null && _activeCalc != null)
+		{
+			try
+			{
+				// 1.5.0 (A2): the SAME age window the composition's own pairing uses. This fallback had
+				// none, so a calc left over from the previous battle could label this battle's opening
+				// hits -- and `_activeCalc` was not even cleared when a session started (fixed in
+				// StartSession below). The composition path was protected; this one was not.
+				double age = Session.ActiveSeconds - _activeCalcT;
+				if (age >= -0.05 && age <= 0.20 && GameRef.Same(_activeCalc.Attacker, source))
+				{
+					int effectId = _activeCalc.m_effectId;
+					if (effectId != 0)
+					{
+						actorStats.SkillDamage.TryGetValue(effectId, out var v4);
+						actorStats.SkillDamage[effectId] = v4 + damage;
+						actorStats.SkillHits.TryGetValue(effectId, out var v5);
+						actorStats.SkillHits[effectId] = v5 + 1;
+					}
+				}
+			}
+			catch { }
+		}
+
+		if (Plugin.CfgVerbose.Value)
+		{
+			string line = $"[DpsMeter] DMG {damage} {Desc(source)} -> {Desc(victim)} mode={attrMode} src={hitRecord?.Source} crit={hitRecord?.CritObserved} match={hitHow} eff={hitRecord?.EffectId}";
+			Plugin.LogSource.LogInfo(line);
+			RuntimeLog.Write(line);
+		}
+		// full event log for offline analysis
+		try
+		{
+			TryGetCompForVictim(victim, damage, nominal, out string compA, out string compB, out string compC, out string compD, out CalcBreakdown compCalc);
+			var ev = new BattleEvent
+			{
+				T = Session.ActiveSeconds,
+				Type = "dmg",
+				Victim = NameOf(victim),
+				Attacker = NameOf(source),
+				Owner = NameOf(owner),
+				Attr = attrMode,
+				Amount = damage,
+				Nominal = nominal,
+				Source = hitRecord != null ? (int)hitRecord.Source : 0,
+				Crit = hitRecord != null && hitRecord.CritObserved == 2,
+				// 1.5.0 (A2/A3): a tri-state, so "the game said no" and "we never saw the flag" are
+				// distinguishable in the data. `Crit` above keeps its old bool shape for existing scripts
+				// and is exactly (CritObserved == 2).
+				CritObserved = hitRecord != null ? hitRecord.CritObserved : (byte)0,
+				HitMatch = hitHow,
+				// 1.5.2: the value the matched record actually carried, so `hitMatch` becomes auditable
+				// instead of only assertable -- see BattleEvent.HitValue.
+				HitValue = hitRecord != null ? hitRecord.Damage : 0L,
+				CalcHitType = hitRecord != null ? (int)hitRecord.HitType : -1,
+				CalcEffectId = hitRecord != null ? hitRecord.EffectId : 0,
+				HealCalc = hitRecord != null && hitRecord.HitType == eDamageCalcType.Heal,
+				AttackerTeam = TeamOf(source),
+				VictimTeam = TeamOf(victim),
+				AttackerKey = actorStats != null ? actorStats.Key : 0,
+				VictimKey = victimStats != null ? victimStats.Key : 0,
+				Friendly = friendly,
+				Comp = compA,
+				Comp2 = compB,
+				Comp3 = compC,
+				Comp4 = compD,
+				Calc = compCalc
+			};
+			// Did THIS record inflict an ailment on the victim? Diff the status list captured by the
+			// Damage prefix against the state now, and schedule a late re-check (StatusDeltaProbe).
+			// Bind before AddEvent: the probe keeps the reference and mutates it when the late result
+			// lands, and the event is the same object the export and the overlay read.
+			StatusDeltaProbe.Bind(ev, victim, Session.ActiveSeconds);
+			// Which 素质/词条 fired between this attacker's previous hit and this one? Read the game's own
+			// activation counters (Diagnostics/TalentRuntime.cs). The extra hit produced by a follow-up
+			// talent is exactly the evidence that the talent fired, so it is attributed to this record.
+			TalentRuntime.NoteAttack(source, actorStats, ev);
+			// 1.4.0: keep a bounded specimen of the hits the chain could NOT explain, with the LIVE state
+			// of both sides. Must run BEFORE AddEvent but while `source`/`victim` are still alive -- the
+			// composition reads only what it models, and what it does not model is the whole question.
+			Forensics.Observe(ev, source, victim);
+			// 1.5.0 (B4): the full-resolution state timeline for the VICTIM. Runs for EVERY damage event
+			// (not only the unexplained ones) and emits a row only when something actually changed, so the
+			// cost is 18 slot reads here and near-zero output. This is what makes a resistance curve
+			// measured rather than sampled -- see Diagnostics/StateTimelineProbe.cs.
+			StateTimeline.Observe(victim, victimStats != null ? victimStats.Key : 0, Session.ActiveSeconds);
+			// 1.5.0 (B1): the deduplicated fact record. Runs for EVERY damage hit, so the export can
+			// answer a question about any past battle instead of only about the 3% forensics sampled.
+			ev.FactId = FactStore.Observe(ev, source, victim,
+				actorStats != null ? actorStats.Key : 0,
+				victimStats != null ? victimStats.Key : 0);
+			Session.AddEvent(ev);
+		}
+		catch { }
+	}
+
+	public static void RecordHeal(BattleObject target, BattleObject healer, int actual, int nominal)
+	{
+		if (actual <= 0 && nominal <= 0) return;
+		EnsureSessionStartedFor(healer, target);
+		BeginTimingIfNeeded();
+		_eventCount++;
+		Session.NoteEvent();
+		ActorStats actor = Session.GetActor(target, create: true);
+		if (actor != null)
+		{
+			actor.HealingTaken += actual;
+			actor.HealingTakenNominal += nominal;
+			actor.AddSecondHeal((int)Session.ActiveSeconds, actual);
+			if (CharacterInfo.IsAllyTeam(actor.Team))
+				Session.AddTeamHeal((int)Session.ActiveSeconds, actual);
+		}
+		// 1.5.0 (A4): resolved OUTSIDE the block below so the event can carry stable keys. `healerStats` is
+		// null when the healer object is missing, which is exactly what key 0 means.
+		ActorStats healerStats = null;
+		if (!GameRef.IsNull(healer))
+		{
+			ActorStats actor2 = Session.GetActor(healer, create: true);
+			healerStats = actor2;
+			if (actor2 != null)
+			{
+				actor2.HealingGiven += actual;
+				actor2.HealingGivenNominal += nominal;
+			}
+		}
+		else if (actor != null)
+		{
+			actor.HealingSelf += nominal;
+		}
+		if (Plugin.CfgVerbose.Value)
+		{
+			string line = $"[DpsMeter] HEAL {actual}/{nominal} {Desc(healer)} -> {Desc(target)}";
+			Plugin.LogSource.LogInfo(line);
+			RuntimeLog.Write(line);
+		}
+		try
+		{
+			Session.AddEvent(new BattleEvent
+			{
+				T = Session.ActiveSeconds,
+				Type = "heal",
+				Victim = NameOf(target),
+				Attacker = NameOf(healer),
+				Owner = NameOf(healer),
+				Attr = "H",
+				Amount = actual,
+				Nominal = nominal,
+				Source = (int)DamageSource.DirectHeal,
+				Crit = false,
+				AttackerTeam = TeamOf(healer),
+				VictimTeam = TeamOf(target),
+				// 1.5.0 (A4): the same stable keys as the damage path. `actor` is the TARGET of the heal
+				// and `actor2` the healer, so the names line up with Attacker/Victim above.
+				AttackerKey = healerStats != null ? healerStats.Key : 0,
+				VictimKey = actor != null ? actor.Key : 0
+			});
+		}
+		catch { }
+	}
+}

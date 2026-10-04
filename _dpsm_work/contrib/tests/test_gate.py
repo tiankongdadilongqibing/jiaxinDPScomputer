@@ -358,6 +358,12 @@ def main():
     for n in names:
         p = os.path.join(exports_dir, n)
         rr = loader.load(p).raw
+        # A TRAINING-GROUND export (quest 9999) is LEGACY_NOT_APPLICABLE by design, so it can never reach
+        # the ERROR a tamper has to produce. "The newest file with counters" therefore made this control
+        # depend on which battle the player finished last: on 2026-10-04 the newest was 9999 and CASE3
+        # failed for the wrong reason. Select a comparable battle instead.
+        if str(rr.get("quest")) == "9999":
+            continue
         ra = rr.get("rosterAudit") or {}
         if ra.get("giveApplied") is not None and (rr.get("contribution") or {}):
             real_give = (p, rr, ra)

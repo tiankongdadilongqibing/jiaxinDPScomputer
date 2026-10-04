@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    RF1: the NORMALISED, game-free behaviour test executable.
+
+    Why it exists. Before this, offline C# assertions lived in two ad-hoc probes
+    (recon_probe/Program.cs and test/TierTest/Program.cs): no case names, no groups, no
+    negative control, and nothing covered the battle clock, the 0.35 s hit-pairing window,
+    ResetActors, the per-second series or the contribution cache. Those are exactly the
+    places a refactor can change behaviour without changing any number a battle produces.
+
+    It executes the REAL production sources below (never a copy of the formula). Everything
+    else comes from Stubs.cs, which declares ONLY the members those files touch, so a
+    compiled file that starts depending on the game surface fails the build here instead of
+    silently drifting.
+
+    SrcRoot is parameterised (default ..\..\src) so the negative-control driver can build the
+    SAME test against a TAMPERED COPY of the sources and require the matching case to go red.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>BehaviorTests</AssemblyName>
+    <RootNamespace>BehaviorTests</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <SrcRoot Condition="'$(SrcRoot)' == ''">..\..\src</SrcRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- pure: no Unity, no IL2CPP, no Plugin, no Aggregator -->
+    <Compile Include="$(SrcRoot)\BuildInfo.cs" />
+    <Compile Include="$(SrcRoot)\Model\BattleTime.cs" />
+    <Compile Include="$(SrcRoot)\Model\BattleEvent.cs" />
+    <Compile Include="$(SrcRoot)\Model\ActorStats.cs" />
+    <Compile Include="$(SrcRoot)\Model\BattleSummary.cs" />
+    <Compile Include="$(SrcRoot)\Model\CalcBreakdown.cs" />
+    <Compile Include="$(SrcRoot)\Model\FoldStep.cs" />
+    <Compile Include="$(SrcRoot)\Model\StatusKey.cs" />
+    <Compile Include="$(SrcRoot)\Model\ClauseStatusRun.cs" />
+    <Compile Include="$(SrcRoot)\Model\AtkAddFold.cs" />
+    <Compile Include="$(SrcRoot)\Output\Contribution.cs" />
+    <Compile Include="$(SrcRoot)\Output\CalcReconcile.cs" />
+    <Compile Include="$(SrcRoot)\Output\JsonText.cs" />
+    <Compile Include="$(SrcRoot)\Output\JsonCheck.cs" />
+    <Compile Include="$(SrcRoot)\Composition\TieredModifier.cs" />
+    <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
+    <!-- impure, but the game surface it touches is small and stubbed:
+         HitRecord -> BattleObject/DamageSource/eDamageCalcType
+         BattleSession -> GameRef/CharacterInfo/BattleObject/TeamType/GameResult
+         ContributionSession -> UnityEngine.Time + Aggregator.Session -->
+    <Compile Include="$(SrcRoot)\Model\HitRecord.cs" />
+    <Compile Include="$(SrcRoot)\Model\BattleSession.cs" />
+    <Compile Include="$(SrcRoot)\Output\ContributionSession.cs" />
+  </ItemGroup>
+</Project>
