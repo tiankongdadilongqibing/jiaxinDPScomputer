@@ -50,35 +50,18 @@ public static partial class Aggregator
 	private static int _lastGameSteps;
 	private static bool _hasLastSteps;
 
-	/// <summary>Game-clock seconds of silence after which a session is closed even though the game never
-	/// said the battle ended. Measured on the BATTLE clock (paused time excluded), so the value is in the
-	/// clock's own unit: 8 game seconds ~= 5.3 real seconds while the game runs at 1.5x.</summary>
-	private const double IdleSeconds = 8.0;
+	// IdleSeconds moved to Policy/SessionTransitionPolicy.cs (RF3b), together with the rule that uses it.
 
 	// MaxFrameDelta moved to Policy/BattleClockPolicy.cs (RF3): the clamp rule and its bound now live in
 	// one place and are executed by the behaviour tests at the boundary.
 
-	/// <summary>Most recently finalised session, with how/when it closed, so late events that clearly
-	/// belong to it can be folded back in instead of opening a fragment session.</summary>
-	private static BattleSession _lastClosed;
-	private static DateTime _lastClosedWall;
-	private static string _lastClosedWhy = "";
-
-	// ResumeWindowSeconds moved to Policy/SessionTransitionPolicy.cs (RF3).
-
 	/// <summary>
-	/// Grouping marker state (1.3.3). Descriptive ONLY -- it does not change the session boundary, the
-	/// clock or any number. See <see cref="BattleSession.RunId"/> for why the grouping is needed.
+	/// RF4 (first state family): all state that must SURVIVE a session boundary -- the remembered soft
+	/// close, the grouping marker, and how the previous session ended. One owner, one place, and drivable
+	/// offline (tests/BehaviorTests, group "runtime/continuity"). Ownership rules:
+	/// _dpsm_work/STATE-LIFETIME-MATRIX.md (not cleared by F9, only a finalisation or a start changes it).
 	/// </summary>
-	private static long _runId;
-	private static int _runSeq;
-	private static DateTime _lastEndWall;
-	private static bool _hasEnded;
-	private static int _lastEndQuest = int.MinValue;
-	private static int _lastEndResult;
-	private static string _lastEndWhy = "";
-
-	// RunJoinSeconds moved to Policy/SessionTransitionPolicy.cs (RF3).
+	private static readonly SessionContinuity Continuity = new SessionContinuity();
 
 	private static long _lastGsPointer;
 
@@ -103,8 +86,10 @@ public static partial class Aggregator
 	private static readonly List<CalcActivity> _calcEvents = new List<CalcActivity>();
 	private const int CalcEventMax = 64;
 
-	private static double _lastCompT = -1.0;
-	private static int _lastPow;
+	// RF4: two fields were DELETED here (_lastCompT, _lastPow). The matrix found them write-only: they were
+	// assigned on every calc-activity note and read nowhere in src (PowerProbe has its own pair with the
+	// same names, which is what made them look alive). Removing them removes two writes from a per-hit
+	// path; the assignment they sat next to was pure (CompositionProbe.Power only decrypts a value).
 
 	/// <summary>
 	/// Native pointer of an interop wrapper: a plain managed field read, so it makes no IL2CPP call and

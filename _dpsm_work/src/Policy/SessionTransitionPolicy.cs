@@ -36,6 +36,23 @@ internal static class SessionTransitionPolicy
 	/// <summary>How long after a SOFT (idle) close a late event may still rejoin its session.</summary>
 	public const double ResumeWindowSeconds = 5.0;
 
+	/// <summary>Game-clock seconds of silence after which a session is closed even though the game never
+	/// said the battle ended. Measured on the BATTLE clock (paused time excluded), so the value is in the
+	/// clock's own unit: 8 game seconds ~= 5.3 real seconds while the game runs at 1.5x.</summary>
+	public const double IdleSeconds = 8.0;
+
+	/// <summary>
+	/// The idle-close rule. Three conditions, and the first is not decoration: a frame in which the game is
+	/// paused cannot close the session, and the silence is measured on CombatSeconds (the no-pause clock),
+	/// so a pause is never mistaken for silence. A session with no events yet is never closed (its clock
+	/// has not started).
+	/// </summary>
+	public static bool ShouldCloseIdle(bool paused, int eventCount, double idleCombatSeconds,
+	                                  double idleSeconds)
+	{
+		return !paused && eventCount > 0 && idleCombatSeconds > idleSeconds;
+	}
+
 	/// <summary>Does this session continue the previous stretch of play? The gap must be non-negative
 	/// (a negative gap means "no previous session") and at most <paramref name="joinSeconds"/>.</summary>
 	public static bool RunContinues(bool hasEnded, int prevResult, int prevQuest, int quest,

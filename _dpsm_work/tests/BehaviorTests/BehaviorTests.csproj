@@ -50,6 +50,9 @@
     <Compile Include="$(SrcRoot)\Policy\BattleClockPolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\SessionTransitionPolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\AttributionPolicy.cs" />
+    <!-- RF4: the first state family. Game-free by construction (BattleSession only), which is what makes
+         the Start/End/resume sequences executable here instead of only in a battle. -->
+    <Compile Include="$(SrcRoot)\Runtime\SessionContinuity.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

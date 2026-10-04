@@ -211,7 +211,10 @@ public static partial class Aggregator
 		// pause nor a stall can be mistaken for silence. The wall-clock version of this test closed a
 		// session on the first frame after a pause -- 0.02 s before that same battle's remaining hits
 		// arrived, which then opened a fragment session starting at t=0 (what F6 used to show).
-		if (!val.IsPaused && _eventCount > 0 && Session.IdleCombatSeconds > IdleSeconds)
+		// RF3b: the idle rule is a policy decision (paused frames can never close a session, and the
+		// silence is measured on the no-pause clock).
+		if (SessionTransitionPolicy.ShouldCloseIdle(val.IsPaused, _eventCount, Session.IdleCombatSeconds,
+		                                            SessionTransitionPolicy.IdleSeconds))
 		{
 			FinalizeLocked(Session, ((int)val.GameResult != 0) ? val.GameResult : (GameResult)0, "idle");
 			Session = null;

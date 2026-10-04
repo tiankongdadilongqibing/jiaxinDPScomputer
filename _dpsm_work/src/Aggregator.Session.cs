@@ -45,18 +45,12 @@ public static partial class Aggregator
 		// battle-end signal once per wave with no result, which cut a measured 45 s stage into 13 exports;
 		// marking them lets offline analysis add the fragments up itself, without this code ever risking
 		// the silent merge that a relaxed resume rule would cause.
-		double runGap = _hasEnded ? (DateTime.Now - _lastEndWall).TotalSeconds : -1.0;
-		// RF3: the grouping rule and the marker transition are decisions (SessionTransitionPolicy); the
-		// wall-clock read and the remembered previous-end state stay here.
-		bool runContinues = SessionTransitionPolicy.RunContinues(_hasEnded, _lastEndResult, _lastEndQuest,
-		                                                         questId, runGap,
-		                                                         SessionTransitionPolicy.RunJoinSeconds);
-		SessionTransitionPolicy.NextRun(runContinues, ref _runId, ref _runSeq);
-		int runSeq = _runSeq;
-		long runIdNow = _runId;
-		double runGapNow = runContinues ? runGap : -1.0;
-		string runPrevWhy = runContinues ? _lastEndWhy : "";
-		int runPrevResult = runContinues ? _lastEndResult : 0;
+		// RF3 + RF4: the grouping RULE is the policy, the marker STATE is the container; the wall-clock read
+		// stays here (every clock read belongs to the facade).
+		double runGap = Continuity.HasEnded ? (DateTime.Now - Continuity.LastEndWall).TotalSeconds : -1.0;
+		RunMarker marker = Continuity.BeginSession(runGap, questId, SessionTransitionPolicy.RunJoinSeconds);
+		int runSeq = marker.RunSeq;
+		long runIdNow = marker.RunId;
 		BattleSession battleSession = (Session = new BattleSession
 		{
 			InBattle = true,
@@ -66,9 +60,9 @@ public static partial class Aggregator
 			LastEventWall = DateTime.Now,
 			RunId = runIdNow,
 			RunSeq = runSeq,
-			RunGap = runGapNow,
-			RunPrevWhy = runPrevWhy,
-			RunPrevResult = runPrevResult
+			RunGap = marker.RunGap,
+			RunPrevWhy = marker.PrevWhy,
+			RunPrevResult = marker.PrevResult
 		});
 		_eventCount = 0;
 		_lastSummaryLog = 0.0;
@@ -106,7 +100,7 @@ public static partial class Aggregator
 		string text = $"[DpsMeter] Battle session started (quest={battleSession.QuestId})"
 			+ $" gameTimeAtStart={_gameTimeAtStart} run=#{runIdNow}.{runSeq}"
 			+ (runSeq > 0
-				? $" gap={runGapNow:F2}s prev={runPrevWhy}/{runPrevResult}"
+				? $" gap={marker.RunGap:F2}s prev={marker.PrevWhy}/{marker.PrevResult}"
 				: " (run start)");
 		Plugin.LogSource.LogInfo(text);
 		RuntimeLog.Write(text);
@@ -141,20 +135,18 @@ public static partial class Aggregator
 	{
 		try
 		{
-			BattleSession s = _lastClosed;
-			double gap = (s != null) ? (DateTime.Now - _lastClosedWall).TotalSeconds : -1.0;
-			// RF3: the window/reason gates are a decision. ONLY an expired window forgets the remembered
-			// session -- a non-idle close or an unknown actor leaves it, so a later event can still rejoin.
-			ResumeGate gate = SessionTransitionPolicy.ClosedSessionGate(
-				s != null, gap, SessionTransitionPolicy.ResumeWindowSeconds, _lastClosedWhy);
-			if (gate == ResumeGate.WindowExpired) _lastClosed = null;
+			BattleSession s = Continuity.LastClosed;
+			double gap = (s != null) ? (DateTime.Now - Continuity.LastClosedWall).TotalSeconds : -1.0;
+			// RF3 + RF4: the verdict is the policy's, the state (and its one side effect: only an expired
+			// window forgets the session) is the container's.
+			ResumeGate gate = Continuity.Gate(s != null, gap, SessionTransitionPolicy.ResumeWindowSeconds);
 			if (gate != ResumeGate.Eligible) return false;
 			// The native actor check stays in the facade and runs only after the gates (it reads objects).
 			bool known = (!GameRef.IsNull(a) && s.Actors.ContainsKey(a))
 				|| (!GameRef.IsNull(b) && s.Actors.ContainsKey(b));
 			if (!known) return false;                        // unknown units -> this is the next battle
 
-			_lastClosed = null;
+			Continuity.ForgetClosed();
 			// The soft close pushed a summary into the history and wrote an export; both are replaced
 			// when the resumed session is finalised for real. The export file name is derived from
 			// StartWallClock, so it is overwritten instead of duplicated.

@@ -24,11 +24,7 @@ public static partial class Aggregator
 				Calc = calc
 			});
 			while (_calcEvents.Count > CalcEventMax) _calcEvents.RemoveAt(0);
-			if (calc != null)
-			{
-				_lastPow = CompositionProbe.Power(calc);
-				_lastCompT = (Session != null) ? Session.ActiveSeconds : 0.0;
-			}
+			// RF4: the two "last calc" fields that were written here every hit had no reader (see Aggregator.cs).
 		}
 		catch { }
 	}

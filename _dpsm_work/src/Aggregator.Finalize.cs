@@ -14,12 +14,9 @@ public static partial class Aggregator
 	{
 		s.InBattle = false;
 		// Remember how this one ended so the NEXT session can decide whether it is a continuation of the
-		// same stretch of play (grouping marker only -- see BattleSession.RunId).
-		_lastEndWall = DateTime.Now;
-		_hasEnded = true;
-		_lastEndQuest = s.QuestId;
-		_lastEndResult = (int)result;
-		_lastEndWhy = why ?? "";
+		// same stretch of play (grouping marker only -- see BattleSession.RunId). RF4: the state is the
+		// container's; this stays the FIRST thing a finalisation does.
+		Continuity.RememberEnd(s.QuestId, (int)result, why, DateTime.Now);
 		// NOTE: the battle-wide rule table is deliberately NOT cleared here. Units of the NEXT battle are
 		// created (BattleObject.SetupAbility -> RegisterGlobalDebuffs) BEFORE the previous battle is
 		// finalized, so clearing here threw away the fresh registrations and an ally buff like
@@ -161,9 +158,7 @@ public static partial class Aggregator
 		foreach (ActorStats orderedActor4 in s.OrderedActors) orderedActor4.Source = null;
 		RuntimeLog.Flush();
 		// Remember the close so a late event of the SAME battle can rejoin it (TryResumeClosedSession)
-		// instead of opening a fragment session. Only an "idle" close is resumable.
-		_lastClosed = s;
-		_lastClosedWall = DateTime.Now;
-		_lastClosedWhy = why;
+		// instead of opening a fragment session. Only an "idle" close is resumable. RF4: this stays the LAST
+		// thing a finalisation does -- after the export -- so nothing can rejoin a half-written session.
 	}
 }
