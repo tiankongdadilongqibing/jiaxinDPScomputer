@@ -45,7 +45,15 @@ dpsmeter_analyze.py  dpsmeter_contrib.py
 BepInEx/config/dev.dpsmeter.cfg
 _dpsm_work/*.py  *.md  *.txt  *.json  *.cfg
 _dpsm_work/src/  tests/  recon_probe/  test/  contrib/  contrib_cs/
-_dpsm_work/review_contrib_core/  acceptance_1.7.11/
+_dpsm_work/review_contrib_core/  acceptance_1.7.11/  acceptance_rf2/  acceptance_rf3/
+```
+
+**批次档案里刻意不提交的东西**(RF3 起):每个 `acceptance_*/` 目录里的 `pairtrusted_impact_report.json`
+(约 4 MB,indent=1 展开成 ~15 万行)与同名 `.txt`。它们是**从冻结快照可重算**的派生产物,工具都已纳管,
+所以档案保留证据本体(results / corpus_manifest / runs / applicability / 守卫转录),不保留那份重算结果:`git
+`add -A` 曾经让一个轮次插入 15.5 万行。`acceptance_1.7.11`(第 6 轮)早于这条规则,作为历史**保持完整**;
+两种情况下文件都留在原地。`_dpsm_work/tests/_*.tmp`(临时脚本/提交信息)也一并排除 —— `tests/` 是被显式
+回纳的目录,没有这条规则时 `git add -A` 会把临时文件带进提交。
 ```
 
 提交前检查(tamper 前先看输出):
