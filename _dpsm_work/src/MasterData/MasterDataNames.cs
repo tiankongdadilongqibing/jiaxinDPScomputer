@@ -74,14 +74,10 @@ public static class MasterDataNames
 
 	private const int MaxNotes = 8;
 
-	private static Dictionary<int, List<Cand>> ById = new Dictionary<int, List<Cand>>();
-
-	private sealed class Cand
-	{
-		public string Name;
-
-		public string Sig;
-	}
+	// RF6a: the map holds the policy's plain candidate struct, and the SELECTION RULE lives in
+	// Policy/MasterDataLabelPolicy.cs (pure, and covered by tests that use the measured 刻印 cases).
+	private static Dictionary<int, List<MasterDataLabelPolicy.Candidate>> ById =
+		new Dictionary<int, List<MasterDataLabelPolicy.Candidate>>();
 
 	/// <summary>Number of 刻印 rows that got an official name from the master tables.</summary>
 	public static int Resolved => _resolved;
@@ -131,7 +127,7 @@ public static class MasterDataNames
 		try
 		{
 			if (!_built && !Build()) return false;
-			List<Cand> list;
+			List<MasterDataLabelPolicy.Candidate> list;
 			if (!ById.TryGetValue(abilityId, out list) || list == null || list.Count == 0)
 			{
 				_noCandidate++;
@@ -139,31 +135,15 @@ public static class MasterDataNames
 			}
 
 			string sig = Signature(talents);
-			string name = null;
-			int distinct = 0;
-			for (int i = 0; i < list.Count; i++)
-			{
-				Cand c = list[i];
-				if (c.Sig != sig) continue;
-				if (name == null)
-				{
-					name = c.Name;
-					distinct = 1;
-				}
-				else if (name != c.Name)
-				{
-					distinct = 2;
-					break;
-				}
-			}
-
-			if (distinct == 1 && !string.IsNullOrEmpty(name))
+			string name;
+			LabelMiss why;
+			if (MasterDataLabelPolicy.Select(list, sig, out name, out why))
 			{
 				label = name;
 				_resolved++;
 				return true;
 			}
-			if (distinct == 0) _noCandidate++;
+			if (why == LabelMiss.NoCandidate) _noCandidate++;
 			else _ambiguous++;
 			return false;
 		}
@@ -181,16 +161,10 @@ public static class MasterDataNames
 		List<int> ids = new List<int>(talents.Count);
 		for (int i = 0; i < talents.Count; i++)
 		{
+			// a native read per talent: it stays here, the sorting/joining is the policy's
 			try { ids.Add(talents[i].Type); } catch { }
 		}
-		ids.Sort();
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < ids.Count; i++)
-		{
-			if (i > 0) sb.Append(',');
-			sb.Append(ids[i]);
-		}
-		return sb.ToString();
+		return MasterDataLabelPolicy.Signature(ids);
 	}
 
 	/// <summary>
@@ -211,7 +185,7 @@ public static class MasterDataNames
 				(EngravingMutateMasterTable t) => t.m_cache, "刻印变异");
 			if (eng == null || engAb == null || mut == null) return false;
 
-			Dictionary<int, List<Cand>> map = new Dictionary<int, List<Cand>>();
+			Dictionary<int, List<MasterDataLabelPolicy.Candidate>> map = new Dictionary<int, List<MasterDataLabelPolicy.Candidate>>();
 
 			Dictionary<int, string> engName = new Dictionary<int, string>();
 			foreach (EngravingMasterData e in Rows<EngravingMasterTable, int, EngravingMasterData>(eng, (EngravingMasterTable t) => t.m_cache))
@@ -264,19 +238,17 @@ public static class MasterDataNames
 		}
 	}
 
-	private static void Add(Dictionary<int, List<Cand>> map, int id, string name, string sig)
+	private static void Add(Dictionary<int, List<MasterDataLabelPolicy.Candidate>> map, int id, string name,
+	                        string sig)
 	{
 		if (string.IsNullOrEmpty(name)) return;
-		List<Cand> list;
+		List<MasterDataLabelPolicy.Candidate> list;
 		if (!map.TryGetValue(id, out list))
 		{
-			list = new List<Cand>(8);
+			list = new List<MasterDataLabelPolicy.Candidate>(8);
 			map[id] = list;
 		}
-		Cand c = new Cand();
-		c.Name = name;
-		c.Sig = sig;
-		list.Add(c);
+		list.Add(new MasterDataLabelPolicy.Candidate { Name = name, Signature = sig });
 	}
 
 	private static string TalentSig(Il2CppSystem.Collections.Generic.List<AbilityTalent> list)

@@ -1,0 +1,9 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_docs_123.py --selftest
+clean                              want_red=False got_red=False ok
+U+FFFD                             want_red=True  got_red=True  ok
+mojibake                           want_red=True  got_red=True  ok
+non-utf8                           want_red=True  got_red=True  ok
+missing-file                       want_red=True  got_red=True  ok
+all 49 listed docs exist           want_red=False got_red=False ok
+selftest: 6 case(s), 0 failed
