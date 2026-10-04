@@ -41,12 +41,10 @@ public static partial class CompositionProbe
 		public System.Collections.Generic.List<string> Tokens = new System.Collections.Generic.List<string>();
 	}
 
-	private static readonly System.Collections.Generic.Dictionary<long, System.Collections.Generic.List<GlobalRule>> _globalRules =
-		new System.Collections.Generic.Dictionary<long, System.Collections.Generic.List<GlobalRule>>();
-
-	/// <summary>Unit name registered per pointer, so a reused IL2CPP pointer is detected and re-scanned.</summary>
-	private static readonly System.Collections.Generic.Dictionary<long, string> _ruleOwnerName =
-		new System.Collections.Generic.Dictionary<long, string>();
+	/// <summary>RF4c: the registry itself is <see cref="GlobalRuleRegistry{TRule}"/> -- owner, reclamation and
+	/// iteration order live there and are unit-tested offline. It holds the rules per owner pointer plus the
+	/// owner NAME per pointer, the latter so a REUSED IL2CPP pointer is detected and re-scanned.</summary>
+	private static readonly GlobalRuleRegistry<GlobalRule> _registry = new GlobalRuleRegistry<GlobalRule>();
 
 	/// <summary>Drop the rules of units that no longer exist (called by the table-size valve in
 	/// RegisterGlobalDebuffs; the table itself is never cleared when a battle ends).
@@ -67,33 +65,17 @@ public static partial class CompositionProbe
 	{
 		try
 		{
-			var dead = new System.Collections.Generic.List<long>();
-			foreach (var kv in _globalRules)
-			{
-				var list = kv.Value;
-				bool alive = false;
-				if (list != null)
-				{
-					for (int i = 0; i < list.Count; i++)
-					{
-						try
-						{
-							if (!GameRef.IsNull(list[i].OwnerObj)) { alive = true; break; }
-						}
-						catch { }
-					}
-				}
-				// an empty list is only the "scanned, found nothing" memo: drop it so the (cheap,
-				// ability-text-cached) scan is repeated once for units that are still alive
-				if (!alive) dead.Add(kv.Key);
-			}
-			for (int i = 0; i < dead.Count; i++)
-			{
-				_globalRules.Remove(dead[i]);
-				_ruleOwnerName.Remove(dead[i]);
-			}
+			// RF4c: "which entries are dead" lives in the container (and is tested there). The per-element
+			// try/catch moved into OwnerAlive, so a throw still counts as "gone".
+			_registry.Reclaim(OwnerAlive);
 		}
 		catch { }
+	}
+
+	/// <summary>Aliveness of a rule's owner object: a native read, so it stays in the probe.</summary>
+	private static bool OwnerAlive(GlobalRule r)
+	{
+		try { return !GameRef.IsNull(r.OwnerObj); } catch { return false; }
 	}
 
 	/// <summary>Hit type of the composition currently being built (used by the ally-attack rules).</summary>
@@ -138,18 +120,17 @@ public static partial class CompositionProbe
 			string me = "";
 			try { me = bo.Name; } catch { }
 			System.Collections.Generic.List<GlobalRule> existing;
-			if (_globalRules.TryGetValue(key, out existing))
+			if (_registry.TryGet(key, out existing))
 			{
 				// the pointer can be REUSED by a different unit in a later battle: re-scan when the registered
 				// owner is not this unit. RF4 family 2: the rule itself is GlobalRuleClassifier.SkipRescan.
-				bool hasMemo = _ruleOwnerName.ContainsKey(key);
 				var facts = new GlobalRuleClassifier.RegisterFacts
 				{
 					HasEntry = true,
 					EntryCount = (existing == null) ? -1 : existing.Count,
 					FirstRuleOwnerName = (existing != null && existing.Count > 0) ? existing[0].OwnerName : null,
-					HasNameMemo = hasMemo,
-					NameMemoOwner = hasMemo ? _ruleOwnerName[key] : null,
+					HasNameMemo = _registry.HasOwnerName(key),
+					NameMemoOwner = _registry.OwnerNameOf(key),
 					CurrentName = me,
 				};
 				if (GlobalRuleClassifier.SkipRescan(facts)) return;
@@ -162,13 +143,13 @@ public static partial class CompositionProbe
 			// fighting right now, which is exactly the bug the "no clear at battle end" policy avoids.
 			// RF4 family 2: the two valve thresholds are named policy constants, and the second test is
 			// measured against the count AFTER the reclamation -- exactly as before.
-			if (GlobalRuleClassifier.ShouldReclaim(_globalRules.Count))
+			if (GlobalRuleClassifier.ShouldReclaim(_registry.Count))
 			{
 				ClearGlobalRules();
-				if (GlobalRuleClassifier.ShouldClearAll(_globalRules.Count)) { _globalRules.Clear(); _ruleOwnerName.Clear(); }
+				if (GlobalRuleClassifier.ShouldClearAll(_registry.Count)) _registry.ClearAll();
 			}
-			_globalRules[key] = rules;   // register even when empty, so the scan happens once
-			_ruleOwnerName[key] = me;
+			// register even when empty, so the scan happens once (the container documents that rule too)
+			_registry.Set(key, me, rules);
 			var list = bo.m_ability;
 			if (list == null) return;
 			int entry = 0;
@@ -274,7 +255,7 @@ public static partial class CompositionProbe
 			bool logThis = false;
 			try
 			{
-				if (_ruleLogCount < 40 && _globalRules.Count > 0
+				if (_ruleLogCount < 40 && _registry.Count > 0
 					&& Plugin.CfgAbilityDump != null && Plugin.CfgAbilityDump.Value)
 				{
 					logThis = true;
@@ -283,11 +264,12 @@ public static partial class CompositionProbe
 					try { an = atk.Name; } catch { }
 					try { vn = victim.Name; } catch { }
 					RuntimeLog.Write("[RULE] hit atk=" + an + " ht=" + ht + " vic=" + vn
-						+ " owners=" + _globalRules.Count);
+						+ " owners=" + _registry.Count);
 				}
 			}
 			catch { }
-			foreach (var kv in _globalRules)
+			// RF4c: the container enumerates in insertion order, which the double product below depends on.
+			foreach (var kv in _registry)
 			{
 				var rules = kv.Value;
 				if (rules == null || rules.Count == 0) continue;

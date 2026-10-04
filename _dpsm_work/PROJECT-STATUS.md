@@ -18,12 +18,12 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**75 个 .cs / 21,778 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **90** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**76 个 .cs / 21,857 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **93** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF4):**378 个命名用例 / 10 组**,**34 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF4):**405 个命名用例 / 11 组**,**39 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
 | 离线守卫 | **33 条命令 / 65 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `acceptance_rf2`);**RF0–RF2 与 RF3 两轮终验收都是 65/65 全绿**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12) |
 
 ## 2. 语料现状(35 份,冻结快照)
@@ -89,7 +89,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 |---|---|---|---|---|
 | 纯函数/模型 | `Model/StatusKey.cs`、`Model/ClauseStatusRun.cs`、`Model/FoldStep.cs`、`Model/BattleTime.cs`、`Composition/TieredModifier.cs` | 约 1.1k | **不依赖 IL2CPP / Plugin** | **能**:`recon_probe` 直接编译执行 |
 | **纯判据(RF3/RF4b)** | `Policy/`(4:时钟 / 会话转换 / 归属 / 全局规则分类) | 428 | **不依赖 IL2CPP / Plugin / 时钟源 / 配置** | **能**:`tests/BehaviorTests` 直接编译执行(RF3 起) |
-| **状态容器(RF4)** | `Runtime/`(1:跨场衔接) | 118 | 不依赖 IL2CPP / Plugin(只用 `BattleSession`) | **能**:`tests/BehaviorTests` 的 `runtime/*` 组 |
+| **状态容器(RF4)** | `Runtime/`(2:跨场衔接 / 战场规则注册表) | 215 | 不依赖 IL2CPP / Plugin(只用 `BattleSession`) | **能**:`tests/BehaviorTests` 的 `runtime/*` 组 |
 | 数据模型 | `Model/`(12 文件) | 1,958 | 无逻辑 | 部分 |
 | 中枢/组合根 | `src` 根(10 文件:Plugin、GameRef、GameSystemAccess、BuildInfo + **Aggregator 6 个 partial**) | 1,970 | 单例 + 静态 + 时间源 | 否(编排留在门面;判据已下沉到 `Policy/`) |
 | 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,692 | IL2CPP | 否(每个探针一个开关) |
@@ -185,7 +185,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **R2 纯函数下沉** | ~~时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口~~ **已完成(RF3:3 个策略文件,269 用例,20 例负控,见 §12)**;仍留:composition 链自身窗口、`IdleSeconds`、候选扫描(读原生对象) | 用例 + 网格对照 + 变异负控 |
 | **R3 界面** | `OverlayUGUI.Rows` 按"测量/截断/行构造"拆,列宽算术只留一处 | 布局守卫 634 行 0 违规 + 目视 |
 | **R4 数据侧** | `MasterDataAccess` 合并两处表查找;`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
-| **R5 状态生命周期(方案 RF4)** | ~~先交 `StateLifetimeMatrix`~~ **已交**([STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>));第 1 族(跨场衔接)已迁到 `Runtime/SessionContinuity`,并删掉矩阵查出的死状态;第 2 族的**判据半**已抽到 `Policy/GlobalRuleClassifier`(登记跳过/阀门/分句分类);其余族的前置条件写在矩阵 §7 | 378 用例 + 34 例负控 + 全量验收;每族/每半批后重跑 |
+| **R5 状态生命周期(方案 RF4)** | ~~先交 `StateLifetimeMatrix`~~ **已交**([STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>));第 1 族(跨场衔接)已迁到 `Runtime/SessionContinuity`,并删掉矩阵查出的死状态;第 2 族**两半都完成**:判据半在 `Policy/GlobalRuleClassifier`,状态半在 `Runtime/GlobalRuleRegistry`(结算不清表/只回收死持有者/枚举序都有用例);其余族的前置条件写在矩阵 §7 | 405 用例 + 39 例负控 + 全量验收;每族/每半批后重跑 |
 
 **顺序原则**:先有护栏再动刀;一次只动一层;每批都能单独回滚(回滚锚点 = 上一版 DLL + 源码快照)。
 
@@ -246,7 +246,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | [`IDENTITY-CENSUS.md`](<IDENTITY-CENSUS.md>) · [`IDENTITY-METADATA-DESIGN.md`](<IDENTITY-METADATA-DESIGN.md>) · [`ATKADD-MODEL-AUDIT.md`](<ATKADD-MODEL-AUDIT.md>) · [`atkadd_sensitivity_result.md`](<atkadd_sensitivity_result.md>) | 30 份时的身份/atkadd 研究 | 🟡 **当时快照**(30 份),结论可用、计数不可当现状 |
 | [`REFACTOR-BATCH-RF0-RF2.md`](<REFACTOR-BATCH-RF0-RF2.md>) | **重构第 1 轮记录**(RF0–RF2:文件清单 / 证据 / 未覆盖项 / 回滚) | ✅ 当前(该批次) |
 | [`REFACTOR-BATCH-RF3.md`](<REFACTOR-BATCH-RF3.md>) | **重构第 2 轮记录**(RF3 纯判据下沉:抽了什么 / 四处去重 / 未做) | ✅ 当前(该批次) |
-| [`STATE-LIFETIME-MATRIX.md`](<STATE-LIFETIME-MATRIX.md>) · [`REFACTOR-BATCH-RF4.md`](<REFACTOR-BATCH-RF4.md>) · [`REFACTOR-BATCH-RF4B.md`](<REFACTOR-BATCH-RF4B.md>) | **状态生命周期矩阵**(逐字段表 + 发现)、**第 3 轮记录**(第 1 族迁移 + 死状态删除)、**第 4 轮记录**(第 2 族判据半 + 真实线上文本用例) | ✅ 当前 |
+| [`STATE-LIFETIME-MATRIX.md`](<STATE-LIFETIME-MATRIX.md>) · [`REFACTOR-BATCH-RF4.md`](<REFACTOR-BATCH-RF4.md>) · [`REFACTOR-BATCH-RF4B.md`](<REFACTOR-BATCH-RF4B.md>) · [`REFACTOR-BATCH-RF4C.md`](<REFACTOR-BATCH-RF4C.md>) | **状态生命周期矩阵**、**第 3/4/5 轮记录**:第 1 族迁移与死状态删除 → 第 2 族判据半(线上文本夹具)→ 第 2 族状态半(注册表所有权与时序) | ✅ 当前 |
 | [`../../REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) · [`baseline-manifest.json`](<baseline-manifest.json>) · [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>) | 仓库边界 / 基线清单 / 本批输入清单 | ✅ 当前(每次输入变化要重新 `--write`) |
 | [`CONTRIBUTION-TABLE-REPORT.md`](<CONTRIBUTION-TABLE-REPORT.md>) | 贡献表完整报告(26/29 份时代) | 🟡 历史报告:只改了当前状态句,历史段落保持原样 |
 | [`SESSION-STATE.md`](<SESSION-STATE.md>)(377 KB) | 主档:§1–§6 API/限制、§7.2.x 逐版决策 | 🟡 **逐版决策档案**,不是现状摘要 |
@@ -272,7 +272,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 2 轮 RF3** | 时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口下沉为 `src/Policy/` 3 个纯文件;四处重复(来源规则、伤害匹配条件、存活窗口、pending 上限)各归一处;269 用例 + 20 例负控 + 7 组"旧式表达式"网格对照 | [REFACTOR-BATCH-RF3.md](<REFACTOR-BATCH-RF3.md>) |
 | **第 3 轮 RF4(第 1 步)** | 先交 [STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md)>(五类生命周期 + `Aggregator` 逐字段表 + 6 项发现);迁移第 1 族"跨场衔接"到 `src/Runtime/SessionContinuity.cs`(118 行);按矩阵证据删除死状态 `_lastCompT`/`_lastPow`;空闲关闭规则并入策略层;320 用例 / 26 例负控 | [REFACTOR-BATCH-RF4.md](<REFACTOR-BATCH-RF4.md>) |
 | **第 4 轮 RF4b(第 2 族判据半)** | 抽 `src/Policy/GlobalRuleClassifier.cs`(141 行):分句分类的 11 项字段、登记跳过(含指针复用检测)、阀门两级阈值;登记回路保留原生读取与身份字段;夹具用**线上实测文本**(`[RULE] 敌受伤 ×1.150 …`,18:03:50);378 用例 / 34 例负控 | [REFACTOR-BATCH-RF4B.md](<REFACTOR-BATCH-RF4B.md>) |
-| **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族与其判据半(前置条件见矩阵 §7)、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
+| **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
 

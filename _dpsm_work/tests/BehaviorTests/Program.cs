@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 378;
+	public const int ExpectedCases = 405;
 
 	private static int Main(string[] args)
 	{
@@ -29,6 +29,8 @@ internal static class Program
 		Cases.Runtime(r);
 		// RF4 family 2: the battle-wide rule classification (the decision half of the registration path).
 		Cases.GlobalRule(r);
+		// RF4c: the battle-wide rule registry container (ownership + the register-before-finalise timing).
+		Cases.Registry(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
