@@ -318,8 +318,9 @@ public static partial class CompositionProbe
 							if (!Aggregator.IsSameTeam(r.OwnerObj, atk)) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:攻击者不同队"); continue; }
 							if (r.Vanguard && !atkVan) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:攻击者非前衛"); continue; }
 							if (r.Rearguard && !atkRear) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:攻击者非後衛"); continue; }
-							if (r.MagicOnly && !(ht == 2 || ht == 5)) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:非魔法 ht=" + ht); continue; }
-							if (r.PhysOnly && !(ht == 1 || ht == 5)) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:非物理 ht=" + ht); continue; }
+							// RF4 apply side: the attribute gates are pure (the eDamageCalcType numbers live in the policy).
+							if (r.MagicOnly && !GlobalRuleApplyPolicy.IsMagicHit(ht)) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:非魔法 ht=" + ht); continue; }
+							if (r.PhysOnly && !GlobalRuleApplyPolicy.IsPhysHit(ht)) { if (logThis) RuntimeLog.Write("[RULE]   skip 我攻击:非物理 ht=" + ht); continue; }
 						}
 						// 1.3.8: record RESPONSIBILITY, not just what fired -- i.e. before the status-hit
 						// test below. See the note above for why the "fired" multiset was not enough.
@@ -329,22 +330,18 @@ public static partial class CompositionProbe
 						// 刻印 id=26 grant that shares its 1.10 value).
 						if (r.EnemyTakes && ctx != null)
 							ctx.AddEnemy(r.Factor, "global#" + kv.Key + "/" + i, r.Text);
-						int hits = 0;
-						if (r.Tokens.Count == 0) hits = 1;
-						else
+						// RF4 apply side: how many copies (0 = does not fire) and the resulting factor are the
+						// policy's. The status reads stay here: HasStatusLike invokes native code per token.
+						int matched = 0;
+						if (r.Tokens.Count > 0)
 							for (int t = 0; t < r.Tokens.Count; t++)
 							{
 								bool k;
-								if (HasStatusLike(victim, r.Tokens[t], out k)) hits++;
+								if (HasStatusLike(victim, r.Tokens[t], out k)) matched++;
 							}
-						if (hits == 0) continue;
-						double f = r.Factor;
-						if (hits > 1 && r.PerStatus)
-						{
-							double acc = 1.0;
-							for (int h = 0; h < hits; h++) acc *= f;
-							f = acc;
-						}
+						int copies = GlobalRuleApplyPolicy.StatusCopies(r.Tokens.Count, matched);
+						if (copies == 0) continue;
+						double f = GlobalRuleApplyPolicy.EffectiveFactor(r.Factor, copies, r.PerStatus);
 						m *= f;
 						if (ctx != null)
 							ctx.Add(r.EnemyTakes ? "vic" : "atk", "global", "global#" + kv.Key + "/" + i, f,

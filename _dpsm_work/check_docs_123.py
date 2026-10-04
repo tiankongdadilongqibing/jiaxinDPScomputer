@@ -63,6 +63,7 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF4C.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\CACHE-SEMANTICS-ADR.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF5A.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF4D.md',
 ]
 
 
