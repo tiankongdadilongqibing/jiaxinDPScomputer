@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 697;
+	public const int ExpectedCases = 709;
 
 	private static int Main(string[] args)
 	{
@@ -60,6 +60,8 @@ internal static class Program
 		Cases.BattleHistoryRingCases(r);
 		// RF5h: the no-separator whole-number formatter.
 		Cases.DisplayFormatWholeCases(r);
+		// Round 41: the cache decisions (1s throttle, F9 generation).
+		Cases.CacheGenerationCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

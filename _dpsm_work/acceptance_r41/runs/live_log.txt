@@ -1,0 +1,9 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_live_log.py --log D:\dmmplayer\rlyehshoujotaix_cl\BepInEx\LogOutput.log
+live-log gate: WARNING
+  note: no DpsMeter [Error] line in the log
+  note: 1 exported battle(s) paired with the machine log; version 1.7.11
+  note: history counter non-decreasing across 38 frame(s) (max 1)
+  note: 11 overlay frame(s) carried an unattributed row agreeing with an export
+  warn: 6 overlay frame(s) printed a ??? row WITHOUT a hit count (a live partial surface, e.g. '????? 8,913   ???(??????) 0   (????????)'): no export can corroborate those, and they are not claimed to be correct
+---- exit 0

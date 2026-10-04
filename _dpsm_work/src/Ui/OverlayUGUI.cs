@@ -389,7 +389,7 @@ public static partial class OverlayUGUI
 			Visible = !Visible;
 			if (Visible) _lastRefresh = -1f; // force an immediate rebuild when going back visible
 		}
-		if (f9 && !_prevF9) Aggregator.ResetCurrent();
+		if (f9 && !_prevF9) { Aggregator.ResetCurrent(); ContributionSession.Invalidate(); }
 		if (f10 && !_prevF10)
 		{
 			// F10 only cycles roster <-> chart now (detail has its own key: F6)

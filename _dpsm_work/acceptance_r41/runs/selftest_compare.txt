@@ -1,0 +1,13 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe -m contrib.compare --selftest
+  [PASS] three comparable real battles publish a comparison (exit 0) rc=0
+  [PASS] actor_credit is stratified by capability, each stratum with its own n strata=2
+  [PASS] an actor whose events were removed is a REAL zero, not a missing row rows_with_zero=1
+  [PASS] two entities with the same NAME stay two rows (never merged) rows=2 distinct=2
+  [PASS] a different capability set is a different stratum, never an average caps=[[False], [True], [True]]
+  [PASS] a different observed config flag is a different stratum    caps=[[False], [True]]
+  [PASS] training ground is its own stratum and is not pooled with a normal quest strata=3
+  [PASS] the gate-ERROR sample is listed as rejected, not silently averaged rejected=2
+  [PASS] a single sample is not a comparison (exit 4)               rc=4
+  [PASS] strata with different sizes keep their own n (no pooled average) n=[1, 2]
+---- selftest: PASS

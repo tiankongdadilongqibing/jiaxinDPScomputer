@@ -53,7 +53,7 @@ public static class OverlayCore
 		if (current != null && current.type == EventType.KeyDown)
 		{
 			if (current.keyCode == KeyCode.F8) Visible = !Visible;
-			else if (current.keyCode == KeyCode.F9) Aggregator.ResetCurrent();
+			else if (current.keyCode == KeyCode.F9) { Aggregator.ResetCurrent(); ContributionSession.Invalidate(); }
 		}
 		if (!Visible) return;
 

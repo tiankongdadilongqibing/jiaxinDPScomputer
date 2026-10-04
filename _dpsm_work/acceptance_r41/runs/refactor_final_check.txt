@@ -1,0 +1,11 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\refactor_final_check.py
+cs files            : 121
+CJK characters      : 10059
+dead symbol refs    : none
+version truth       : BuildInfo=1.7.11 csproj=1.7.11 agree=True
+CompositionProbe         10 partial files, all declare partial: True
+OverlayUGUI              4 partial files, all declare partial: True
+Aggregator               6 partial files, all declare partial: True
+CharacterNames rows : 105
+refactor check: blocks=0 warns=0

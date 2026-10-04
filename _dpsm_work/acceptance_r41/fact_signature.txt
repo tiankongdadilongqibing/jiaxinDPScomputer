@@ -1,0 +1,20 @@
+======================================================================================================================
+FACT signature replay
+  file    battle_9999_20261005_064910.json
+  version 1.7.11   quest 9999   damage events 874   replayable 873
+  caps    {"MaxClasses": 2400, "MaxLiveClasses": 900}
+----------------------------------------------------------------------------------------------------------------------
+1.5.1 legacy key           distinct=342    cap=600   kept=342   served=873    overflow=0      servedIfRanked=873    singletons=227   maxHits=96     OK 
+1.5.2 shipped key          distinct=340    cap=2400  kept=340   served=873    overflow=0      servedIfRanked=873    singletons=225   maxHits=96     OK 
+
+coverage: 1.5.1 legacy 873/873 (100.0%)   1.5.2 shipped 873/873 (100.0%)
+plugin bookkeeping: observed=873  sum(facts.items[].hits)=873  classes=340/2400
+  note: replay served (873) counts only the 873 exported events; the plugin counted 873 Observe calls. Not expected to be equal.
+VERDICT: shipped key fits (headroom 2060 classes) and every consistency check holds.
+
+top 5 classes by hits (shipped key):
+   n=96    ('ムスクーマ', 2, '城塞', 1, 0, 3, 0.028, 40, 160, 0, 0, None, ())
+   n=50    ('ムスクーマ', 2, '城塞', 1, 10165, 2, 0.034, 40, 160, 0, 0, None, ())
+   n=49    ('ムスクーマ', 2, '城塞', 1, 0, 2, 0.034, 40, 160, 0, 0, None, ())
+   n=21    ('ムスクーマ', 2, 'T.O.W.E.R.typeR', 1, 0, 3, 0.95, 40, 160, 1, 0, None, ())
+   n=14    ('ムスクーマ', 2, 'T.O.W.E.R.typeR', 1, 0, 3, 0.95, 40, 160, 0, 0, None, ())

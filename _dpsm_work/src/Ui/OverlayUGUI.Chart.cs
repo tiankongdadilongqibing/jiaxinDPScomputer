@@ -37,7 +37,7 @@ public static partial class OverlayUGUI
 				else enemyDealt += a.DamageDealt;
 			}
 			double secs = Math.Max(1.0, session.ActiveSeconds);
-			return $"任务 {session.QuestId}  时间 {BattleTime.Seconds(session.ActiveSeconds)}   我方:总伤 {allyDealt:N0}  承伤 {allyTaken:N0}  受回复 {allyHeal:N0}   敌方总伤 {enemyDealt:N0}  未归属 {session.UnattributedDamage:N0}";
+			return $"任务 {session.QuestId}  时间 {BattleTime.Seconds(session.ActiveSeconds)}   我方:总伤 {DisplayFormat.Num((long)allyDealt)}  承伤 {DisplayFormat.Num((long)allyTaken)}  受回复 {DisplayFormat.Num((long)allyHeal)}   敌方总伤 {DisplayFormat.Num((long)enemyDealt)}  未归属 {DisplayFormat.Num((long)session.UnattributedDamage)}";
 		}
 		return "已结束战斗(上一场) 累计曲线";
 	}
@@ -82,14 +82,14 @@ public static partial class OverlayUGUI
 			string nm = (a.Name ?? "").Length > 12 ? (a.Name.Substring(0, 12) + "…") : (a.Name ?? "");
 			string line;
 			if (mode == 0)
-				line = $"● {nm}   总伤害 {a.DamageDealt:N0}   均秒伤 {(long)(a.DamageDealt / secs):N0}";
+				line = $"● {nm}   总伤害 {DisplayFormat.Num((long)a.DamageDealt)}   均秒伤 {DisplayFormat.Num((long)(a.DamageDealt / secs))}";
 			else if (mode == 1)
 			{
 				float hp = a.GetHpPct(Math.Max(0, a.MaxSecond() - 1));
-				line = $"● {nm}   受击 {a.DamageTaken:N0}   剩余耐久 {hp:F0}%";
+				line = $"● {nm}   受击 {DisplayFormat.Num((long)a.DamageTaken)}   剩余耐久 {hp:F0}%";
 			}
 			else
-				line = $"● {nm}   总伤害 {a.DamageDealt:N0}   均秒伤 {(long)(a.DamageDealt / secs):N0}";
+				line = $"● {nm}   总伤害 {DisplayFormat.Num((long)a.DamageDealt)}   均秒伤 {DisplayFormat.Num((long)(a.DamageDealt / secs))}";
 			rows.Add(new RowDef
 			{
 				Text = line,

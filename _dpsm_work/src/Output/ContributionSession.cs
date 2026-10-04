@@ -173,9 +173,17 @@ public static class ContributionSession
 	private static bool _cacheUsedFolds;
 	private static int _cacheQuest;
 	private static double _cacheSeconds;
+	// Round 41 (user decision): the generation the cached result was computed from. F9 must make the panel
+	// stop showing pre-reset numbers even when the event count happens to be the same, so the cache cannot key
+	// on the count alone.
+	private static int _cacheGen;
+
+	/// <summary>Bumped by every <see cref="Invalidate"/>: "the same session object, a new generation of data".</summary>
+	public static int Generation { get; private set; }
 
 	public static void Invalidate()
 	{
+		Generation++;
 		_cache = null;
 		_cacheSession = null;
 		_cacheEvents = -1;
@@ -195,7 +203,7 @@ public static class ContributionSession
 			// RF5: the four-way staleness rule is the policy's; session identity is still compared here.
 			bool stale = ContributionCachePolicy.IsStale(ReferenceEquals(_cacheSession, s), _cacheEvents,
 			                                             s.Events.Count, _cacheUsedFolds, useFolds, _cacheAt, now,
-			                                             ContributionCachePolicy.RefreshSeconds);
+			                                             ContributionCachePolicy.RefreshSeconds, _cacheGen, Generation);
 			if (stale)
 			{
 				_cache = Compute(s, useFolds);
@@ -205,6 +213,7 @@ public static class ContributionSession
 				_cacheUsedFolds = useFolds;
 				_cacheQuest = s.QuestId;
 				_cacheSeconds = s.ActiveSeconds;
+				_cacheGen = Generation;
 			}
 			return new ContributionView { Result = _cache, Live = true, Usable = _cache != null, QuestId = s.QuestId, Seconds = s.ActiveSeconds };
 		}

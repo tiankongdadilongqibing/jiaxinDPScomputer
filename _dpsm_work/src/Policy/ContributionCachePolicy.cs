@@ -60,8 +60,27 @@ internal static class ContributionCachePolicy
 	public static bool IsStale(bool sameSession, int cachedEvents, int currentEvents, bool cachedUsedFolds,
 	                           bool useFolds, double cachedAt, double now, double refreshSeconds)
 	{
+		return IsStale(sameSession, cachedEvents, currentEvents, cachedUsedFolds, useFolds, cachedAt, now,
+		               refreshSeconds, 0, 0);
+	}
+
+	/// <summary>
+	/// The production rule (round 41, from the user's decision on the cache ADR):
+	///   * the throttle is one second and it is the ONLY time-based clause -- an unchanged panel is not
+	///     recomputed merely because a second passed, and the comparison stays STRICT `>`;
+	///   * a data GENERATION is compared too, because a F9 reset can leave the event count identical to what
+	///     it was before the reset. Counting events alone cannot see that, and the panel would keep showing the
+	///     pre-reset numbers. The generation is bumped whenever the facade invalidates.
+	/// The other two clauses are the pre-existing ones (session identity and the folds switch) and are what make
+	/// a battle switch or a ReconcileCalc toggle bypass the throttle, as decided.
+	/// </summary>
+	public static bool IsStale(bool sameSession, int cachedEvents, int currentEvents, bool cachedUsedFolds,
+	                           bool useFolds, double cachedAt, double now, double refreshSeconds,
+	                           int cachedGeneration, int currentGeneration)
+	{
 		return !sameSession
 			|| cachedEvents != currentEvents
+			|| cachedGeneration != currentGeneration
 			|| cachedUsedFolds != useFolds
 			|| now - cachedAt > refreshSeconds;
 	}

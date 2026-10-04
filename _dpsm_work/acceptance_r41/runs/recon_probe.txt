@@ -1,0 +1,239 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=D:\dmmplayer\dotnet-sdk6\dotnet.exe run --project D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\recon_probe\ReconProbe.csproj -c Release -v quiet -- D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_r41\recon_probe_out.json
+--- 分类断言 ---
+PASS dmgEvents: got=14 want=14
+PASS withCalc: got=13 want=13
+PASS exact: got=4 want=4
+PASS exactWithCrit: got=6 want=6
+PASS critInferred: got=2 want=2
+PASS approx: got=1 want=1
+PASS unexplained: got=6 want=6
+PASS theoryExceeds: got=1 want=1
+PASS absorbed: got=1 want=1
+PASS critObserved: got=3 want=3
+PASS critObservedYes: got=2 want=2
+PASS critAgree: got=1 want=1
+PASS critInferredButDenied: got=1 want=1
+PASS critObservedButUnexplained: got=1 want=1
+PASS absorbedAmount: got=200 want=200
+PASS distinctResiduals: got=4 want=4
+PASS pairLiveSame: got=9 want=9
+PASS pairLiveAge: got=1 want=1
+PASS pairValue: got=2 want=2
+PASS pairFifo: got=1 want=1
+PASS pairNone: got=1 want=1
+PASS pairUnknown: got=0 want=0
+PASS pairCorroborated: got=2 want=2
+PASS top[0].r(x1000): got=1210 want=1210
+PASS top[0].n: got=3 want=3
+PASS byTenth exact sum: got=4 want=4
+PASS byTenth total sum: got=14 want=14
+PASS tenth[0].total: got=3 want=3
+PASS tenth[0].exact: got=2 want=2
+PASS tenth[7].exact: got=1 want=1
+PASS absorbed GameValue: got=1000 want=1000
+PASS absorbed ValueMatches: got=1 want=1
+PASS absorbed PairTrusted: got=1 want=1
+PASS live-age PairTrusted: got=0 want=0
+PASS fifo PairTrusted: got=0 want=0
+--- [RECON] 自检行 ---
+[DpsMeter][RECON] 伤害事件=14 有构成=13 精确=4(30.8%) 计入会心=6(其中凭会心新增=2) 会心实测=3/是=2 一致=1 实测否决=1 实测未解释=1 近似=1 未解释=6 | 理论超实际10倍=1 被吸收=1件/200 | 配对 live-same=9 live-age=1 value=2 fifo=1 无构成=1 配对未标注=0 佐证=2 | 未识别倍率 种类=4 首位=1.210×3 | 口径:精确=理论==游戏值(含被吸收),近似=|差|≤5%,理论超实际10倍=理论>10×实际(可能未建模的大幅减伤,不必然是配对错位)
+--- JSON: reconcile ---
+{"pad":0,"reconcile":{"dmgEvents":14,"withCalc":13,"exact":4,"exactWithCrit":6,"critInferred":2,"critObserved":3,"critObservedYes":2,"critAgree":1,"critInferredButDenied":1,"critObservedButUnexplained":1,"approx":1,"unexplained":6,"theoryExceeds":1,"absorbed":1,"absorbedAmount":200,"distinctResiduals":4,"approxTolerance":0.05,"theoryExceedsResidualMax":0.10,"critInferredTolerance":0.0020,"byPair":{"liveSame":9,"liveAge":1,"value":2,"fifo":1,"none":1,"unknown":0,"corroborated":2},"byTenthExact":[2,0,0,0,0,0,0,1,1,0],"byTenthTotal":[3,1,1,0,1,1,1,1,1,4],"topResidual":[{"r":1.210,"n":3},{"r":0.040,"n":1},{"r":1.900,"n":1},{"r":2.500,"n":1}]}}
+--- JSON: event calc (full) ---
+{"pad":0,"calc":{"effectId":10100,"hitType":1,"attackPower":10000,"power":10000,"ratio":1.00,"base":1000,"attrMult":1.000,"dealtMult":1.000,"takenMult":1.000,"knownMult":1.000,"theory":1000,"applied":1000,"residual":1.000,"defense":500,"defenseKind":"物防","penetration":5,"effectiveDefense":475,"critRate":25,"critDamageRate":160,"vicBlocking":0,"vicUnitBlocking":0,"vicBlockCount":0,"vicExtra":0,"vicBuffs":0,"vicGive":0,"givenFoldOn":false,"pair":"live-same","pairTrusted":true,"pairCorroborated":true,"valueMatches":true}}
+--- JSON: event calc (theory exceeds actual 25x) ---
+{"pad":0,"calc":{"effectId":10100,"hitType":1,"attackPower":10000,"power":10000,"ratio":1.00,"base":100000,"attrMult":1.000,"dealtMult":1.000,"takenMult":1.000,"knownMult":1.000,"theory":100000,"applied":4000,"residual":0.040,"defense":500,"defenseKind":"物防","penetration":5,"effectiveDefense":475,"vicBlocking":0,"vicUnitBlocking":0,"vicBlockCount":0,"vicExtra":0,"vicBuffs":0,"vicGive":0,"givenFoldOn":false,"pair":"live-same","pairTrusted":true,"pairCorroborated":false,"valueMatches":false}}
+--- JSON: 1.5.0 fold/cancel provenance ---
+,"calc":{"effectId":10100,"hitType":1,"attackPower":10000,"power":10000,"ratio":1.00,"base":1000,"attrMult":1.000,"dealtMult":1.000,"takenMult":1.000,"knownMult":1.000,"theory":1000,"applied":1000,"residual":1.000,"defense":500,"defenseKind":"物防","penetration":5,"effectiveDefense":475,"critRate":25,"critDamageRate":160,"vicBlocking":0,"vicUnitBlocking":0,"vicBlockCount":0,"vicExtra":0,"vicBuffs":0,"vicGive":0,"givenFoldOn":false,"fold":[{"side":"atk","kind":"text","origin":"text#3/40009/c1","factor":1.15,"label":"与ダメージ+15%"},{"side":"vic","kind":"global","origin":"global#123/2","factor":1.15,"label":"毒状態の敵全ての被ダメージ+15%"}],"cancel":[{"origin":"given#7/1006/-15","value":1.1500,"by":"global#123/2","label":"被伤害+15%(赋予)"}],"responsibility":1,"maxAbsorbed":5,"pair":"live-same","pairTrusted":true,"pairCorroborated":true,"valueMatches":true}
+PASS fold[] emitted
+PASS fold keeps a stable origin id
+PASS fold factor round-trips exactly
+PASS fold factor is not truncated to 4 decimals
+PASS the written factor parses back to the same double
+PASS cancel[] emitted with the dropped copy
+PASS cancel names the absorbing rule
+PASS responsibility emitted
+PASS maxAbsorbed emitted (1 rule absorbed 5 copies)
+PASS foldDropped omitted when 0
+PASS no fold key when absent
+PASS no cancel key when absent
+PASS label quote escaped
+PASS defenseKind quote escaped
+--- StatusKey: 1.5.2 canonical set ---
+PASS canonical count: got=3 want=3
+PASS permutation+duplicate count: got=3 want=3
+PASS permutation maps to one form
+PASS canonical order is ordinal
+PASS ordinal order ignores case-ish collation: got=2 want=2
+PASS ordinal puts 'A' before 'b'
+PASS SameSet accepts a permutation
+PASS SameSet rejects a subset
+PASS SameSet rejects a different name
+PASS null source yields nothing: got=0 want=0
+PASS null buffer yields nothing: got=0 want=0
+PASS empty and null names are skipped: got=1 want=1
+PASS tight buffer holds two names: got=2 want=2
+PASS tight buffer is ordered
+--- ClauseStatusRun: 1.5.3 status-list joiners (と/や/及) ---
+PASS と-list: the name BEFORE the joiner finds its 状態 run
+PASS slash-list still works
+PASS a plain name still works
+PASS a name NOT followed by a 状態 run does not match
+PASS longest body wins at the 火傷 offset
+PASS と-run stripped when its SECOND name is verified
+PASS と-run leaves no bare 毒 behind
+PASS mirror: the 火傷 sibling goes too
+PASS an unrelated verified name strips nothing
+PASS と-list yields BOTH status tokens: got=2 want=2
+PASS と-list tokens are 毒 and 火傷
+PASS slash-list still yields both: got=2 want=2
+PASS a single name yields one token: got=1 want=1
+PASS the single token is 毒
+PASS それぞれ with 2 tokens is 1.15^2 = 1.3225
+--- FoldStep: 1.5.4 byUnit ---
+PASS fold step carries byUnit when set
+PASS fold step omits byUnit when unset
+PASS Add overload stores ByUnit
+PASS old Add signature leaves ByUnit null
+PASS NoteCancellation stores ByUnit
+PASS old NoteCancellation signature leaves ByUnit null
+--- JSON: 结构自检 ---
+PASS check accepts the probe's own fold JSON
+PASS check accepts the escaped JSON
+PASS check rejects unbalanced brace
+PASS check rejects unbalanced bracket
+PASS check rejects unterminated string
+PASS check rejects a stray closing brace
+PASS check ignores brackets inside strings
+PASS check ignores an escaped quote
+PASS duplicate root keys counted: got=1 want=1
+PASS nested duplicate NOT counted as root: got=0 want=0
+PASS error carries an offset
+PASS error quotes the context
+PASS error names the depth at end
+--- Contribution: 1.6.0 阶段 E (字典 S1-S13) ---
+PASS S1 analyzable: got=1000.0000 want=1000.0000
+PASS S1 attributed: got=1000.0000 want=1000.0000
+PASS S1 unattributed: got=0.0000 want=0.0000
+PASS S1 hits: got=1 want=1
+PASS S1 base credit line is exact
+PASS S2 attributed: got=3000.0000 want=3000.0000
+PASS S2 unattributed: got=0.0000 want=0.0000
+PASS S2 assist credit 1000 goes to B
+PASS S3 analyzable: got=2750.0000 want=2750.0000
+PASS S3 unattributed = 386.02: got=386.0230 want=386.0200
+PASS S3 identity credited+unattributed: got=2750.0000 want=2750.0000
+PASS S3 ambiguous global is a reason code
+PASS S4 attributed: got=1000.0000 want=1000.0000
+PASS S4 unattributed: got=500.0000 want=500.0000
+PASS S4 outside reason
+PASS S5 attributed: got=2000.0000 want=2000.0000
+PASS S5 no assist
+PASS S5 no link
+PASS S6 zero-factor folds: got=1 want=1
+PASS S6 unattributed: got=0.0000 want=0.0000
+PASS S8 attributed: got=2000.0000 want=2000.0000
+PASS S8 assist goes to the ALLY
+PASS S8 enemy key never appears
+PASS S9 unattributed: got=500.0000 want=500.0000
+PASS S9 ambiguous reason
+PASS S10a attributed: got=2000.0000 want=2000.0000
+PASS S10a unattributed: got=0.0000 want=0.0000
+PASS S10b unattributed: got=1000.0000 want=1000.0000
+PASS S10b ambiguous reason
+PASS S11 unattributed: got=333.3333 want=333.3330
+PASS S11 unknown reason
+PASS S12 analyzable: got=0.0000 want=0.0000
+PASS S12 hits: got=0 want=0
+PASS S13 sub-unity folds: got=1 want=1
+PASS S13 attributed keeps the whole hit: got=1000.0000 want=1000.0000
+PASS S13 no negative lines: got=0 want=0
+PASS calc-missing hit counted: got=1 want=1
+PASS dropped folds counted: got=2 want=2
+PASS dropped-fold hits counted: got=1 want=1
+PASS Compute stats == AppendJson stats (attributed): got=3000.0000 want=3000.0000
+PASS structured result has one actor row per credited actor: got=2 want=2
+PASS dashboard row totalCredit == stats: got=3000.0000 want=3000.0000
+PASS actor rows are ordered by totalCredit desc
+PASS structured JSON == overload JSON
+PASS contribution section passes JsonCheck
+PASS section carries its schema identity
+PASS P0-B analyzableDealt: got=600.0000 want=600.0000
+PASS P0-B attributedDamage: got=500.0000 want=500.0000
+PASS P0-B unattributedCredit: got=100.0000 want=100.0000
+PASS P0-B excludedDamage == unknown-attacker pool: got=400.0000 want=400.0000
+PASS P0-B outsideTeamDealt is a SEPARATE bucket: got=400.0000 want=400.0000
+PASS P0-B eventSumAll: got=1400.0000 want=1400.0000
+PASS P0-B events: got=3 want=3
+PASS P0-B analyzableHits: got=1 want=1
+PASS P0-B outsideTeamHits: got=1 want=1
+PASS P0-B unknownAttackerHits: got=1 want=1
+PASS P0-B analysisDamageCoverage = 60%: got=0.6000 want=0.6000
+PASS P0-B creditCoverageWithinAnalyzed = 83.333%: got=0.8333 want=0.8333
+PASS P0-B overallAttributedCoverage = 50%: got=0.5000 want=0.5000
+PASS P0-B ledger identity analyzable+outsideTeam == totalsDealt: got=1000.0000 want=1000.0000
+PASS P0-B reconciliationGap is zero when every unit is bucketed: got=0.0000 want=0.0000
+PASS P0-B totalDamage is analyzableDealt, not analyzable+unattributed
+PASS P0-B schema identity is 1.1 / producer plugin
+PASS P0-B ledger block is emitted
+PASS P0-B zero-denominator ratios are undefined (JSON null), not a measured 0
+PASS P0-B an unknown totals.dealt leaves the gap undefined, not 0
+--- 阶段 G: 参数所有者 (paramOwners) ---
+PASS paramOwners reads: got=2 want=2
+PASS paramOwners entries seen: got=5 want=5
+PASS paramOwners owner = another unit (the GIVER): got=3 want=3
+PASS paramOwners owner = this unit (the holder): got=1 want=1
+PASS paramOwners owner unreadable: got=1 want=1
+PASS paramOwners distinct owners in the union: got=2 want=2
+PASS paramOwners value/key owner disagreements: got=3 want=3
+PASS paramOwners cross-checked entries: got=4 want=4
+PASS paramOwners scanned entries: got=15 want=15
+PASS paramOwners owner getters: got=12 want=12
+PASS paramOwners skipped entries: got=3 want=3
+PASS paramOwners completeness identity holds
+PASS paramOwners JSON is structurally valid
+PASS paramOwners JSON names the giver
+PASS paramOwners JSON emits null for an unreadable owner
+PASS paramOwners JSON carries the merged entry as seen=2
+PASS paramOwners JSON keeps the reference text
+--- 阶段 G: 攻击力加算归属 (atkadd) ---
+PASS atkadd rows for a giver other than the attacker: got=1 want=1
+PASS atkadd names the GIVER, not the holder
+PASS atkadd origin is deterministic
+PASS atkadd factor reproduces P when dP_g is removed: got=1971.0000 want=1971.0000
+PASS atkadd dP_g equals B*r_g/100 + a_g: got=440.4202 want=440.4202
+PASS atkadd rate excludes the attacker own 9%: got=10.0000 want=10.0000
+PASS atkadd actual sum: got=300 want=300
+PASS atkadd self values are not charged to a giver: got=1 want=1
+PASS atkadd colliding value emits nothing: got=0 want=0
+PASS atkadd colliding value is counted: got=1 want=1
+PASS atkadd refuses a hit whose power is below its own addends: got=0 want=0
+PASS atkadd refusal is counted: got=1 want=1
+PASS atkadd unreadable owner emits nothing: got=0 want=0
+PASS atkadd unreadable owner is counted: got=1 want=1
+PASS atkadd empty input emits nothing: got=0 want=0
+PASS atkadd empty input counts no hit: got=0 want=0
+--- P1-A: atkadd actor-key self verdict ---
+PASS atkadd same-name teammate is NOT dropped into baseCredit: got=1 want=1
+PASS atkadd same-name teammate is charged: got=1 want=1
+PASS atkadd same-name teammate is not self: got=0 want=0
+PASS atkadd same-name teammate is counted as a name collision: got=1 want=1
+PASS atkadd same-name teammate uses the key path, not the fallback: got=0 want=0
+PASS atkadd same-name teammate resolves both keys: got=0 want=0
+PASS atkadd same-name teammate keeps the log-share factor f=P/(P-dP): got=1.0900 want=1.0900
+PASS atkadd same-name teammate keeps byUnit = the giver name
+PASS atkadd self grant by key emits nothing: got=0 want=0
+PASS atkadd self grant by key is counted as self: got=1 want=1
+PASS atkadd self grant by key is not a collision: got=0 want=0
+PASS atkadd self grant by key needs no fallback: got=0 want=0
+PASS atkadd keyless self is decided by name: got=1 want=1
+PASS atkadd keyless verdict is counted as owner-unknown: got=1 want=1
+PASS atkadd keyless self emits nothing: got=0 want=0
+PASS atkadd keyless teammate is charged: got=1 want=1
+PASS atkadd keyless teammate is counted as owner-unknown: got=1 want=1
+PASS atkadd keyless teammate is not a self fallback: got=0 want=0
+PASS atkadd missing attacker key falls back to name: got=1 want=1
+PASS atkadd missing attacker key is counted: got=1 want=1
+wrote D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_r41\recon_probe_out.json
+ALL CHECKS PASSED
