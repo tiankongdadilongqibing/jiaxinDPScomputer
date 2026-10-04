@@ -1,0 +1,133 @@
+===== 1.5.0 battle 173710  version=1.5.0 =====
+  withCalc=5271 exact=2473(46.9%) exactWithCrit=2643(50.1%) critInferred=170 approx=30 unexplained=2598
+  residual histogram top12 (r = gamevalue/theory; r>1 => we UNDER-counted):
+     r=1.0       n=2485
+     r=1.323     n=468
+     r=0.756     n=386
+     r=1.249     n=383
+     r=1.322     n=288
+     r=0.657     n=287
+     r=0.658     n=270
+     r=1.437     n=211
+     r=1.15      n=91
+     r=1.65      n=64
+     r=0.87      n=58
+     r=1.5       n=58
+  per-attacker (n with residual, r==1, top3 non-1):
+     マッドシーカー                tot=1800  r=1:142    r=0.756 n=385, r=1.249 n=383, r=0.657 n=287
+     テトラ                    tot=1401  r=1:2742   r=0.87 n=17, r=1.15 n=9, r=0.714 n=3
+     メアリー                   tot=894   r=1:90     r=1.323 n=468, r=1.322 n=288, r=1.15 n=75
+     ネーフェ＝ジアー               tot=478   r=1:800    r=1.65 n=59, r=0.139 n=8, r=1.15 n=4
+     ク＝ルヴィ                  tot=240   r=1:350    r=1.5 n=58, r=0.87 n=2, r=1.15 n=2
+     エヴァラス・フラウ              tot=171   r=1:330    r=0.097 n=2, r=0.87 n=1, r=1.15 n=1
+     生ける炎 クトゥグア             tot=131   r=1:224    r=1.002 n=15, r=0.87 n=1, r=0.715 n=1
+     ?                      tot=69    r=1:138    
+     ルナリス                   tot=42    r=1:84     
+     ショゴス                   tot=19    r=1:20     r=0.0 n=9
+     クトゥグァ砲台                tot=13    r=1:24     r=0.667 n=1
+     クトゥグァ砲台R               tot=13    r=1:26     
+
+===== 1.5.1 battle 175142  version=1.5.1 =====
+  withCalc=5055 exact=3270(64.7%) exactWithCrit=4064(80.4%) critInferred=794 approx=23 unexplained=968
+  residual histogram top12 (r = gamevalue/theory; r>1 => we UNDER-counted):
+     r=1.0       n=3272
+     r=1.9       n=667
+     r=1.323     n=483
+     r=1.322     n=295
+     r=1.15      n=151
+     r=1.65      n=69
+     r=1.899     n=21
+     r=1.002     n=21
+     r=0.87      n=14
+     r=1.901     n=10
+     r=1.5       n=9
+     r=1.898     n=9
+  per-attacker (n with residual, r==1, top3 non-1):
+     マッドシーカー                tot=1737  r=1:1996   r=1.9 n=667, r=1.899 n=21, r=1.901 n=10
+     テトラ                    tot=1362  r=1:2694   r=1.15 n=12, r=0.87 n=3
+     メアリー                   tot=915   r=1:6      r=1.323 n=483, r=1.322 n=295, r=1.15 n=123
+     ネーフェ＝ジアー               tot=474   r=1:796    r=1.65 n=69, r=0.87 n=4, r=1.15 n=3
+     エヴァラス・フラウ              tot=176   r=1:346    r=1.15 n=3
+     生ける炎 クトゥグア             tot=125   r=1:208    r=1.002 n=21
+     ?                      tot=68    r=1:134    r=1.15 n=1
+     氷鳥                     tot=65    r=1:130    
+     ノイシス                   tot=52    r=1:84     r=1.5 n=9, r=1.499 n=1
+     ルナリス                   tot=40    r=1:80     
+     ショゴス                   tot=15    r=1:18     r=0.0 n=6
+     クトゥグァ砲台                tot=13    r=1:26     
+     クトゥグァ砲台R               tot=13    r=1:26     
+
+===== specimens (1.5.1) =====
+  ---- r=1.9 atk=マッドシーカー vic=ショゴス eff=0 ht=2
+       amount=7386 nominal=7386 theory=3888 applied=7386 absorbed=None known=1.84
+       attrMult=1.0 dealtMult=1.521 takenMult=1.21 base=2113 ratio=0.22
+       critRate=40 critDamageRate=190 madnessRatio=None responsibility=1 maxAbsorbed=3
+       vicGive=7 vicGiveApplied=2 vicBuffs=138 vicExtra=0
+       pair=live-same pairTrusted=True valueMatches=False
+       vicGiveText=被伤害+10%(赋予)、被伤害+10%(赋予)
+       fold  atk  text     text#4/20056/c0              x1.5209   [母なる変異の飛沫] 毒/凍結/火傷状態の敵全ての被ダメージがそれぞれ+15%
+       fold  vic  given    given#3/1006/-10             x1.1      被伤害+10%(赋予)
+       fold  vic  given    given#4/1006/-10             x1.1      被伤害+10%(赋予)
+       CXL  given#2/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#5/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#6/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+
+  ---- r=1.323 atk=メアリー vic=ショゴス eff=10002 ht=1
+       amount=184707 nominal=184707 theory=139665 applied=184707 absorbed=None known=7.619
+       attrMult=1.0 dealtMult=6.296 takenMult=1.21 base=18332 ratio=1.0
+       critRate=None critDamageRate=150 madnessRatio=250 responsibility=1 maxAbsorbed=3
+       vicGive=7 vicGiveApplied=2 vicBuffs=134 vicExtra=0
+       pair=live-same pairTrusted=True valueMatches=False
+       vicGiveText=被伤害+10%(赋予)、被伤害+10%(赋予)
+       fold  atk  text     text#2/75/c1                 x1.15     [毒の短剣] 毒状態の敵に対して与ダメージ+15％
+       fold  atk  text     text#7/6/c1                  x1.2      与ダメージ+20%（前衛のみ）
+       fold  atk  text     text#10/6/c1                 x1.2      与ダメージ+20%（前衛のみ）
+       fold  vic  global   global#1237167183168/0       x1.5209   [母なる変異の飛沫] 毒/凍結/火傷状態の敵全ての被ダメージがそれぞれ+15%(全局:敌方受伤)
+       fold  vic  given    given#3/1006/-10             x1.1      被伤害+10%(赋予)
+       fold  vic  given    given#4/1006/-10             x1.1      被伤害+10%(赋予)
+       fold  atk  madness  madness#250                  x2.5      狂気 与伤害×2.50(狂気比250)
+       CXL  given#2/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#5/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#6/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+
+  ---- r=1.65 atk=ネーフェ＝ジアー vic=ショゴス eff=10100 ht=1
+       amount=86580 nominal=86580 theory=52473 applied=86580 absorbed=None known=5.091
+       attrMult=1.0 dealtMult=4.207 takenMult=1.21 base=10308 ratio=1.0
+       critRate=15 critDamageRate=165 madnessRatio=None responsibility=1 maxAbsorbed=3
+       vicGive=7 vicGiveApplied=2 vicBuffs=157 vicExtra=0
+       pair=live-same pairTrusted=True valueMatches=False
+       vicGiveText=被伤害+10%(赋予)、被伤害+10%(赋予)
+       fold  atk  text     text#1/10110/c1              x1.2      [腐食の毒薬] 与ダメージ+20%
+       fold  atk  text     text#1/10110/c3              x1.05     [腐食の毒薬] 与ダメージ+5%（前衛のみ）
+       fold  atk  text     text#2/10110/c1              x1.2      [腐食の毒薬] 与ダメージ+20%
+       fold  atk  text     text#2/10110/c3              x1.05     [腐食の毒薬] 与ダメージ+5%（前衛のみ）
+       fold  atk  text     text#7/6/c1                  x1.2      与ダメージ+20%（前衛のみ）
+       fold  atk  text     text#8/2/c0                  x1.1      物理与ダメージ+10%
+       fold  atk  text     text#10/2/c0                 x1.1      物理与ダメージ+10%
+       fold  atk  text     text#11/6/c1                 x1.2      与ダメージ+20%（前衛のみ）
+       fold  vic  global   global#1237167183168/0       x1.5209   [母なる変異の飛沫] 毒/凍結/火傷状態の敵全ての被ダメージがそれぞれ+15%(全局:敌方受伤)
+       fold  vic  given    given#3/1006/-10             x1.1      被伤害+10%(赋予)
+       fold  vic  given    given#4/1006/-10             x1.1      被伤害+10%(赋予)
+       CXL  given#2/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#5/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#6/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+
+  ---- r=1.15 atk=エヴァラス・フラウ vic=ショゴス eff=0 ht=2
+       amount=46771 nominal=46771 theory=40670 applied=46771 absorbed=None known=3.962
+       attrMult=1.0 dealtMult=3.274 takenMult=1.21 base=10266 ratio=0.5
+       critRate=None critDamageRate=150 madnessRatio=None responsibility=1 maxAbsorbed=3
+       vicGive=7 vicGiveApplied=2 vicBuffs=170 vicExtra=0
+       pair=live-same pairTrusted=True valueMatches=False
+       vicGiveText=被伤害+10%(赋予)、被伤害+10%(赋予)
+       fold  atk  text     text#1/75/c1                 x1.15     [毒の短剣] 毒状態の敵に対して与ダメージ+15％
+       fold  atk  text     text#2/75/c1                 x1.15     [毒の短剣] 毒状態の敵に対して与ダメージ+15％
+       fold  atk  text     text#4/20079/c0              x1.3      [幻惑胞子の過密爆縮] 毒状態の敵への与ダメージ+30％
+       fold  atk  text     text#7/6/c1                  x1.2      与ダメージ+20%（前衛のみ）
+       fold  atk  text     text#11/6/c1                 x1.2      与ダメージ+20%（前衛のみ）
+       fold  vic  global   global#1237167183168/0       x1.3225   [母なる変異の飛沫] 毒/凍結/火傷状態の敵全ての被ダメージがそれぞれ+15%(全局:敌方受伤)
+       fold  vic  given    given#3/1006/-10             x1.1      被伤害+10%(赋予)
+       fold  vic  given    given#4/1006/-10             x1.1      被伤害+10%(赋予)
+       CXL  given#2/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#5/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+       CXL  given#6/1006/-15             v=1.15     by=global#1237167183168/0       被伤害+15%(赋予)
+

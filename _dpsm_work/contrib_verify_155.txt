@@ -1,0 +1,60 @@
+=== contrib.tests.test_samples ===
+OK contrib hand samples S1-S13 (S1-S6 math, S7 accounting, S8-S12 actor-key/ambiguity, S13 sub-unity): all passed
+EXIT=0
+=== contrib.run (newest non-training) ===
+export=battle_411001_20261003_235204.json version=1.5.5 quest=411001 training=False
+analyzable=203865411 credited=100.0000% unattributed=0.0000% pool=76.9916%
+perHitMaxErr=1.164e-10 foldResolved=28369 foldUnresolved=0 zero=0 noop=0
+byUnitGiven=[6110, 6110] byUnitMadness=[897, 897] nameFallbacks=0
+actorIdentityErr=0.000001 analyzeVsTotals=-99347
+issues: ERROR=0 WARN=1
+  [WARN I7] analyzableDealt differs from totals.dealt by -99347 (-0.0487%)
+  [INFO I8] 1 actor names repeat across the export (outside the analysed team; harmless)
+  [INFO I9] unattributed credit pool is empty
+top5 totalCredit (key,base,self,assist,total,share):
+  key=4 base=13513395 self=9155038 assist=40038548 total=62706981 share=30.7590%
+  key=2 base=11146143 self=31034255 assist=0 total=42180398 share=20.6903%
+  key=7 base=5693540 self=36433945 assist=0 total=42127485 share=20.6644%
+  key=5 base=2455002 self=3313229 assist=25250506 total=31018737 share=15.2153%
+  key=9 base=4587652 self=9520576 assist=0 total=14108228 share=6.9204%
+paths: text=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contrib\reports\report_battle_411001_20261003_235204.txt json=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contrib\reports\report_battle_411001_20261003_235204.json legacy=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contrib\reports\report_battle_411001_20261003_235204.legacy.txt
+EXIT=0
+=== contrib.legacy_diff (regression vs Stage-0) ===
+rows=11 missing=0 extra=0
+  maxAbsDiff direct    = 0.000
+  maxAbsDiff base      = 0.474
+  maxAbsDiff self      = 0.442
+  maxAbsDiff received  = 0.408
+  maxAbsDiff assist    = 0.206
+report=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contrib\reports\legacy_diff_battle_411001_20261003_235204.txt
+VERDICT=MATCHES-LEGACY-ON-SHARED-COLUMNS
+EXIT=0
+=== contrib.crosscheck --selftest (Phase E gate) ===
+selftest faithful-section=ACCEPT corrupted-section=MISMATCH detected=2
+  detected totalDamage
+  detected actors[key=2].assistCredit
+EXIT=0
+=== contrib.compare (cross-battle) ===
+exports=7 groups=4
+  quest=411001 ver=1.5.3 n=1 analyzable_mean=198463938 credited=73.8576% unattr=26.1424% compActors=10
+    key-set=[5] totalShareMean=26.39% directShareMean=13.60%
+    key-set=[2] totalShareMean=21.14% directShareMean=30.89%
+    key-set=[7] totalShareMean=10.84% directShareMean=28.39%
+    key-set=[9] totalShareMean=7.09% directShareMean=11.17%
+  quest=411001 ver=1.5.4 n=1 analyzable_mean=209294474 credited=84.9238% unattr=15.0762% compActors=11
+    key-set=[5] totalShareMean=25.55% directShareMean=13.63%
+    key-set=[2] totalShareMean=20.52% directShareMean=32.05%
+    key-set=[3] totalShareMean=15.71% directShareMean=3.33%
+    key-set=[7] totalShareMean=11.42% directShareMean=29.95%
+  quest=411001 ver=1.5.4 n=4 analyzable_mean=190870796 credited=85.2632% unattr=14.7368% compActors=10
+    key-set=[5] totalShareMean=26.13% directShareMean=13.50%
+    key-set=[2] totalShareMean=22.34% directShareMean=33.29%
+    key-set=[3] totalShareMean=14.91% directShareMean=6.23%
+    key-set=[7] totalShareMean=10.30% directShareMean=27.46%
+  quest=411001 ver=1.5.5 n=1 analyzable_mean=203865411 credited=100.0000% unattr=0.0000% compActors=11
+    key-set=[4] totalShareMean=30.76% directShareMean=13.57%
+    key-set=[2] totalShareMean=20.69% directShareMean=31.93%
+    key-set=[7] totalShareMean=20.66% directShareMean=28.71%
+    key-set=[5] totalShareMean=15.22% directShareMean=3.91%
+report=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contrib\reports\compare_411001.txt
+EXIT=0

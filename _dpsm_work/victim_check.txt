@@ -1,0 +1,28 @@
+================================================================================================
+battle_411001_20261003_231044.json
+  team2 actors=193  total taken=197.2M
+    ショゴス                   taken=17.5       M hits=1      dealt=10661     hpPct=[1000]
+    ショゴス                   taken=9.8        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=6.4        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=5.4        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=5.3        M hits=1      dealt=18337     hpPct=[1000]
+    ショゴス                   taken=4.7        M hits=1      dealt=2111      hpPct=[1000]
+    ショゴス                   taken=4.6        M hits=1      dealt=8524      hpPct=[1000]
+    ショゴス                   taken=4.6        M hits=0      dealt=0         hpPct=[1000]
+  team1 hpPct last: ネーフェ＝ジアー=1000 ルゥ=ルルサ=1000 テトラ=1000 マッドシーカー=1000 ルナリス=1000 メアリー=540 エヴァラス・フラウ=893 生ける炎 クトゥグア=1000 クトゥグァ砲台=1000 クトゥグァ砲台R=1000
+  team1 taken: メアリー=0.08M エヴァラス・フラウ=0.03M ネーフェ＝ジアー=0.00M ルゥ=ルルサ=0.00M テトラ=0.00M マッドシーカー=0.00M
+  healing: ルナリス=41.3k メアリー=22.1k エヴァラス・フラウ=10.0k
+================================================================================================
+battle_411001_20261003_231340.json
+  team2 actors=204  total taken=209.7M
+    ショゴス                   taken=10.7       M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=9.3        M hits=1      dealt=4257      hpPct=[1000]
+    ショゴス                   taken=8.7        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=8.6        M hits=1      dealt=1407      hpPct=[1000]
+    ショゴス                   taken=6.9        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=5.0        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=4.9        M hits=0      dealt=0         hpPct=[1000]
+    ショゴス                   taken=4.5        M hits=1      dealt=2832      hpPct=[1000]
+  team1 hpPct last: ネーフェ＝ジアー=1000 メルティエル=1000 テトラ=1000 マッドシーカー=1000 ルナリス=1000 メアリー=540 エヴァラス・フラウ=633 火砲=1000 生ける炎 クトゥグア=1000 クトゥグァ砲台=1000 クトゥグァ砲台R=1000
+  team1 taken: メアリー=0.09M エヴァラス・フラウ=0.04M ネーフェ＝ジアー=0.00M メルティエル=0.00M テトラ=0.00M マッドシーカー=0.00M
+  healing: ルナリス=41.5k メアリー=29.4k エヴァラス・フラウ=12.7k

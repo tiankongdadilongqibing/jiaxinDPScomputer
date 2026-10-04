@@ -1,0 +1,90 @@
+top-level keys: ['actors', 'app', 'duration', 'events', 'factCoverage', 'facts', 'forensics', 'giveTypeList', 'hitDetail', 'layout', 'liveRange', 'params', 'quest', 'reconcile', 'resistMaster', 'result', 'rosterAudit', 'run', 'started', 'statsRows', 'statusAudit', 'statusValues', 'subParams', 'timeline', 'totals', 'unattributedByVictim', 'version']
+events total           : 5600
+events with calc       : 5582
+factCoverage           : {"dmg": 5583, "withFact": 5582, "withLiveState": 5582}
+hitDetail              : {"produced": 5636, "trimmed": 0, "errors": 0, "matchExact": 31, "matchPair": 5551, "matchNone": 1}
+facts.classes          : 271
+
+event key -> count (damage events, n=5582):
+   amount                       5582
+   atkKey                       5509
+   atkTeam                      5509
+   attacker                     5582
+   attr                         5582
+   calc                         5582
+   calcEffectId                 1103
+   calcHitType                  5582
+   comp                         5582
+   comp2                        5582
+   comp3                        5582
+   comp4                        5582
+   crit                         5582
+   factId                       5582
+   hitMatch                     5582
+   hitValue                     5582
+   nominal                      5582
+   owner                        5582
+   source                       5582
+   t                            5582
+   triggers                     5245
+   type                         5582
+   vicKey                       5582
+   vicTeam                      5582
+   victim                       5582
+
+events with hitValue   : 5582 / 5582
+
+sample damage event (json):
+{
+ "t": 0.63,
+ "type": "dmg",
+ "victim": "ショゴス",
+ "attacker": "テトラ",
+ "owner": "テトラ",
+ "attr": "A",
+ "amount": 3654,
+ "nominal": 3654,
+ "source": 0,
+ "crit": false,
+ "hitMatch": 1,
+ "hitValue": 3654,
+ "calcHitType": 2,
+ "calcEffectId": 10145,
+ "atkTeam": 1,
+ "vicTeam": 2,
+ "atkKey": 3,
+ "vicKey": 1,
+ "factId": 1,
+ "comp": "技能#10145 · 攻击力 3656 × 系数 1.00(推算) = 计算威力 3654 · 无适用防御 → 减算后 3654 · 已识别倍率 ×1.000(属性×1.00 · 与伤害×1.000 · 被伤害×1.000) · 理论 3654 × 1.000 = 3654 · 实际伤害 3654 · 剩余倍率 ×1.000(会心/未识别部分)",
+ "comp2": "攻击属性 魔法 · 攻击方会心 率0/伤害率150(×1.50) · 属性 水→無 同属/无属性 · 增益:攻击力+9%、贯通率+5、攻击力+300(参照ExistenceTime3000%)、攻击力+7%、攻击力+10% · 与伤害补正:[毒の短剣] 毒状態の敵に対して与ダメージ+15％(条件性,未计入)",
+ "comp3": "受击方 物防0/魔防0(本次使用魔防) · 被伤害补正:未检出(无相关能力文本)",
+ "comp4": "受击方状态:无",
+ "calc": {
+  "effectId": 10145,
+  "hitType": 2,
+  "attackPower": 3656,
+  "power": 3654,
+  "ratio": 1.0,
+  "base": 3654,
+  "attrMult": 1.0,
+  "dealtMult": 1.0,
+  "takenMult": 1.0,
+  "knownMult": 1.0,
+  "theory": 3654,
+  "applied": 3654,
+  "residual": 1.0,
+  "penetration": 5,
+  "critDamageRate": 150,
+  "vicBlocking": 0,
+  "vicUnitBlocking": 0,
+  "vicBlockCount": 0,
+  "vicExtra": 0,
+  "vicBuffs": 4,
+  "vicGive": 0,
+  "responsibility": 2,
+  "pair": "live-same",
+  "pairTrusted": true,
+  "pairCorroborated": true,
+  "valueMatches": true
+ }
+}

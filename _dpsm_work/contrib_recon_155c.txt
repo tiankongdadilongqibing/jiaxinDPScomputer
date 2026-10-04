@@ -1,0 +1,34 @@
+totals keys: ["absorbed", "dealt", "dealtWithAbsorbed", "healing", "healingGiven", "taken", "unattributedDamage", "unattributedHits"]
+totals: {"dealt": 203964758, "taken": 204271307, "healing": 65645, "healingGiven": 65645, "unattributedDamage": 306549, "unattributedHits": 67, "absorbed": 8500000, "dealtWithAbsorbed": 212464758}
+(a) dmg with null atkTeam/atkKey: n=67 sum=306549.0
+    owners: {"(None, '?', '?')": 67}
+    sample: [{"t": 9.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 2097, "atkTeam": null, "vicTeam": 2, "source": 3}, {"t": 12.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 1507, "atkTeam": null, "vicTeam": 2, "source": 3}, {"t": 15.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 2600, "atkTeam": null, "vicTeam": 2, "source": 3}, {"t": 18.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 3439, "atkTeam": null, "vicTeam": 2, "source": 3}, {"t": 18.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 201, "atkTeam": null, "vicTeam": 2, "source": 4}, {"t": 21.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 3618, "atkTeam": null, "vicTeam": 2, "source": 3}, {"t": 21.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 211, "atkTeam": null, "vicTeam": 2, "source": 4}, {"t": 24.53, "attacker": "?", "owner": "?", "victim": "ショゴス", "amount": 4161, "atkTeam": null, "vicTeam": 2, "source": 3}]
+(b) atk-side text/talent folds: attacker-in-holders=12701 violations=0 noAbilityId=0
+(d) attackers carrying selected rules:
+    text#4/20042 -> {}
+    text#4/20056 -> {}
+    madness#250 -> {"メアリー": 897}
+    global#2543376704832/0 -> {"テトラ": 1470, "メアリー": 924, "ネーフェ＝ジアー": 483, "メルティエル": 336, "エヴァラス・フラウ": 181, "生ける炎 クトゥグア": 129, "火砲": 64, "ルナリス": 40}
+    global#2543377347904/0 -> {"マッドシーカー": 1736, "テトラ": 1448, "メアリー": 924, "ネーフェ＝ジアー": 467, "エヴァラス・フラウ": 179, "生ける炎 クトゥグア": 125, "火砲": 63, "ルナリス": 40}
+    text#1/75/c1 -> {"テトラ": 1439, "メルティエル": 324, "エヴァラス・フラウ": 179}
+    text#8/2/c0 -> {"ネーフェ＝ジアー": 488}
+    given#6/1006/-10 -> {"マッドシーカー": 727, "テトラ": 579, "メアリー": 354, "ネーフェ＝ジアー": 219, "メルティエル": 132, "エヴァラス・フラウ": 83, "生ける炎 クトゥグア": 56, "火砲": 32}
+    talent#0/30042/t1/1005 -> {"火砲": 65}
+(e) global folds by (ruleName,factor) -> attackers:
+    ["海魔の残滓", 1.3225] n=3910 -> {"マッドシーカー": 1352, "テトラ": 1113, "メアリー": 698, "ネーフェ＝ジアー": 391, "エヴァラス・フラウ": 143, "生ける炎 クトゥグア": 104}
+    ["母なる変異の飛沫", 1.5209] n=2073 -> {"テトラ": 759, "メアリー": 553, "ネーフェ＝ジアー": 338, "メルティエル": 177, "エヴァラス・フラウ": 92, "生ける炎 クトゥグア": 76}
+    ["母なる変異の飛沫", 1.3225] n=1167 -> {"テトラ": 518, "メアリー": 268, "ネーフェ＝ジアー": 119, "メルティエル": 111, "エヴァラス・フラウ": 70, "生ける炎 クトゥグア": 40}
+    ["海魔の残滓", 1.15] n=1098 -> {"マッドシーカー": 384, "テトラ": 335, "メアリー": 226, "ネーフェ＝ジアー": 76, "エヴァラス・フラウ": 36, "生ける炎 クトゥグア": 21}
+    ["母なる変異の飛沫", 1.15] n=413 -> {"テトラ": 193, "メアリー": 103, "メルティエル": 48, "ネーフェ＝ジアー": 26, "エヴァラス・フラウ": 19, "生ける炎 クトゥグア": 13}
+(c) cancel (byPrefix, originPrefix, value, byUnit):
+    ["global#2543376704832", "given#0", "1.15", "マッドシーカー"] : 4314
+    ["global#2543376704832", "given#1", "1.15", "マッドシーカー"] : 4277
+    ["global#2543376704832", "given#2", "1.15", "マッドシーカー"] : 3734
+    ["global#2543376704832", "given#3", "1.15", "マッドシーカー"] : 3357
+    ["global#2543376704832", "given#4", "1.15", "マッドシーカー"] : 2303
+    ["global#2543376704832", "given#8", "1.15", "マッドシーカー"] : 1720
+    ["global#2543376704832", "given#5", "1.15", "マッドシーカー"] : 1702
+    ["global#2543376704832", "given#6", "1.15", "マッドシーカー"] : 1329
+    ["global#2543376704832", "given#7", "1.15", "マッドシーカー"] : 288
+(f) given folds (giver, label, factor):
+    ["マッドシーカー", "被伤害+10%(赋予)", 1.1] : 6110

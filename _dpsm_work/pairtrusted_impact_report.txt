@@ -1,0 +1,614 @@
+P0-C PairTrusted / PairCorroborated offline impact
+========================================================================
+evidence class: OFFLINE REPLAY (recomputed from exports; no live plugin run)
+implementation: independent Python re-run of Contribution.Compute (see module docstring)
+  owner ladder : contrib.attribution.OwnerIndex.resolve
+  fold vocab   : contrib.aggregate.extract_folds   split: contrib.aggregate.split_hit
+  aggregation  : local loop mirroring src/Output/Contribution.cs Compute()
+
+criteria:
+  A   all calc.fold + calc.atkAdd (deployed Contribution.Compute)
+  B   folds only when calc.pairTrusted == true (same event set / denominator)
+  C   folds only when pairTrusted == true AND pairCorroborated == true (same denominator)
+  B*  hits only when pairTrusted == true, all their folds (DIFFERENT denominator)
+  C*  hits only when pairTrusted && pairCorroborated, all their folds (DIFFERENT denominator)
+  A/B/C keep the same event set and denominator; only the fold trust varies.
+  B*/C* (marked) drop whole hits -> DIFFERENT denominator, not rank-comparable with A.
+
+------------------------------------------------------------------------
+export : battle_411001_20261004_115417.json
+version: 1.7.6   quest: 411001   contribution section: True
+variant A vs plugin contribution section: OK  mismatches=0
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=6181  untrusted=0 (with folds=0, damage=0.0)  corroborated=61
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 0.0000
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=0 (with folds=0, damage=0.0, would-be pool=0.00)
+  in-domain pair string census: {"live-same": 6264}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A        190889625.00     6182       162689426.88       190889625.00    85.2270%    1.000000          0           0.00
+  B        190889625.00     6182       162689426.88       190889625.00    85.2270%    1.000000          0           0.00
+  C        190889625.00     6182           20986.30       190889625.00     0.0110%    1.000000       6120   190759659.00
+  B*       190881653.00     6181       162689426.88       190881653.00    85.2305%    1.000000          1        7972.00
+  C*          121994.00       61           20986.30          121994.00    17.2027%    1.000000       6121   190767631.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  6      \u30eb\u30ca\u30ea\u30b9                               51955401/27.22%           51955401/27.22%             368775/ 0.19%           51955401/27.22%              24896/20.41%
+  5      \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc             42977343/22.51%           42977343/22.51%           27181660/14.24%           42977343/22.52%              17955/14.72%
+  2      \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc           30914429/16.19%           30914429/16.19%           56189789/29.44%           30906457/16.19%                  0/ 0.00%
+  7      \u30e1\u30a2\u30ea\u30fc                               25625601/13.42%           25625601/13.42%           54527319/28.56%           25625601/13.42%                  0/ 0.00%
+  3      \u30eb\u30a5=\u30eb\u30eb\u30b5                        21713707/11.38%           21713707/11.38%           12914344/ 6.77%           21713707/11.38%              44195/36.23%
+  9      \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6           11112759/ 5.82%           11112759/ 5.82%           21025193/11.01%           11112759/ 5.82%                  0/ 0.00%
+  4      \u30c6\u30c8\u30e9                                      6451909/ 3.38%            6451909/ 3.38%           18422168/ 9.65%            6451909/ 3.38%              32248/26.43%
+  13     \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2             103735/ 0.05%             103735/ 0.05%             199195/ 0.10%             103735/ 0.05%               2700/ 2.21%
+  110    \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0                17370/ 0.01%              17370/ 0.01%              30591/ 0.02%              17370/ 0.01%                  0/ 0.00%
+  111    \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0R               17370/ 0.01%              17370/ 0.01%              30591/ 0.02%              17370/ 0.01%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|global|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc         23785227.87        23785227.87                  -        23785227.87                  -
+  \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3\u00d71.50|madness|vic|\u30eb\u30a5=\u30eb\u30eb\u30b5         18062727.15        18062727.15                  -        18062727.15                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7|atkadd|atk|\u30eb\u30ca\u30ea\u30b9         16308230.89        16308230.89                  -        16308230.89                  -
+  \u72c2\u6c17 \u4e0e\u4f24\u5bb3\u00d72.50(\u72c2\u6c17\u6bd4250)|madness|atk|\u30e1\u30a2\u30ea\u30fc         13420930.28        13420930.28                  -        13420930.28                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400|atkadd|atk|\u30eb\u30ca\u30ea\u30b9         11101561.53        11101561.53                  -        11101561.53                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc         10819694.26        10819694.26                  -        10819694.26                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09|text|atk|\u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc          8535540.71         8535540.71                  -         8535540.71                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+300|atkadd|atk|\u30eb\u30ca\u30ea\u30b9          7883069.62         7883069.62                  -         7883069.62                  -
+  \u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)|given|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc          6188291.57         6188291.57                  -         6188291.57                  -
+  \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|text|atk|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc          5165620.50         5165620.50                  -         5165620.50                  -
+  \u7269\u7406\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|\u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc          4462028.15         4462028.15                  -         4462028.15                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09|text|atk|\u30e1\u30a2\u30ea\u30fc          4439463.24         4439463.24                  -         4439463.24                  -
+
+  diff B_vs_A       poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff C_vs_A       poolDelta=  -162668440.58 (-99.9871% of A pool) attributedDelta=          -0.00
+       denominatorChanged=False maxAbsActorCreditDelta=51586625.72 maxAbsActorShareDelta=27.0243pp top1Changed=True top3SetChanged=True rulesRemoved=33 rulesAppeared=0
+       component deltas: maxBase=52734612.70 maxSelf=23832894.66 maxAssist=51761008.89 anyAssistMoved=True
+       actor deltas (top 5):
+         \u30eb\u30ca\u30ea\u30b9     credits      51955401.03 ->        368775.30  d=   -51586625.72  share -27.0243pp  rank 1->7
+         \u30e1\u30a2\u30ea\u30fc     credits      25625600.96 ->      54527319.00  d=   +28901718.04  share +15.1405pp  rank 4->2
+         \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc credits      30914429.06 ->      56189789.00  d=   +25275359.94  share +13.2408pp  rank 3->1
+         \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc credits      42977343.02 ->      27181660.08  d=   -15795682.95  share -8.2748pp  rank 2->3
+         \u30c6\u30c8\u30e9           credits       6451908.91 ->      18422167.79  d=   +11970258.88  share +6.2708pp  rank 7->5
+       rule deltas (top 5):
+         \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|global|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc      23785227.87 ->             0.00  d=   -23785227.87 [removed]
+         \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3\u00d71.50|madness|vic|\u30eb\u30a5=\u30eb\u30eb\u30b5      18062727.15 ->             0.00  d=   -18062727.15 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7|atkadd|atk|\u30eb\u30ca\u30ea\u30b9      16308230.89 ->             0.00  d=   -16308230.89 [removed]
+         \u72c2\u6c17 \u4e0e\u4f24\u5bb3\u00d72.50(\u72c2\u6c17\u6bd4250)|madness|atk|\u30e1\u30a2\u30ea\u30fc      13420930.28 ->             0.00  d=   -13420930.28 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400|atkadd|atk|\u30eb\u30ca\u30ea\u30b9      11101561.53 ->             0.00  d=   -11101561.53 [removed]
+  diff Bstar_vs_A   poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=       -7972.00
+       denominatorChanged=True maxAbsActorCreditDelta=7972.00 maxAbsActorShareDelta=0.0035pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=7972.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=  -162668440.58 (-99.9871% of A pool) attributedDelta=  -190767631.00
+       denominatorChanged=True maxAbsActorCreditDelta=51930504.72 maxAbsActorShareDelta=24.8520pp top1Changed=True top3SetChanged=True rulesRemoved=33 rulesAppeared=0
+       component deltas: maxBase=7820248.01 maxSelf=23832894.66 maxAssist=51761008.89 anyAssistMoved=True
+
+------------------------------------------------------------------------
+export : battle_411001_20261004_041309.json
+version: 1.7.4   quest: 411001   contribution section: True
+variant A vs plugin contribution section: OK  mismatches=0
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=5471  untrusted=0 (with folds=0, damage=0.0)  corroborated=57
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 0.0000
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=0 (with folds=0, damage=0.0, would-be pool=0.00)
+  in-domain pair string census: {"live-same": 5562}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A        203752194.00     5472       177006361.86       203752194.00    86.8734%    1.000000          0           0.00
+  B        203752194.00     5472       177006361.86       203752194.00    86.8734%    1.000000          0           0.00
+  C        203752194.00     5472           16124.32       203752194.00     0.0079%    1.000000       5414   203644061.00
+  B*       203739041.00     5471       177006361.86       203739041.00    86.8790%    1.000000          1       13153.00
+  C*           94980.00       57           16124.32           94980.00    16.9765%    1.000000       5415   203657214.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  6      \u30eb\u30ca\u30ea\u30b9                               51403530/25.23%           51403530/25.23%             379990/ 0.19%           51403530/25.23%              19600/20.64%
+  4      \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc             46757759/22.95%           46757759/22.95%           27592991/13.54%           46757759/22.95%              27836/29.31%
+  2      \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc           32446212/15.92%           32446212/15.92%           63265629/31.05%           32433059/15.92%                  0/ 0.00%
+  7      \u30e1\u30a2\u30ea\u30fc                               29067974/14.27%           29067974/14.27%           61628444/30.25%           29067974/14.27%                  0/ 0.00%
+  5      \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb                   24714023/12.13%           24714023/12.13%            6811864/ 3.34%           24714023/12.13%               2059/ 2.17%
+  9      \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6           11474035/ 5.63%           11474035/ 5.63%           21900059/10.75%           11474035/ 5.63%                  0/ 0.00%
+  3      \u30c6\u30c8\u30e9                                      6499412/ 3.19%            6499412/ 3.19%           19481117/ 9.56%            6499412/ 3.19%              40972/43.14%
+  11     \u706b\u7832                                            1249448/ 0.61%            1249448/ 0.61%            2409107/ 1.18%            1249448/ 0.61%               1813/ 1.91%
+  14     \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2             103830/ 0.05%             103830/ 0.05%             213232/ 0.10%             103830/ 0.05%               2700/ 2.84%
+  103    \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0R               18009/ 0.01%              18009/ 0.01%              35046/ 0.02%              18009/ 0.01%                  0/ 0.00%
+  102    \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0                17961/ 0.01%              17961/ 0.01%              34715/ 0.02%              17961/ 0.01%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|global|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc         25264221.41        25264221.41                  -        25264221.41                  -
+  \u6d77\u9b54\u306e\u6b8b\u6ed3|global|vic|\u30e1\u30eb\u30c6\u30a3\u30a8\u30eb         21573848.26        21573848.26                  -        21573848.26                  -
+  \u72c2\u6c17 \u4e0e\u4f24\u5bb3\u00d72.50(\u72c2\u6c17\u6bd4250)|madness|atk|\u30e1\u30a2\u30ea\u30fc         14611208.16        14611208.16                  -        14611208.16                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7|atkadd|atk|\u30eb\u30ca\u30ea\u30b9         13559766.70        13559766.70                  -        13559766.70                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400|atkadd|atk|\u30eb\u30ca\u30ea\u30b9         12048511.61        12048511.61                  -        12048511.61                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc         11610728.21        11610728.21                  -        11610728.21                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09|text|atk|\u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc          9159578.90         9159578.90                  -         9159578.90                  -
+  \u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)|given|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc          8380975.33         8380975.33                  -         8380975.33                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+300|atkadd|atk|\u30eb\u30ca\u30ea\u30b9          6802283.36         6802283.36                  -         6802283.36                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09|text|atk|\u30e1\u30a2\u30ea\u30fc          5822925.89         5822925.89                  -         5822925.89                  -
+  \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|text|atk|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc          5412652.57         5412652.57                  -         5412652.57                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+300+Rate+7|atkadd|atk|\u30eb\u30ca\u30ea\u30b9          5048468.28         5048468.28                  -         5048468.28                  -
+
+  diff B_vs_A       poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff C_vs_A       poolDelta=  -176990237.54 (-99.9909% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=51023540.30 maxAbsActorShareDelta=25.0420pp top1Changed=True top3SetChanged=True rulesRemoved=34 rulesAppeared=0
+       component deltas: maxBase=59843411.46 maxSelf=27282941.61 maxAssist=51214431.87 anyAssistMoved=True
+       actor deltas (top 5):
+         \u30eb\u30ca\u30ea\u30b9     credits      51403529.87 ->        379989.57  d=   -51023540.30  share -25.0420pp  rank 1->8
+         \u30e1\u30a2\u30ea\u30fc     credits      29067974.15 ->      61628444.00  d=   +32560469.85  share +15.9804pp  rank 4->2
+         \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc credits      32446212.28 ->      63265629.00  d=   +30819416.72  share +15.1259pp  rank 3->1
+         \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc credits      46757759.26 ->      27592990.89  d=   -19164768.37  share -9.4059pp  rank 2->3
+         \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb credits      24714022.81 ->       6811864.49  d=   -17902158.32  share -8.7862pp  rank 5->6
+       rule deltas (top 5):
+         \u6bcd\u306a\u308b\u5909\u7570\u306e\u98db\u6cab|global|vic|\u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc      25264221.41 ->             0.00  d=   -25264221.41 [removed]
+         \u6d77\u9b54\u306e\u6b8b\u6ed3|global|vic|\u30e1\u30eb\u30c6\u30a3\u30a8\u30eb      21573848.26 ->             0.00  d=   -21573848.26 [removed]
+         \u72c2\u6c17 \u4e0e\u4f24\u5bb3\u00d72.50(\u72c2\u6c17\u6bd4250)|madness|atk|\u30e1\u30a2\u30ea\u30fc      14611208.16 ->             0.00  d=   -14611208.16 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7|atkadd|atk|\u30eb\u30ca\u30ea\u30b9      13559766.70 ->             0.00  d=   -13559766.70 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400|atkadd|atk|\u30eb\u30ca\u30ea\u30b9      12048511.61 ->             0.00  d=   -12048511.61 [removed]
+  diff Bstar_vs_A   poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=      -13153.00
+       denominatorChanged=True maxAbsActorCreditDelta=13153.00 maxAbsActorShareDelta=0.0054pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=13153.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=  -176990237.54 (-99.9909% of A pool) attributedDelta=  -203657214.00
+       denominatorChanged=True maxAbsActorCreditDelta=51383930.30 maxAbsActorShareDelta=39.9476pp top1Changed=True top3SetChanged=True rulesRemoved=34 rulesAppeared=0
+       component deltas: maxBase=7672074.06 maxSelf=27282941.61 maxAssist=51214431.87 anyAssistMoved=True
+
+------------------------------------------------------------------------
+export : battle_700817_20261004_114821.json
+version: 1.7.6   quest: 700817   contribution section: True
+variant A vs plugin contribution section: OK  mismatches=0
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=232  untrusted=0 (with folds=0, damage=0.0)  corroborated=4
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 0.0000
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=0 (with folds=0, damage=0.0, would-be pool=0.00)
+  in-domain pair string census: {"live-same": 284}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          2289375.00      233          231197.83         2289375.00    10.0987%    1.000000          0           0.00
+  B          2289375.00      233          231197.83         2289375.00    10.0987%    1.000000          0           0.00
+  C          2289375.00      233               0.00         2289375.00     0.0000%    1.000000         74     1815430.00
+  B*         2288919.00      232          231197.83         2288919.00    10.1007%    1.000000          1         456.00
+  C*            1600.00        4               0.00            1600.00     0.0000%    1.000000        229     2287775.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  10     [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                  1053525/46.02%            1053525/46.02%            1051798/45.94%            1053525/46.03%                  0/ 0.00%
+  16     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9             452829/19.78%             452829/19.78%             454556/19.86%             452829/19.78%                  0/ 0.00%
+  5      \u30ec\u30f4\u30ca\u30f3\u30c8                           335339/14.65%             335339/14.65%             335339/14.65%             335339/14.65%                  0/ 0.00%
+  7      \u30a2\u30fc\u30d5\u30ca                                 149665/ 6.54%             149665/ 6.54%             151696/ 6.63%             149665/ 6.54%                  0/ 0.00%
+  47     \u5927\u6d77\u306e\u5996\u7cbe                           147653/ 6.45%             147653/ 6.45%             157190/ 6.87%             147653/ 6.45%                  0/ 0.00%
+  2      [\u7729\u611b]\u30c1\u30a7\u30a4\u30b7\u30a3              71318/ 3.12%              71318/ 3.12%              59750/ 2.61%              70862/ 3.10%                  0/ 0.00%
+  12     \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2              65854/ 2.88%              65854/ 2.88%              65854/ 2.88%              65854/ 2.88%               1600/100.00%
+  13     \u3086\u308b\u30cf\u30b9\u30bf\u30fc                       8084/ 0.35%               8084/ 0.35%               8084/ 0.35%               8084/ 0.35%                  0/ 0.00%
+  8      \u30d4\u30aa\u30cb\u30fc                                   2974/ 0.13%               2974/ 0.13%               2974/ 0.13%               2974/ 0.13%                  0/ 0.00%
+  3      T.O.W.E.R.typeR                                            1183/ 0.05%               1183/ 0.05%               1183/ 0.05%               1183/ 0.05%                  0/ 0.00%
+  4      [\u75fa\u590f]\u30b7\u30bc\u30eb\uff1d\u30e1                761/ 0.03%                761/ 0.03%                761/ 0.03%                761/ 0.03%                  0/ 0.00%
+  51     \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0                  114/ 0.00%                114/ 0.00%                114/ 0.00%                114/ 0.00%                  0/ 0.00%
+  50     \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0R                  76/ 0.00%                 76/ 0.00%                 76/ 0.00%                 76/ 0.00%                  0/ 0.00%
+  18     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           178781.19          178781.19                  -          178781.19                  -
+  \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            38358.68           38358.68                  -           38358.68                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Rate+6|atkadd|atk|[\u7729\u611b]\u30c1\u30a7\u30a4\u30b7\u30a3            11567.89           11567.89                  -           11567.89                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0)|atkadd|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9             1726.56            1726.56                  -            1726.56                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0)|atkadd|atk|\u30a2\u30fc\u30d5\u30ca              700.18             700.18                  -             700.18                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+50%|talent|atk|\u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0               38.00              38.00                  -              38.00                  -
+  \u4e0e\u30c0\u30e1\u30fc\u30b8+50%|talent|atk|\u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0R               25.33              25.33                  -              25.33                  -
+
+  diff B_vs_A       poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff C_vs_A       poolDelta=     -231197.83 (-100.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=11567.89 maxAbsActorShareDelta=0.5053pp top1Changed=False top3SetChanged=False rulesRemoved=7 rulesAppeared=0
+       component deltas: maxBase=217139.87 maxSelf=217139.87 maxAssist=11567.89 anyAssistMoved=True
+       actor deltas (top 5):
+         [\u7729\u611b]\u30c1\u30a7\u30a4\u30b7\u30a3 credits         71317.89 ->         59750.00  d=      -11567.89  share -0.5053pp  rank 6->7
+         \u5927\u6d77\u306e\u5996\u7cbe credits        147653.19 ->        157190.00  d=       +9536.81  share +0.4166pp  rank 5->4
+         \u30a2\u30fc\u30d5\u30ca     credits        149664.92 ->        151696.00  d=       +2031.08  share +0.0887pp  rank 4->5
+         \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 credits        452829.44 ->        454556.00  d=       +1726.56  share +0.0754pp  rank 2->2
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits       1053524.56 ->       1051798.00  d=       -1726.56  share -0.0754pp  rank 1->1
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        178781.19 ->             0.00  d=     -178781.19 [removed]
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         38358.68 ->             0.00  d=      -38358.68 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Rate+6|atkadd|atk|[\u7729\u611b]\u30c1\u30a7\u30a4\u30b7\u30a3         11567.89 ->             0.00  d=      -11567.89 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0)|atkadd|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9          1726.56 ->             0.00  d=       -1726.56 [removed]
+         \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0)|atkadd|atk|\u30a2\u30fc\u30d5\u30ca           700.18 ->             0.00  d=        -700.18 [removed]
+  diff Bstar_vs_A   poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=        -456.00
+       denominatorChanged=True maxAbsActorCreditDelta=456.00 maxAbsActorShareDelta=0.0193pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=456.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -231197.83 (-100.0000% of A pool) attributedDelta=    -2287775.00
+       denominatorChanged=True maxAbsActorCreditDelta=1053524.56 maxAbsActorShareDelta=97.1235pp top1Changed=True top3SetChanged=True rulesRemoved=7 rulesAppeared=0
+       component deltas: maxBase=834658.13 maxSelf=217139.87 maxAssist=11567.89 anyAssistMoved=True
+
+------------------------------------------------------------------------
+export : battle_9999_20261004_042458.json
+version: 1.7.5   quest: 9999  [TRAINING GROUND]   contribution section: True
+variant A vs plugin contribution section: OK  mismatches=0
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=158  untrusted=0 (with folds=0, damage=0.0)  corroborated=1
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 0.0000
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=104 (with folds=104, damage=11790.0, would-be pool=1958.98)
+  in-domain pair string census: {"live-same": 510, "live-age": 104}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          4351950.00      158          709968.43         4351950.00    16.3138%    1.000000          0           0.00
+  B          4351950.00      158          709968.43         4351950.00    16.3138%    1.000000          0           0.00
+  C          4351950.00      158               0.00         4351950.00     0.0000%    1.000000         74     2421476.00
+  B*         4351950.00      158          709968.43         4351950.00    16.3138%    1.000000          0           0.00
+  C*             219.00        1               0.00             219.00     0.0000%    1.000000        157     4351731.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  15     [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                  1177412/27.05%            1177412/27.05%            1231246/28.29%            1177412/27.05%                  0/ 0.00%
+  1      \u30ec\u30f4\u30ca\u30f3\u30c8                          1060663/24.37%            1060663/24.37%            1066943/24.52%            1060663/24.37%                  0/ 0.00%
+  14     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9             849243/19.51%             849243/19.51%             920352/21.15%             849243/19.51%                  0/ 0.00%
+  12     \u30ea\u30f4\u30a1\u30b7\u30fc                           557433/12.81%             557433/12.81%             400191/ 9.20%             557433/12.81%                  0/ 0.00%
+  11     \u30af\uff1d\u30eb\u30f4\u30a3                           466039/10.71%             466039/10.71%             466039/10.71%             466039/10.71%                219/100.00%
+  7      \u30dd\u30dd\u30ed\u30c3\u30c8                           188265/ 4.33%             188265/ 4.33%             197600/ 4.54%             188265/ 4.33%                  0/ 0.00%
+  16     \u30bd\u30d5\u30a3\u30fc                                  52896/ 1.22%              52896/ 1.22%              69579/ 1.60%              52896/ 1.22%                  0/ 0.00%
+  4      T.O.W.E.R.typeR                                               0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+  13     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           176431.82          176431.82                  -          176431.82                  -
+  \u88ab\u4f24\u5bb3+40%(\u8d4b\u4e88)|given|vic|\u30ea\u30f4\u30a1\u30b7\u30fc           161880.60          161880.60                  -          161880.60                  -
+  \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           111108.47          111108.47                  -          111108.47                  -
+  \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           104893.24          104893.24                  -          104893.24                  -
+  \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            88215.91           88215.91                  -           88215.91                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8            59526.52           59526.52                  -           59526.52                  -
+  \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0)|atkadd|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9             7911.87            7911.87                  -            7911.87                  -
+
+  diff B_vs_A       poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff C_vs_A       poolDelta=     -709968.43 (-100.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=157241.74 maxAbsActorShareDelta=3.6131pp top1Changed=False top3SetChanged=False rulesRemoved=7 rulesAppeared=0
+       component deltas: maxBase=542395.20 maxSelf=480649.45 maxAssist=157241.74 anyAssistMoved=True
+       actor deltas (top 5):
+         \u30ea\u30f4\u30a1\u30b7\u30fc credits        557432.74 ->        400191.00  d=     -157241.74  share -3.6131pp  rank 4->5
+         \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 credits        849243.01 ->        920352.00  d=      +71108.99  share +1.6340pp  rank 3->3
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits       1177412.11 ->       1231246.00  d=      +53833.89  share +1.2370pp  rank 1->1
+         \u30bd\u30d5\u30a3\u30fc     credits         52895.57 ->         69579.00  d=      +16683.43  share +0.3834pp  rank 7->7
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits        188264.56 ->        197600.00  d=       +9335.44  share +0.2145pp  rank 6->6
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        176431.82 ->             0.00  d=     -176431.82 [removed]
+         \u88ab\u4f24\u5bb3+40%(\u8d4b\u4e88)|given|vic|\u30ea\u30f4\u30a1\u30b7\u30fc        161880.60 ->             0.00  d=     -161880.60 [removed]
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        111108.47 ->             0.00  d=     -111108.47 [removed]
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        104893.24 ->             0.00  d=     -104893.24 [removed]
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         88215.91 ->             0.00  d=      -88215.91 [removed]
+  diff Bstar_vs_A   poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=True maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -709968.43 (-100.0000% of A pool) attributedDelta=    -4351731.00
+       denominatorChanged=True maxAbsActorCreditDelta=1177412.11 maxAbsActorShareDelta=89.2913pp top1Changed=True top3SetChanged=True rulesRemoved=7 rulesAppeared=0
+       component deltas: maxBase=1060663.00 maxSelf=480649.45 maxAssist=157241.74 anyAssistMoved=True
+
+------------------------------------------------------------------------
+export : battle_9999_20261003_205129.json
+version: 1.5.3   quest: 9999  [TRAINING GROUND]   contribution section: False
+variant A vs plugin contribution section: ABSENT
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=213  untrusted=19 (with folds=0, damage=0.0)  corroborated=0
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 0.0000
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=184 (with folds=92, damage=26620.0, would-be pool=3473.85)
+  in-domain pair string census: {"live-same": 664, "live-age": 203}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          4680300.00      232          665587.58         4591067.26    14.2210%    0.980934          0           0.00
+  B          4680300.00      232          665587.58         4591067.26    14.2210%    0.980934          0           0.00
+  C          4680300.00      232               0.00         4680300.00     0.0000%    1.000000         50     1658278.00
+  B*         4634782.00      213          665587.58         4545549.26    14.3607%    0.980747         19       45518.00
+  C*               0.00        0               0.00               0.00     0.0000%    0.000000        232     4680300.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  13     [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                  1243628/26.57%            1243628/26.57%            1259292/26.91%            1243628/26.83%                  0/ 0.00%
+  1      \u30ec\u30f4\u30ca\u30f3\u30c8                          1104640/23.60%            1104640/23.60%            1104640/23.60%            1104640/23.83%                  0/ 0.00%
+  17     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9             999329/21.35%             999329/21.35%            1033795/22.09%             999329/21.56%                  0/ 0.00%
+  11     \u30ea\u30f4\u30a1\u30b7\u30fc                           456208/ 9.75%             456208/ 9.75%             456208/ 9.75%             421443/ 9.09%                  0/ 0.00%
+  9      \u30af\uff1d\u30eb\u30f4\u30a3                           443861/ 9.48%             443861/ 9.48%             443861/ 9.48%             433108/ 9.34%                  0/ 0.00%
+  14     \u30dd\u30dd\u30ed\u30c3\u30c8                           278520/ 5.95%             278520/ 5.95%             309276/ 6.61%             278520/ 6.01%                  0/ 0.00%
+  16     \u30bd\u30d5\u30a3\u30fc                                  62581/ 1.34%              62581/ 1.34%              70929/ 1.52%              62581/ 1.35%                  0/ 0.00%
+  5      T.O.W.E.R.typeR                                            2299/ 0.05%               2299/ 0.05%               2299/ 0.05%               2299/ 0.05%                  0/ 0.00%
+  12     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           187654.19          187654.19                  -          187654.19                  -
+  \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           111565.22          111565.22                  -          111565.22                  -
+  \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            93827.09           93827.09                  -           93827.09                  -
+  \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            92778.93           92778.93                  -           92778.93                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8            89968.77           89968.77                  -           89968.77                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|T.O.W.E.R.typeR              560.63             560.63                  -             560.63                  -
+
+  diff B_vs_A       poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=0.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff C_vs_A       poolDelta=     -665587.58 (-100.0000% of A pool) attributedDelta=       89232.74
+       denominatorChanged=False maxAbsActorCreditDelta=34465.96 maxAbsActorShareDelta=0.7364pp top1Changed=False top3SetChanged=False rulesRemoved=6 rulesAppeared=0
+       component deltas: maxBase=501489.05 maxSelf=485825.43 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 credits        999329.04 ->       1033795.00  d=      +34465.96  share +0.7364pp  rank 3->3
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits        278520.43 ->        309276.00  d=      +30755.57  share +0.6571pp  rank 6->6
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits       1243628.38 ->       1259292.00  d=      +15663.62  share +0.3347pp  rank 1->1
+         \u30bd\u30d5\u30a3\u30fc     credits         62581.41 ->         70929.00  d=       +8347.59  share +0.1784pp  rank 7->7
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits       1104640.00 ->       1104640.00  d=          +0.00  share +0.0000pp  rank 2->2
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        187654.19 ->             0.00  d=     -187654.19 [removed]
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        111565.22 ->             0.00  d=     -111565.22 [removed]
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         93827.09 ->             0.00  d=      -93827.09 [removed]
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         92778.93 ->             0.00  d=      -92778.93 [removed]
+         \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8         89968.77 ->             0.00  d=      -89968.77 [removed]
+  diff Bstar_vs_A   poolDelta=           0.00 ( +0.0000% of A pool) attributedDelta=      -45518.00
+       denominatorChanged=True maxAbsActorCreditDelta=34765.00 maxAbsActorShareDelta=0.6544pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=34765.00 maxSelf=0.00 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -665587.58 (-100.0000% of A pool) attributedDelta=    -4591067.26
+       denominatorChanged=True maxAbsActorCreditDelta=1243628.38 maxAbsActorShareDelta=26.5716pp top1Changed=True top3SetChanged=True rulesRemoved=6 rulesAppeared=0
+       component deltas: maxBase=1104640.00 maxSelf=485825.43 maxAssist=0.00 anyAssistMoved=False
+
+------------------------------------------------------------------------
+export : battle_9999_20261003_225530.json
+version: 1.5.4   quest: 9999  [TRAINING GROUND]   contribution section: False
+variant A vs plugin contribution section: ABSENT
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=55  untrusted=9 (with folds=9, damage=89291.0)  corroborated=1
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 29393.0983
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=0 (with folds=0, damage=0.0, would-be pool=0.00)
+  in-domain pair string census: {"live-same": 92, "live-age": 9}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          1119294.00       65          192748.34         1119294.00    17.2205%    1.000000          0           0.00
+  B          1119294.00       65          163355.24         1119294.00    14.5945%    1.000000          9       89291.00
+  C          1119294.00       65               0.00         1119294.00     0.0000%    1.000000         33      590731.00
+  B*         1004219.00       55          163355.24         1004219.00    16.2669%    1.000000         10      115075.00
+  C*             214.00        1               0.00             214.00     0.0000%    1.000000         64     1119080.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  8      [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                   508567/45.44%             508567/45.44%             508567/45.44%             419276/41.75%                  0/ 0.00%
+  3      \u30ec\u30f4\u30ca\u30f3\u30c8                           222183/19.85%             222183/19.85%             222183/19.85%             222183/22.12%                  0/ 0.00%
+  11     \u30af\uff1d\u30eb\u30f4\u30a3                           171711/15.34%             171711/15.34%             171711/15.34%             171711/17.10%                  0/ 0.00%
+  9      \u30dd\u30dd\u30ed\u30c3\u30c8                            80294/ 7.17%              80294/ 7.17%              80294/ 7.17%              80294/ 8.00%                  0/ 0.00%
+  2      \u30ea\u30f4\u30a1\u30b7\u30fc                            61881/ 5.53%              61881/ 5.53%              61881/ 5.53%              36097/ 3.59%                  0/ 0.00%
+  18     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9              57612/ 5.15%              57612/ 5.15%              57612/ 5.15%              57612/ 5.74%                  0/ 0.00%
+  16     \u30bd\u30d5\u30a3\u30fc                                  15176/ 1.36%              15176/ 1.36%              15176/ 1.36%              15176/ 1.51%                214/100.00%
+  7      T.O.W.E.R.typeR                                            1870/ 0.17%               1870/ 0.17%               1870/ 0.17%               1870/ 0.19%                  0/ 0.00%
+  17     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            79928.23           65894.93                  -           65894.93                  -
+  \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            47519.38           39176.22                  -           39176.22                  -
+  \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            39964.11           32947.47                  -           32947.47                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8            24880.61           24880.61                  -           24880.61                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|T.O.W.E.R.typeR              456.01             456.01                  -             456.01                  -
+
+  diff B_vs_A       poolDelta=      -29393.10 (-15.2495% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=29393.10 maxSelf=29393.10 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        508567.00 ->        508567.00  d=          -0.00  share -0.0000pp  rank 1->1
+         \u30ea\u30f4\u30a1\u30b7\u30fc credits         61881.00 ->         61881.00  d=          +0.00  share +0.0000pp  rank 5->5
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits        222183.00 ->        222183.00  d=          +0.00  share +0.0000pp  rank 2->2
+         T.O.W.E.R.typeR              credits          1870.00 ->          1870.00  d=          +0.00  share +0.0000pp  rank 8->8
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits         80294.00 ->         80294.00  d=          +0.00  share +0.0000pp  rank 4->4
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         79928.23 ->         65894.93  d=      -14033.30
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         47519.38 ->         39176.22  d=       -8343.15
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         39964.11 ->         32947.47  d=       -7016.65
+  diff C_vs_A       poolDelta=     -192748.34 (-100.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=5 rulesAppeared=0
+       component deltas: maxBase=167411.72 maxSelf=167411.72 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits         80294.00 ->         80294.00  d=          -0.00  share -0.0000pp  rank 4->4
+         \u30ea\u30f4\u30a1\u30b7\u30fc credits         61881.00 ->         61881.00  d=          +0.00  share +0.0000pp  rank 5->5
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits        222183.00 ->        222183.00  d=          +0.00  share +0.0000pp  rank 2->2
+         T.O.W.E.R.typeR              credits          1870.00 ->          1870.00  d=          +0.00  share +0.0000pp  rank 8->8
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        508567.00 ->        508567.00  d=          +0.00  share +0.0000pp  rank 1->1
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         79928.23 ->             0.00  d=      -79928.23 [removed]
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         47519.38 ->             0.00  d=      -47519.38 [removed]
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         39964.11 ->             0.00  d=      -39964.11 [removed]
+         \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8         24880.61 ->             0.00  d=      -24880.61 [removed]
+         \u8150\u98df\u306e\u6bd2\u85ac|text|atk|T.O.W.E.R.typeR           456.01 ->             0.00  d=        -456.01 [removed]
+  diff Bstar_vs_A   poolDelta=      -29393.10 (-15.2495% of A pool) attributedDelta=     -115075.00
+       denominatorChanged=True maxAbsActorCreditDelta=89291.00 maxAbsActorShareDelta=3.6850pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=59897.90 maxSelf=29393.10 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -192748.34 (-100.0000% of A pool) attributedDelta=    -1119080.00
+       denominatorChanged=True maxAbsActorCreditDelta=508567.00 maxAbsActorShareDelta=98.6441pp top1Changed=True top3SetChanged=True rulesRemoved=5 rulesAppeared=0
+       component deltas: maxBase=341155.28 maxSelf=167411.72 maxAssist=0.00 anyAssistMoved=False
+
+------------------------------------------------------------------------
+export : battle_9999_20261003_225647.json
+version: 1.5.4   quest: 9999  [TRAINING GROUND]   contribution section: False
+variant A vs plugin contribution section: ABSENT
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=100  untrusted=5 (with folds=5, damage=59748.0)  corroborated=9
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 19668.0386
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=6 (with folds=4, damage=100.0, would-be pool=10.56)
+  in-domain pair string census: {"live-same": 134, "live-age": 11}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          2366746.00      105          435769.07         2366746.00    18.4122%    1.000000          0           0.00
+  B          2366746.00      105          416101.03         2366746.00    17.5811%    1.000000          5       59748.00
+  C          2366746.00      105               0.00         2366746.00     0.0000%    1.000000         29     1065995.00
+  B*         2306998.00      100          416101.03         2306998.00    18.0365%    1.000000          5       59748.00
+  C*            1951.00        9               0.00            1951.00     0.0000%    1.000000         96     2364795.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  7      [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                   978967/41.36%             978967/41.36%             978967/41.36%             919219/39.84%                  0/ 0.00%
+  9      \u30ec\u30f4\u30ca\u30f3\u30c8                           535762/22.64%             535762/22.64%             535762/22.64%             535762/23.22%                  0/ 0.00%
+  13     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9             349814/14.78%             349814/14.78%             349814/14.78%             349814/15.16%                  0/ 0.00%
+  5      \u30ea\u30f4\u30a1\u30b7\u30fc                           216092/ 9.13%             216092/ 9.13%             216092/ 9.13%             216092/ 9.37%                  0/ 0.00%
+  11     \u30af\uff1d\u30eb\u30f4\u30a3                           160877/ 6.80%             160877/ 6.80%             160877/ 6.80%             160877/ 6.97%               1095/56.13%
+  4      \u30dd\u30dd\u30ed\u30c3\u30c8                            87028/ 3.68%              87028/ 3.68%              87028/ 3.68%              87028/ 3.77%                  0/ 0.00%
+  10     \u30bd\u30d5\u30a3\u30fc                                  32072/ 1.36%              32072/ 1.36%              32072/ 1.36%              32072/ 1.39%                856/43.87%
+  1      \u30ec\u30f4\u30ca\u30f3\u30c8                             6134/ 0.26%               6134/ 0.26%               6134/ 0.26%               6134/ 0.27%                  0/ 0.00%
+  8      \u30ec\u30f4\u30ca\u30f3\u30c8                                0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+  15     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+  16     T.O.W.E.R.typeR                                               0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           143709.70          134319.49                  -          134319.49                  -
+  \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9           107798.16          107798.16                  -          107798.16                  -
+  \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            85439.09           79856.37                  -           79856.37                  -
+  \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            71854.85           67159.74                  -           67159.74                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8            26967.27           26967.27                  -           26967.27                  -
+
+  diff B_vs_A       poolDelta=      -19668.04 ( -4.5134% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=19668.04 maxSelf=19668.04 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        978967.00 ->        978967.00  d=          +0.00  share +0.0000pp  rank 1->1
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits          6134.00 ->          6134.00  d=          +0.00  share +0.0000pp  rank 8->8
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits         87028.00 ->         87028.00  d=          +0.00  share +0.0000pp  rank 6->6
+         \u30ea\u30f4\u30a1\u30b7\u30fc credits        216092.00 ->        216092.00  d=          +0.00  share +0.0000pp  rank 4->4
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits             0.00 ->             0.00  d=          +0.00  share +0.0000pp  rank 9->9
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        143709.70 ->        134319.49  d=       -9390.21
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         85439.09 ->         79856.37  d=       -5582.72
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         71854.85 ->         67159.74  d=       -4695.11
+  diff C_vs_A       poolDelta=     -435769.07 (-100.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=5 rulesAppeared=0
+       component deltas: maxBase=408801.80 maxSelf=408801.80 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        978967.00 ->        978967.00  d=          +0.00  share +0.0000pp  rank 1->1
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits          6134.00 ->          6134.00  d=          +0.00  share +0.0000pp  rank 8->8
+         \u30dd\u30dd\u30ed\u30c3\u30c8 credits         87028.00 ->         87028.00  d=          +0.00  share +0.0000pp  rank 6->6
+         \u30ea\u30f4\u30a1\u30b7\u30fc credits        216092.00 ->        216092.00  d=          +0.00  share +0.0000pp  rank 4->4
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits             0.00 ->             0.00  d=          +0.00  share +0.0000pp  rank 9->9
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        143709.70 ->             0.00  d=     -143709.70 [removed]
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9        107798.16 ->             0.00  d=     -107798.16 [removed]
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         85439.09 ->             0.00  d=      -85439.09 [removed]
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         71854.85 ->             0.00  d=      -71854.85 [removed]
+         \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8         26967.27 ->             0.00  d=      -26967.27 [removed]
+  diff Bstar_vs_A   poolDelta=      -19668.04 ( -4.5134% of A pool) attributedDelta=      -59748.00
+       denominatorChanged=True maxAbsActorCreditDelta=59748.00 maxAbsActorShareDelta=1.5186pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=40079.96 maxSelf=19668.04 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -435769.07 (-100.0000% of A pool) attributedDelta=    -2364795.00
+       denominatorChanged=True maxAbsActorCreditDelta=978967.00 maxAbsActorShareDelta=49.3277pp top1Changed=True top3SetChanged=True rulesRemoved=5 rulesAppeared=0
+       component deltas: maxBase=570165.20 maxSelf=408801.80 maxAssist=0.00 anyAssistMoved=False
+
+------------------------------------------------------------------------
+export : battle_9999_20261004_012138.json
+version: 1.5.5   quest: 9999  [TRAINING GROUND]   contribution section: False
+variant A vs plugin contribution section: ABSENT
+variant A vs offline core contrib.aggregate.analyze: OK  mismatches=0
+pairing census IN DOMAIN (team-1 hits Contribution.Compute actually receives):
+  trusted=73  untrusted=6 (with folds=6, damage=66936.0)  corroborated=2
+  pairUntrustedCredit (A-pool on in-domain untrusted hits, i.e. what B moves) = 24285.0215
+pairing census OUT OF DOMAIN (hits excluded at Contribution.cs:321):
+  untrusted=0 (with folds=0, damage=0.0, would-be pool=0.00)
+  in-domain pair string census: {"live-same": 99, "live-age": 6}
+
+  crit  analyzableDealt     hits          poolTotal   attributedDamage       pool%   credShare   exclHits     exclDamage
+  A          1458721.00       79          234120.12         1458721.00    16.0497%    1.000000          0           0.00
+  B          1458721.00       79          209835.10         1458721.00    14.3849%    1.000000          6       66936.00
+  C          1458721.00       79               0.00         1458721.00     0.0000%    1.000000         23      527556.00
+  B*         1391785.00       73          209835.10         1391785.00    15.0767%    1.000000          6       66936.00
+  C*            2407.00        2               0.00            2407.00     0.0000%    1.000000         77     1456314.00
+  exclHits/exclDamage: A/B/C = hits whose folds were zeroed but whose damage STAYS in
+    the denominator (only the composition is withdrawn); B*/C* = hits dropped entirely,
+    so their analyzableDealt differs (denominatorChanged=true).
+
+  actor totalCredit / totalShare%% by criterion (full list; key is the stable actor id):
+  key    actor (escaped)                                                      A                         B                         C                        B*                        C*
+  5      [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9                   497945/34.14%             497945/34.14%             497945/34.14%             431009/30.97%                  0/ 0.00%
+  1      \u30ec\u30f4\u30ca\u30f3\u30c8                           338298/23.19%             338298/23.19%             338298/23.19%             338298/24.31%                  0/ 0.00%
+  16     \u30af\uff1d\u30eb\u30f4\u30a3                           285461/19.57%             285461/19.57%             285461/19.57%             285461/20.51%               2193/91.11%
+  10     \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9             226243/15.51%             226243/15.51%             226243/15.51%             226243/16.26%                  0/ 0.00%
+  15     \u30ea\u30f4\u30a1\u30b7\u30fc                            53214/ 3.65%              53214/ 3.65%              53214/ 3.65%              53214/ 3.82%                  0/ 0.00%
+  6      \u30bd\u30d5\u30a3\u30fc                                  27949/ 1.92%              27949/ 1.92%              27949/ 1.92%              27949/ 2.01%                214/ 8.89%
+  18     \u30dd\u30dd\u30ed\u30c3\u30c8                            25829/ 1.77%              25829/ 1.77%              25829/ 1.77%              25829/ 1.86%                  0/ 0.00%
+  7      T.O.W.E.R.typeR                                            3782/ 0.26%               3782/ 0.26%               3782/ 0.26%               3782/ 0.27%                  0/ 0.00%
+  17     \u57ce\u585e                                                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%                  0/ 0.00%
+
+  top 12 rules by A damageEquivalent, damageEquivalent by criterion:
+  rule|kind|side|owner (escaped)                   A                  B                  C                 B*                 C*
+  \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            76330.02           73526.38                  -           73526.38                  -
+  \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            71073.00           60817.04                  -           60817.04                  -
+  \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            42254.72           36157.29                  -           36157.29                  -
+  \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9            35536.50           30408.52                  -           30408.52                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8             8003.60            8003.60                  -            8003.60                  -
+  \u8150\u98df\u306e\u6bd2\u85ac|text|atk|T.O.W.E.R.typeR              922.26             922.26                  -             922.26                  -
+
+  diff B_vs_A       poolDelta=      -24285.02 (-10.3729% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=24285.02 maxSelf=24285.02 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        497945.00 ->        497945.00  d=          -0.00  share -0.0000pp  rank 1->1
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits        338298.00 ->        338298.00  d=          +0.00  share +0.0000pp  rank 2->2
+         \u30bd\u30d5\u30a3\u30fc     credits         27949.00 ->         27949.00  d=          +0.00  share +0.0000pp  rank 6->6
+         T.O.W.E.R.typeR              credits          3782.00 ->          3782.00  d=          +0.00  share +0.0000pp  rank 8->8
+         \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 credits        226243.00 ->        226243.00  d=          +0.00  share +0.0000pp  rank 4->4
+       rule deltas (top 5):
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         71073.00 ->         60817.04  d=      -10255.96
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         42254.72 ->         36157.29  d=       -6097.43
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         35536.50 ->         30408.52  d=       -5127.98
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         76330.02 ->         73526.38  d=       -2803.64
+  diff C_vs_A       poolDelta=     -234120.12 (-100.0000% of A pool) attributedDelta=           0.00
+       denominatorChanged=False maxAbsActorCreditDelta=0.00 maxAbsActorShareDelta=0.0000pp top1Changed=False top3SetChanged=False rulesRemoved=6 rulesAppeared=0
+       component deltas: maxBase=225194.25 maxSelf=225194.25 maxAssist=0.00 anyAssistMoved=False
+       actor deltas (top 5):
+         [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9 credits        497945.00 ->        497945.00  d=          -0.00  share -0.0000pp  rank 1->1
+         \u30ec\u30f4\u30ca\u30f3\u30c8 credits        338298.00 ->        338298.00  d=          +0.00  share +0.0000pp  rank 2->2
+         \u30bd\u30d5\u30a3\u30fc     credits         27949.00 ->         27949.00  d=          +0.00  share +0.0000pp  rank 6->6
+         T.O.W.E.R.typeR              credits          3782.00 ->          3782.00  d=          +0.00  share +0.0000pp  rank 8->8
+         \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 credits        226243.00 ->        226243.00  d=          +0.00  share +0.0000pp  rank 4->4
+       rule deltas (top 5):
+         \u9b54\u5c0e\u306e\u602a\u7ffc|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         76330.02 ->             0.00  d=      -76330.02 [removed]
+         \u9b54\u6cd5\u4e0e\u30c0\u30e1\u30fc\u30b8+10%|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         71073.00 ->             0.00  d=      -71073.00 [removed]
+         \u708e\u306e\u5263|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         42254.72 ->             0.00  d=      -42254.72 [removed]
+         \u30a8\u30a4\u30dc\u30f3\u306e\u6307\u8f2a|text|atk|[\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9         35536.50 ->             0.00  d=      -35536.50 [removed]
+         \u8150\u98df\u306e\u6bd2\u85ac|text|atk|\u30dd\u30dd\u30ed\u30c3\u30c8          8003.60 ->             0.00  d=       -8003.60 [removed]
+  diff Bstar_vs_A   poolDelta=      -24285.02 (-10.3729% of A pool) attributedDelta=      -66936.00
+       denominatorChanged=True maxAbsActorCreditDelta=66936.00 maxAbsActorShareDelta=3.1677pp top1Changed=False top3SetChanged=False rulesRemoved=0 rulesAppeared=0
+       component deltas: maxBase=42650.98 maxSelf=24285.02 maxAssist=0.00 anyAssistMoved=False
+  diff Cstar_vs_A   poolDelta=     -234120.12 (-100.0000% of A pool) attributedDelta=    -1456314.00
+       denominatorChanged=True maxAbsActorCreditDelta=497945.00 maxAbsActorShareDelta=71.5400pp top1Changed=True top3SetChanged=True rulesRemoved=6 rulesAppeared=0
+       component deltas: maxBase=338298.00 maxSelf=225194.25 maxAssist=0.00 anyAssistMoved=False
+

@@ -1,0 +1,58 @@
+DpsMeter(邪神战记)悬浮窗+图表+导出分析 使用说明
+============================================
+版本:0.9.2+  适用:《邪神戦記 ルルイエ少女隊X》DMM Windows 客户端
+环境:Unity 6000.3.5 / IL2CPP / BepInEx 6(游戏目录已装好)
+
+一、安装 / 更新
+1. 关闭游戏
+2. 把 DpsMeter.dll 覆盖到  BepInEx\plugins\DpsMeter\DpsMeter.dll
+   (原版备份:同目录 DpsMeter.dll.0.9.0.bak)
+3. 启动游戏;配置在 BepInEx\config\dev.dpsmeter.cfg
+
+二、悬浮窗(默认 uGUI,底部居中偏下)
+- 顶部行:任务 / 时间(取自游戏战斗时长) / 我方总伤 / 承伤 / 治疗(受) / 敌方总伤 / 未归属
+- 我方栏:每角色 伤害/秒伤/最大单次/受击;治疗(受)(名义)/自回复/给予
+- 敌方栏:敌方单位输出(F11 不影响敌方栏;ShowEnemies 配置关闭)
+
+三、快捷键
+- F8：显示/隐藏悬浮窗
+- F9：重置当前战斗统计
+- F10：列表 ↔ 图表
+- F11：图表 显示双方 / 仅我方
+- F12：图表 累计 ↔ 每秒瞬时DPS
+- 滚轮(悬停于面板)/ PageUp/PageDown / 方向键：滚动(范围内钳制)
+
+四、图表视图(F10)三张图
+1. 我方 · 累计伤害(各角色DPS,0点左下、单调上升;F12 可切每秒DPS)
+2. 我方 · 剩余生命%(受过伤角色,纵轴0-100%,受伤下降/治疗回弹)
+3. 敌方 · 输出(敌方单位累计;游戏不提供敌方逐单位造成伤害,故为近似)
+- 均带 x 轴秒刻度数字 + 左上角纵轴上限(HP 图显 HP%),曲线2x抗锯齿
+
+五、快捷键对应配置(dev.dpsmeter.cfg)
+- [General] OverlayMode=ugui | imgui | none
+- [General] TimerUsesGameTime=false(默认现实秒| true=游戏逻辑秒,慢动作关用)
+- [Overlay] ShowEnemies / ShowSkills / ChartBothSides / WheelScrolls / ChartPerSecond
+- [Debug] VerboseEvents / TraceCandidates
+
+六、战斗数据全量导出(自动)
+- 每场战斗结束自动写:
+  BepInEx\plugins\DpsMeter\exports\battle_<任务>_<时间>.json
+- 内容:totals / actors[](名称/队伍/总伤/承伤/治疗/命中/最大/暴击 + perSecDamage/Taken/Heal + hpPct + sources/skills) / events[](逐事件:时间/类型/受害/攻击/归属/数额/来源/暴击) / unattributedByVictim
+- 注:Source/Crit 因游戏 IL2CPP 内部计算,托管层拿不到,多为空(数据限制)
+
+七、离线精细分析(Python)
+- 依赖:pip install matplotlib numpy
+- 脚本:游戏根目录 dpsmeter_analyze.py
+- 交互窗口: python dpsmeter_analyze.py <json|目录>
+- 保存PNG:   python dpsmeter_analyze.py --save <输出目录> <json|目录>
+- 图:各角色累计/每秒伤害、我方承伤vs治疗、逐事件时间线、汇总、来源分布
+  (来源为空是数据限制;可加未归属TOP等)
+- 导出的 JSON 也可用 Excel/Power BI 等读
+
+八、回退
+删除 BepInEx\plugins\DpsMeter\ 或用备份 DpsMeter.dll.0.9.0.bak 覆盖回旧版。
+
+九、已知限制(如实)
+- 敌方逐单位“造成伤害”:游戏官方统计对面为0,插件只能给“已归属敌方单位 + 我方输出造成的敌方承伤 + 未归属总量”;无法伪造逐单位明细
+- 暴击/伤害来源:IL2CPP 内部计算,托管层不可得(面板以“最大单次”代替)
+- 同名召唤物合并;游戏大版本更新后如需重新编译

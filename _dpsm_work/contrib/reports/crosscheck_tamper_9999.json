@@ -1,0 +1,80 @@
+{
+ "file": "tamper_9999.json",
+ "pluginVersion": "1.7.5",
+ "quest": 9999,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [
+  "ATKADD_FOLDS_VS_BODY: contribution rules kind=atkadd folds=35 != non-empty calc.atkAdd entries on in-domain hits=34 (475 of 509 body rows are outside the analysed team): the section authors atkadd rows but does not restate all of them"
+ ],
+ "checked": {
+  "totals": 4,
+  "actors": 7,
+  "rules": 7,
+  "links": 6
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 1,
+ "reasons": [
+  {
+   "severity": "legacy",
+   "code": "TRAINING_NOT_COMPARABLE",
+   "message": "quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS"
+  },
+  {
+   "severity": "error",
+   "code": "ATKADD_FOLDS_VS_BODY",
+   "message": "contribution rules kind=atkadd folds=35 != non-empty calc.atkAdd entries on in-domain hits=34 (475 of 509 body rows are outside the analysed team): the section authors atkadd rows but does not restate all of them"
+  },
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.5)"
+  }
+ ],
+ "notes": [],
+ "modelApplicability": "not_comparable",
+ "trainingMode": true,
+ "atkAddCensus": {
+  "nonEmptyHits": 472,
+  "rows": 509,
+  "nonEmptyHitsInDomain": 34,
+  "rowsInDomain": 34,
+  "analysedTeam": 1,
+  "root": {
+   "hits": 558,
+   "emitted": 509,
+   "selfValues": 482,
+   "skippedGuard": 0,
+   "skippedCollision": 3,
+   "skippedUnowned": 44,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0
+  }
+ },
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 177,
+   "resolved": 177,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 249,
+   "unknown_reason": 0
+  }
+ },
+ "status": "ERROR"
+}

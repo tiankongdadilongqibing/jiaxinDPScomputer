@@ -1,0 +1,93 @@
+TOP-LEVEL KEYS
+  app            'DpsMeter'
+  version        '1.5.3'
+  quest          411001
+  duration       119.07
+  result         'Lose'
+  started        '2026-10-03T20:54:49'
+  run            dict keys=['id', 'seq']
+  totals         dict keys=['dealt', 'taken', 'healing', 'healingGiven', 'unattributedDamage', 'unattributedHits', 'absorbed', 'dealtWithAbsorbed']
+  actors         list len=216
+  events         list len=6285
+  reconcile      dict keys=['dmgEvents', 'withCalc', 'exact', 'exactWithCrit', 'critInferred', 'critObserved', 'critObservedYes', 'critAgree', 'critInferredButDenied', 'critObservedButUnexplained', 'approx', 'unexplained', 'theoryExceeds', 'absorbed', 'absorbedAmount', 'distinctResiduals']
+  hitDetail      dict keys=['produced', 'trimmed', 'errors', 'matchExact', 'matchPair', 'matchNone']
+  timeline       dict keys=['observed', 'units', 'rowCount', 'rowsDropped', 'statusChanges', 'resistChanges', 'notCharacter', 'nullStatus', 'nullResistance', 'errors', 'resistSlots', 'statusFlags', 'rows']
+  facts          dict keys=['observed', 'classes', 'maxClasses', 'liveClasses', 'maxLiveClasses', 'classesOverflow', 'liveSkipped', 'stateUnreadable', 'errors', 'items']
+  factCoverage   dict keys=['dmg', 'withFact', 'withLiveState']
+  forensics      dict keys=['seen', 'kept', 'buckets', 'maxBuckets', 'maxPerBucket', 'bucketsOverflow', 'perBucketOverflow', 'stateUnreadable', 'errors', 'records']
+  unattributedByVictim dict keys=['ショゴス']
+  statusAudit    dict keys=['appearances', 'explained', 'unexplainedCap', 'unexplainedOmitted', 'sigErrors', 'sigErrorMsg', 'sigNoList', 'statusValueSample', 'unexplained']
+  rosterAudit    dict keys=['routeA', 'unitsOk', 'unitsFail', 'castFails', 'slotInvalid', 'layoutMismatch', 'layoutSwapped', 'layoutAmbiguous', 'layoutSample', 'layoutSlots', 'slotConflicts', 'statsEntries', 'statsSample', 'ptrHits', 'idHits', 'unlabelled']
+  giveTypeList   list len=7
+  resistMaster   dict keys=['slots', 'first', 'last']
+  statusValues   list len=5
+  layout         dict keys=['pairs', 'slots']
+  liveRange      dict keys=['slots', 'rangeSamples', 'units']
+  subParams      dict keys=['units', 'reads', 'errors']
+  params         dict keys=['units', 'reads', 'errors']
+  statsRows      dict keys=['entries', 'sampledFrom', 'rows']
+
+EVENT KEYS: amount, atkKey, atkTeam, attacker, attr, crit, nominal, owner, source, t, type, vicKey, vicTeam, victim
+EVENT[0]: {"t": 0.0, "type": "dmg", "victim": "ショゴス", "attacker": "ネーフェ＝ジアー", "owner": "ネーフェ＝ジアー", "attr": "A", "amount": 7972, "nominal": 7972, "source": 0, "crit": false, "atkTeam": 1, "vicTeam": 2, "atkKey": 2, "vicKey": 1}
+
+FOLD ORIGIN PATTERNS (all events; # = digits):
+  text##/#/c#                                  n=12302  sample={"side": "atk", "kind": "text", "origin": "text#1/10110/c1", "factor": 1.2, "label": "[腐食の毒薬] 与ダメージ+20%"}
+  given##/#/-#                                 n=7352   sample={"side": "vic", "kind": "given", "origin": "given#4/1006/-10", "factor": 1.1, "label": "被伤害+10%(赋予)"}
+  global##/#                                   n=4401   sample={"side": "vic", "kind": "global", "origin": "global#1628461610304/0", "factor": 1.15, "label": "[母なる変異の飛沫] 毒/凍結/火傷状態の敵全ての被ダメージがそれぞれ+15%(全局:敌方受伤)"}
+  vicmadness##                                 n=3462   sample={"side": "vic", "kind": "madness", "origin": "vicmadness#150", "factor": 1.5, "label": "狂気(受击方) 被伤害×1.50"}
+  madness##                                    n=892    sample={"side": "atk", "kind": "madness", "origin": "madness#250", "factor": 2.5, "label": "狂気 与伤害×2.50(狂気比250)"}
+  talent##/#/t#/#                              n=26     sample={"side": "atk", "kind": "talent", "origin": "talent#0/39001/t1/1005", "factor": 1.5, "label": "与ダメージ+50%"}
+
+SAMPLE CANCEL ENTRIES: [{"origin": "given#3/1006/-15", "value": 1.15, "by": "global#1628461610304/0", "label": "被伤害+15%(赋予)"}]
+
+SECTION app: "DpsMeter"
+
+SECTION version: "1.5.3"
+
+SECTION quest: 411001
+
+SECTION duration: 119.07
+
+SECTION result: "Lose"
+
+SECTION started: "2026-10-03T20:54:49"
+
+SECTION run: {"id": 2, "seq": 0}
+
+SECTION totals: {"dealt": 198588964, "taken": 198878152, "healing": 81619, "healingGiven": 81619, "unattributedDamage": 289188, "unattributedHits": 72, "absorbed": 3000000, "dealtWithAbsorbed": 201588964}
+
+SECTION actors <317568 chars>: [{"key": 1, "name": "ショゴス", "team": 2, "kind": "Boss", "summon": false, "dealt": 390, "friendly": 0, "friendlyHits": 0, "taken": 80390, "healingGiven": 0, "healingTaken": 0, "self": 0, "hit": 1, "maxHit": 390, "crit": 0, "attr": "A", "perSecDamage": [0, 390, 0], "perSecTaken": [25591, 39922, 14877], "perSecHeal": [0, 0, 0], "hpPct": [1000, 1000, 1000], "sources": {"0": 390}, "skills": {"10155": 390}, "abilities": [{"slot": 1, "slotName": "基础被动", "origin": 1, "id": 40009, "level": 1, "name": "ショゴス用（遠隔）", "talents": [{"i": 0, "type": 1002, "typeName": "ModeChange", "timing": "EarlyPassive", "p": [0, 0, 0], "cond": "IsBlocking(1)"}, {"i": 1, "type": 6, "typeName": "攻击力%+", "timing": "Passive", "p": [150, -1, 0], "cond": "ExistenceTime(600)+QuestId(411001)"}]}], "talents": [{"slot": 1, "slotName": "基础被动", "abilityId": 40009, "ability": "ショゴス用（遠隔）", "i": 1, "type": 6, "typeName": "攻击力%+", "p"
+
+SECTION reconcile: {"dmgEvents": 6269, "withCalc": 6268, "exact": 5206, "exactWithCrit": 6119, "critInferred": 913, "critObserved": 0, "critObservedYes": 0, "critAgree": 0, "critInferredButDenied": 0, "critObservedButUnexplained": 0, "approx": 25, "unexplained": 124, "theoryExceeds": 0, "absorbed": 6, "absorbedAmount": 3000000, "distinctResiduals": 12, "approxTolerance": 0.05, "theoryExceedsResidualMax": 0.1, "critInferredTolerance": 0.002, "byPair": {"liveSame": 6268, "liveAge": 0, "value": 0, "fifo": 0, "none": 1, "unknown": 0, "corroborated": 44}, "byTenthExact": [370, 468, 541, 547, 592, 571, 537, 484, 466, 630], "byTenthTotal": [454, 565, 681, 636, 700, 699, 634, 584, 580, 736], "topResidual": [{"r": 0.87, "n": 56}, {"r": 1.15, "n": 17}, {"r": 1.652, "n": 13}, {"r": 0.869, "n": 12}, {"r": 0.826, "n": 11}, {"r": 0.0, "n": 7}, {"r": 0.827, "n": 3}, {"r": 1.569, "n": 1}, {"r": 1.57, "n": 1}, {"r": 1.651, "n": 1}, {"r": 1.725, "n": 1}, {"r": 2.185, "n": 1}]}
+
+SECTION hitDetail: {"produced": 6314, "trimmed": 0, "errors": 0, "matchExact": 44, "matchPair": 6224, "matchNone": 1}
+
+SECTION timeline <42459 chars>: {"observed": 6269, "units": 208, "rowCount": 525, "rowsDropped": 0, "statusChanges": 53, "resistChanges": 472, "notCharacter": 0, "nullStatus": 0, "nullResistance": 0, "errors": 0, "resistSlots": ["眩晕", "眩晕蓄积", "石化", "石化蓄积", "毒", "毒伤害", "击退", "火傷", "凍結", "暗闇", "狂気", "恐怖", "即死", "时停", "基础状态", "移速", "攻速", "攻隔"], "statusFlags": ["眩晕", "石化", "毒", "火傷", "凍結", "暗闇", "狂気", "恐怖", "即死", "时停"], "rows": [{"t": 0.63, "k": 1, "kind": "res", "i": 4, "name": "毒", "from": 100, "to": 85}, {"t": 0.63, "k": 1, "kind": "res", "i": 7, "name": "火傷", "from": 100, "to": 85}, {"t": 0.63, "k": 1, "kind": "res", "i": 8, "name": "凍結", "from": 100, "to": 85}, {"t": 1.23, "k": 1, "kind": "res", "i": 4, "name": "毒", "from": 85, "to": 55}, {"t": 1.23, "k": 1, "kind": "res", "i": 5, "name": "毒伤害", "from": 0, "to": -90}, {"t": 2.43, "k": 10, "kind": "res", "i": 4, "name": "毒", "from": 55, "to": 40}, {"t": 2.43, "k": 10, 
+
+SECTION facts <424562 chars>: {"observed": 6268, "classes": 431, "maxClasses": 2400, "liveClasses": 431, "maxLiveClasses": 900, "classesOverflow": 0, "liveSkipped": 0, "stateUnreadable": 0, "errors": 0, "items": [{"id": 1, "hits": 1, "atk": 3, "vic": 1, "atkName": "ルゥ=ルルサ", "vicName": "ショゴス", "atkTeam": 1, "vicTeam": 2, "eff": 10149, "ht": 2, "pair": "live-same", "known": 1.0, "resid": 1.0, "comp": "技能#10149 · 攻击力 4900 × 系数 1.00(推算) = 计算威力 4898 · 无适用防御 → 减算后 4898 · 已识别倍率 ×1.000(属性×1.00 · 与伤害×1.000 · 被伤害×1.000) · 理论 4898 × 1.000 = 4898 · 实际伤害 4898 · 剩余倍率 ×1.000(会心/未识别部分)", "comp2": "攻击属性 魔法 · 攻击方会心 率0/伤害率150(×1.50) · 属性 水→無 同属/无属性 · 增益:攻击力+9%、贯通率+5、攻击力+2(参照当前耐久0%)、攻击力+300(参照ExistenceTime3000%)、攻击力+7%、攻击力+10% · 与伤害补正:[毒の短剣] 毒状態の敵に対して与ダメージ+15％(条件性,未计入)", "comp3": "受击方 物防0/魔防0(本次使用魔防) · 被伤害补正:未检出(无相关能力文本)", "comp4": "受击方状态:无", "state": "判定=1 阈值=100 蓄积:眩晕=0/狂気=4/毒伤=0/火傷=0/狂気比=100 状态:无 抗性:眩晕=100>0 眩晕蓄积=0>150 石化=100>0 石化蓄积=
+
+SECTION factCoverage: {"dmg": 6269, "withFact": 6268, "withLiveState": 6268}
+
+SECTION forensics <117195 chars>: {"seen": 142, "kept": 55, "buckets": 33, "maxBuckets": 80, "maxPerBucket": 2, "bucketsOverflow": 0, "perBucketOverflow": 87, "stateUnreadable": 3, "errors": 0, "records": [{"class": "テトラ|0.870", "t": 3.63, "atk": "テトラ", "vic": "ショゴス", "atkTeam": 1, "vicTeam": 2, "friendly": false, "dmg": 2102, "nominal": 2102, "attr": "A", "source": 14, "hypCrit": false, "calc": {"effectId": 0, "hitType": 2, "attackPower": 3665, "power": 1828, "ratio": 0.5, "defense": 0, "penetration": 5, "base": 1828, "attrMult": 1.0, "dealtMult": 1.322, "takenMult": 1.0, "knownMult": 1.322, "theory": 2417, "applied": 2102, "residual": 0.87, "critRate": 0, "critDamageRate": 150, "pair": "live-same", "vicGive": 3, "vicGiveApplied": 0, "vicBuffs": 55, "vicExtra": 0}, "comp": "攻击力 3665 × 系数 0.50(推算) = 计算威力 1828 · 无适用防御 → 减算后 1828 · 已识别倍率 ×1.322(属性×1.00 · 与伤害×1.322 · 被伤害×1.000) · 理论 1828 × 1.322 = 2417 · 实际伤害 2102 · 剩余倍率 ×0
+
+SECTION unattributedByVictim: {"ショゴス": 289188}
+
+SECTION statusAudit: {"appearances": 32, "explained": 0, "unexplainedCap": 20, "unexplainedOmitted": 12, "sigErrors": 0, "sigErrorMsg": "", "sigNoList": 0, "statusValueSample": "ノックバック=0 凍結=0 毒=0 火傷=0 狂気=0", "unexplained": ["ショゴス 毒 @3.60s", "ショゴス 狂気 @4.43s", "ショゴス 凍結 @5.03s", "ショゴス 火傷 @5.20s", "ショゴス 凍結 @10.43s", "エヴァラス・フラウ ノックバック @16.03s", "ショゴス 狂気 @17.73s", "ショゴス 凍結 @22.03s", "ショゴス 火傷 @26.03s", "ショゴス 凍結 @28.10s", "メアリー 狂気 @33.70s", "メアリー ノックバック @33.70s", "ショゴス 毒 @35.23s", "ショゴス 狂気 @35.43s", "ショゴス 凍結 @35.50s", "ショゴス 凍結 @44.20s", "ショゴス 狂気 @51.50s", "ショゴス 凍結 @52.80s", "ショゴス 凍結 @61.30s", "メアリー 狂気 @66.90s"]}
+
+SECTION rosterAudit <9409 chars>: {"routeA": 2, "unitsOk": 23, "unitsFail": 1, "castFails": 0, "slotInvalid": 0, "layoutMismatch": 0, "layoutSwapped": 0, "layoutAmbiguous": 97, "layoutSample": "2/0,9/0,9/1,5/0,5/1,6/0,10/0,10/1,10/2,10/3,10/4,10/5,2/0,9/0,9/1,5/0,5/1,6/0,10/0,10/1,10/2,10/3,10/4,10/5,2/0,9/0,9/1,5/0…", "layoutSlots": "刻印:39,基础被动:16,神器:14,被动:14,职业特性:7,潜在:7", "slotConflicts": 0, "statsEntries": 14, "statsSample": "(职业特性:0/0)(神器:0/0)(神器:1/0)(被动:0/0)(被动:1/0)(潜在:0/0)", "ptrHits": 74, "idHits": 23, "unlabelled": 0, "rosterErrors": 0, "triggerReads": 122431, "triggerErrors": 0, "blockReads": 21405, "blockErrors": 0, "giveReads": 6268, "giveErrors": 0, "giveHits": 6254, "giveApplied": 11028, "giveUnusable": 0, "giveOverflow": 0, "giveFlagTrue": 49918, "giveFlagFalse": 118, "giveClausesDeferred": 492, "giveCancelled": 15894, "giveTypes": "1006/-10:7352,1006/-15:15894,1029/10018:4354,17/30:4354,409/30:5914,411/90:
+
+SECTION giveTypeList: [{"type": 1006, "param": -10, "n": 7352}, {"type": 1006, "param": -15, "n": 15894}, {"type": 1029, "param": 10018, "n": 4354}, {"type": 17, "param": 30, "n": 4354}, {"type": 409, "param": 30, "n": 5914}, {"type": 411, "param": 90, "n": 5914}, {"type": 421, "param": 40, "n": 6254}]
+
+SECTION resistMaster: {"slots": ["眩晕", "眩晕蓄积", "石化", "石化蓄积", "毒", "毒伤害", "击退", "火傷", "凍結", "暗闇", "狂気", "恐怖", "即死", "时停", "基础状态", "移速", "攻速", "攻隔"], "first": [{"unit": "0|ショゴス", "v": [100, 0, 100, 0, 100, 0, 100, 100, 100, 100, 100, 100, 100, 100, 0, 0, 0, 0]}, {"unit": "-1|ルゥ=ルルサ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|テトラ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|マッドシーカー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|ルナリス", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|ネーフェ＝ジアー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|メアリー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|エヴァラス・フラウ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|生ける炎 クトゥグア", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|クトゥグァ砲台", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|クトゥグァ砲台R", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}], "last": [{"unit": "-1|ルゥ=ルルサ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "0|ショゴス", "v": [100, 0, 100, 0, 100, 0, 100, 100, 100, 100, 100, 100, 100, 100, 0, 0, 0, 0]}, {"unit": "-1|テトラ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|マッドシーカー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|ルナリス", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|ネーフェ＝ジアー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|メアリー", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|エヴァラス・フラウ", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|生ける炎 クトゥグア", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|クトゥグァ砲台", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"unit": "-1|クトゥグァ砲台R", "v": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}]}
+
+SECTION statusValues: [{"name": "ノックバック", "min": 0, "max": 0}, {"name": "凍結", "min": 0, "max": 0}, {"name": "毒", "min": 0, "max": 0}, {"name": "火傷", "min": 0, "max": 0}, {"name": "狂気", "min": 0, "max": 0}]
+
+SECTION layout: {"pairs": [{"w8": 2, "w12": 0}, {"w8": 9, "w12": 0}, {"w8": 9, "w12": 1}, {"w8": 5, "w12": 0}, {"w8": 5, "w12": 1}, {"w8": 6, "w12": 0}, {"w8": 10, "w12": 0}, {"w8": 10, "w12": 1}], "slots": [{"slot": 10, "name": "刻印", "n": 39}, {"slot": 1, "name": "基础被动", "n": 16}, {"slot": 9, "name": "神器", "n": 14}, {"slot": 5, "name": "被动", "n": 14}, {"slot": 2, "name": "职业特性", "n": 7}, {"slot": 6, "name": "潜在", "n": 7}]}
+
+SECTION liveRange: {"slots": ["眩晕", "眩晕蓄积", "石化", "石化蓄积", "毒", "毒伤害", "击退", "火傷", "凍結", "暗闇", "狂気", "恐怖", "即死", "时停", "基础状态", "移速", "攻速", "攻隔"], "rangeSamples": 894, "units": [{"unit": "0|ショゴス", "moved": [{"i": 4, "min": -50, "max": 100}, {"i": 5, "min": -90, "max": 0}, {"i": 7, "min": -20, "max": 100}, {"i": 8, "min": -20, "max": 100}]}, {"unit": "-1|ルゥ=ルルサ", "moved": []}, {"unit": "-1|テトラ", "moved": []}, {"unit": "-1|マッドシーカー", "moved": []}, {"unit": "-1|ルナリス", "moved": []}, {"unit": "-1|ネーフェ＝ジアー", "moved": []}, {"unit": "-1|メアリー", "moved": []}, {"unit": "-1|エヴァラス・フラウ", "moved": []}]}
+
+SECTION subParams: {"units": [{"unit": "0|ショゴス", "v": []}, {"unit": "-1|ルゥ=ルルサ", "v": []}, {"unit": "-1|テトラ", "v": []}, {"unit": "-1|マッドシーカー", "v": []}, {"unit": "-1|ルナリス", "v": []}, {"unit": "-1|ネーフェ＝ジアー", "v": []}, {"unit": "-1|メアリー", "v": []}, {"unit": "-1|エヴァラス・フラウ", "v": []}, {"unit": "-1|生ける炎 クトゥグア", "v": []}, {"unit": "-1|クトゥグァ砲台", "v": []}, {"unit": "-1|クトゥグァ砲台R", "v": []}], "reads": 1007, "errors": 0}
+
+SECTION params <9434 chars>: {"units": [{"unit": "0|ショゴス", "rows": [{"i": 0, "tgt": "疯狂抗性", "ty": "Actual", "val": 40, "vTgt": "疯狂抗性", "vTy": "Actual", "vParam": 40, "vRef": ""}, {"i": 1, "tgt": "毒伤害", "ty": "Fixed", "val": 1710, "vTgt": "毒伤害", "vTy": "Fixed", "vParam": 1710, "vRef": ""}, {"i": 2, "tgt": "移动速度", "ty": "Rate", "val": 20, "vTgt": "移动速度", "vTy": "Rate", "vParam": 20, "vRef": ""}, {"i": 3, "tgt": "毒抗性", "ty": "Actual", "val": 30, "vTgt": "毒抗性", "vTy": "Actual", "vParam": 30, "vRef": ""}, {"i": 4, "tgt": "毒伤害抗性", "ty": "Actual", "val": 90, "vTgt": "毒伤害抗性", "vTy": "Actual", "vParam": 90, "vRef": ""}, {"i": 5, "tgt": "火伤伤害", "ty": "Actual", "val": 850, "vTgt": "火伤伤害", "vTy": "Actual", "vParam": 850, "vRef": ""}, {"i": 6, "tgt": "火伤伤害", "ty": "Actual", "val": 850, "vTgt": "火伤伤害", "vTy": "Actual", "vParam": 850, "vRef": ""}, {"i": 7, "tgt": "火伤伤害", "ty": "Actual", "val": 850, "vTgt": "火伤伤害", "vTy": "Actual",
+
+SECTION statsRows: {"entries": 14, "sampledFrom": 14, "rows": [{"slot": 2, "slotName": "职业特性", "slotId": 0, "slotSubId": 0}, {"slot": 9, "slotName": "神器", "slotId": 0, "slotSubId": 0}, {"slot": 9, "slotName": "神器", "slotId": 1, "slotSubId": 0}, {"slot": 5, "slotName": "被动", "slotId": 0, "slotSubId": 0}, {"slot": 5, "slotName": "被动", "slotId": 1, "slotSubId": 0}, {"slot": 6, "slotName": "潜在", "slotId": 0, "slotSubId": 0}]}

@@ -1,0 +1,19 @@
+exports scanned       : 771
+exports with hitDetail: 3
+exports without       : 768
+
+file                                         ver        prod  exact   pair  none  matched     dmg delta       
+battle_411001_20261003_173710.json           1.5.0      5369    115   5156     1     5272    5272 OK          
+battle_411001_20261003_175142.json           1.5.1      5258     39   5181     1     5221    5055 +166        
+battle_411001_20261003_183213.json           1.5.2      5636     31   5551     1     5583    5583 OK          
+
+MISMATCH count: 1
+by version (ver: OK / BAD):
+   1.5.0      OK   1
+   1.5.1      BAD  1
+   1.5.2      OK   1
+
+per-export delta vs produced: produced - matched =
+   battle_411001_20261003_173710.json           prod=  5369 matched=  5272 dmg=  5272  produced-matched=  +97
+   battle_411001_20261003_175142.json           prod=  5258 matched=  5221 dmg=  5055  produced-matched=  +37
+   battle_411001_20261003_183213.json           prod=  5636 matched=  5583 dmg=  5583  produced-matched=  +53

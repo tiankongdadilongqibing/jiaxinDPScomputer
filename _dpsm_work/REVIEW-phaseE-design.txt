@@ -1,0 +1,421 @@
+# 阶段 E 施工前审查与设计(贡献结果进入正式导出 schema)
+
+> 只读审查。本文不改任何现有文件;施工建议只在"建议"一节,未执行。
+> 基线:插件 1.5.5(部署 DLL SHA256 18E4D933...,340,992 B),导出
+> BepInEx/plugins/DpsMeter/exports/battle_411001_20261003_235204.json(22,964,452 B = 21.90 MiB)。
+> 证据等级:【实测】=直接来自导出字段/磁盘文件/源码行;【离线重放】=用该导出复算;
+> 【父代理实测】=父代理干跑/自测给出的数字;【推断】=尚未被数据证实。
+> 源码事实标注 (源码:路径:行)。对应计划书 §5 阶段 E、指标字典、SESSION-STATE §7.2.83、
+> _dpsm_work/ROLLBACK-1.6.0.md。
+> 版本说明:成文后父代理补充了「聚合段 25.9KB(0.116%)、逐击 credit 1403.6KB(6.26%)、
+> check_export_schema.py 已能校验可选 contribution、自测 17 例全过、干跑 PASS」,已并入 §3/§4。
+
+---
+
+## 0. 结论(给施工者的 10 条)
+
+1. C# 侧已具备算贡献的绝大部分输入,且比导出文件里更多(进程内还有 global 规则的 owner 指针与 owner 名)。
+   缺的不是原始数据,而是一份与离线核心逐字段等价的解析/归属实现。
+2. 接线点只有一个正确位置:导出结算时从已存事件重算(ExportService.BuildJson 内调用新的 Contribution)。
+   这与 CalcReconcile "永远从事件派生、绝不战斗中累加"的既有纪律一致(源码:src/Output/CalcReconcile.cs:27-29)。
+   不要在折叠发生处累加:诊断重算路径会重复计。
+3. 逐击 credit 明细默认不要输出。聚合段实测 25.9 KB(+0.116%)【父代理实测】;
+   逐击 credit 实测 1403.6 KB(+6.26%)【父代理实测】。建议:聚合默认开、逐击默认关。
+4. 旧导出兼容原理清楚:check_export_schema.py 按 version 门控新键(源码:check_export_schema.py:139-163)。
+   父代理已把 contribution 做成"可选段"且自测 17 例全过、干跑 PASS【父代理实测】;残项见 §4.2。
+5. 阶段 E 的硬验收已写好:python -m contrib.crosscheck,逐字段比对插件段与离线核心
+   (rel 1e-6 / abs 1.0)(源码:_dpsm_work/contrib/crosscheck.py)。
+6. 最大施工风险不是性能,是双实现漂移。离线归属阶梯里有一条未写进字典正文的  talent#buff  origin 正则陷阱
+   (源码:contrib/attribution.py:12);C# 若"顺手修好"它,crosscheck 会红。阶段 E 的唯一目标是同值,不是更好。
+7. 必踩的坑:contribution 的 fold 输入受通用开关 CfgReconcileCalc 影响。离线核心只读文件里
+   实际存在的 calc.fold,而 C# 读内存;CfgReconcileCalc=false 时两边结论不同。必须共用同一判据(§5.2)。
+8. attribution 要用 atkKey,绝不能对 attacker 问号 的名称做回退;本语料里那 67 条正是离线核心
+   单列的未归因事件(字典 §1.2)。多归因一条 crosscheck 就红。
+9. 数值一律 InvariantCulture + 固定小数(建议 F4),文件内自证恒等式;不要把贡献数写进 totals.*
+   (那是实测口径),否则违反"推断不得伪装实测"。
+10. 回退锚点已建并校验:部署 DLL = 1.5.5-verified.bak = Release 产物,三者同哈希。
+    阶段 E 回退 = 复制回 DLL + 关开关 + 重跑五守卫 + recon_probe + crosscheck(应 ABSENT)。
+
+---
+
+## 1. 现状:输入盘点(逐项举证)
+
+### 1.1 每击 fold 的 kind/side/factor/origin/label/byUnit —— 具备
+
+* 数据结构:CalcBreakdown.Fold 是 List<FoldStep>(源码:src/Model/CalcBreakdown.cs:166-179;
+  src/Model/FoldStep.cs:21-86,字段 Side/Kind/Origin/Factor/Label/ByUnit)。
+* 生产:CompositionProbe.BuildChainParts 内单次命中新建 FoldContext(源码:Chain.cs:122),各通道写入:
+  text 到 Abilities.cs:213-215;talent 到 Talents.cs:730/740/784/794;given 到 Talents.cs:524(带 byUnit);
+  global 到 GlobalRules.cs:376(无 byUnit);madness 到 Chain.cs:213(vicmadness)、:241(madness,带 byUnit)。
+  最后写回 brk.Fold(源码:Chain.cs:250-254)。
+* 落地:事件持 Calc(源码:src/Model/BattleEvent.cs:106),由 Aggregator.RecordDamage 的
+  TryGetCompForVictim(out CalcBreakdown compCalc) 填充(源码:src/Aggregator.cs:1123、1156)。
+* 已进导出:calc.fold[](源码:src/Output/CalcReconcile.cs:417-426)。
+* 【离线重放】1.5.5 场全部 dmg 事件 fold 总数 28585;进入分析池(我方出手且 atkKey 解析到我方)的
+  28369,与字典 §10 折叠记账 28369 精确一致。通道计数(全事件):text 12617、global 8795、given 6180、
+  madness 902、talent 91。byUnit 只出现在 given(6180)与 madness(902)。
+
+### 1.2 ability 到 holder 与 byUnit 名字到 key —— 具备,但阶梯要自己写
+
+* 持有者来源一:ActorStats.Roster(List<RosterAbility>,含 Id/Name/Slot)
+  (源码:src/Model/ActorStats.cs:74-79;src/Composition/AbilityRoster.cs:25-38、459、598)。
+* 持有者来源二:ActorStats.TalentTable(List<TalentUsage>,含 AbilityId/Ability)
+  (源码:ActorStats.cs:81-82)。离线核心同时索引 abilities 与 talents(源码:contrib/attribution.py:42-51)。
+* 名册构建时机:TalentRuntime.FinalizeTable 在 FinalizeLocked 内、导出前调用(源码:src/Aggregator.cs:623;
+  src/Diagnostics/TalentRuntime.cs:185-190),只给我方且活着的单位建(源码:TalentRuntime.cs:67-85)。
+  这与离线阶梯只索引 team==1 一致。
+* 名字到 key 索引:actor 列表 + ActorStats.Name/Key/Team;歧义处理(同队同名不合并,返回 byUnit_ambiguous)
+  只有离线实现(源码:contrib/attribution.py:60-73),C# 没有等价物 —— 这是"要写的代码",不是"缺的数据"。
+
+### 1.3 atkKey / vicKey —— 具备
+
+* BattleEvent.AttackerKey/VictimKey(源码:src/Model/BattleEvent.cs:70-80);RecordDamage 由
+  actorStats.Key/victimStats.Key 赋值(源码:src/Aggregator.cs:1149-1150);导出为 atkKey/vicKey,
+  0 省略(源码:src/Output/ExportService.cs:290-291)。
+* 【实测】1.5.5 场 atkKey 非空 5535/5602;atkTeam==1 为 5521 条;attacker 不可解析 67 条。
+* 【离线重放】池内伤害和 203,865,411 = 字典 §1.2;totals.dealt 203,964,758(含 14 条敌方打我方)。
+
+### 1.4 其它输入
+
+| 需要 | C# 现成字段 | 位置 |
+|---|---|---|
+| 角色主键/名/队/类型/召唤 | ActorStats.Key/Name/Team/Kind/IsSummonMerge | ActorStats.cs:18-60 |
+| 事件顺序与时间 | BattleSession.Events、BattleEvent.T | src/Model/BattleSession.cs |
+| 伤害口径 | BattleEvent.Amount / Nominal | BattleEvent.cs:13-14 |
+| 队伍判定 | CharacterInfo.IsAllyTeam(team) | src/Model/CharacterInfo.cs |
+| global 规则 owner 名/指针 | GlobalRule.OwnerName/Owner、_ruleOwnerName[key] | GlobalRules.cs:29、48 |
+
+### 1.5 缺口清单
+
+1. 归属阶梯的 C# 实现(核心缺口)。reason 码表/正则/歧义规则在 contrib/attribution.py:11-96 与
+   contrib/aggregate.py:23-73;C# 无对应物。
+2. byUnit 只有显示名,没有 key(源码:FoldStep.cs:61-70)。同队同名召唤物必须判歧义、不得任选。
+3. global 折叠无 byUnit;owner 只能由 label 的方括号规则名反查 ability 名,或读进程内 _ruleOwnerName[ptr]。
+   离线核心用前者(源码:attribution.py:90-95),C# 必须同套。静态表跨场且带只回收死者的阀门
+   (源码:GlobalRules.cs:44-97),不可作权威输入。
+4. fold 与 calc 的可见性绑定:导出只在 e.Calc.Valid 且 CfgReconcileCalc.Value 时写 calc
+   (源码:src/Output/ExportService.cs:304);Valid 直到 line1 构建完才 true(源码:Chain.cs:420),
+   Fold 更早赋值(Chain.cs:250)。异常路径可能有 Fold 已填但 Valid=false。C# 必须以发射判据为准。
+5. 诊断重算会二次穿过折叠:Debug/DamageComposition=true 时 Diagnostics.cs:208-241 用本地 FoldContext
+   重跑全部通道。把贡献累加挂在 FoldContext.Add 会重复计 —— 这是不能选方案 C 的直接证据。
+6. talent#buff<i>/t<k>/<ty> 这类 origin 在离线核心解析不出 abilityId(正则要求斜杠后即数字 —
+   源码:attribution.py:12),落 attacker_default。【离线重放】本场 buff 型 talent fold 为 0 条,
+   陷阱是潜在的;C# 必须复刻,或先改核心加字典再改 C#。
+
+---
+
+## 2. 接线点
+
+### 2.1 三个候选
+
+| 方案 | 挂点 | 改动面 | 风险 |
+|---|---|---|---|
+| A(推荐) | 导出结算:ExportService.BuildJson 内调用新 Contribution.AppendJson(sb, s, useFolds) | 新增 1 个 C# 文件 + ExportService 一行 + 2 个 cfg + 版本号 | 低。纯派生,可离线单测;与 CalcReconcile 同构 |
+| B | 命中入库:Aggregator.RecordDamage 内 TryGetCompForVictim 之后逐击累加 | Aggregator 会话级累加器 + BattleSession 字段 + 结算清零 | 中。与"汇总从事件派生"纪律冲突;续场与清零点必须成对;要与导出重算逐位相等 |
+| C | 折叠发生处:FoldContext.Add 或 BuildChainParts 末尾 | Composition 各文件与 Model/FoldContext | 高。诊断路径重复计(§1.5 第 5 条);把插件逻辑塞进 recon_probe 编译的模型文件;仅配对成功才有 fold |
+
+### 2.2 推荐 A 的调用链
+
+	FinalizeLocked                                   (Aggregator.cs:510)
+	  -> ExportService.Export(s)                      (Aggregator.cs:656)
+	       -> CalcReconcile.Compute(s)                (ExportService.cs:42,已有)
+	       -> BuildJson(s, rec)                       (ExportService.cs:150)
+	            -> Contribution.AppendJson(sb, s, useFolds)   <== 新增
+	       -> JsonCheck.Validate                      (ExportService.cs:50,已有)
+	       -> File.WriteAllText                       (ExportService.cs:51)
+
+Contribution 拆两层,便于离线编译:
+* Contribution.Compute(BattleSession s, bool useFolds):纯数据聚合,不引用 Plugin/IL2CPP;
+* Contribution.AppendJson(StringBuilder, BattleSession, bool useFolds):手写 JSON。
+useFolds 由调用方传 Plugin.CfgReconcileCalc 的取值,使模型文件可被 recon_probe 用 Stubs 编译(§4.3)。
+
+### 2.3 为什么选 A
+
+* 与 CalcReconcile 契约完全一致(源码:CalcReconcile.cs:27-29),汇总不可能与行数据不一致。
+* 不动 Aggregator 热路径(每击);导出时一次 O(事件 乘 折叠)= 28369 次循环,可忽略。
+* 可离线单测:接口只吃已存内存对象。
+* 阶段 F 可复用同一 Compute,不必另写一套。
+
+### 2.4 接线点必须钉死的四个判据
+
+1. 只处理 e.Type == "dmg"(离线同 — aggregate.py:104-108)。
+2. 攻击者只由 e.AttackerKey 解析到 team==1 的 actor;不得名字回退(aggregate.py:114-131)。
+3. fold 输入 = e.Calc.Valid 且 useFolds 时的 e.Calc.Fold,再按 factor>0、不等于 1、>=1 过滤
+   (离线 extract_folds — aggregate.py:47-73)。
+4. attributedDamage/totalDamage 由同一轮计算的浮点值给出,不要另算整数版(§3.2)。
+
+---
+
+## 3. 字段方案与体积
+
+### 3.1 字段清单(对齐计划 §5E 与 crosscheck 的检查项;星号 = crosscheck 会查)
+
+	contribution
+	  schemaVersion*         "1.0"        (不要沿用 0.1-draft)
+	  method*                "log-share/1"
+	  damageBasis*           "dealt"
+	  totalDamage*           203865411   = analyzableDealt + unattributedCredit
+	  attributedDamage*      203865411   = 所有 actors[].totalCredit 之和
+	  unattributedDamage*    0           = 所有 unattributed[].amount 之和
+	  evidence               "derived"   (纪律:推断不得伪装实测;本段全部是派生量)
+	  assumptions[]          [fold factors as exported (4dp), crit/unidentified stays in base,
+	                          factor below 1 excluded from M, globals resolved by label name]
+	  coverage*
+	     creditedShare* / unattributedShare* / analyzableDealt* / hits* / byUnitGiven / byUnitMadness
+	     / keyCoverage / ownerPaths / foldAccounting / channelCensus
+	  actors[]*              { key*, name, team, kind, summon, directDamage*, directShare,
+	                           baseCredit*, selfRuleCredit*, assistCredit*, totalCredit*, totalShare,
+	                           receivedAssist, hits, rules:[{ruleName,kind,side,hits,coverage,damageEquivalent}] }
+	  rules[]*               { ownerKey, ownerName*, ruleName*, kind*, side*, origin, resolved, hits, folds,
+	                           coverage, damageEquivalent*, reasons[], beneficiaries:[{key,name,amount,hits,folds}] }
+	  links[]*               { fromKey*, toKey*, fromName, toName, amount*, hits, folds, rules[] }
+	  unattributed[]         { reason, amount, hits }
+	  diagnostics            { reasonCounts, foldAccounting, zeroFactorFolds, noopFactorFolds,
+	                           subUnityFactorFolds, duplicateInHit, attackerNameFallbacks, atkTeamMismatch,
+	                           analyzableVsTotals, knownLimits[] }
+	  source                 { pluginVersion, quest, duration, result, run, started }
+
+要点:
+* crosscheck 用 (ruleName|kind|side|ownerName) 作规则键(crosscheck.py:97-101),rules 行必须带 ownerName。
+* crosscheck 要求离线侧任何 direct>0 或 total>0 的 actor 都出现在插件 actors 里(crosscheck.py:91-93);
+  建议直接输出全部 team==1 角色(本场 11 个)。
+* contribution.unattributedDamage 与根 totals.unattributedDamage 是两个口径(信用级 0 对事件级 306549),
+  文档与日志必须显式区分(§7 R12)。
+* 不要把贡献数写进 totals.*:totals 是实测口径,贡献是派生量。
+
+### 3.2 数值格式与恒等式
+
+* 金额建议 F4(InvariantCulture)。若只输出整数(long),每个角色独立取整,11 个角色总误差可达正负 5.5,
+  会撞穿 crosscheck 的 abs 容差 1.0(crosscheck.py:30-33);F4 总误差小于 1e-3,安全。
+* totalDamage/attributedDamage/unattributedDamage 用未取整 double 写 F4,并保证文件内
+  Σactors.totalCredit + unattributed == analyzableDealt(离线角色恒等式绝对误差约 1e-6,相对 3.8e-15 — 字典 §10)。
+* 所有文本转义走 JsonText.Str(源码:src/Output/JsonText.cs),与全插件同一条规则。
+
+### 3.3 体积取舍
+
+【父代理实测】聚合段 25.9 KB(占 22.9 MB 的 0.116%);逐击 credit 1403.6 KB(6.26%)。
+【离线重放】我按 log-share 复算后另测三种写法的增量(仅作对照,与父代理口径可能不同):
+
+| 档 | 写法 | 新增字节 | 膨胀倍数 | 占现文件 |
+|---|---|---|---|---|
+| 仅聚合(精简版) | 无逐击,规则/关系/角色 | 7,045 | 1.00031x | +0.031% |
+| 逐击-紧凑 | 每击 credit:[owner,share,...],下标对齐 calc.fold | 252,832 | 1.01101x | +1.10% |
+| 逐击-对象 | 每折叠 {owner,share,kind,origin} | 1,995,368 | 1.08689x | +8.69% |
+| (参考)现 fold 段 | 已有 calc.fold 序列化 | 3,300,602 | — | 14.37% |
+| (参考)现 cancel 段 | 已有 calc.cancel 序列化 | 2,630,227 | — | 11.45% |
+
+结论:父代理实测的逐击 6.26% 介于紧凑与对象之间(很可能每折叠带 owner+share+reason/kind)。
+紧凑写法只 +1.1% 且下标对齐 fold,且不增加任何离线不可复算信息(share 可由 factor 与 D 推出)。
+
+### 3.4 建议
+
+* 默认:General/Contribution=true(输出聚合段),General/ContributionPerHit=false(不输出逐击)。
+* 若保留逐击,建议写成与 calc.fold 顺序对齐的紧凑元组,并在 contribution 里写
+  perHit:{alignedWith:"calc.fold", tuple:["ownerKey","share"]} 自描述;不要重复 kind/origin/label。
+* 逐击开关打开时必须保证 calc.fold 也在文件里(§5.2),否则下标对不上。
+
+---
+
+## 4. 兼容与守卫
+
+### 4.1 旧导出为什么仍通过
+
+check_export_schema.py 每条 required 带 since,版本门控跳过更高版本的要求
+(源码:check_export_schema.py:139-163)。contribution 作为"可选段"(存在才校验类型/子键)即可:
+11 份旧导出(version<=1.5.5)不受影响。父代理已实现该可选校验,自测 17 例全过、干跑 PASS【父代理实测】。
+
+### 4.2 check_export_schema.py 的残项(已基本完成)
+
+建议补齐:
+1. ver>=1.6.0 且存在 contribution 时,校验 CONTRIBUTION_KEYS(schemaVersion/method/damageBasis/
+   totalDamage/attributedDamage/unattributedDamage/coverage/actors/rules/links)与 actor/rule/link 子键;
+   coverage 追加 contribution.actors/rules/links 计数、creditedShare、analyzableDealt。
+2. 自测补"既接受新、又拒绝坏":ACCEPT 1.6.0 合法段;ACCEPT 1.5.5 无该段(门控);
+   REJECT 1.6.0 缺 contribution(若定义为必需)、类型错、actors[0] 缺 totalCredit、
+   totalDamage 为字符串、rules[0] 缺 ownerName。保留 1.5.1/1.4.0 旧版接受用例。
+3. 干跑对一个"有 contribution"的真实导出执行一次(现在是插件未部署,ABSENT 属于预期)。
+
+### 4.3 五个守卫与 recon_probe
+
+| 守卫 | 需要什么 | 理由 |
+|---|---|---|
+| check_export_schema.py | §4.2 残项 | 形状与版本门控(父代理已基本完成) |
+| v150_validate.py | 追加 1.6.0 段:解析 contribution,自证 Σactor.totalCredit+unattributed==analyzable、creditedShare+unattributedShare==1、foldAccounting.total==池内 fold 数;旧导出缺段打印 absent 不红 | 新导出第一道人工验收入口 |
+| check_fact_signature.py | 不需要改 | 只重放 FACT 签名;必须仍 exit 0 |
+| check_docs_123.py | 若把新报告/C# 文件纳入必须保持 UTF-8 的清单 | 该守卫对损坏直接 exit 1(源码:check_docs_123.py:33-44) |
+| refactor_final_check.py | 追加:BuildInfo.Version 与 csproj Version 一致;新 C# 合法 UTF-8、无 U+FFFD | 现在只查 1.0.29 字面量与 BuildInfo 使用(源码:refactor_final_check.py:46-52) |
+| recon_probe | 把 Output/Contribution.cs 加入 ReconProbe.csproj,扩展 Stubs(BattleSession/ActorStats/RosterAbility/TalentUsage/TeamType,BattleEvent 的 atkKey/atkTeam/vicKey);断言覆盖字典 S1/S2/S3/S4/S9/S10/S11/S13 与 byUnit 歧义 | 项目既有做法:真实源文件离线编译并断言(源码:recon_probe/Program.cs:8-21、ReconProbe.csproj:24-37)。为此 Contribution 不得引用 Plugin/IL2CPP |
+
+更强施工前验证(强力建议):写一次性离线控制台,读现成 1.5.5 导出,构造同样 DTO,调用
+Contribution.Compute,输出 contribution JSON,再与离线核心逐字段比对。部署前、不需用户再打一场即可证明一致。
+
+### 4.4 BuildInfo 版本怎么升、谁读它
+
+* 真源 BuildInfo.Version(源码:src/BuildInfo.cs:14,当前 1.5.5)升到 1.6.0;csproj Version 手动同步
+  (源码:src/DpsMeter.csproj:11,当前 1.5.5)。
+* 读它的人:BepInPlugin 特性(源码:src/Plugin.cs:13)、启动横幅(Plugin.cs:359)、
+  导出根 version(源码:src/Output/ExportService.cs:153)。
+* schema checker 用根 version 门控(源码:check_export_schema.py:172)。
+* contribution.schemaVersion 应是独立常量 "1.0",不跟插件版本联动:贡献结构变更升它,插件功能变更升 BuildInfo。
+* 【实测】部署 DpsMeter.dll、DpsMeter.dll.1.5.5-verified.bak、src/bin/Release/DpsMeter.dll 三者
+  SHA256 均 18E4D933C9C8724090FE276CE5E9F70CD844BF7E5AB038D3B335554691365FA9(340,992 B)。
+
+### 4.5 crosscheck 闸门的不对称(建议补,不阻塞)
+
+* 规则只遍历"插件提供的行"(crosscheck.py:99-110):插件漏报一条规则不会被发现;
+* 链接同样只查插件侧(crosscheck.py:113-125);actor 才是双向查(crosscheck.py:80-93)。
+建议补"离线有、插件无"的反向断言,否则少报规则能骗过验收。属守卫自身,不属插件改动。
+
+---
+
+## 5. 开关与失败模式
+
+### 5.1 建议 cfg(沿用现有命名约定 — 源码:src/Plugin.cs:299-328)
+
+	General/Contribution        bool  true   "FEATURE (1.6.0 阶段 E):写 contribution 段(派生量)。off = 1.5.5 结构"
+	General/ContributionPerHit  bool  false  "逐击 credit(与 calc.fold 顺序对齐)。实测约 +6.26% 文件体积;默认关"
+
+* "关掉时完全回到 1.5.5 行为":严格说只有结构能回到(不再有 contribution 与逐击 credit);
+  根 version 会随 BuildInfo 变成 1.6.0。要数值/结构逐字节等同 1.5.5 只有 §6 回退 DLL。
+* 两个开关在 BuildJson 开头取一次快照,不要在循环里读 ConfigEntry。
+
+### 5.2 关键耦合 CfgReconcileCalc
+
+离线核心只读文件里实际存在的 calc.fold;插件读内存。若 General/ReconcileCalc=false:文件无 calc.fold;
+离线把所有伤害记基础项(creditedShare 仍可能 1,但规则/关系空);C# 若仍按内存 fold 算即 MISMATCH。
+处理(推荐):共用判据 —— Contribution.Compute(s, useFolds),useFolds 取 Plugin.CfgReconcileCalc 的值,
+且逐事件仍要求 e.Calc.Valid。非默认配置下两边同样退化为全部基础,crosscheck 仍一致。
+在 contribution.diagnostics.knownLimits 写 "ReconcileCalc off => folds unused"。
+(备选:Contribution on 时强制发射 calc — 改变 ReconcileCalc 既有语义,风险大,第一版不做。)
+
+### 5.3 失败降级
+
+* 异常:BuildJson 在 Export 的 try 内(源码:ExportService.cs:37-147),Contribution 抛异常会让整场导出失败。
+  所以 AppendJson 内部必须自 try/catch:失败时写
+  "contribution":{"schemaVersion":"1.0","method":"log-share/1","damageBasis":"dealt","error":"...","evidence":"failed"}。
+  这样根键仍存在(1.6.0 形状不被误判缺键),且"没有"与"失败"可区分(与 HITDET/FACT 自报哲学一致)。
+* actor 解析失败:逐 fold 落 unattributed[reason],绝不静默回填攻击者或队友(字典 §1.3/§4)。
+* 数值退化:M<=0、ln(M)==0、f<=0、f==1、0<f<1 全按离线语义;对 NaN/Infinity 做 IsFinite 检查,
+  绝不把 NaN/Infinity 写进 JSON(JsonCheck 只查括号与重复键 — 源码:src/Output/JsonCheck.cs:31-36)。
+* 空会话:s==null 或 s.Events==null 时输出 header 加全 0 coverage,不要省略根键。
+
+---
+
+## 6. 回退措施(与 _dpsm_work/ROLLBACK-1.6.0.md 对齐)
+
+### 6.1 锚点(已建并校验,勿删)
+
+| 锚点 | 路径 | 大小 | SHA256 |
+|---|---|---|---|
+| 部署 DLL 备份 | BepInEx/plugins/DpsMeter/DpsMeter.dll.1.5.5-verified.bak | 340,992 B | 18E4D933C9C8724090FE276CE5E9F70CD844BF7E5AB038D3B335554691365FA9 |
+| 源码快照 | _dpsm_work/src_snapshot_155.zip | 288,979 B | E4A0D4DB16E38BCD6775406C4D87DDF13FA9579A4A66D17049E7DAD281DC080A |
+| 当前部署 DLL | BepInEx/plugins/DpsMeter/DpsMeter.dll | 340,992 B | 同 18E4D933... |
+
+【实测】三者及 Release 产物同哈希;警告:DpsMeter-1.0.48-crash.bak 与 DpsMeter-1.0.49-crash.bak
+绝不回滚、绝不删除。
+
+### 6.2 精确回退步骤
+
+1. 关闭游戏(DLL 被占用会复制失败)。
+2. 用 Copy-Item -LiteralPath 把 DpsMeter.dll.1.5.5-verified.bak 覆盖到 DpsMeter.dll -Force。
+3. 用 Get-FileHash -Algorithm SHA256 校验 DpsMeter.dll,必须等于 18E4D933...。
+4. 源码回退(仅当 .cs 已改):先把 _dpsm_work/src 复制成 src_before_rollback(不要删),
+   再 tar -xf _dpsm_work/src_snapshot_155.zip -C D:/dmmplayer/rlyehshoujotaix_cl。
+5. 配置回退:General/Contribution、General/ContributionPerHit 置 false;或恢复 dev.dpsmeter.cfg 备份。
+   (配置回退不能代替 DLL 回退:1.6.0 的根 version 与代码行为已变。)
+6. 验证(全满足才算完成):
+   - dotnet build _dpsm_work/src/DpsMeter.csproj -c Release -v minimal:0 警 0 错,产物哈希回 18E4D933...;
+   - 五守卫 exit 0:check_export_schema.py / v150_validate.py / check_fact_signature.py /
+     check_docs_123.py / refactor_final_check.py;
+   - recon_probe 输出 ALL CHECKS PASSED;
+   - python -m contrib.crosscheck(最新导出)得到 section=ABSENT status=ABSENT(exit 0),正是 1.5.5 结构应有结果;
+   - 游戏启动日志出现 Harmony patches applied,新导出通过 check_export_schema(1.5.5 结构)。
+
+### 6.3 分级回退
+
+* 只关开关:General/Contribution=false 重启,新导出回 1.5.5 结构(除 version)。
+* 只回退源码:§6.2 第 4 步 + 重建 + 哈希核对。
+* 只回退部署:§6.2 第 2/3 步(不碰源码)。
+
+---
+
+## 7. 风险清单(按严重度排序)
+
+R1 严重:双实现漂移,crosscheck 失败。触发:reason 码/正则/歧义/取整任一处不同。
+影响:验收红;若放宽阈值会上线错误口径。缓解:§4.3 recon_probe 加离线对跑;先让两实现同值再部署。
+探测:python -m contrib.crosscheck 导出文件,必须 status=OK、mismatches=0。
+
+R2 严重:contribution 的 fold 输入与文件可见性脱钩(CfgReconcileCalc=false)。触发:用户关 ReconcileCalc。
+影响:插件按内存 fold、离线按无 fold,规则/关系全不一致。缓解:§5.2 共用 useFolds 加 knownLimits。
+探测:关掉该开关的导出跑 crosscheck(两边都应只剩 base)。
+
+R3 高:global 归属被改进成读进程内 owner 指针。触发:看到 _ruleOwnerName 可用就不走 label 名称匹配。
+影响:部分规则 owner 与离线不同,导致 rules/links 分叉;静态表会被下一场单位污染(源码:GlobalRules.cs:44-97)。
+缓解:严格复刻 label 方括号名路径(attribution.py:90-95);owner 指针留到后续阶段并先改核心加字典。
+探测:crosscheck 的 rules/links 逐条比对。
+
+R4 高:攻击者名字回退。触发:把 attacker 问号(67 条)按名字或最近 calc 解析成我方。
+影响:多归因 306,549 伤害,analyzable 变大,crosscheck 全红。缓解:只认 e.AttackerKey;
+attacker 问号 进 unattributed_events(aggregate.py:114-124)。探测:analyzableDealt==203,865,411 且 keyCoverage==0.9880。
+
+R5 高:因子边界(0<f<1 与 f<=0)错误产生负份额。触发:把 0<f<1 计入 M,或把池外 7 条非正因子计入池内诊断。
+影响:D/M>D、ln 份额转负(字典 §2.2 记载试炼场 credited 412% / unattributed -312%);
+诊断 zero_factor 与离线 0 不符。缓解:复刻 aggregate.extract_folds(aggregate.py:47-73);
+zero/negative 只池内计数;加 negativeLines 断言诊断(离线已有 — validate.py:64-66)。
+探测:crosscheck 加 v150 延展段;试炼场导出单独跑。
+
+R6 中:逐击明细体积。触发:默认打开逐击或写成每折叠一个对象。
+影响:父代理实测 +6.26%(1403.6 KB);我离线预估对象写法 +8.69%。
+缓解:默认仅聚合(父代理实测 25.9 KB,+0.116%);逐击改紧凑对齐数组(+1.10%)。
+探测:导出后比较 json.Length 与基线 22,964,452。
+
+R7 中:数值格式/取整破坏文件内恒等式。触发:角色信用各自取整、当前文化格式化、NaN/Infinity 落盘。
+影响:Σactor 不等于 attributedDamage;JSON 非法而 JsonCheck 查不出。缓解:F4 加 InvariantCulture 加 IsFinite;
+totalDamage/attributedDamage 与 actor 值同源(§3.2)。探测:v150 延展段加 json.load 解析。
+
+R8 中:Contribution 异常让整场导出失败。触发:BuildJson 内未捕获异常。
+影响:本场没有导出文件(数据永久丢失,战斗对象已死)。缓解:§5.3 局部 try/catch 加 error 段;保留 Export 外层兜底。
+探测:单测让某 actor 触发异常,确认仍写出文件且带 error。
+
+R9 中:schema 版本门控写错。触发:contribution 标成 1.5.5 或漏 since;selftest 未加门控用例。
+影响:11 份旧导出报缺键,或新导出漏检。缓解:§4.2 用例,尤其"1.5.5 无 contribution 必须 ACCEPT"。
+探测:python check_export_schema.py --selftest 全 PASS 且旧导出 problems=0。
+
+R10 中:talent#buff origin 陷阱(潜在)。触发:未来出现 buff 型 talent 折叠且两边解析不一致。
+影响:该折叠 owner 归属分叉(离线落 attacker_default)。缓解:两边复刻同一正则;
+若判定要修,先改核心加字典并升贡献 schema,再同步 C#。探测:crosscheck 的 reasonCounts,或 recon_probe 合成用例。
+
+R11 低:名册只在存活我方单位上构建。触发:C# 从 ActorStats.Source 现读而非用 Roster/TalentTable。
+影响:导出后 Source 已置 null(源码:Aggregator.cs:658),读到空,与离线不一致。
+缓解:只用托管快照 Roster/TalentTable。探测:recon_probe Stubs 里没有 Source,编译期即挡。
+
+R12 低:contribution.unattributedDamage 与根 totals.unattributedDamage 冲突。触发:读者或脚本混用。
+影响:结论错。缓解:文档显式区分;contribution 内给 unattributed[] 明细与 evidence:"derived"。
+
+R13 低:派生量伪装实测。触发:把贡献数写进 totals.*,或不给 method/assumptions。
+影响:违反字典 §5 纪律。缓解:严格分块加 evidence/assumptions/knownLimits。
+
+R14 低:守卫覆盖不足。触发:check_docs_123.py 未收录新文件;crosscheck 只单向查 rules/links。
+影响:损坏或漏报不被发现。缓解:§4.3 与 §4.5。
+
+---
+
+## 8. 施工顺序(建议,未执行)
+
+1. 先离线:在 Python 侧或一次性 C# 控制台对着 battle_411001_20261003_235204.json 实现
+   Contribution.Compute,直到与 contrib 核心逐字段相等(rel 1e-6)。
+2. 加 C# 文件加 ExportService 一行加两个 cfg 加 BuildInfo/csproj 版本号;不改 Aggregator/Composition。
+3. 构建 0 警 0 错;recon_probe(已扩展)ALL CHECKS PASSED。
+4. 五守卫加 check_export_schema.py --selftest 加 python -m contrib.crosscheck --selftest。
+5. 部署前再问用户;部署后需用户打一场,然后:
+   check_export_schema(problems=0)、v150_validate(1.6.0 段)、
+   python -m contrib.crosscheck 新导出(status=OK,mismatches=0)== 阶段 E 硬验收。
+6. 任一步红:按 §6.3 分级回退,不往前堆。
+
+## 9. 已知限制与未决问题
+
+1. 本文体积与数值为【离线重放】自 1.5.5 单场导出,加父代理实测数字;未在 1.6.0 实机验证。
+2. contribution.actors[].rules 的 coverage 语义字典 §2.5 已定,但 crosscheck 目前只比 damageEquivalent。
+3. 离线核心对 talent#buff origin 的解析只是【实测】本场 0 条;是否为缺陷未定。
+4. 跨场主键缺失(字典 §8.8)未解决:contribution 的 key 只在单场稳定。
+5. 本文未触碰任何现有文件;新增文件仅 _dpsm_work/REVIEW-phaseE-design.txt。

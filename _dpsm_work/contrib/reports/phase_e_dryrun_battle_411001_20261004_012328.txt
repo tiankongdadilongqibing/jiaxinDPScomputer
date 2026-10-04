@@ -1,0 +1,7 @@
+Phase E 干跑(真实导出 + 离线核心算出的 contribution 段)
+  导出:battle_411001_20261004_012328.json(21.72 MB)
+  段的来源:外部文件 contribution_cs_new.json
+  段大小:8.8 KB(占导出 0.040%;actors 11 / rules 21 / links 20)
+  逐击明细变体大小:1378.4 KB(占导出 6.198%;5478 击 / 32814 条 credit 行)—— 供阶段 E 取舍
+  闸门1 check_export_schema:problems=0 missing=0
+  闸门2 crosscheck:OK(mismatches=0,checked={'totals': 4, 'actors': 11, 'rules': 21, 'links': 20})

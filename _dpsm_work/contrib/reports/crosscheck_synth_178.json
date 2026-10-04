@@ -1,0 +1,65 @@
+{
+ "file": "synth_178.json",
+ "pluginVersion": "1.7.6",
+ "quest": 411001,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [],
+ "checked": {
+  "totals": 4,
+  "actors": 10,
+  "rules": 34,
+  "links": 26
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.6)"
+  }
+ ],
+ "notes": [],
+ "modelApplicability": "full",
+ "trainingMode": false,
+ "atkAddCensus": {
+  "nonEmptyHits": 6006,
+  "rows": 6006,
+  "root": {
+   "hits": 6191,
+   "emitted": 6006,
+   "selfValues": 7003,
+   "skippedGuard": 131,
+   "skippedCollision": 50,
+   "skippedUnowned": 0,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0
+  }
+ },
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0000000000000009,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 31681,
+   "resolved": 31681,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ },
+ "status": "PASS"
+}

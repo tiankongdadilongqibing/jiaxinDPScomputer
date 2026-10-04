@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>ContribCs</AssemblyName>
+    <RootNamespace>ContribCs</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- 2026-10-03: build the ACTUAL plugin source offline, so the parity run exercises the code that
+         will ship rather than a copy of it. Contribution.cs only needs JsonText (same as FoldStep.cs). -->
+    <Compile Include="..\src\Output\Contribution.cs" />
+    <Compile Include="..\src\Output\JsonText.cs" />
+  </ItemGroup>
+</Project>

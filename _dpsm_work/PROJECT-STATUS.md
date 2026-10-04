@@ -1,0 +1,249 @@
+# DpsMeter 项目现状快照(PROJECT-STATUS)
+
+> 生成:2026-10-04,第 6 轮末。**本文件描述“此刻为真”的事实**;历史快照与逐版决策见 §10。
+> 与 [`DpsMeter-文档索引.md`](../DpsMeter-文档索引.md) 分工:索引回答“去哪查”,本文件回答“现在是什么状态、能不能重构、先动哪里”。
+> 证据等级:【实测】= 真实运行/文件输出;【静态】= 读源码或文件;【推断】= 未直接观测。**没核实过的旧结论一律标【待复核】。**
+
+## 0. 一句话现状
+
+插件 **1.7.11** 已部署且与源码一致;语料 **32 份导出、19 份带 `contribution` 段**;6 个契约都有可复现入口和会变红的负控;
+路线图 N0–N6 已闭环、N7 目视 9 项里 1 项由实机日志自动核对通过;**当前没有任何“影响伤害”的已知丢失**;
+配队结论仍是**「有倾向但不确定 → 不换人」**(样本增加后等级未变)。
+**重构最大的障碍不是代码耦合,而是没有版本控制、没有 C# 单元测试工程** —— 见 §7。
+
+## 1. 快照表(全部【实测】,2026-10-04)
+
+| 项 | 值 |
+|---|---|
+| 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
+| 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
+| 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
+| 源码规模 | `_dpsm_work/src`:**65 个 .cs / 21,228 行**(不含 obj/bin);最大 3 个文件见 §5 |
+| 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
+| 语料 | `BepInEx\plugins\DpsMeter\exports\`:32 份,合计约 502 MB(v1.7.11 前一次全量统计) |
+| 导出段 schema | `contribution.schemaVersion` = **1.1**(19 份带段:1.0 ×13 / 1.1 ×6);方法 `log-share/1` |
+| 版本控制 | **无**(没有 .git);一切结论靠 SHA256 + 验收 manifest + 报告追认 |
+| C# 测试工程 | **无**;离线断言靠 `recon_probe`(dotnet,**ALL CHECKS PASSED**) |
+| 离线守卫 | 30 条命令的验收流水线(`n0_acceptance.py`),**51/51 检查通过**,486.3 s |
+
+## 2. 语料现状(32 份)
+
+| 维度 | 分布 |
+|---|---|
+| 按任务 | 411001 ×23 / 训练场 9999 ×8 / 700817 ×1 |
+| 按版本 | 1.5.3, 1.5.4×4, 1.5.5×2, 1.6.0, 1.6.1, 1.7.0, 1.7.2–1.7.6, 1.7.8×2, 1.7.10, **1.7.11×2** |
+| 带 `contribution` 段 | **19/32**(1.0 ×13 / 1.1 ×6);无段 13 份 = 1.5.3–1.5.5 / 1.6.0(段前版本) |
+| `crosscheck --batch` | ERROR **1**(已知坏样本)/ LEGACY_NOT_APPLICABLE 16 / PASS 12 / WARNING 3 |
+| 适用性(模型) | full **14** / partial 9 / not_comparable **9**(9999 训练场一律 not_comparable) |
+| 准入(actor_credit / rule_coverage) | 各 **18/32** 可准入;整体没有可排名指标 ⇒ CLI exit 4 |
+| 布局守卫 | 32 份 / **634 行 / 0 违规** |
+| 已知负例 | `battle_411001_20261004_015919.json`(1.6.0,58 处 `factor` 四位截断)—— **保留、不放宽、不删除** |
+| 折叠丢步 | **0/32 场、0 步、0 伤害**(`FoldContext.MaxSteps=24` 从未触发) |
+| 溢出 / 读取失败 / 未知身份 | 31/32 / 8/32 / 16/32 场有非零计数;**只影响记录完整性,不影响逐击倍率与总量** |
+
+第 6 轮新增两场(用户正常游玩,未为验证开战):`battle_9999_20261004_165952.json`(17.9 s,1.7.11)、
+`battle_411001_20261004_170157.json`(119.0 s / Lose / 2.12 亿可分析伤害 / 5,525 击,1.7.11)。两场 `compWeak=0`。
+
+## 3. 契约清单(改动前必须知道的“对外承诺”)
+
+| 契约 | 实现入口 | 承诺 | 退出码 | 负控 | 最近结果 |
+|---|---|---|---|---|---|
+| `log-share/1` | `contrib/`(loader→aggregate→report) + `src/Output/Contribution.cs` | 逐击 `M=∏folds`,`base=D/M` 给攻击者,`pool=D−base` 按 `ln(f_i)/ln(M)` 分给规则持有者;三条恒等式守恒 | — | S1–S13 + `test_gate` + `test_golden_155` | 域内未归因 0.0% |
+| `ComparisonEligibility/1` | `comparison_eligibility.py` | 指标级准入 `ELIGIBLE/RESTRICTED/REJECTED/NOT_APPLICABLE`;未跑的检查 = `unknown` = RESTRICTED | 0/4/2/3 | `--selftest` **17** + `--selftest-e2e` **6** | exit 4(无可整体排名指标) |
+| `compare/2` | `contrib/compare.py` | 先准入再分层;`entityKey` 行 + `\|inst:` 冲突后缀;四态(观测到/缺席/零/身份未知);份额与累计量分列 | 0/4/2/3 | `--selftest` **10** | 23 份 → 9 个可比较分层 |
+| `decision/1` | `decision_report.py` + `decision_prereg.json` | 预注册阈值/alpha/自助单位与种子/每组下限;**只有四条件全满足才允许给最高等级** | 0/4/2/3 | `--selftest` **14** | 有倾向但不确定(不换人) |
+| `budget-census/1` | `budget_census.py` | 丢步/溢出/读取失败/未知身份分开计数,按**影响伤害**排序;每个问题卡四必填字段 | — | `--selftest` **8** | 0/32 丢步 |
+| 身份映射 | `identity_map.py` | `entityKey = ent:<ns>:<templateId>:<loadoutFingerprint>`;`identityStrength` strong/weak | — | `--selftest` **54 checks** | 0 failed |
+
+补充:`n0_acceptance.py --selftest` **11 例**(逐文件钉住 + 闸门退出码两道新闸门的负控);
+`comparison_eligibility` 另把「丢步」判为降级(`fold-dropped`),有丢步 ⇒ 等式降为**下界**。
+
+## 4. 可复现入口(照抄,工作目录一律 `_dpsm_work`)
+
+```
+PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
+
+验收(最全,29 条命令 / 50 条检查)   python n0_acceptance.py
+验收负控                          python n0_acceptance.py --selftest
+比较器                            python -m contrib.compare --applicability acceptance_1.7.11\applicability.json --out contrib\reports\compare2_411001
+配队决策                          python decision_report.py --compare contrib\reports\compare2_411001.json
+预算普查                          python budget_census.py
+准入(全语料)                      python comparison_eligibility.py --applicability acceptance_1.7.11\applicability.json --json acceptance_1.7.11\eligibility.json
+文档收敛                          python check_doc_convergence.py(--selftest)
+编码守卫                          python check_docs_123.py
+实机日志核对                      python check_live_log.py --log ..\BepInEx\LogOutput.log
+新样本只读体检                    python sample_intake.py
+C# 离线断言                       dotnet run --project recon_probe\ReconProbe.csproj -c Release -v quiet -- out.json
+构建                              dotnet build src\DpsMeter.csproj -c Release -v minimal
+```
+
+## 5. 代码地图(重构视角;行数为本次实测)
+
+| 层 | 文件 | 行数 | 依赖 | 能不能离线测 |
+|---|---|---|---|---|
+| 纯函数/模型 | `Model/StatusKey.cs`、`Model/ClauseStatusRun.cs`、`Model/FoldStep.cs`、`Model/BattleTime.cs`、`Composition/TieredModifier.cs` | 约 1.1k | **不依赖 IL2CPP / Plugin** | **能**:`recon_probe` 直接编译执行 |
+| 数据模型 | `Model/`(12 文件) | 1,958 | 无逻辑 | 部分 |
+| 中枢/组合根 | `src` 根(Plugin、Aggregator、GameRef、GameSystemAccess、BuildInfo) | 1,911 | 单例 + 静态 | 否 |
+| 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,694 | IL2CPP | 否(每个探针一个开关) |
+| 判定核心 | `Composition/`(14,含 10 个 `CompositionProbe*` partial) | 6,777 | IL2CPP | 否 |
+| 主数据 | `MasterData/`(2) | 1,204 | IL2CPP + 反编译件 | 否 |
+| 输出 | `Output/`(7) | 2,274 | 读会话状态 | `JsonCheck` 由 recon_probe 反向验证 |
+| 界面 | `Ui/`(7) | 2,915 | Unity(uGUI + IMGUI 两套) | 否(靠布局守卫离线复算 634 行) |
+
+**最大的 6 个文件**(拆分候选,按行数):`Ui/OverlayUGUI.Rows.cs` **1,376**、`Aggregator.cs` **1,359**、
+`Composition/CompositionProbe.Chain.cs` **1,194**、`Composition/CompositionProbe.Talents.cs` **852**、
+`MasterData/MasterDataDump.cs` **828**、`Composition/AbilityRoster.cs` **791**、`Output/ExportService.cs` **708**。
+
+**依赖方向(重构时必须保住)**
+
+1. `Model/` 的少数几个类**故意不依赖 IL2CPP/Plugin**,所以离线探针能执行它们 —— 这类文件是"先动"的安全区。
+2. `Hooks/` 只负责**取数与快照**;判定只允许发生在构成模块的**单一裁决点**(见 §8)。
+3. `Output/` 在**导出时**从事件流重算(`CalcReconcile` 不从累加器取数),因此汇总永远可能与它不一致时是它说了算。
+4. `Ui/` 与导出**共用同一条计算路径**(先 `Compute` 出结构化结果,再分别序列化/渲染);不允许界面各写一套口径。
+
+**静态可变状态清单**(无法单测与生命周期 bug 的根因):`Aggregator.Session`、`CompositionProbe._globalRules/_snap*`、
+`Probe.Counts`、`OverlayUGUI` 的若干 static。长期方向:把"一局"的状态挂到 `BattleSession` 实例上。
+
+## 6. 离线工具地图
+
+**常用工具(重构时的护栏,不要当一次性脚本删)**
+
+| 工具 | 职责 | 输入 → 输出 |
+|---|---|---|
+| `n0_acceptance.py` | 验收流水线 + 50 条可证伪检查(桶 / 退出码 / 白名单 / 逐文件钉住) | exports → `acceptance_1.7.11/{corpus_manifest,runs,RESULTS.md}` |
+| `comparison_eligibility.py` | 指标级准入契约 + 闸门映射 + 丢步降级 | exports + applicability → `eligibility.json`(exit 4) |
+| `contrib/compare.py` | 跨场比较器 2.0(准入→分层→逐角色统计) | 23 份 411001 → `contrib/reports/compare2_411001.{txt,json}` |
+| `decision_report.py` | 预注册配队决策报告(五节 + 交叉校验) | compare2 json → `DECISION-REPORT-411001.{md,json}` |
+| `budget_census.py` | 丢步/溢出/读取失败/未知身份/残差分层普查 | exports → `BUDGET-CENSUS.{md,json}` |
+| `identity_map.py` | entityKey / 身份强度 / 同实体判定 | export → actor 身份(54 checks) |
+| `atkadd_sensitivity.py` | 攻击力加算归因敏感性(隔离实验) | export → `atkadd_sensitivity_result.{json,md}` |
+| `pairtrusted_impact.py` | 配对可信度影响(A/B/C 三口径) | exports → 影响报告 |
+| `contribution_applicability.py` | 任务适用性 full/partial/not_comparable | exports → applicability.json |
+| `contribution_gate.py` | 验证闸门状态机(ERROR>DATA_MISSING>LEGACY>WARNING>PASS) | 单份 → 状态码 |
+| `check_export_schema.py` | 键/类型/覆盖率 + 逐角色恒等式(**54 例自测**) | exports |
+| `check_contribution_layout.py` | 布局守卫:显示列算术 + 渲染器↔副本对账 | exports + C# 源 |
+| `check_live_log.py` | 实机日志:未归属行与导出对账、`hist` 单调 | LogOutput.log |
+| `check_doc_convergence.py` | 文档收敛 8 规则(版本/哈希/语料总数/训练场/…)+ 10 例自测 | 5 份状态文档 |
+| `check_docs_123.py` | 编码守卫(UTF-8 / U+FFFD / mojibake / 缺失文件 / CJK 存活),6 例自测 | **29 份当前文档集** |
+| `check_fact_signature.py` / `check_given_fold_coupling.py` / `check_p2a_summary_and_lastbattle.py` / `refactor_final_check.py` / `v150_validate.py` | FACT 签名 / 开关耦合 20 条 / UI 契约 / 源码结构真阻断 / KPI 基线 | 源码 + exports |
+| `contrib/crosscheck.py` | 插件 `contribution` 段 ↔ 离线核心**逐字段**比对 | export 段 |
+| `contrib/run.py` / `report_text.py` / `report_json.py` / `loader.py` / `aggregate.py` / `model.py` / `attribution.py` | 单场重放与报告(C# 的独立等价实现) | 单份 export |
+| `contrib/tests/`(3 个) | S1–S13 / 闸门 / 1.5.5 金样本回归 | 无导出也能跑 |
+| `recon_probe/` | **C# 离线断言工程**(不依赖游戏) | `dotnet run` → out.json |
+| `sample_intake.py` | 新导出只读体检(版本/任务/训练场/段/阵容/总量/命中) | 单份 export |
+
+**一次性证据脚本(考古层,重构前建议打包归档,不要接进流水线)**:`evidence_*.py`(约 30 个)、`probe_*.py`、
+`contrib_recon_155*.py`、`compare_comps.py`、`rules_census.py`、`verify_155.py`、`victim_check.py`、`umima_check.py`、
+`madness_owner_check.py`、`contrib_gap_dealt.py`,以及 `_review/`、`_verify_178_live/`、`_verify_179/`、`contrib_cs/`、`enum_probe/` 等目录。
+
+## 7. 重构就绪评估
+
+### 7.1 护栏矩阵:改了什么,谁会红
+
+| 改动 | 会被谁抓住 |
+|---|---|
+| 导出键/类型/逐角色恒等式 | `check_export_schema.py`(54 例自测 + 32 份实测) |
+| 表宽/列标签/渲染器与副本漂移 | `check_contribution_layout.py`(解析 C# 源与副本对账) |
+| 贡献数学(份额/恒等式) | `contrib/tests`、`contrib.crosscheck`、`recon_probe` |
+| 文档与版本/哈希/语料总数不一致 | `check_doc_convergence.py`(8 规则 + 10 例) |
+| CJK 文件被写坏 / 文档缺失 / 列错文件 | `check_docs_123.py`(29 份文档集 + 6 例自测,四种红灯都跑过) |
+| 源码结构(缺文件/partial 缺失/死符号/版本不一致) | `refactor_final_check.py`(真阻断 + 10 例) |
+| KPI 相对历史基线下降 | `v150_validate.py`(显式哈希固定的基线) |
+| 界面契约(上一场未归属透传) | `check_p2a_summary_and_lastbattle.py` |
+| 实机未归属行与导出不一致 | `check_live_log.py`(43 帧核对) |
+| 比较/决策/准入语义 | 各自 `--selftest`(10/14/17+6/8 例) |
+
+**护栏空洞(重构中真会漏的)**:①**没有 C# 单元测试工程** —— `Aggregator`/`OverlayUGUI` 的改动只能靠构建 + 实机 + 日志;
+②**没有版本控制** —— 任何重构都没有"回到上一版"的能力,只能靠 `.bak` 与手工副本;③界面观感只能靠眼睛(第 6 轮起有部分日志证据)。
+
+### 7.2 高危耦合热点
+
+1. **`Aggregator.cs`(1,359 行)**:会话生命周期/时钟/攻击者归属/统计/结算/导出触发混在一起,且硬编码时间窗(0.80/0.60/0.45/0.20/0.08 s)散在归属逻辑里。
+2. **`Ui/OverlayUGUI.Rows.cs`(1,376 行)**:表格行渲染与列宽算术;**布局守卫直接解析这个文件的列标签/宽度**,改它必须同步跑布局守卫。
+3. **`CompositionProbe*`(10 partial / 6.8k 行)**:判定链的单点裁决;拆分时最容易把"单一裁决点"拆成两处而静默改变折叠加法顺序。
+4. **静态可变状态**:`Aggregator.Session` / `CompositionProbe._globalRules` / `OverlayUGUI` statics —— 跨场污染型 bug 只会以日志形式出现。
+5. **`MasterData/`**:`MasterDataAccess.cs` **至今不存在**(模块地图里标注"下次改 dump 时合并两处")→ 同一份非泛型表查找有两处实现。
+6. **一次性脚本与工具链混在同一目录**(60+ 个 `.py` 平铺),新人难以分辨哪些是活的护栏。
+
+### 7.3 建议的重构批次(每批都要能独立验收)
+
+| 批次 | 内容 | 出口验证 |
+|---|---|---|
+| **R0 前置** | ①把 `_dpsm_work/src` + 守卫脚本纳入版本控制(哪怕只是本地 git);②把 `evidence_*`/`probe_*`/旧验证目录打包归档;~~③给 `check_docs_123.py` 扩到当前文档集并加自测~~ **已在第 6 轮完成**(17 → 29 份文档,6 例自测) | `n0_acceptance.py` 全绿且工具哈希零漂移(当前 51/51) |
+| **R1 无风险拆分** | `Aggregator` 按 Session / Attribution / Stats / Finalize 拆 partial,时间窗提为命名常量 | 构建 0 警 0 错 + `recon_probe` + 五守卫 + 实机一场 |
+| **R2 纯函数下沉** | 把仍可离线的逻辑(归属时间窗判定、残差分层键)从 IL2CPP 侧搬到可被探针执行的纯函数,并**先补断言再搬** | `recon_probe` 断言数上升 + 新旧输出逐位一致 |
+| **R3 界面** | `OverlayUGUI.Rows` 按"测量/截断/行构造"拆,列宽算术只留一处 | 布局守卫 634 行 0 违规 + 目视 |
+| **R4 数据侧** | `MasterDataAccess` 合并两处表查找;`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
+
+**顺序原则**:先有护栏再动刀;一次只动一层;每批都能单独回滚(回滚锚点 = 上一版 DLL + 源码快照)。
+
+### 7.4 禁区(重构中不可动)
+
+- 两个 `*-crash.bak`:**绝不回滚/删除**。
+- `battle_411001_20261004_015919.json` 等已知坏样本:**不修不删不放宽容差**。
+- 历史导出、`.bak`、证据 zip、旧报告正文:**只读**(要改"当前状态句"就另起一行,不动历史叙述)。
+- 训练场(9999)与普通关卡**不得混进同一个排名**。
+- 部署/版本/公共导出契约:**只有主负责人**可以改;重构批次不得自行部署。
+- 不为了"看起来更精确"引入未经证据支持的倍数、暴击归因、治疗折伤害。
+
+## 8. 不可破坏的不变量(重构的安全边界)
+
+完整 44 条在 [`ARCHITECTURE.md`](<ARCHITECTURE.md>) §4;以下是**动代码前必须逐条确认**的最小集:
+
+1. `totalCredit = baseCredit + selfRuleCredit + assistCredit`;`ΣtotalCredit + unattributedCredit = analyzableDealt`。
+2. `totalDamage = analyzableDealt`;直接伤害与辅助当量**不可相加**当新总量。
+3. 逐击折叠 `M = ∏folds`;规则间按 `ln(f_i)/ln(M)` 分池,**顺序无关**。
+4. 丢步时等式降为**合法下界**,**不得**伪造补偿因子;有丢步的样本在准入层降级。
+5. 属性倍率 / 原生 fold / 贡献虚拟因子**分开**,不拿贡献因子直接对 `knownMult`。
+6. 零分母输出**不可用 + 原因**,缺数据不得伪装成 0 或 100%。
+7. 覆盖率的**分母必须写明**;整场覆盖率不可用域内 `creditedShare` 替代。
+8. 判定链保持**单一裁决点**(`JudgeClause`),诊断/显示/导出三条路径共用。
+9. 状态集合只有一个**规范形**(`StatusKey`:去重 + 序数排序)。
+10. 时间格式只有一个入口(`BattleTime`);导出结构自检(`JsonCheck`)在写盘前必须跑。
+
+## 9. 未闭合项(按“谁能推进”分层)
+
+**A. 只有用户能做(目视)** —— 见 [`N7-PERF-AND-VISUAL-CHECKLIST.md`](<N7-PERF-AND-VISUAL-CHECKLIST.md>) §7:长名对齐、F9 重置、
+回看更早那一场、低覆盖提示、非 CJK 机器字体回退(共 5 项);未归属行已自动核对通过。
+
+**B. 证据不足,当前明确不做**:插件侧 CPU/分配插桩(`MaxSteps=24`/`_statusSnaps=256`/`BuildBuffText` 40 条三个计数器)。
+实测 **0/32 场**丢步 ⇒ 没有证据支持为它改插件实时路径。
+
+**C. 需要用户拍板的产品决定**:队伍对比页(UI 变更,会升版本);`dealt` 是否改成"吸收前"口径(会动悬浮窗/DPS/曲线/全部历史对比)。
+
+**D. 已知待核实的旧结论(重构前应逐条复核,别当现状)**:
+
+- [`ARCHITECTURE.md`](<ARCHITECTURE.md>) §7 的债务清单写于 1.3–1.5 时代。**本轮已核实两条**:
+  · 「`source` 通道从未接线」**已过期** —— `Aggregator.cs:1291` 现在是 `RecordHitDetail` 的调用点,最新一场 5,628 条事件里
+    `source` 取值已分化(14:2592 / 1:1633 / 0:1312 / 3:38 / 4:37 / 8:16)。
+  · 「`crit` 恒 false」**仍然成立** —— 同一场 5,628/5,628 全为 false,会心仍只能靠 `critDamageRate` 推断。
+- 其余条目(跨单位「被ダメージ+X%」读取路径、全局 +15% 重复登记、会话被波切碎、`dealt` 口径)在 1.5.x 之后是否已闭合,**未逐条复核**。
+
+## 10. 文档年龄表(哪些能当现状,哪些只是历史快照)
+
+| 文档 | 是什么 | 能不能当现状 |
+|---|---|---|
+| [`DpsMeter-文档索引.md`](../DpsMeter-文档索引.md) | 唯一入口 / 指针 | ✅ 当前(随轮次更新) |
+| **本文件** | 现状快照 + 重构地图 | ✅ 当前(随轮次更新) |
+| [`CONTRIBUTION-NEXT-PHASE-ROADMAP.md`](<CONTRIBUTION-NEXT-PHASE-ROADMAP.md>) | N0–N7 路线图 + 逐任务进度块 | ✅ 当前(§0 进度表为准) |
+| [`RELEASE-1.7.11-ACCEPTANCE.md`](<RELEASE-1.7.11-ACCEPTANCE.md>) | 1.7.11 验收记录(§0–§9 = 30 份时;§10 = 32 份第 6 轮) | ✅ 当前(以 §10 为准) |
+| [`HANDOFF.md`](<HANDOFF.md>) | 交接书:环境硬事实 / 编码坑 / 部署表 / 历史验收账 | 🟡 环境章节是现状;历史验收账是快照 |
+| [`DECISION-REPORT-411001.md`](<DECISION-REPORT-411001.md>) · [`BUDGET-CENSUS.md`](<BUDGET-CENSUS.md>) · [`N7-PERF-AND-VISUAL-CHECKLIST.md`](<N7-PERF-AND-VISUAL-CHECKLIST.md>) | 决策 / 普查 / 目视记录 | ✅ 当前(工具每次重算覆盖) |
+| [`CONTRIBUTION-DATA-DICTIONARY.md`](<CONTRIBUTION-DATA-DICTIONARY.md>) | 口径/公式/字段字典(schema 1.1) | ✅ 当前 |
+| [`ARCHITECTURE.md`](<ARCHITECTURE.md>) · [`ARCH-REVIEW-1.5.md`](<ARCH-REVIEW-1.5.md>) | 架构 / 1.5 时代审视 | 🟡 结构仍准;**§7 债务清单需逐条复核**(见 §9D) |
+| [`IDENTITY-CENSUS.md`](<IDENTITY-CENSUS.md>) · [`IDENTITY-METADATA-DESIGN.md`](<IDENTITY-METADATA-DESIGN.md>) · [`ATKADD-MODEL-AUDIT.md`](<ATKADD-MODEL-AUDIT.md>) · [`atkadd_sensitivity_result.md`](<atkadd_sensitivity_result.md>) | 30 份时的身份/atkadd 研究 | 🟡 **当时快照**(30 份),结论可用、计数不可当现状 |
+| [`CONTRIBUTION-TABLE-REPORT.md`](<CONTRIBUTION-TABLE-REPORT.md>) | 贡献表完整报告(26/29 份时代) | 🟡 历史报告:只改了当前状态句,历史段落保持原样 |
+| [`SESSION-STATE.md`](<SESSION-STATE.md>)(377 KB) | 主档:§1–§6 API/限制、§7.2.x 逐版决策 | 🟡 **逐版决策档案**,不是现状摘要 |
+| [`P0-A-VALIDATION-GATE-REPORT.md`](<P0-A-VALIDATION-GATE-REPORT.md>) · [`CONTRIBUTION-APPLICABILITY-P0D.md`](<CONTRIBUTION-APPLICABILITY-P0D.md>) · [`PAIRTRUSTED-IMPACT-REPORT.md`](<PAIRTRUSTED-IMPACT-REPORT.md>) · [`CONTRIBUTION-REVIEW-NEXT-STEPS.md`](<CONTRIBUTION-REVIEW-NEXT-STEPS.md>) | 历史验收/审查报告 | 🟡 历史快照 |
+| [`ROLLBACK-1.7.11.md`](<ROLLBACK-1.7.11.md>) | **当前**回退预案(锚点 1.7.10) | ✅ 当前 |
+| `ROLLBACK-1.7.7/1.7.8/1.7.9/1.7.10/1.6.0.md` | 旧回退预案 | 🟡 已作废(留作锚点哈希表) |
+| `_dpsm_work/doc_archive_20261003.zip` · `export_archive_20261003.zip` | 归档:8 份逐版说明 / 3 份证据战场 | 📦 归档 |
+| `REPORT-换人后总伤害为什么变低-20261003.txt` · `REPORT-两种搭配对比-20261003.txt` · `REPORT-解包与游戏内数据获取.md` | 早期面向用户的结案报告 | 🟡 历史(结论已被 §N5 取代) |
+
+## 11. 维护约定
+
+- **本文件与索引一起更新**:任何一轮结束时,先更新本文件的事实表,再更新索引指针;历史段落不重写。
+- 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
+- 每次改动后跑:`python n0_acceptance.py`(全绿且工具哈希零漂移);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
+
+

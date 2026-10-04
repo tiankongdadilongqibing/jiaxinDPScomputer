@@ -1,0 +1,4169 @@
+{
+ "tool": "contribution_applicability",
+ "schema": "p0d-1",
+ "generatedFrom": "D:\\dmmplayer\\rlyehshoujotaix_cl\\BepInEx\\plugins\\DpsMeter\\exports",
+ "exportCount": 30,
+ "criteria": {
+  "missingFoldTest": "|prod(calc.fold)/(dealtMult*takenMult)-1| > tolerance; attrMult excluded by design",
+  "strictRelTol": 0.001,
+  "roundingEnvelope": "5e-4*(|dealtMult|+|takenMult|) + (1e-3 + 5e-5*nFoldFactors)*|dealtMult*takenMult|",
+  "roundingEnvelopeRationale": "dealtMult/takenMult/attrMult/knownMult are serialized with 3 decimals (+-5e-4 absolute). A sub-unity factor amplifies that absolute rounding: takenMult=0.194 turns +-5e-4 into 2.6e-3 relative, so a fixed 1e-3 relative gate must be paired with the absolute term. fold[].factor is round-trip from 1.6.1 and 4-decimal truncated before, hence the per-factor 5e-5 term scaled by the factor count.",
+  "retiredCriterion": "knownMult != 1 and fold empty (reported for contrast only; NOT a leak test)",
+  "excludedDamageSplit": "enemy-team damage is evidenced but normal/expected; own-side exclusions are the defect part; anything else is reconciliationGap; unresolved attackers are outside totals.dealt"
+ },
+ "exports": [
+  {
+   "file": "battle_411001_20261003_205449.json",
+   "version": "1.5.3",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 6269,
+    "dmgWithCalc": 6268,
+    "offlineAnalyzableHits": 6183,
+    "contributionHits": null,
+    "reconcileDmgEvents": 6269
+   },
+   "damage": {
+    "totalsDealt": 198588964.0,
+    "offlineAnalyzableDealt": 198463938.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6261,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.00037821482602140577,
+    "maxAbsDeviation": 0.0009075000000007272,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "degenerateZeroChainHits": 7,
+    "degenerateConsistent": 7,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 125026.0,
+    "excludedDamage": {
+     "enemyTeamHits": 14,
+     "enemyTeamDamage": 125026.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 125026.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 72,
+     "unknownAttackerDamage": 289188.0,
+     "reportedTotalsUnattributedHits": 72,
+     "reportedTotalsUnattributedDamage": 289188
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261003_230040.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 6128,
+    "dmgWithCalc": 6127,
+    "offlineAnalyzableHits": 6039,
+    "contributionHits": null,
+    "reconcileDmgEvents": 6128
+   },
+   "damage": {
+    "totalsDealt": 181236937.0,
+    "offlineAnalyzableDealt": 181046593.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6117,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.00037821482602140577,
+    "maxAbsDeviation": 0.0009075000000007272,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 40129.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 40129.0
+    },
+    "degenerateZeroChainHits": 10,
+    "degenerateConsistent": 10,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 190344.0,
+    "excludedDamage": {
+     "enemyTeamHits": 21,
+     "enemyTeamDamage": 190344.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 190344.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 68,
+     "unknownAttackerDamage": 275582.0,
+     "reportedTotalsUnattributedHits": 68,
+     "reportedTotalsUnattributedDamage": 275582
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261003_230311.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 6213,
+    "dmgWithCalc": 6212,
+    "offlineAnalyzableHits": 6123,
+    "contributionHits": null,
+    "reconcileDmgEvents": 6213
+   },
+   "damage": {
+    "totalsDealt": 189268037.0,
+    "offlineAnalyzableDealt": 189105840.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6203,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.00037821482602140577,
+    "maxAbsDeviation": 0.0009075000000007272,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 10,
+    "subUnityFoldCount": 10,
+    "subUnityChainTakenMultHits": 10,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "sub_unity_folds"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 162197.0,
+    "excludedDamage": {
+     "enemyTeamHits": 19,
+     "enemyTeamDamage": 162197.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 162197.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 71,
+     "unknownAttackerDamage": 287383.0,
+     "reportedTotalsUnattributedHits": 71,
+     "reportedTotalsUnattributedDamage": 287383
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file",
+    "10 hits contain sub-unity folds, which the pool drops as SubUnity (Contribution.cs:384)"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "sub_unity_folds"
+  },
+  {
+   "file": "battle_411001_20261003_230615.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 6271,
+    "dmgWithCalc": 6270,
+    "offlineAnalyzableHits": 6182,
+    "contributionHits": null,
+    "reconcileDmgEvents": 6271
+   },
+   "damage": {
+    "totalsDealt": 196505136.0,
+    "offlineAnalyzableDealt": 196357382.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6261,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.00037821482602140577,
+    "maxAbsDeviation": 0.0009075000000007272,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 880.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 880.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 9,
+    "subUnityFoldCount": 9,
+    "subUnityChainTakenMultHits": 9,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "sub_unity_folds"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 147754.0,
+    "excludedDamage": {
+     "enemyTeamHits": 18,
+     "enemyTeamDamage": 147754.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 147754.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 71,
+     "unknownAttackerDamage": 269500.0,
+     "reportedTotalsUnattributedHits": 71,
+     "reportedTotalsUnattributedDamage": 269500
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file",
+    "9 hits contain sub-unity folds, which the pool drops as SubUnity (Contribution.cs:384)"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "sub_unity_folds"
+  },
+  {
+   "file": "battle_411001_20261003_231044.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 6281,
+    "dmgWithCalc": 6280,
+    "offlineAnalyzableHits": 6197,
+    "contributionHits": null,
+    "reconcileDmgEvents": 6281
+   },
+   "damage": {
+    "totalsDealt": 197087773.0,
+    "offlineAnalyzableDealt": 196973371.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6274,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.00037821482602140577,
+    "maxAbsDeviation": 0.0009075000000007272,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.400337500000001,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.00037821482602140577,
+     "absDeviation": 0.0009075000000007272,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "degenerateZeroChainHits": 6,
+    "degenerateConsistent": 6,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 7,
+    "subUnityFoldCount": 7,
+    "subUnityChainTakenMultHits": 7,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "sub_unity_folds"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 114402.0,
+    "excludedDamage": {
+     "enemyTeamHits": 13,
+     "enemyTeamDamage": 114402.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 114402.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 71,
+     "unknownAttackerDamage": 258061.0,
+     "reportedTotalsUnattributedHits": 71,
+     "reportedTotalsUnattributedDamage": 258061
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file",
+    "7 hits contain sub-unity folds, which the pool drops as SubUnity (Contribution.cs:384)"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "sub_unity_folds"
+  },
+  {
+   "file": "battle_411001_20261003_231340.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 5655,
+    "dmgWithCalc": 5654,
+    "offlineAnalyzableHits": 5561,
+    "contributionHits": null,
+    "reconcileDmgEvents": 5655
+   },
+   "damage": {
+    "totalsDealt": 209426327.0,
+    "offlineAnalyzableDealt": 209294474.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5645,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0008026260178723987,
+    "maxRelDeviationRecord": {
+     "effectId": 10151,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 5117.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10002,
+     "foldProduct": 13.325322626017872,
+     "dealtMult": 11.012,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 13.325,
+     "foldCount": 9,
+     "relDeviation": 6.023676784394638e-05,
+     "absDeviation": 0.0008026260178723987,
+     "envelope": 0.025431554000000002,
+     "amount": 70183.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 9,
+    "subUnityFoldCount": 9,
+    "subUnityChainTakenMultHits": 9,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "sub_unity_folds"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 131853.0,
+    "excludedDamage": {
+     "enemyTeamHits": 18,
+     "enemyTeamDamage": 131853.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 131853.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 368956.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 368956
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file",
+    "9 hits contain sub-unity folds, which the pool drops as SubUnity (Contribution.cs:384)"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "sub_unity_folds"
+  },
+  {
+   "file": "battle_411001_20261003_235204.json",
+   "version": "1.5.5",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 5602,
+    "dmgWithCalc": 5601,
+    "offlineAnalyzableHits": 5521,
+    "contributionHits": null,
+    "reconcileDmgEvents": 5602
+   },
+   "damage": {
+    "totalsDealt": 203964758.0,
+    "offlineAnalyzableDealt": 203865411.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5594,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0008026260178723987,
+    "maxRelDeviationRecord": {
+     "effectId": 10151,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 3192.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10002,
+     "foldProduct": 13.325322626017872,
+     "dealtMult": 11.012,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 13.325,
+     "foldCount": 9,
+     "relDeviation": 6.023676784394638e-05,
+     "absDeviation": 0.0008026260178723987,
+     "envelope": 0.025431554000000002,
+     "amount": 76073.0
+    },
+    "degenerateZeroChainHits": 7,
+    "degenerateConsistent": 7,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 99347.0,
+    "excludedDamage": {
+     "enemyTeamHits": 14,
+     "enemyTeamDamage": 99347.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 99347.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 67,
+     "unknownAttackerDamage": 306549.0,
+     "reportedTotalsUnattributedHits": 67,
+     "reportedTotalsUnattributedDamage": 306549
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_012328.json",
+   "version": "1.5.5",
+   "quest": 411001,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 5571,
+    "dmgWithCalc": 5570,
+    "offlineAnalyzableHits": 5478,
+    "contributionHits": null,
+    "reconcileDmgEvents": 5571
+   },
+   "damage": {
+    "totalsDealt": 206931707.0,
+    "offlineAnalyzableDealt": 206792136.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5560,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0008026260178723987,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10002,
+     "foldProduct": 13.325322626017872,
+     "dealtMult": 11.012,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 13.325,
+     "foldCount": 9,
+     "relDeviation": 6.023676784394638e-05,
+     "absDeviation": 0.0008026260178723987,
+     "envelope": 0.025431554000000002,
+     "amount": 213885.0
+    },
+    "degenerateZeroChainHits": 10,
+    "degenerateConsistent": 10,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 139571.0,
+    "excludedDamage": {
+     "enemyTeamHits": 19,
+     "enemyTeamDamage": 139571.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 139571.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 74,
+     "unknownAttackerDamage": 364760.0,
+     "reportedTotalsUnattributedHits": 74,
+     "reportedTotalsUnattributedDamage": 364760
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "offline-recompute-only",
+   "reasons": [
+    "no contribution section: offline recompute is possible but the plugin in-memory values cannot be verified against the file"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_015919.json",
+   "version": "1.6.0",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "ERROR",
+    "statusCode": 1,
+    "mismatches": 58,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT",
+     "MISMATCH"
+    ],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 5529,
+    "dmgWithCalc": 5528,
+    "offlineAnalyzableHits": 5434,
+    "contributionHits": 5434,
+    "reconcileDmgEvents": 5529
+   },
+   "damage": {
+    "totalsDealt": 197273140.0,
+    "offlineAnalyzableDealt": 197128494.0,
+    "contributionAnalyzableDealt": 197128494.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5519,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0008026260178723987,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10002,
+     "foldProduct": 13.325322626017872,
+     "dealtMult": 11.012,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 13.325,
+     "foldCount": 9,
+     "relDeviation": 6.023676784394638e-05,
+     "absDeviation": 0.0008026260178723987,
+     "envelope": 0.025431554000000002,
+     "amount": 305437.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 144646.0,
+    "excludedDamage": {
+     "enemyTeamHits": 19,
+     "enemyTeamDamage": 144646.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 144646.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 344432.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 344432
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "invalid-plugin-value-trust",
+   "reasons": [
+    "plugin contribution section does not match the offline core (status=ERROR mismatches=58 omissions=0 validateErrors=0; 1.6.0 factor precision is the known case)"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_021914.json",
+   "version": "1.6.1",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5553,
+    "dmgWithCalc": 5552,
+    "offlineAnalyzableHits": 5463,
+    "contributionHits": 5463,
+    "reconcileDmgEvents": 5553
+   },
+   "damage": {
+    "totalsDealt": 197859703.0,
+    "offlineAnalyzableDealt": 197737832.0,
+    "contributionAnalyzableDealt": 197737832.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5544,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 7762.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 7762.0
+    },
+    "degenerateZeroChainHits": 8,
+    "degenerateConsistent": 8,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 121871.0,
+    "excludedDamage": {
+     "enemyTeamHits": 17,
+     "enemyTeamDamage": 121871.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 121871.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 73,
+     "unknownAttackerDamage": 348987.0,
+     "reportedTotalsUnattributedHits": 73,
+     "reportedTotalsUnattributedDamage": 348987
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_023627.json",
+   "version": "1.7.0",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5576,
+    "dmgWithCalc": 5575,
+    "offlineAnalyzableHits": 5482,
+    "contributionHits": 5482,
+    "reconcileDmgEvents": 5576
+   },
+   "damage": {
+    "totalsDealt": 212633192.0,
+    "offlineAnalyzableDealt": 212508846.0,
+    "contributionAnalyzableDealt": 212508846.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5566,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260209617,
+    "maxAbsDeviation": 0.0005936562499999631,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.3224999999999998,
+     "dealtMult": 1.322,
+     "takenMult": 1.0,
+     "attrMult": 1.0,
+     "knownMult": 1.322,
+     "foldCount": 2,
+     "relDeviation": 0.0003782148260209617,
+     "absDeviation": 0.0004999999999997229,
+     "envelope": 0.0026152000000000003,
+     "amount": 3041.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10031,
+     "foldProduct": 3.17444634375,
+     "dealtMult": 2.624,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 3.174,
+     "foldCount": 5,
+     "relDeviation": 0.0001869759908535995,
+     "absDeviation": 0.0005936562499999631,
+     "envelope": 0.0058858,
+     "amount": 2669.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 124346.0,
+    "excludedDamage": {
+     "enemyTeamHits": 18,
+     "enemyTeamDamage": 124346.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 124346.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 336304.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 336304
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_033231.json",
+   "version": "1.7.2",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5565,
+    "dmgWithCalc": 5564,
+    "offlineAnalyzableHits": 5475,
+    "contributionHits": 5475,
+    "reconcileDmgEvents": 5565
+   },
+   "damage": {
+    "totalsDealt": 200728856.0,
+    "offlineAnalyzableDealt": 200609217.0,
+    "contributionAnalyzableDealt": 200609217.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5556,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 6560.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 6560.0
+    },
+    "degenerateZeroChainHits": 8,
+    "degenerateConsistent": 8,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 119639.0,
+    "excludedDamage": {
+     "enemyTeamHits": 16,
+     "enemyTeamDamage": 119639.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 119639.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 74,
+     "unknownAttackerDamage": 313327.0,
+     "reportedTotalsUnattributedHits": 74,
+     "reportedTotalsUnattributedDamage": 313327
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_035437.json",
+   "version": "1.7.3",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5599,
+    "dmgWithCalc": 5598,
+    "offlineAnalyzableHits": 5507,
+    "contributionHits": 5507,
+    "reconcileDmgEvents": 5599
+   },
+   "damage": {
+    "totalsDealt": 195664426.0,
+    "offlineAnalyzableDealt": 195543862.0,
+    "contributionAnalyzableDealt": 195543862.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5589,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 10145,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 8983.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10145,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 8983.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 120564.0,
+    "excludedDamage": {
+     "enemyTeamHits": 16,
+     "enemyTeamDamage": 120564.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 120564.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 325921.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 325921
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_041309.json",
+   "version": "1.7.4",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5563,
+    "dmgWithCalc": 5562,
+    "offlineAnalyzableHits": 5472,
+    "contributionHits": 5472,
+    "reconcileDmgEvents": 5563
+   },
+   "damage": {
+    "totalsDealt": 203853083.0,
+    "offlineAnalyzableDealt": 203752194.0,
+    "contributionAnalyzableDealt": 203752194.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5554,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 513.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 513.0
+    },
+    "degenerateZeroChainHits": 8,
+    "degenerateConsistent": 8,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 100889.0,
+    "excludedDamage": {
+     "enemyTeamHits": 16,
+     "enemyTeamDamage": 100889.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 100889.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 75,
+     "unknownAttackerDamage": 333547.0,
+     "reportedTotalsUnattributedHits": 75,
+     "reportedTotalsUnattributedDamage": 333547
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_042637.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5543,
+    "dmgWithCalc": 5542,
+    "offlineAnalyzableHits": 5453,
+    "contributionHits": 5453,
+    "reconcileDmgEvents": 5543
+   },
+   "damage": {
+    "totalsDealt": 200353734.0,
+    "offlineAnalyzableDealt": 200251795.0,
+    "contributionAnalyzableDealt": 200251795.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5536,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "degenerateZeroChainHits": 6,
+    "degenerateConsistent": 6,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 101939.0,
+    "excludedDamage": {
+     "enemyTeamHits": 14,
+     "enemyTeamDamage": 101939.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 101939.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 323423.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 323423
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_042844.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5544,
+    "dmgWithCalc": 5543,
+    "offlineAnalyzableHits": 5448,
+    "contributionHits": 5448,
+    "reconcileDmgEvents": 5544
+   },
+   "damage": {
+    "totalsDealt": 196606611.0,
+    "offlineAnalyzableDealt": 196479410.0,
+    "contributionAnalyzableDealt": 196479410.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5533,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 10219.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 10219.0
+    },
+    "degenerateZeroChainHits": 10,
+    "degenerateConsistent": 10,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 127201.0,
+    "excludedDamage": {
+     "enemyTeamHits": 20,
+     "enemyTeamDamage": 127201.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 127201.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 281809.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 281809
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_113553.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5553,
+    "dmgWithCalc": 5552,
+    "offlineAnalyzableHits": 5461,
+    "contributionHits": 5461,
+    "reconcileDmgEvents": 5553
+   },
+   "damage": {
+    "totalsDealt": 198797524.0,
+    "offlineAnalyzableDealt": 198653453.0,
+    "contributionAnalyzableDealt": 198653453.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5542,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 19399.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 19399.0
+    },
+    "degenerateZeroChainHits": 10,
+    "degenerateConsistent": 10,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 144071.0,
+    "excludedDamage": {
+     "enemyTeamHits": 19,
+     "enemyTeamDamage": 144071.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 144071.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 73,
+     "unknownAttackerDamage": 299365.0,
+     "reportedTotalsUnattributedHits": 73,
+     "reportedTotalsUnattributedDamage": 299365
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_115024.json",
+   "version": "1.7.6",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5566,
+    "dmgWithCalc": 5565,
+    "offlineAnalyzableHits": 5478,
+    "contributionHits": 5478,
+    "reconcileDmgEvents": 5566
+   },
+   "damage": {
+    "totalsDealt": 202081366.0,
+    "offlineAnalyzableDealt": 201961202.0,
+    "contributionAnalyzableDealt": 201961202.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5558,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "degenerateZeroChainHits": 7,
+    "degenerateConsistent": 7,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 120164.0,
+    "excludedDamage": {
+     "enemyTeamHits": 15,
+     "enemyTeamDamage": 120164.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 120164.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 73,
+     "unknownAttackerDamage": 296754.0,
+     "reportedTotalsUnattributedHits": 73,
+     "reportedTotalsUnattributedDamage": 296754
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_115417.json",
+   "version": "1.7.6",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "WARNING",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "ATKADD_COUNTER_GT_HITS",
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 6265,
+    "dmgWithCalc": 6264,
+    "offlineAnalyzableHits": 6182,
+    "contributionHits": 6182,
+    "reconcileDmgEvents": 6265
+   },
+   "damage": {
+    "totalsDealt": 190984342.0,
+    "offlineAnalyzableDealt": 190889625.0,
+    "contributionAnalyzableDealt": 190889625.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6259,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.000907499999999839,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.4003375,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.000907499999999839,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.4003375,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.000907499999999839,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "degenerateZeroChainHits": 5,
+    "degenerateConsistent": 5,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 94717.0,
+    "excludedDamage": {
+     "enemyTeamHits": 12,
+     "enemyTeamDamage": 94717.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 94717.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 71,
+     "unknownAttackerDamage": 273702.0,
+     "reportedTotalsUnattributedHits": 71,
+     "reportedTotalsUnattributedDamage": 273702
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_134524.json",
+   "version": "1.7.8",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.1",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "WARNING",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "ATKADD_COUNTER_GT_HITS",
+     "ATKADD_COUNTER_GT_HITS",
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 6267,
+    "dmgWithCalc": 6266,
+    "offlineAnalyzableHits": 6180,
+    "contributionHits": 6180,
+    "reconcileDmgEvents": 6267
+   },
+   "damage": {
+    "totalsDealt": 195026518.0,
+    "offlineAnalyzableDealt": 194904570.0,
+    "contributionAnalyzableDealt": 194904570.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 6259,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.000907499999999839,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.4003375,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.000907499999999839,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 2.4003375,
+     "dealtMult": 1.322,
+     "takenMult": 1.815,
+     "attrMult": 1.0,
+     "knownMult": 2.4,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.000907499999999839,
+     "envelope": 0.004447816,
+     "amount": 960.0
+    },
+    "degenerateZeroChainHits": 7,
+    "degenerateConsistent": 7,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 121948.0,
+    "excludedDamage": {
+     "enemyTeamHits": 14,
+     "enemyTeamDamage": 121948.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 121948.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 73,
+     "unknownAttackerDamage": 257056.0,
+     "reportedTotalsUnattributedHits": 73,
+     "reportedTotalsUnattributedDamage": 257056
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_134853.json",
+   "version": "1.7.8",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.1",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5630,
+    "dmgWithCalc": 5629,
+    "offlineAnalyzableHits": 5539,
+    "contributionHits": 5539,
+    "reconcileDmgEvents": 5630
+   },
+   "damage": {
+    "totalsDealt": 200853545.0,
+    "offlineAnalyzableDealt": 200752131.0,
+    "contributionAnalyzableDealt": 200752131.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5622,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260209617,
+    "maxAbsDeviation": 0.0005936562499999631,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.3224999999999998,
+     "dealtMult": 1.322,
+     "takenMult": 1.0,
+     "attrMult": 1.0,
+     "knownMult": 1.322,
+     "foldCount": 2,
+     "relDeviation": 0.0003782148260209617,
+     "absDeviation": 0.0004999999999997229,
+     "envelope": 0.0026152000000000003,
+     "amount": 3041.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10031,
+     "foldProduct": 3.17444634375,
+     "dealtMult": 2.624,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 3.174,
+     "foldCount": 5,
+     "relDeviation": 0.0001869759908535995,
+     "absDeviation": 0.0005936562499999631,
+     "envelope": 0.0058858,
+     "amount": 2669.0
+    },
+    "degenerateZeroChainHits": 7,
+    "degenerateConsistent": 7,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 101414.0,
+    "excludedDamage": {
+     "enemyTeamHits": 15,
+     "enemyTeamDamage": 101414.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 101414.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 76,
+     "unknownAttackerDamage": 305770.0,
+     "reportedTotalsUnattributedHits": 76,
+     "reportedTotalsUnattributedDamage": 305770
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_411001_20261004_144548.json",
+   "version": "1.7.10",
+   "quest": 411001,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.1",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "PASS",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 5585,
+    "dmgWithCalc": 5584,
+    "offlineAnalyzableHits": 5493,
+    "contributionHits": 5493,
+    "reconcileDmgEvents": 5585
+   },
+   "damage": {
+    "totalsDealt": 194811623.0,
+    "offlineAnalyzableDealt": 194697612.0,
+    "contributionAnalyzableDealt": 194697612.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 5575,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0003782148260211837,
+    "maxAbsDeviation": 0.0006049999999999667,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.600225,
+     "dealtMult": 1.322,
+     "takenMult": 1.21,
+     "attrMult": 1.0,
+     "knownMult": 1.6,
+     "foldCount": 4,
+     "relDeviation": 0.0003782148260211837,
+     "absDeviation": 0.0006049999999999667,
+     "envelope": 0.0031855440000000002,
+     "amount": 640.0
+    },
+    "degenerateZeroChainHits": 9,
+    "degenerateConsistent": 9,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 0,
+    "damage": 0.0,
+    "explainedByAttrMultHits": 0,
+    "explainedByAttrMultDamage": 0.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 0,
+    "damage": 0.0,
+    "hitsWithoutFold": 0,
+    "shareOfDealt": 0.0
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 114011.0,
+    "excludedDamage": {
+     "enemyTeamHits": 18,
+     "enemyTeamDamage": 114011.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 114011.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 74,
+     "unknownAttackerDamage": 325381.0,
+     "reportedTotalsUnattributedHits": 74,
+     "reportedTotalsUnattributedDamage": 325381
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "full",
+   "comparisonAllowed": true,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "normal-benchmark",
+   "reasons": [
+    "contribution section consistent, fold identity within envelope, attrMult == 1, no sub-unity folds, gap fully event-evidenced"
+   ],
+   "retiredKnownMultCriterionLeaks": 0,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldDamage": 0.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 0,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_700817_20261004_114821.json",
+   "version": "1.7.6",
+   "quest": 700817,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "WARNING",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "ATKADD_COUNTER_GT_HITS",
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 285,
+    "dmgWithCalc": 284,
+    "offlineAnalyzableHits": 233,
+    "contributionHits": 233,
+    "reconcileDmgEvents": 285
+   },
+   "damage": {
+    "totalsDealt": 2314831.0,
+    "offlineAnalyzableDealt": 2289375.0,
+    "contributionAnalyzableDealt": 2289375.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 284,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 2.220446049250313e-16,
+    "maxAbsDeviation": 4.440892098500626e-16,
+    "maxRelDeviationRecord": {
+     "effectId": 10114,
+     "foldProduct": 1.2100000000000002,
+     "dealtMult": 1.21,
+     "takenMult": 1.0,
+     "attrMult": 1.0,
+     "knownMult": 1.21,
+     "foldCount": 2,
+     "relDeviation": 2.220446049250313e-16,
+     "absDeviation": 2.220446049250313e-16,
+     "envelope": 0.002436,
+     "amount": 4264.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10024,
+     "foldProduct": 1.8150000000000004,
+     "dealtMult": 1.815,
+     "takenMult": 1.0,
+     "attrMult": 1.0,
+     "knownMult": 1.815,
+     "foldCount": 3,
+     "relDeviation": 2.220446049250313e-16,
+     "absDeviation": 4.440892098500626e-16,
+     "envelope": 0.0034947499999999996,
+     "amount": 50234.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 59,
+    "damage": 91482.0,
+    "explainedByAttrMultHits": 59,
+    "explainedByAttrMultDamage": 91482.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 62,
+    "damage": 102578.0,
+    "hitsWithoutFold": 59,
+    "shareOfDealt": 0.044313386160803964
+   },
+   "specialMode": {
+    "trainingGround": false,
+    "trainingScaleX003": false,
+    "trainingScaleHits": 0,
+    "subUnityFoldHits": 0,
+    "subUnityFoldCount": 0,
+    "subUnityChainTakenMultHits": 0,
+    "subUnityChainDealtMultHits": 0,
+    "markers": []
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 25456.0,
+    "excludedDamage": {
+     "enemyTeamHits": 15,
+     "enemyTeamDamage": 25456.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 25456.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 37,
+     "unknownAttackerDamage": 16225.0,
+     "reportedTotalsUnattributedHits": 37,
+     "reportedTotalsUnattributedDamage": 16225
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "partial",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": true,
+   "comparisonScope": "caveat-attribute-affinity",
+   "reasons": [
+    "62 hits carry attrMult != 1 (4.43% of dealt); attribute affinity is outside calc.fold by design, so the fold/base split does not describe that multiplier"
+   ],
+   "retiredKnownMultCriterionLeaks": 59,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 59,
+   "knownMultWithoutFoldDamage": 91482.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 59,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "none"
+  },
+  {
+   "file": "battle_9999_20261003_205129.json",
+   "version": "1.5.3",
+   "quest": 9999,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 868,
+    "dmgWithCalc": 867,
+    "offlineAnalyzableHits": 232,
+    "contributionHits": null,
+    "reconcileDmgEvents": 868
+   },
+   "damage": {
+    "totalsDealt": 7702608.0,
+    "offlineAnalyzableDealt": 4680300.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 867,
+    "violationsStrictRel1e3": 15,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0020618556701030855,
+    "maxAbsDeviation": 0.0006050000000001887,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.1944,
+     "dealtMult": 1.0,
+     "takenMult": 0.194,
+     "attrMult": 1.0,
+     "knownMult": 0.194,
+     "foldCount": 4,
+     "relDeviation": 0.0020618556701030855,
+     "absDeviation": 0.0003999999999999837,
+     "envelope": 0.0008298,
+     "amount": 18477.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10165,
+     "foldProduct": 0.8742250000000001,
+     "dealtMult": 1.21,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.874,
+     "foldCount": 4,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.0006050000000001887,
+     "envelope": 0.002014344,
+     "amount": 194.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 2,
+    "damage": 7616.0,
+    "explainedByAttrMultHits": 2,
+    "explainedByAttrMultDamage": 7616.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 34,
+    "damage": 184305.0,
+    "hitsWithoutFold": 2,
+    "shareOfDealt": 0.023927609973141563
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 225,
+    "subUnityFoldHits": 750,
+    "subUnityFoldCount": 2047,
+    "subUnityChainTakenMultHits": 750,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 3022308.0,
+    "excludedDamage": {
+     "enemyTeamHits": 626,
+     "enemyTeamDamage": 3022308.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 3022308.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 10,
+     "unknownAttackerDamage": 319936.0,
+     "reportedTotalsUnattributedHits": 10,
+     "reportedTotalsUnattributedDamage": 319936
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 20,
+     "selfDamageDamage": 1026755.0,
+     "friendlyFireHits": 12,
+     "friendlyFireDamage": 184520.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 225 hits with 0<takenMult<0.1, 750 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 2,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 2,
+   "knownMultWithoutFoldDamage": 7616.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 2,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261003_225530.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 102,
+    "dmgWithCalc": 101,
+    "offlineAnalyzableHits": 65,
+    "contributionHits": null,
+    "reconcileDmgEvents": 102
+   },
+   "damage": {
+    "totalsDealt": 1680568.0,
+    "offlineAnalyzableDealt": 1119294.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 101,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0006925207756234286,
+    "maxAbsDeviation": 0.000616000000000172,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.8901200000000001,
+     "dealtMult": 1.232,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.89,
+     "foldCount": 4,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.000616000000000172,
+     "envelope": 0.0020444048,
+     "amount": 61170.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.8901200000000001,
+     "dealtMult": 1.232,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.89,
+     "foldCount": 4,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.000616000000000172,
+     "envelope": 0.0020444048,
+     "amount": 61170.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 5,
+    "damage": 129154.0,
+    "explainedByAttrMultHits": 5,
+    "explainedByAttrMultDamage": 129154.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 16,
+    "damage": 278888.0,
+    "hitsWithoutFold": 5,
+    "shareOfDealt": 0.1659486554545844
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 9,
+    "subUnityFoldHits": 38,
+    "subUnityFoldCount": 65,
+    "subUnityChainTakenMultHits": 38,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 561274.0,
+    "excludedDamage": {
+     "enemyTeamHits": 33,
+     "enemyTeamDamage": 561274.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 561274.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 4,
+     "unknownAttackerDamage": 67202.0,
+     "reportedTotalsUnattributedHits": 4,
+     "reportedTotalsUnattributedDamage": 67202
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 4,
+     "selfDamageDamage": 154242.0,
+     "friendlyFireHits": 3,
+     "friendlyFireDamage": 16873.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 9 hits with 0<takenMult<0.1, 38 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 5,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 5,
+   "knownMultWithoutFoldDamage": 129154.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 5,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261003_225647.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 146,
+    "dmgWithCalc": 145,
+    "offlineAnalyzableHits": 105,
+    "contributionHits": null,
+    "reconcileDmgEvents": 146
+   },
+   "damage": {
+    "totalsDealt": 2579582.0,
+    "offlineAnalyzableDealt": 2366746.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 145,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0006925207756232066,
+    "maxAbsDeviation": 0.0004999999999999449,
+    "maxRelDeviationRecord": {
+     "effectId": 10072,
+     "foldProduct": 0.7224999999999999,
+     "dealtMult": 1.0,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.722,
+     "foldCount": 2,
+     "relDeviation": 0.0006925207756232066,
+     "absDeviation": 0.0004999999999999449,
+     "envelope": 0.0016552,
+     "amount": 15690.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10072,
+     "foldProduct": 0.7224999999999999,
+     "dealtMult": 1.0,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.722,
+     "foldCount": 2,
+     "relDeviation": 0.0006925207756232066,
+     "absDeviation": 0.0004999999999999449,
+     "envelope": 0.0016552,
+     "amount": 15690.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 7,
+    "damage": 137170.0,
+    "explainedByAttrMultHits": 7,
+    "explainedByAttrMultDamage": 137170.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 8,
+    "damage": 142094.0,
+    "hitsWithoutFold": 7,
+    "shareOfDealt": 0.05508411827962825
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 11,
+    "subUnityFoldHits": 61,
+    "subUnityFoldCount": 91,
+    "subUnityChainTakenMultHits": 61,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 212836.0,
+    "excludedDamage": {
+     "enemyTeamHits": 39,
+     "enemyTeamDamage": 212836.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 212836.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 2,
+     "unknownAttackerDamage": 65894.0,
+     "reportedTotalsUnattributedHits": 2,
+     "reportedTotalsUnattributedDamage": 65894
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 4,
+     "selfDamageDamage": 154242.0,
+     "friendlyFireHits": 3,
+     "friendlyFireDamage": 16873.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 11 hits with 0<takenMult<0.1, 61 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 7,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 7,
+   "knownMultWithoutFoldDamage": 137170.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 7,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261003_225905.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 176,
+    "dmgWithCalc": 176,
+    "offlineAnalyzableHits": 91,
+    "contributionHits": null,
+    "reconcileDmgEvents": 176
+   },
+   "damage": {
+    "totalsDealt": 2718309.0,
+    "offlineAnalyzableDealt": 1948231.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 176,
+    "violationsStrictRel1e3": 2,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0010330578512396382,
+    "maxAbsDeviation": 0.0005762399999997836,
+    "maxRelDeviationRecord": {
+     "effectId": 10024,
+     "foldProduct": 0.4845,
+     "dealtMult": 1.0,
+     "takenMult": 0.484,
+     "attrMult": 2.0,
+     "knownMult": 0.969,
+     "foldCount": 3,
+     "relDeviation": 0.0010330578512396382,
+     "absDeviation": 0.0005000000000000004,
+     "envelope": 0.0012986,
+     "amount": 5110.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10114,
+     "foldProduct": 1.0833807600000003,
+     "dealtMult": 1.491,
+     "takenMult": 0.727,
+     "attrMult": 2.0,
+     "knownMult": 2.167,
+     "foldCount": 7,
+     "relDeviation": 0.000531607803630374,
+     "absDeviation": 0.0005762399999997836,
+     "envelope": 0.0025723419500000002,
+     "amount": 86460.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 12,
+    "damage": 157162.0,
+    "explainedByAttrMultHits": 12,
+    "explainedByAttrMultDamage": 157162.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 46,
+    "damage": 1116258.0,
+    "hitsWithoutFold": 12,
+    "shareOfDealt": 0.41064426450414576
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 16,
+    "subUnityFoldHits": 91,
+    "subUnityFoldCount": 182,
+    "subUnityChainTakenMultHits": 91,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 770078.0,
+    "excludedDamage": {
+     "enemyTeamHits": 84,
+     "enemyTeamDamage": 770078.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 770078.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 1,
+     "unknownAttackerDamage": 601.0,
+     "reportedTotalsUnattributedHits": 1,
+     "reportedTotalsUnattributedDamage": 601
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 0,
+     "selfDamageDamage": 0.0,
+     "friendlyFireHits": 0,
+     "friendlyFireDamage": 0.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 16 hits with 0<takenMult<0.1, 91 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 12,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 12,
+   "knownMultWithoutFoldDamage": 157162.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 12,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261004_012138.json",
+   "version": "1.5.5",
+   "quest": 9999,
+   "hasContributionSection": false,
+   "contributionSchemaVersion": null,
+   "contributionMethod": null,
+   "damageBasis": null,
+   "crosscheck": {
+    "status": "NOT_RUN",
+    "statusCode": null,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [],
+    "valuesTrusted": false
+   },
+   "counts": {
+    "dmgEvents": 105,
+    "dmgWithCalc": 105,
+    "offlineAnalyzableHits": 79,
+    "contributionHits": null,
+    "reconcileDmgEvents": 105
+   },
+   "damage": {
+    "totalsDealt": 2147664.0,
+    "offlineAnalyzableDealt": 1458721.0,
+    "contributionAnalyzableDealt": null,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 105,
+    "violationsStrictRel1e3": 0,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0006925207756234286,
+    "maxAbsDeviation": 0.0008250000000002977,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.7947500000000001,
+     "dealtMult": 1.1,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 0.795,
+     "foldCount": 3,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.0005500000000000504,
+     "envelope": 0.0018243299999999999,
+     "amount": 96550.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 1.192125,
+     "dealtMult": 1.65,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 1.192,
+     "foldCount": 4,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.0008250000000002977,
+     "envelope": 0.00261556,
+     "amount": 144825.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 2,
+    "damage": 4226.0,
+    "explainedByAttrMultHits": 2,
+    "explainedByAttrMultDamage": 4226.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 17,
+    "damage": 245026.0,
+    "hitsWithoutFold": 2,
+    "shareOfDealt": 0.1140895410082769
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 6,
+    "subUnityFoldHits": 71,
+    "subUnityFoldCount": 97,
+    "subUnityChainTakenMultHits": 71,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 688943.0,
+    "excludedDamage": {
+     "enemyTeamHits": 24,
+     "enemyTeamDamage": 688943.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 688943.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 2,
+     "unknownAttackerDamage": 65894.0,
+     "reportedTotalsUnattributedHits": 2,
+     "reportedTotalsUnattributedDamage": 65894
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 4,
+     "selfDamageDamage": 154242.0,
+     "friendlyFireHits": 3,
+     "friendlyFireDamage": 16873.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 6 hits with 0<takenMult<0.1, 71 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 2,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 2,
+   "knownMultWithoutFoldDamage": 4226.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 2,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261004_042458.json",
+   "version": "1.7.5",
+   "quest": 9999,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.0",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "LEGACY_NOT_APPLICABLE",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "TRAINING_NOT_COMPARABLE",
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 614,
+    "dmgWithCalc": 614,
+    "offlineAnalyzableHits": 158,
+    "contributionHits": 158,
+    "reconcileDmgEvents": 614
+   },
+   "damage": {
+    "totalsDealt": 7024899.0,
+    "offlineAnalyzableDealt": 4351950.0,
+    "contributionAnalyzableDealt": 4351950.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 614,
+    "violationsStrictRel1e3": 16,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0020618556701030855,
+    "maxAbsDeviation": 0.0009075000000002831,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.23522400000000002,
+     "dealtMult": 1.21,
+     "takenMult": 0.194,
+     "attrMult": 1.0,
+     "knownMult": 0.235,
+     "foldCount": 6,
+     "relDeviation": 0.0020618556701030855,
+     "absDeviation": 0.0004840000000000122,
+     "envelope": 0.0010071619999999998,
+     "amount": 563.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10024,
+     "foldProduct": 1.3113375000000003,
+     "dealtMult": 1.815,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 1.311,
+     "foldCount": 5,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.0009075000000002831,
+     "envelope": 0.0029065374999999996,
+     "amount": 51748.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 8,
+    "damage": 123000.0,
+    "explainedByAttrMultHits": 8,
+    "explainedByAttrMultDamage": 123000.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 0
+   },
+   "attributeAffinity": {
+    "hits": 16,
+    "damage": 261222.0,
+    "hitsWithoutFold": 8,
+    "shareOfDealt": 0.0371851609539155
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 146,
+    "subUnityFoldHits": 487,
+    "subUnityFoldCount": 1281,
+    "subUnityChainTakenMultHits": 486,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 2672949.0,
+    "excludedDamage": {
+     "enemyTeamHits": 448,
+     "enemyTeamDamage": 2672949.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 2672949.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 8,
+     "unknownAttackerDamage": 281763.0,
+     "reportedTotalsUnattributedHits": 8,
+     "reportedTotalsUnattributedDamage": 281763
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 18,
+     "selfDamageDamage": 983861.0,
+     "friendlyFireHits": 14,
+     "friendlyFireDamage": 221669.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 146 hits with 0<takenMult<0.1, 487 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 8,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 8,
+   "knownMultWithoutFoldDamage": 123000.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 8,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  },
+  {
+   "file": "battle_9999_20261004_135214.json",
+   "version": "1.7.8",
+   "quest": 9999,
+   "hasContributionSection": true,
+   "contributionSchemaVersion": "1.1",
+   "contributionMethod": "log-share/1",
+   "damageBasis": "dealt",
+   "crosscheck": {
+    "status": "LEGACY_NOT_APPLICABLE",
+    "statusCode": 0,
+    "mismatches": 0,
+    "omissions": 0,
+    "validateErrors": 0,
+    "reasons": [
+     "TRAINING_NOT_COMPARABLE",
+     "SECTION_PRESENT"
+    ],
+    "valuesTrusted": true
+   },
+   "counts": {
+    "dmgEvents": 1073,
+    "dmgWithCalc": 1072,
+    "offlineAnalyzableHits": 415,
+    "contributionHits": 415,
+    "reconcileDmgEvents": 1073
+   },
+   "damage": {
+    "totalsDealt": 10710019.0,
+    "offlineAnalyzableDealt": 7467581.0,
+    "contributionAnalyzableDealt": 7467581.0,
+    "analyzableFilterMatchesOffline": true
+   },
+   "foldIdentity": {
+    "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",
+    "strictRelTol": 0.001,
+    "checkedHits": 1072,
+    "violationsStrictRel1e3": 13,
+    "violationsUnexplainedByRounding": 0,
+    "maxRelDeviation": 0.0020618556701035295,
+    "maxAbsDeviation": 0.0009075000000002831,
+    "maxRelDeviationRecord": {
+     "effectId": 0,
+     "foldProduct": 0.3528360000000001,
+     "dealtMult": 1.815,
+     "takenMult": 0.194,
+     "attrMult": 1.0,
+     "knownMult": 0.353,
+     "foldCount": 7,
+     "relDeviation": 0.0020618556701035295,
+     "absDeviation": 0.0007260000000001154,
+     "envelope": 0.0014798485,
+     "amount": 5795.0
+    },
+    "maxAbsDeviationRecord": {
+     "effectId": 10024,
+     "foldProduct": 1.3113375000000003,
+     "dealtMult": 1.815,
+     "takenMult": 0.722,
+     "attrMult": 1.0,
+     "knownMult": 1.311,
+     "foldCount": 5,
+     "relDeviation": 0.0006925207756234286,
+     "absDeviation": 0.0009075000000002831,
+     "envelope": 0.0029065374999999996,
+     "amount": 52097.0
+    },
+    "degenerateZeroChainHits": 0,
+    "degenerateConsistent": 0,
+    "degenerateInconsistent": 0
+   },
+   "knownMultWithoutFold": {
+    "criterion": "knownMult != 1 and calc.fold empty (literal NEXT-STEPS detection)",
+    "hits": 1,
+    "damage": 3808.0,
+    "explainedByAttrMultHits": 1,
+    "explainedByAttrMultDamage": 3808.0,
+    "unexplainedHits": 0,
+    "unexplainedDamage": 0.0,
+    "withAtkAddHits": 1
+   },
+   "attributeAffinity": {
+    "hits": 1,
+    "damage": 3808.0,
+    "hitsWithoutFold": 1,
+    "shareOfDealt": 0.00035555492478584773
+   },
+   "specialMode": {
+    "trainingGround": true,
+    "trainingScaleX003": true,
+    "trainingScaleHits": 221,
+    "subUnityFoldHits": 806,
+    "subUnityFoldCount": 2032,
+    "subUnityChainTakenMultHits": 806,
+    "subUnityChainDealtMultHits": 0,
+    "markers": [
+     "training_ground",
+     "training_x0.03",
+     "sub_unity_folds",
+     "self_damage",
+     "friendly_fire"
+    ]
+   },
+   "reconciliation": {
+    "dealtMinusAnalyzable": 3242438.0,
+    "excludedDamage": {
+     "enemyTeamHits": 630,
+     "enemyTeamDamage": 3242438.0,
+     "enemyTeamNormalExpected": true,
+     "ownSideExcludedHits": 0,
+     "ownSideExcludedDamage": 0.0,
+     "total": 3242438.0
+    },
+    "reconciliationGap": 0.0,
+    "outsideDealt": {
+     "unknownAttackerHits": 28,
+     "unknownAttackerDamage": 635599.0,
+     "reportedTotalsUnattributedHits": 28,
+     "reportedTotalsUnattributedDamage": 635599
+    },
+    "inAnalyzed": {
+     "selfDamageHits": 53,
+     "selfDamageDamage": 3057587.0,
+     "friendlyFireHits": 9,
+     "friendlyFireDamage": 70540.0
+    }
+   },
+   "modelApplicability": "not_comparable",
+   "comparisonAllowed": false,
+   "comparisonAllowedWithCaveat": false,
+   "comparisonScope": "training-ground-only",
+   "reasons": [
+    "quest 9999 is the training ground (special x0.03 mode: 221 hits with 0<takenMult<0.1, 806 sub-unity fold hits)"
+   ],
+   "retiredKnownMultCriterionLeaks": 1,
+   "correctedUnexplainedLeaks": 0,
+   "knownMultWithoutFoldHits": 1,
+   "knownMultWithoutFoldDamage": 3808.0,
+   "knownMultWithoutFoldExplainedByAttrMultHits": 1,
+   "foldIdentityUnexplainedLeaks": 0,
+   "specialModeVerdict": "training_ground"
+  }
+ ],
+ "verdicts": {
+  "411001": {
+   "exports": 22,
+   "versions": [
+    "1.5.3",
+    "1.5.4",
+    "1.5.5",
+    "1.6.0",
+    "1.6.1",
+    "1.7.0",
+    "1.7.10",
+    "1.7.2",
+    "1.7.3",
+    "1.7.4",
+    "1.7.5",
+    "1.7.6",
+    "1.7.8"
+   ],
+   "withSection": 14,
+   "applicability": [
+    "full",
+    "not_comparable",
+    "partial"
+   ],
+   "comparisonScopes": [
+    "invalid-plugin-value-trust",
+    "normal-benchmark",
+    "offline-recompute-only"
+   ],
+   "knownMultWithoutFoldHits": 0,
+   "knownMultWithoutFoldExplainedByAttr": 0,
+   "correctedUnexplainedLeaks": 0
+  },
+  "700817": {
+   "exports": 1,
+   "versions": [
+    "1.7.6"
+   ],
+   "withSection": 1,
+   "applicability": [
+    "partial"
+   ],
+   "comparisonScopes": [
+    "caveat-attribute-affinity"
+   ],
+   "knownMultWithoutFoldHits": 59,
+   "knownMultWithoutFoldExplainedByAttr": 59,
+   "correctedUnexplainedLeaks": 0
+  },
+  "9999": {
+   "exports": 7,
+   "versions": [
+    "1.5.3",
+    "1.5.4",
+    "1.5.5",
+    "1.7.5",
+    "1.7.8"
+   ],
+   "withSection": 2,
+   "applicability": [
+    "not_comparable"
+   ],
+   "comparisonScopes": [
+    "training-ground-only"
+   ],
+   "knownMultWithoutFoldHits": 37,
+   "knownMultWithoutFoldExplainedByAttr": 37,
+   "correctedUnexplainedLeaks": 0
+  }
+ }
+}

@@ -1,0 +1,524 @@
+{
+ "contribution": {
+  "schemaVersion": "0.1-draft",
+  "method": "log-share/1",
+  "damageBasis": "dealt",
+  "totalDamage": 1948231.0,
+  "attributedDamage": 1948231.0,
+  "unattributedDamage": 0.0,
+  "coverage": {
+   "creditedShare": 1.0,
+   "unattributedShare": 0.0,
+   "analyzableDealt": 1948231.0,
+   "hits": 91,
+   "byUnitGiven": [
+    0,
+    0
+   ],
+   "byUnitMadness": [
+    0,
+    0
+   ],
+   "keyCoverage": 0.9891304347826086,
+   "ownerPaths": {
+    "byUnit_name_to_key": 0,
+    "abilityId_to_holder": 112,
+    "abilityName_to_holder": 0,
+    "attacker_default_fallback": 0
+   },
+   "foldAccounting": {
+    "total": 112,
+    "resolved": 112,
+    "unresolved": 0,
+    "zero_factor": 0,
+    "noop_factor": 0,
+    "unknown_reason": 0
+   }
+  },
+  "source": {
+   "file": "battle_9999_20261003_225905.json",
+   "pluginVersion": "1.5.4",
+   "quest": 9999,
+   "duration": 17.63,
+   "result": "None",
+   "run": {
+    "id": 3,
+    "seq": 0
+   },
+   "started": "2026-10-03T22:59:05",
+   "app": "DpsMeter"
+  },
+  "totals": {
+   "dealt": 2718309,
+   "analyzableDealt": 1948231.0,
+   "eventSumAll": 2718910.0,
+   "analyzeVsTotalsDelta": -770078.0,
+   "unattributedDamageEvents": {
+    "count": 1,
+    "damage": 601.0
+   },
+   "outsideTeamEvents": {
+    "count": 84,
+    "damage": 770078.0
+   },
+   "unattributedCredit": 0.0,
+   "dealtWithAbsorbed": 2861446,
+   "absorbed": 143137,
+   "hits": 91,
+   "coverage": {
+    "creditedShare": 1.0,
+    "unattributedShare": 0.0,
+    "poolShareOfAnalyzable": 0.18956207420144647,
+    "byUnitGiven": [
+     0,
+     0
+    ],
+    "byUnitMadness": [
+     0,
+     0
+    ],
+    "perHitMaxError": 0.0
+   }
+  },
+  "actors": [
+   {
+    "key": 3,
+    "name": "[賢導]トレイラ",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 716595.0,
+    "directShare": 0.36781829259466664,
+    "baseCredit": 458592.9394297162,
+    "selfRuleCredit": 258002.06057028382,
+    "assistCredit": 0.0,
+    "totalCredit": 716595.0,
+    "totalShare": 0.36781829259466664,
+    "receivedAssist": 0.0,
+    "hits": 16,
+    "rules": [
+     {
+      "ruleName": "魔法与ダメージ+10%",
+      "kind": "text",
+      "side": "atk",
+      "hits": 32,
+      "damageEquivalent": 110029.83391410032
+     },
+     {
+      "ruleName": "炎の剣",
+      "kind": "text",
+      "side": "atk",
+      "hits": 16,
+      "damageEquivalent": 65415.55397142936
+     },
+     {
+      "ruleName": "エイボンの指輪",
+      "kind": "text",
+      "side": "atk",
+      "hits": 16,
+      "damageEquivalent": 55014.916957050154
+     },
+     {
+      "ruleName": "魔導の怪翼",
+      "kind": "text",
+      "side": "atk",
+      "hits": 1,
+      "damageEquivalent": 27541.755727703992
+     }
+    ]
+   },
+   {
+    "key": 15,
+    "name": "邪悪なる死のカラス",
+    "team": 1,
+    "kind": "P",
+    "summon": true,
+    "directDamage": 416164.0,
+    "directShare": 0.2136112196141012,
+    "baseCredit": 416164.0,
+    "selfRuleCredit": 0.0,
+    "assistCredit": 0.0,
+    "totalCredit": 416164.0,
+    "totalShare": 0.2136112196141012,
+    "receivedAssist": 0.0,
+    "hits": 12,
+    "rules": []
+   },
+   {
+    "key": 13,
+    "name": "ポポロット",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 357938.0,
+    "directShare": 0.183724619924434,
+    "baseCredit": 247024.15458937205,
+    "selfRuleCredit": 110913.84541062801,
+    "assistCredit": 0.0,
+    "totalCredit": 357938.00000000006,
+    "totalShare": 0.18372461992443404,
+    "receivedAssist": 0.0,
+    "hits": 15,
+    "rules": [
+     {
+      "ruleName": "腐食の毒薬",
+      "kind": "text",
+      "side": "atk",
+      "hits": 45,
+      "damageEquivalent": 110913.84541062801
+     }
+    ]
+   },
+   {
+    "key": 8,
+    "name": "リヴァシー",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 227164.0,
+    "directShare": 0.11660013622614566,
+    "baseCredit": 227164.0,
+    "selfRuleCredit": 0.0,
+    "assistCredit": 0.0,
+    "totalCredit": 227164.0,
+    "totalShare": 0.11660013622614566,
+    "receivedAssist": 0.0,
+    "hits": 9,
+    "rules": []
+   },
+   {
+    "key": 6,
+    "name": "ク＝ルヴィ",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 153095.0,
+    "directShare": 0.07858154397502144,
+    "baseCredit": 153095.0,
+    "selfRuleCredit": 0.0,
+    "assistCredit": 0.0,
+    "totalCredit": 153095.0,
+    "totalShare": 0.07858154397502144,
+    "receivedAssist": 0.0,
+    "hits": 17,
+    "rules": []
+   },
+   {
+    "key": 1,
+    "name": "レヴナント",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 61650.0,
+    "directShare": 0.03164409148607121,
+    "baseCredit": 61650.0,
+    "selfRuleCredit": 0.0,
+    "assistCredit": 0.0,
+    "totalCredit": 61650.0,
+    "totalShare": 0.03164409148607121,
+    "receivedAssist": 0.0,
+    "hits": 14,
+    "rules": []
+   },
+   {
+    "key": 16,
+    "name": "ソフィー",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 14006.0,
+    "directShare": 0.0071890858938185465,
+    "baseCredit": 14006.0,
+    "selfRuleCredit": 0.0,
+    "assistCredit": 0.0,
+    "totalCredit": 14006.0,
+    "totalShare": 0.0071890858938185465,
+    "receivedAssist": 0.0,
+    "hits": 7,
+    "rules": []
+   },
+   {
+    "key": 4,
+    "name": "T.O.W.E.R.typeR",
+    "team": 1,
+    "kind": "P",
+    "summon": false,
+    "directDamage": 1619.0,
+    "directShare": 0.0008310102857412699,
+    "baseCredit": 1224.1965973534973,
+    "selfRuleCredit": 394.8034026465027,
+    "assistCredit": 0.0,
+    "totalCredit": 1619.0,
+    "totalShare": 0.0008310102857412699,
+    "receivedAssist": 0.0,
+    "hits": 1,
+    "rules": [
+     {
+      "ruleName": "腐食の毒薬",
+      "kind": "text",
+      "side": "atk",
+      "hits": 2,
+      "damageEquivalent": 394.8034026465027
+     }
+    ]
+   }
+  ],
+  "rules": [
+   {
+    "ownerKey": 13,
+    "ownerName": "ポポロット",
+    "ruleName": "腐食の毒薬",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#1/10110/c1",
+    "resolved": true,
+    "hits": 15,
+    "folds": 45,
+    "coverage": 0.16483516483516483,
+    "damageEquivalent": 110913.84541062801,
+    "reasons": {
+     "ability_holder_unique": 30,
+     "ability_holder_attacker": 15
+    },
+    "beneficiaries": [
+     {
+      "key": 13,
+      "name": "ポポロット",
+      "amount": 110913.84541062801,
+      "hits": 15,
+      "folds": 0
+     }
+    ]
+   },
+   {
+    "ownerKey": 3,
+    "ownerName": "[賢導]トレイラ",
+    "ruleName": "魔法与ダメージ+10%",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#8/1/c0",
+    "resolved": true,
+    "hits": 16,
+    "folds": 32,
+    "coverage": 0.17582417582417584,
+    "damageEquivalent": 110029.83391410032,
+    "reasons": {
+     "ability_holder_attacker": 32
+    },
+    "beneficiaries": [
+     {
+      "key": 3,
+      "name": "[賢導]トレイラ",
+      "amount": 110029.83391410032,
+      "hits": 16,
+      "folds": 0
+     }
+    ]
+   },
+   {
+    "ownerKey": 3,
+    "ownerName": "[賢導]トレイラ",
+    "ruleName": "炎の剣",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#1/78/c0",
+    "resolved": true,
+    "hits": 16,
+    "folds": 16,
+    "coverage": 0.17582417582417584,
+    "damageEquivalent": 65415.55397142936,
+    "reasons": {
+     "ability_holder_unique": 16
+    },
+    "beneficiaries": [
+     {
+      "key": 3,
+      "name": "[賢導]トレイラ",
+      "amount": 65415.55397142936,
+      "hits": 16,
+      "folds": 0
+     }
+    ]
+   },
+   {
+    "ownerKey": 3,
+    "ownerName": "[賢導]トレイラ",
+    "ruleName": "エイボンの指輪",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#2/84/c0",
+    "resolved": true,
+    "hits": 16,
+    "folds": 16,
+    "coverage": 0.17582417582417584,
+    "damageEquivalent": 55014.916957050154,
+    "reasons": {
+     "ability_holder_unique": 16
+    },
+    "beneficiaries": [
+     {
+      "key": 3,
+      "name": "[賢導]トレイラ",
+      "amount": 55014.916957050154,
+      "hits": 16,
+      "folds": 0
+     }
+    ]
+   },
+   {
+    "ownerKey": 3,
+    "ownerName": "[賢導]トレイラ",
+    "ruleName": "魔導の怪翼",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#4/20084/c2",
+    "resolved": true,
+    "hits": 1,
+    "folds": 1,
+    "coverage": 0.01098901098901099,
+    "damageEquivalent": 27541.755727703992,
+    "reasons": {
+     "ability_holder_unique": 1
+    },
+    "beneficiaries": [
+     {
+      "key": 3,
+      "name": "[賢導]トレイラ",
+      "amount": 27541.755727703992,
+      "hits": 1,
+      "folds": 0
+     }
+    ]
+   },
+   {
+    "ownerKey": 4,
+    "ownerName": "T.O.W.E.R.typeR",
+    "ruleName": "腐食の毒薬",
+    "kind": "text",
+    "side": "atk",
+    "origin": "text#1/36/c1",
+    "resolved": true,
+    "hits": 1,
+    "folds": 2,
+    "coverage": 0.01098901098901099,
+    "damageEquivalent": 394.8034026465027,
+    "reasons": {
+     "ability_holder_attacker": 2
+    },
+    "beneficiaries": [
+     {
+      "key": 4,
+      "name": "T.O.W.E.R.typeR",
+      "amount": 394.8034026465027,
+      "hits": 1,
+      "folds": 0
+     }
+    ]
+   }
+  ],
+  "links": [],
+  "unattributed": [],
+  "unattributedByKind": {},
+  "diagnostics": {
+   "reasonCounts": {
+    "ability_holder_unique": 63,
+    "ability_holder_attacker": 49
+   },
+   "channelCensus": {
+    "text/atk": 112
+   },
+   "foldAccounting": {
+    "total": 112,
+    "resolved": 112,
+    "unresolved": 0,
+    "zero_factor": 0,
+    "noop_factor": 0,
+    "unknown_reason": 0
+   },
+   "zeroFactorHits": 0,
+   "noopFactorFolds": 0,
+   "attackerNameFallbacks": 0,
+   "duplicateInHit": 0,
+   "summonActors": [
+    "邪悪なる死のカラス"
+   ],
+   "duplicateNames": {
+    "レヴナント": [
+     1,
+     12
+    ],
+    "[賢導]トレイラ": [
+     3,
+     18
+    ],
+    "ク＝ルヴィ": [
+     6,
+     10
+    ],
+    "城塞": [
+     7,
+     17
+    ],
+    "邪悪なる死のカラス": [
+     14,
+     15
+    ]
+   },
+   "crits": 0,
+   "modelApplicable": false,
+   "subUnityFolds": 136,
+   "negativeLines": 0,
+   "residualBuckets": {
+    "1.0": 41,
+    "1.25": 12,
+    "1.5": 12,
+    "3.604": 5,
+    "14.293": 4,
+    "2.0": 3,
+    "14.416": 3,
+    "3.572": 2,
+    "1.501": 2,
+    "0.854": 1,
+    "1.875": 1,
+    "0.966": 1,
+    "0.196": 1,
+    "1.685": 1,
+    "29.315": 1,
+    "14.815": 1
+   },
+   "checks": [
+    {
+     "level": "WARN",
+     "code": "I4d",
+     "message": "136 folds had factor < 1 (damage reduction) and were excluded from M: ['text', 'vic', 'text#2/10080/c1', 0.95]"
+    },
+    {
+     "level": "WARN",
+     "code": "I7",
+     "message": "analyzableDealt differs from totals.dealt by -770078 (-28.3293%)"
+    },
+    {
+     "level": "INFO",
+     "code": "I8",
+     "message": "5 actor names repeat across the export (outside the analysed team; harmless)"
+    },
+    {
+     "level": "INFO",
+     "code": "I10",
+     "message": "training mode (quest 9999): special x0.03 rules; do not compare across modes"
+    },
+    {
+     "level": "INFO",
+     "code": "I9",
+     "message": "unattributed credit pool is empty"
+    }
+   ],
+   "knownLimits": [
+    "attackPower addends not split (stays in baseCredit)",
+    "crit / unidentified residual stays in baseCredit",
+    "summons kept as separate actor keys (no owner link in export)",
+    "totals.dealt vs per-event sum differ by ~0.05%"
+   ]
+  }
+ }
+}

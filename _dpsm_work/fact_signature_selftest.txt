@@ -1,0 +1,18 @@
+PASS kind identity replays to ONE class
+PASS kind identity does not starve
+PASS instance identity explodes (12 victims)
+PASS instance identity STARVES at cap 8
+PASS status ORDER alone does not split the kind key
+PASS RAW status order WOULD split it (so the fix is not cosmetic)
+PASS live budget covers every class
+PASS coverage policy fires on overflow
+PASS coverage policy fires on classes > maxClasses
+PASS coverage policy fires on liveSkipped
+PASS coverage policy fires on plugin errors
+PASS coverage policy fires on observed != sum(items.hits)
+PASS coverage policy stays silent on a clean export
+PASS coverage policy refuses to replay an export with no calc block
+PASS cap check accepts FactStore.cs values that agree
+PASS cap check REJECTS a drifted MaxClasses (2400 != 999)
+PASS cap check rejects a source with no such constant
+PASS cap check rejects a missing source file

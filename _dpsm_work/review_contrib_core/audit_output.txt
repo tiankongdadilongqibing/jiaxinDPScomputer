@@ -1,0 +1,126 @@
+=== PART 1: independent recomputation (1.5.5) ===
+hits(analyzable) = 5521  analyzableDealt = 203865411.0
+poolTotal = 156959220.34590647  poolShare = 0.76991589488374
+unattributedCredit = 0.0
+reasonCounts = {'ability_holder_attacker': 6502, 'ability_holder_unique': 6199, 'global_name_unique': 8661, 'byUnit': 7007}
+totBase = 46906190.65409332  totSelf = 91670166.56452306  totAssist = 65289053.7813844
+totalCredit = 203865411.00000077
+identity totalCredit+unattr-analyzable = 7.748603820800781e-07  relative = 3.8008428123203215e-15
+perHitMaxErr = 1.1641532182693481e-10  perHitBad = 0
+ROUNDED columns: base=46906191 self=91670167 assist=65289054 sum_of_rounded=203865412 analyzable_rounded=203865411
+
+=== PART 2: knownMult vs product(calc.fold factors) ===
+knownMult present on 5601 dmg rows
+hits where knownMult != product(fold, incl <=0 and ==1): 5494
+hits where knownMult != product(fold, filtered >0 and !=1): 5501
+hits with knownMult == 0: 7
+max abs deviation (all hits) = 1.5  worst = (1647, 0.0, 1.5, 1)
+max relative deviation (all hits) = 1.0
+max abs deviation (OUR-TEAM hits only) = 0.0006633272874978502
+max relative deviation (OUR-TEAM hits only) = 0.0003782148260209704
+distinct factor values: {0.0: 7, 1.05: 976, 1.1: 7386, 1.15: 5401, 1.2: 3868, 1.3: 244, 1.3225: 6731, 1.5: 31, 1.5209: 3044, 2.5: 897}
+factor values strictly between 0 and 1 (negative shares): {}
+
+=== PART 3: duplicate-computation checks ===
+hits with the SAME fold origin listed more than once: 0  extra instances: 0
+hits with repeated (ruleName, factor) SAME kind: 3966
+hits with repeated (ruleName, factor) CROSS kind (core duplicate_in_hit): 0
+cancel records total: 23024  with byUnit: 23024  whose origin also appears in the SAME hit's fold list: 0
+hits carrying a global fold whose name ALSO appears as a text/talent fold in the same hit: 0
+  ... and with the SAME factor too: 0
+global folds total: 8795  global labels without bracket: 0
+
+=== PART 4: coverage / attribution-path audit ===
+fold instances counted (analyzable): {'text': 12610, 'talent': 91, 'global': 8661, 'given': 6110, 'madness': 897}  total: 28369
+fold instances carrying byUnit (analyzable): {'given': 6110, 'madness': 897}
+   byUnit coverage given    6110/6110
+   byUnit coverage global   0/8661
+   byUnit coverage madness  897/897
+   byUnit coverage talent   0/91
+   byUnit coverage text     0/12610
+fold instances over ALL dmg events: {'text': 12617, 'talent': 91, 'global': 8795, 'given': 6180, 'madness': 902}  total: 28585
+  ... carrying byUnit: {'given': 6180, 'madness': 902}
+  ... factor<=0: {'text': 7}
+dmg events: 5602  attacker=='?': 67  atkKey non-null: 5535  actor-row team==1: 5521
+core key-coverage denominator (hits + unattributed_events) = 5588 -> 0.9880100214745884
+events whose actor row is team!=1 (excluded from analyzable): 14
+atkTeam vs actor-row team mismatches: 0
+team duplicate names: []
+export-wide duplicate name count (name->n): 1
+
+=== PART 5: uncovered / edge-case census ===
+analyzable hits missing calc entirely: 1
+analyzable hits with amount == 0: 0
+hits with folds where product(M) == 1: 0
+single-fold hits: 5
+fold-count histogram (analyzable): {0: 68, 1: 5, 2: 851, 3: 732, 4: 1182, 5: 891, 6: 211, 7: 572, 8: 65, 9: 469, 10: 210, 11: 8, 12: 257}
+folds with factor==1 anywhere: 0
+ability ids held by >1 team actor: 9  e.g. [(12001, ['ネーフェ＝ジアー', 'メルティエル']), (403, ['ネーフェ＝ジアー', 'テトラ', 'マッドシーカー', 'メルティエル', 'ルナリス', 'メアリー', 'エヴァラス・フラウ']), (1, ['ネーフェ＝ジアー', 'テトラ', 'マッドシーカー', 'メルティエル', 'エヴァラス・フラウ']), (6, ['ネーフェ＝ジアー', 'ルナリス', 'メアリー', 'エヴァラス・フラウ']), (10, ['ネーフェ＝ジアー', 'テトラ', 'マッドシーカー', 'メルティエル', 'ルナリス', 'メアリー', 'エヴァラス・フラウ'])]
+folds resolved to ambiguous_multi_holder: 0
+folds resolved to attacker_default (name fallback): 0
+folds resolved to ability_holder_attacker: 6502
+folds resolved to ability_holder_unique: 6199
+folds resolved to global_name_unique: 8661
+folds resolved to byUnit: 7007
+byUnit values not matching any team name: {}
+talent origin shapes: 2  sample: ['talent#0/30042/t1/1005', 'talent#0/39001/t1/1005']
+text/talent origins the abilityId regex cannot parse: {}
+
+=== PART 6: dictionary section 10 table recheck ===
+ACT マッドシーカー          key=4    base=13513395.030615 self=9155037.860395 assist=40038547.794248 total=62706980.685258 direct=27658427.0 recv=4989994.108990
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT ネーフェ＝ジアー         key=2    base=11146142.679841 self=31034255.442201 assist=0.000000 total=42180398.122042 direct=65087894.0 recv=22907495.877958
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT メアリー             key=7    base=5693539.762381 self=36433944.861072 assist=0.000000 total=42127484.623453 direct=58523963.0 recv=16396478.376547
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT メルティエル           key=5    base=2455001.985111 self=3313229.082507 assist=25250505.987136 total=31018737.054754 direct=7977179.0 recv=2208947.932382
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT エヴァラス・フラウ        key=9    base=4587651.990068 self=9520575.841512 assist=0.000000 total=14108227.831580 direct=22062278.0 recv=7954050.168420
+   delta vs report: dBase=0.000e+00 dSelf=1.863e-09 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT テトラ              key=3    base=8362127.780877 self=1807523.403922 assist=0.000000 total=10169651.184800 direct=19558611.0 recv=9388959.815200
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT 火砲               key=11   base=852744.474132 self=389098.316077 assist=0.000000 total=1241842.790209 direct=2372755.0 recv=1130912.209791
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT ルナリス             key=6    base=169873.591930 self=0.000000 assist=0.000000 total=169873.591930 direct=344585.0 recv=174711.408070
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=2.910e-11
+ACT 生ける炎 クトゥグア       key=14   base=104139.919138 self=0.000000 assist=0.000000 total=104139.919138 direct=210805.0 recv=106665.080862
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT クトゥグァ砲台R         key=118  base=10922.330839 self=8292.803490 assist=0.000000 total=19215.134330 direct=34457.0 recv=15241.865670
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+ACT クトゥグァ砲台          key=117  base=10651.109161 self=8208.953346 assist=0.000000 total=18860.062508 direct=34457.0 recv=15596.937492
+   delta vs report: dBase=0.000e+00 dSelf=0.000e+00 dAssist=0.000e+00 dTotal=0.000e+00 dDirect=0.000e+00 dRecv=0.000e+00
+report totals: {"dealt": 203964758, "analyzableDealt": 203865411.0, "eventSumAll": 204271307.0, "analyzeVsTotalsDelta": -99347.0, "unattributedDamageEvents": {"count": 67, "damage": 306549.0}, "outsideTeamEvents": {"count": 14, "damage": 99347.0}, "unattributedCredit": 0.0, "dealtWithAbsorbed": 212464758, "absorbed": 8500000, "hits": 5521, "coverage": {"creditedShare": 1.0000000000000038, "unattributedShare": 0.0, "poolShareOfAnalyzable": 0.76991589488374, "byUnitGiven": [6110, 6110], "byUnitMadness": [897, 897], "perHitMaxError": 1.1641532182693481e-10}}
+report coverage: {"creditedShare": 1.0000000000000038, "unattributedShare": 0.0, "analyzableDealt": 203865411.0, "hits": 5521, "byUnitGiven": [6110, 6110], "byUnitMadness": [897, 897], "keyCoverage": 0.9880100214745884, "ownerPaths": {"byUnit_name_to_key": 7007, "abilityId_to_holder": 12701, "abilityName_to_holder": 8661, "attacker_default_fallback": 0}, "foldAccounting": {"total": 28369, "resolved": 28369, "unresolved": 0, "zero_factor": 0, "noop_factor": 0, "sub_unity": 0, "unknown_reason": 0}}
+report totalDamage=203865411.0 attributedDamage=203865411.00000077 unattributedDamage=0.0
+attributed + unattributed = 203865411.000001 analyzable=203865411.0
+report rule rows: 21 links: 20 actors: 11
+beneficiary entries whose folds != 0 in report json: 49
+my rule top8:
+   母なる変異の飛沫                       global   vic  owner=4    dmg=30689081.570733 folds=3653
+   海魔の残滓                          global   vic  owner=5    dmg=25250505.987136 folds=5008
+   狂気 与伤害×2.50(狂気比250)            madness  atk  owner=7    dmg=20457926.267573 folds=897
+   腐食の毒薬                          text     atk  owner=2    dmg=14098225.888625 folds=1952
+   被伤害+10%(赋予)                    given    vic  owner=4    dmg=11620365.579624 folds=6110
+   与ダメージ+20%（前衛のみ）                text     atk  owner=2    dmg=11121939.126809 folds=976
+   与ダメージ+20%（前衛のみ）                text     atk  owner=7    dmg=7084218.537095 folds=1586
+   母なる変異の飛沫                       text     atk  owner=4    dmg=6884138.504285 folds=1773
+sum(rule damage) = 156959220.34590667  pool_total = 156959220.34590647
+sum(links.amount) in report json = 65289053.78138392  total assist = 65289053.7813844
+sum(received) = 65289053.78138389  total assist = 65289053.7813844  equal: True
+sum(direct) = 203865411.0  analyzable = 203865411.0
+summon actor keys=[11, 117, 118] subtotal totalCredit=1279917.987046 (dictionary says 1533932)
+non-summon totalCredit=202585493.012954
+sum of top6 non-summon = 202311479.50188652
+
+=== PART 7: other exports sanity (fold census + knownMult) ===
+  battle_411001_20261003_205449.json         ver=1.5.3  folds=28435  factor<=0=7   kmRows=6268  km!=prod=6175
+  battle_411001_20261003_230040.json         ver=1.5.4  folds=24990  factor<=0=10  kmRows=6127  km!=prod=5843
+  battle_411001_20261003_230311.json         ver=1.5.4  folds=26820  factor<=0=9   kmRows=6212  km!=prod=5993
+  battle_411001_20261003_230615.json         ver=1.5.4  folds=26469  factor<=0=9   kmRows=6270  km!=prod=6101
+  battle_411001_20261003_231044.json         ver=1.5.4  folds=27219  factor<=0=6   kmRows=6280  km!=prod=6097
+  battle_411001_20261003_231340.json         ver=1.5.4  folds=28084  factor<=0=9   kmRows=5654  km!=prod=5606
+  battle_411001_20261003_235204.json         ver=1.5.5  folds=28585  factor<=0=7   kmRows=5601  km!=prod=5501
+  battle_9999_20261003_205129.json           ver=1.5.3  folds=2864   factor<=0=0   kmRows=867   km!=prod=411
+  battle_9999_20261003_225530.json           ver=1.5.4  folds=236    factor<=0=0   kmRows=101   km!=prod=50
+  battle_9999_20261003_225647.json           ver=1.5.4  folds=243    factor<=0=0   kmRows=145   km!=prod=50
+  battle_9999_20261003_225905.json           ver=1.5.4  folds=344    factor<=0=0   kmRows=176   km!=prod=74

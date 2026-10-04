@@ -1,0 +1,92 @@
+======================================================================================================================
+DpsMeter 队伍贡献分析 v1  ——  method=log-share/1  damageBasis=dealt  schema=0.1-draft
+  导出: battle_9999_20261003_225905.json
+  version=1.5.4 quest=9999 duration=17.63s result=None
+  ⚠ trainingMode = true(试炼场 quest 9999):存在特殊 ×0.03 机制,**不参与跨场比较**
+  可分析池 analyzableDealt = 1948231  (我方 atkTeam=1 且攻击者可解析的逐击 dealt; 91 击)
+  totals.dealt = 2718309  totals.dealtWithAbsorbed = 2861446  差额 = -770078 (-28.3293%)  [口径差,单列不强行对齐]
+
+[0] 校验(阶段B恒等式)
+  逐击:Σcredit+未归因 = D ............ OK   (最大绝对误差 0.000e+00, 破坏击数 0)
+  角色:ΣtotalCredit+未归因 = 可分析池 . OK   (误差 0.000000, 相对 0.000e+00)
+  份额:ΣtotalShare+未归因份额 = 1 ... OK   (1.000000000000)
+  折叠记账:总数 112 = 已解析 112 + 未归因 0 (因子≤0 0, 因子=1 0, 因子<1 136)
+  [WARN I4d] 136 folds had factor < 1 (damage reduction) and were excluded from M: ['text', 'vic', 'text#2/10080/c1', 0.95]
+  [WARN I7] analyzableDealt differs from totals.dealt by -770078 (-28.3293%)
+  [INFO I8] 5 actor names repeat across the export (outside the analysed team; harmless)
+  [INFO I10] training mode (quest 9999): special x0.03 rules; do not compare across modes
+  [INFO I9] unattributed credit pool is empty
+
+  口径提醒:「直接输出」与「总贡献」是两套排名,不可相加;
+            「受队友赋能」是观察量,与「辅助贡献」对称,同样不可与总贡献相加。
+
+[1] 直接输出排名
+  角色                 key          直接伤害      占比     出手
+  [賢導]トレイラ             3        716595  36.78%     16
+  邪悪なる死のカラス           15        416164  21.36%     12
+  ポポロット               13        357938  18.37%     15
+  リヴァシー                8        227164  11.66%      9
+  ク＝ルヴィ                6        153095   7.86%     17
+  レヴナント                1         61650   3.16%     14
+  ソフィー                16         14006   0.72%      7
+  T.O.W.E.R.typeR      4          1619   0.08%      1
+
+[2] 总贡献排名(可加和:基础 + 自身规则 + 辅助贡献)
+  角色                 key           基础         自身规则         辅助贡献           总贡献    总贡献占比     直接占比     出手
+  [賢導]トレイラ             3       458593       258002            0        716595   36.78%   36.78%     16
+  邪悪なる死のカラス           15       416164            0            0        416164   21.36%   21.36%     12
+  ポポロット               13       247024       110914            0        357938   18.37%   18.37%     15
+  リヴァシー                8       227164            0            0        227164   11.66%   11.66%      9
+  ク＝ルヴィ                6       153095            0            0        153095    7.86%    7.86%     17
+  レヴナント                1        61650            0            0         61650    3.16%    3.16%     14
+  ソフィー                16        14006            0            0         14006    0.72%    0.72%      7
+  T.O.W.E.R.typeR      4         1224          395            0          1619    0.08%    0.08%      1
+  合计                          1578920       369311            0       1948231  100.00%
+  未归因                                                                       0    0.00%
+
+[3] 角色贡献构成(非加和观察量:受队友赋能)
+
+[4] 规则贡献排名(damageEquivalent = 该规则带来的份额之和)
+  规则                         通道        侧    持有者                  命中      覆盖率     折叠          伤害当量    受益者
+  腐食の毒薬                      text      atk  ポポロット                15    16.5%     45        110914      1
+  魔法与ダメージ+10%                text      atk  [賢導]トレイラ             16    17.6%     32        110030      1
+  炎の剣                        text      atk  [賢導]トレイラ             16    17.6%     16         65416      1
+  エイボンの指輪                    text      atk  [賢導]トレイラ             16    17.6%     16         55015      1
+  魔導の怪翼                      text      atk  [賢導]トレイラ              1     1.1%      1         27542      1
+  腐食の毒薬                      text      atk  T.O.W.E.R.typeR       1     1.1%      2           395      1
+
+[5] 辅助关系(提供者 -> 出手者,只列非自身规则)
+  (无)
+
+[6] 未归因与残差
+  (未归因池为空)
+  非折叠倍率(会心/攻击力加算/未识别)按定义留在基础项;calc.residual 分布(前 8):
+    residual=1.0      41 击
+    residual=1.25     12 击
+    residual=1.5      12 击
+    residual=3.604    5 击
+    residual=14.293   4 击
+    residual=2.0      3 击
+    residual=14.416   3 击
+    residual=3.572    2 击
+
+[7] 数据质量
+  事件:dmg 176(我方 91)/ heal 40 / 其它 0
+  未归属事件(attacker 为 ?): {'count': 1, 'damage': 601.0}
+  队外攻击者事件: {'count': 84, 'damage': 770078.0}
+  byUnit 覆盖率:given [0, 0], madness [0, 0]   (带 byUnit / 该类折叠)
+  归属理由计数: {'ability_holder_unique': 63, 'ability_holder_attacker': 49}
+  主键覆盖(Phase C):攻击者事件由 actors[].key 解析 91/92 = 98.9130%;未解析 {'count': 1, 'damage': 601.0}
+  规则归属路径(名称→key / id→key / 回退): {'byUnit_name_to_key': 0, 'abilityId_to_holder': 112, 'abilityName_to_holder': 0, 'attacker_default_fallback': 0}
+  通道×侧普查: {'text/atk': 112}
+  名称回退计数(attacker_default): 0 ;  我方同名 actor: 无 ;  全导出重名 actor 名数: 5
+  召唤物(独立 key,第一版不合并): ['邪悪なる死のカラス']
+
+[8] 证据等级与已知限制
+  实测(SS):逐击 amount / atkKey / fold.factor / byUnit / totals.*
+  离线重放(SR):D/M 拆分与 ln 份额、角色/规则/关系聚合、全部恒等式
+  推断(IN):cancel 语义、残差分解、会心观测、训练场特殊倍率
+  限制 1:attackPower 内的攻击力加算未拆,留在基础项(阶段G)
+  限制 2:非折叠残差(会心/未识别)留在基础项,未单独归因
+  限制 3:召唤物与使用者未合并(导出无主人字段)
+  限制 4:totals.dealt 与逐事件求和存在 0.0487% 口径差,并列展示

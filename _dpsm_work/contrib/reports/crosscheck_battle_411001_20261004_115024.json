@@ -1,0 +1,34 @@
+{
+ "file": "battle_411001_20261004_115024.json",
+ "sectionPresent": true,
+ "mismatches": [],
+ "checked": {
+  "totals": 4,
+  "actors": 11,
+  "rules": 37,
+  "links": 29
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "status": "OK",
+ "offline": {
+  "creditedShare": 1.0000000000000016,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 33232,
+   "resolved": 33232,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ }
+}

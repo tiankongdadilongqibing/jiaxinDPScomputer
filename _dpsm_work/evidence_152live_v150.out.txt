@@ -1,0 +1,2 @@
+﻿report -> D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\v150_validate.txt
+version=1.5.2 quest=411001 problems=0

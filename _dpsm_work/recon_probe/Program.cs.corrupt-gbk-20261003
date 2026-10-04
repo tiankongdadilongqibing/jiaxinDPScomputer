@@ -1,0 +1,160 @@
+using System;
+using System.Text;
+using DpsMeter;
+
+namespace ReconProbe;
+
+/// <summary>
+/// Executes CalcReconcile on a synthetic session with hand-computed expected results, then prints the
+/// emitted JSON so it can be parsed as JSON (a malformed block would make every export unreadable).
+/// Any mismatch throws -> non-zero exit code, so this is a real assertion, not a printout.
+/// </summary>
+public static class Program
+{
+	private static int _fail;
+
+	private static void Check(string what, long got, long want)
+	{
+		bool ok = got == want;
+		if (!ok) _fail++;
+		Console.WriteLine("{0} {1}: got={2} want={3}", ok ? "PASS" : "FAIL", what, got, want);
+	}
+
+	private static BattleEvent Dmg(double t, string pair, bool corroborated,
+		int theory, int applied, int absorbed, int critRate, int critDmg)
+	{
+		int pow = 10000;
+		int baseDmg = theory;
+		return new BattleEvent
+		{
+			T = t,
+			Type = "dmg",
+			Amount = applied,
+			Nominal = applied + absorbed,
+			Calc = new CalcBreakdown
+			{
+				Valid = true,
+				EffectId = 10100,
+				HitType = 1,
+				AttackPower = pow,
+				Power = pow,
+				Ratio = 1.0,
+				DefenseUsed = 500,
+				DefenseKind = "物防",
+				Penetration = 5,
+				EffectiveDefense = 475,
+				BaseDamage = baseDmg,
+				AttrMult = 1.0,
+				DealtMult = 1.0,
+				TakenMult = 1.0,
+				KnownMult = 1.0,
+				Theory = theory,
+				Applied = applied,
+				Absorbed = absorbed,
+				Residual = theory > 0 ? (double)applied / theory : 0.0,
+				CritRate = critRate,
+				CritDamageRate = critDmg,
+				Pair = pair,
+				PairCorroborated = corroborated
+			}
+		};
+	}
+
+	public static int Main(string[] args)
+	{
+		var s = new BattleSession { ActiveSeconds = 100.0 };
+		//                 t     pair         corr   theory  applied  abs  cr  cd
+		s.Events.Add(Dmg(1.0, "live-same", true, 1000, 1000, 0, 25, 160));    // exact
+		s.Events.Add(Dmg(2.0, "value", true, 1000, 800, 200, 25, 160));        // exact via 被吸�?		s.Events.Add(Dmg(3.0, "live-same", false, 1000, 1030, 0, 25, 160));    // approx (+3%)
+		s.Events.Add(Dmg(15.0, "live-same", false, 1000, 1210, 0, 0, 0));      // unexplained 1.210
+		s.Events.Add(Dmg(25.0, "live-same", false, 1000, 1210, 0, 0, 0));      // unexplained 1.210
+		s.Events.Add(Dmg(45.0, "live-same", false, 100000, 4000, 0, 0, 0));    // unexplained 0.040 -> theoryExceeds
+		s.Events.Add(Dmg(55.0, "value", false, 1000, 1210, 0, 0, 0));          // unexplained 1.210
+		s.Events.Add(new BattleEvent { T = 65.0, Type = "dmg", Calc = default(CalcBreakdown) }); // no composition
+		s.Events.Add(Dmg(75.0, "live-age", false, 500, 500, 0, 0, 0));         // exact, untrusted pairing
+		s.Events.Add(Dmg(85.0, "fifo", false, 500, 500, 0, 0, 0));             // exact, untrusted pairing
+		s.Events.Add(Dmg(95.0, "live-same", false, 1000, 2500, 0, 0, 0));      // unexplained 2.500
+		// 1.3.9: the crit classification. 1000 x 1.90 == 1900 with 会心伤害�?190 -> counted as
+		// crit-inferred, and it must NOT move the strict `exact` count.
+		s.Events.Add(Dmg(97.0, "live-same", false, 1000, 1900, 0, 40, 190));   // 凭会心新�?		// and the same shape with 会心�?0 must NOT be counted (no roll could have landed)
+		s.Events.Add(Dmg(98.0, "live-same", false, 1000, 1900, 0, 0, 190));    // unexplained
+		// 1.3.10: the game's number is a ROUNDED integer, so the classification must use a relative
+		// tolerance -- 1000*1.9 = 1900 vs an applied 1899 (0.053%) is still a crit.
+		s.Events.Add(Dmg(99.0, "live-same", false, 1000, 1899, 0, 40, 190));   // 凭会心新�?		s.Events.Add(new BattleEvent { T = 96.0, Type = "heal", Calc = default(CalcBreakdown) }); // ignored (not dmg)
+
+		CalcReconcile.Stats st = CalcReconcile.Compute(s);
+
+		Console.WriteLine("--- 分类断言 ---");
+		Check("dmgEvents", st.DmgEvents, 14);
+		Check("withCalc", st.WithCalc, 13);
+		Check("exact", st.Exact, 4);
+		Check("exactWithCrit", st.ExactWithCrit, 6);
+		Check("critInferred", st.CritInferred, 2);
+		Check("approx", st.Approx, 1);
+		Check("unexplained", st.Unexplained, 6);
+		Check("theoryExceeds", st.TheoryExceeds, 1);
+		Check("absorbed", st.Absorbed, 1);
+		Check("absorbedAmount", st.AbsorbedAmount, 200);
+		Check("distinctResiduals", st.DistinctResiduals, 4);
+		Check("pairLiveSame", st.PairLiveSame, 9);
+		Check("pairLiveAge", st.PairLiveAge, 1);
+		Check("pairValue", st.PairValue, 2);
+		Check("pairFifo", st.PairFifo, 1);
+		Check("pairNone", st.PairNone, 1);
+		Check("pairUnknown", st.PairUnknown, 0);
+		Check("pairCorroborated", st.PairCorroborated, 2);
+		Check("top[0].r(x1000)", st.Top.Count > 0 ? st.Top[0].Key : -1, 1210);
+		Check("top[0].n", st.Top.Count > 0 ? st.Top[0].Value : -1, 3);
+		long t0 = 0, tt = 0;
+		for (int i = 0; i < 10; i++) { t0 += st.TenthExact[i]; tt += st.TenthTotal[i]; }
+		Check("byTenth exact sum", t0, 4);
+		Check("byTenth total sum", tt, 14);
+		Check("tenth[0].total", st.TenthTotal[0], 3);
+		Check("tenth[0].exact", st.TenthExact[0], 2);
+		Check("tenth[7].exact", st.TenthExact[7], 1);
+
+		// ValueMatches semantics: an absorbed hit matches the game's pre-absorption figure only.
+		CalcBreakdown abs = s.Events[1].Calc;
+		Check("absorbed GameValue", abs.GameValue, 1000);
+		Check("absorbed ValueMatches", abs.ValueMatches ? 1 : 0, 1);
+		Check("absorbed PairTrusted", abs.PairTrusted ? 1 : 0, 1);
+		Check("live-age PairTrusted", s.Events[8].Calc.PairTrusted ? 1 : 0, 0);
+		Check("fifo PairTrusted", s.Events[9].Calc.PairTrusted ? 1 : 0, 0);
+
+		Console.WriteLine("--- [RECON] 自检�?---");
+		Console.WriteLine("[DpsMeter][RECON] " + CalcReconcile.Summary(st));
+
+		// Emitted exactly as ExportService emits it (AppendJson starts with the separating comma).
+		var sb = new StringBuilder();
+		CalcReconcile.AppendJson(sb, st);
+		string jsonReconcile = "{\"pad\":0" + sb + "}";
+
+		var sbe = new StringBuilder();
+		CalcReconcile.AppendEventCalc(sbe, s.Events[0].Calc);
+		string jsonCalcFull = "{\"pad\":0" + sbe + "}";
+
+		var sbm = new StringBuilder();
+		CalcReconcile.AppendEventCalc(sbm, s.Events[5].Calc);   // the theoryExceeds one
+		string jsonCalcMis = "{\"pad\":0" + sbm + "}";
+
+		Console.WriteLine("--- JSON: reconcile ---");
+		Console.WriteLine(jsonReconcile);
+		Console.WriteLine("--- JSON: event calc (full) ---");
+		Console.WriteLine(jsonCalcFull);
+		Console.WriteLine("--- JSON: event calc (theory exceeds actual 25x) ---");
+		Console.WriteLine(jsonCalcMis);
+
+		// Written as UTF-8 here rather than through the console: the console codepage on a Japanese/Chinese
+		// Windows would re-encode the CJK fields, and the point of this file is to be PARSED as JSON.
+		if (args != null && args.Length > 0)
+		{
+			var dump = new StringBuilder();
+			dump.Append(jsonReconcile).Append('\n').Append(jsonCalcFull).Append('\n').Append(jsonCalcMis).Append('\n');
+			System.IO.File.WriteAllText(args[0], dump.ToString(), new UTF8Encoding(false));
+			Console.WriteLine("wrote " + args[0]);
+		}
+
+		Console.WriteLine(_fail == 0 ? "ALL CHECKS PASSED" : (_fail + " CHECK(S) FAILED"));
+		return _fail == 0 ? 0 : 1;
+	}
+}

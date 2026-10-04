@@ -1,0 +1,58 @@
+邪神战记中文翻译 Mod 0.1.2
+============================
+
+适用版本
+--------
+Windows DMM 客户端：rlyehshoujotaix_cl.exe
+Unity 6000.3.5f2 / IL2CPP x64
+
+安装
+----
+1. 关闭游戏。
+2. 将压缩包里的全部内容复制到 rlyehshoujotaix_cl.exe 所在目录。
+3. 正常从 DMM Game Player 或原本使用的 DMM 启动器启动游戏。
+   不要直接双击 rlyehshoujotaix_cl.exe。
+4. 第一次运行需要生成 IL2CPP interop，可能等待几十秒，属于正常现象。
+
+本发行包已经关闭 BepInEx 的 Unity 日志监听，以避免 Unity 6000.3 在
+Chainloader startup complete 后白屏闪退。此设置不影响汉化和 Mod 日志。
+
+发行包不内置翻译文本。首次启动会从以下公开仓库下载并校验翻译包：
+https://raw.githubusercontent.com/lafayas/JashinsenkiTranslation/main
+下载完成后会写入本地缓存；以后启动先使用缓存，同时后台检查远端更新。
+
+配置
+----
+首次启动后配置文件位于：
+BepInEx\config\local.jitsu.jashinsenki.translation.cfg
+
+下载缓存位于：
+BepInEx\plugins\JashinsenkiTranslationMod\translation\zh-CN
+
+GitHub 自动更新
+--------------
+本发行包已经预设：
+
+RemoteBaseUrl = https://raw.githubusercontent.com/lafayas/JashinsenkiTranslation/main
+
+插件会访问：
+translation/zh-CN/manifest.json
+translation/zh-CN/pack.json
+
+更新包会先经过 SHA-256 校验，再原子替换本地缓存。断网、超时或校验失败
+时继续使用现有本地译文。
+
+卸载
+----
+删除以下目录即可只卸载汉化插件：
+BepInEx\plugins\JashinsenkiTranslationMod
+
+若还要卸载 BepInEx，请一并删除游戏根目录下的 BepInEx、dotnet、
+winhttp.dll、doorstop_config.ini 和 .doorstop_version。
+
+说明
+----
+插件按场景名、原始行号及原文 SHA-256 匹配剧情。游戏更新后发生变化的行会
+安全跳过，不会把旧译文错贴到别处。
+
+本 Mod 为第三方爱好者项目，与游戏官方无关。请自行承担使用风险。

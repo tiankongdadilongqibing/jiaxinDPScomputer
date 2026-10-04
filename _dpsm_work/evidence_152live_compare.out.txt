@@ -1,0 +1,35 @@
+====================================================================================================
+FILE battle_411001_20261003_183213.json
+  version=1.5.2  events=5600  damageEvents=5582  withCalc=5582
+  hitValue present: 5582 / 5582
+  factCoverage={"dmg": 5583, "withFact": 5582, "withLiveState": 5582}
+  hitDetail={"produced": 5636, "trimmed": 0, "errors": 0, "matchExact": 31, "matchPair": 5551, "matchNone": 1}
+  reconcile={"dmgEvents": 5583, "withCalc": 5582, "exact": 3709, "exactWithCrit": 4501, "critInferred": 792, "critObserved": 0, "critObservedYes": 0, "critAgree": 0, "critInferredButDenied": 0, "critObservedButUnexplained": 0, "approx": 44, "unexplained": 1037, "theoryExceeds": 0, "absorbed": 10, "absorbedAmount": 5000000, "distinctResiduals": 19, "approxTolerance": 0.05, "theoryExceedsResidualMax": 0.1, "cri
+  residual(top15 by count): [(1.0, 3746), (1.9, 649), (1.323, 473), (1.322, 336), (1.15, 142), (1.65, 76), (0.87, 28), (1.899, 27), (1.901, 23), (0.756, 12), (1.898, 11), (0.0, 10), (1.093, 9), (2.185, 4), (1.652, 4)]
+  distinct residuals=35
+  amount/hitValue(top15): [(2.4337, 281), (2.313, 223), (2.0112, 220), (2.0113, 218), (2.7988, 147), (2.7987, 138), (6.7323, 138), (2.4336, 131), (11.0124, 74), (2.3129, 74), (2.4335, 72), (1.7489, 69), (5.5639, 67), (1.8402, 65), (2.1162, 58)]
+  hitValue==amount count: 31 ; hitValue==nominal count: 31
+  residual>1.10 total=1758  top15=[(1.9, 649), (1.323, 473), (1.322, 336), (1.15, 142), (1.65, 76), (1.899, 27), (1.901, 23), (1.898, 11), (2.185, 4), (1.652, 4), (1.521, 4), (2.184, 2), (1.436, 2), (1.85, 1), (1.848, 1)]
+  maxAbsorbed dist: [(2, 119), (3, 471), (4, 1816), (5, 3098)]
+====================================================================================================
+FILE battle_411001_20261003_175142.json
+  version=1.5.1  events=5070  damageEvents=5055  withCalc=5055
+  hitValue present: 0 / 5055
+  factCoverage={"dmg": 5055, "withFact": 1852, "withLiveState": 1236}
+  hitDetail={"produced": 5258, "trimmed": 0, "errors": 0, "matchExact": 39, "matchPair": 5181, "matchNone": 1}
+  reconcile={"dmgEvents": 5055, "withCalc": 5055, "exact": 3270, "exactWithCrit": 4064, "critInferred": 794, "critObserved": 0, "critObservedYes": 0, "critAgree": 0, "critInferredButDenied": 0, "critObservedButUnexplained": 0, "approx": 23, "unexplained": 968, "theoryExceeds": 0, "absorbed": 0, "absorbedAmount": 0, "distinctResiduals": 12, "approxTolerance": 0.05, "theoryExceedsResidualMax": 0.1, "critInferre
+  residual(top15 by count): [(1.0, 3272), (1.9, 667), (1.323, 483), (1.322, 295), (1.15, 151), (1.65, 69), (1.899, 21), (1.002, 21), (0.87, 14), (1.901, 10), (1.5, 9), (1.898, 9), (1.902, 8), (0.0, 6), (1.521, 6)]
+  distinct residuals=22
+  residual>1.10 total=1741  top15=[(1.9, 667), (1.323, 483), (1.322, 295), (1.15, 151), (1.65, 69), (1.899, 21), (1.901, 10), (1.5, 9), (1.898, 9), (1.902, 8), (1.521, 6), (1.652, 4), (2.185, 4), (1.904, 2), (2.184, 1)]
+  maxAbsorbed dist: [(1, 167), (2, 1890), (3, 2983)]
+====================================================================================================
+FILE battle_411001_20261003_173710.json
+  version=1.5.0  events=5309  damageEvents=5271  withCalc=5271
+  hitValue present: 0 / 5271
+  factCoverage={"dmg": 5272, "withFact": 694, "withLiveState": 484}
+  hitDetail={"produced": 5369, "trimmed": 0, "errors": 0, "matchExact": 115, "matchPair": 5156, "matchNone": 1}
+  reconcile={"dmgEvents": 5272, "withCalc": 5271, "exact": 2473, "exactWithCrit": 2643, "critInferred": 170, "critObserved": 0, "critObservedYes": 0, "critAgree": 0, "critInferredButDenied": 0, "critObservedButUnexplained": 0, "approx": 30, "unexplained": 2598, "theoryExceeds": 0, "absorbed": 11, "absorbedAmount": 5500000, "distinctResiduals": 30, "approxTolerance": 0.05, "theoryExceedsResidualMax": 0.1, "cri
+  residual(top15 by count): [(1.0, 2485), (1.323, 468), (0.756, 386), (1.249, 383), (1.322, 288), (0.657, 287), (0.658, 270), (1.437, 211), (1.15, 91), (1.65, 64), (0.87, 58), (1.5, 58), (1.436, 52), (1.9, 41), (1.652, 23)]
+  distinct residuals=39
+  residual>1.10 total=1710  top15=[(1.323, 468), (1.249, 383), (1.322, 288), (1.437, 211), (1.15, 91), (1.65, 64), (1.5, 58), (1.436, 52), (1.9, 41), (1.652, 23), (1.248, 11), (1.25, 6), (1.521, 6), (1.85, 3), (1.435, 2)]
+  maxAbsorbed dist: [(1, 99), (2, 1149), (3, 2027)]

@@ -1,0 +1,31 @@
+file battle_411001_20261004_012328.json
+totals {"dealt": 206931707, "taken": 207296467, "healing": 86940, "healingGiven": 86940, "unattributedDamage": 364760, "unattributedHits": 74, "absorbed": 6000000, "dealtWithAbsorbed": 212931707}
+(atkTeam,vicTeam) -> n, sum
+  (1, 2) n=5478 sum=206792136
+  (None, 2) n=74 sum=364760
+  (2, 1) n=19 sum=139571
+
+non-team1-attacker events (19):
+  {"t": 1.7, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 390}
+  {"t": 8.3, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 50}
+  {"t": 11.7, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 975}
+  {"t": 19.17, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 1482}
+  {"t": 32.67, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 4725}
+  {"t": 38.6, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 1482}
+  {"t": 42.0, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 8475}
+  {"t": 47.83, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 2982}
+  {"t": 51.17, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 8475}
+  {"t": 58.37, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 2982}
+  {"t": 71.97, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 12225}
+  {"t": 79.03, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 4482}
+  {"t": 82.37, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 15975}
+  {"t": 85.77, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 5982}
+  {"t": 89.13, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 15975}
+  {"t": 97.67, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 5982}
+  {"t": 106.23, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 19725}
+  {"t": 112.33, "attacker": "ショゴス", "victim": "エヴァラス・フラウ", "atkTeam": 2, "vicTeam": 1, "amount": 7482}
+  {"t": 118.43, "attacker": "ショゴス", "victim": "メアリー", "atkTeam": 2, "vicTeam": 1, "amount": 19725}
+
+sum(atk=1)=206792136  totals.dealt=206931707  diff=139571
+sum(atk=1,vic=2)=206792136
+sum(null)=364760  totals.unattributedDamage=364760

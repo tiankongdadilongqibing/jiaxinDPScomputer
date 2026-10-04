@@ -1,0 +1,4184 @@
+{
+ "contract": "budget-census/1",
+ "n": 32,
+ "exportsDir": "D:\\dmmplayer\\rlyehshoujotaix_cl\\BepInEx\\plugins\\DpsMeter\\exports",
+ "totals": {
+  "dealt": 4621056889.0,
+  "droppedDamage": 0.0,
+  "droppedShare": 0.0
+ },
+ "issues": [
+  {
+   "id": "N6-1",
+   "title": "丢失的折叠步(foldDropped)",
+   "battles": [],
+   "scope": "0/32 份导出出现;共 0 击 / 0 步 / 影响伤害 0(占这些样本总伤害的 0.0000%)",
+   "evidence": "逐击 calc.foldDropped>0;丢步击的折叠条数分布 = {}",
+   "hypothesis": "丢步只在折叠条数达到上下文上限时发生(即引擎上限所致,不是被规则吃掉)",
+   "falsifiableTest": "若存在 foldDropped>0 而折叠条数明显低于上限的击,则该假设被否证",
+   "nextStepCost": "离线即可复核(本报告已给出分布);提高上限需插件改动,当前无证据支持"
+  },
+  {
+   "id": "N6-2",
+   "title": "行/快照溢出(timeline·forensics·applies)",
+   "battles": [
+    "battle_411001_20261003_205449.json",
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json",
+    "battle_411001_20261003_231340.json",
+    "battle_411001_20261003_235204.json",
+    "battle_411001_20261004_012328.json",
+    "battle_411001_20261004_015919.json",
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_9999_20261003_205129.json",
+    "battle_9999_20261003_225530.json",
+    "battle_9999_20261003_225647.json",
+    "battle_9999_20261003_225905.json",
+    "battle_9999_20261004_012138.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ],
+   "scope": "31/32 份导出出现溢出计数",
+   "evidence": "逐段计数器:battle_411001_20261003_205449.json{forensics.perBucketOverflow=87}; battle_411001_20261003_230040.json{forensics.perBucketOverflow=59,madnessApplies.rowsDropped=603}; battle_411001_20261003_230311.json{forensics.perBucketOverflow=94,madnessApplies.rowsDropped=603}; battle_411001_20261003_230615.json{forensics.perBucketOverflow=80,madnessApplies.rowsDropped=602}; battle_411001_20261003_231044.json{forensics.perBucketOverflow=89,madnessApplies.rowsDropped=603}; battle_411001_20261003_231340.json{forensics.perBucketOverflow=59}",
+   "hypothesis": "溢出只影响**诊断/时间线**的记录完整性,不影响逐击伤害与贡献(这两者来自事件与折叠)",
+   "falsifiableTest": "若某场溢出同时其台账对账(reconciliationGap)不为 0,则该假设被否证",
+   "nextStepCost": "离线可复核;若确需完整时间线,需插件提高上限(第四批)"
+  },
+  {
+   "id": "N6-3",
+   "title": "读取失败(错误计数器非零)",
+   "battles": [
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json",
+    "battle_411001_20261003_231340.json",
+    "battle_9999_20261003_225530.json",
+    "battle_9999_20261003_225647.json",
+    "battle_9999_20261003_225905.json"
+   ],
+   "scope": "8/32 份导出报告了非零错误计数",
+   "evidence": "逐段计数器:battle_411001_20261003_230040.json{giverErrors=38736}; battle_411001_20261003_230311.json{giverErrors=43264}; battle_411001_20261003_230615.json{giverErrors=41966}; battle_411001_20261003_231044.json{giverErrors=44190}; battle_411001_20261003_231340.json{giverErrors=62486}; battle_9999_20261003_225530.json{giverErrors=54}",
+   "hypothesis": "读取失败集中在个别能力/字段,且被跳过而不是被猜测(计数器是它的证据)",
+   "falsifiableTest": "若某场的 analyzableDealt 与 totals.dealt 的差超过台账解释范围,则该假设被否证",
+   "nextStepCost": "离线(台账对账已在 N0/N1 里跑);不改插件"
+  },
+  {
+   "id": "N6-4",
+   "title": "未知身份(owner/攻击者不可解析)",
+   "battles": [
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ],
+   "scope": "16/32 份导出出现未知身份计数",
+   "evidence": "逐段计数器(仅列非零):battle_411001_20261004_033231.json{paramOwners.entriesDropped=8908,paramOwners.keyOwnerNull=56,paramOwners.ownerNull=56}; battle_411001_20261004_035437.json{paramOwners.entriesDropped=8530,paramOwners.keyOwnerNull=44,paramOwners.ownerNull=44}; battle_411001_20261004_041309.json{paramOwners.entriesDropped=8545,paramOwners.keyOwnerNull=50,paramOwners.ownerNull=50}; battle_411001_20261004_042637.json{paramOwners.entriesDropped=8492,paramOwners.keyOwnerNull=54,paramOwners.ownerNull=54}; battle_411001_20261004_042844.json{paramOwners.entriesDropped=8342,paramOwners.keyOwnerNull=37,paramOwners.ownerNull=37}; battle_411001_20261004_113553.json{paramOwners.entriesDropped=8483,paramOwners.keyOwnerNull=27,paramOwners.ownerNull=27}",
+   "hypothesis": "未知身份不影响**总量**,只影响**归属**:这些伤害进入 unattributed 而不是被塞给攻击者",
+   "falsifiableTest": "若某场的 contribution.unattributedDamage 与这些计数器不一致,则该假设被否证",
+   "nextStepCost": "离线(见 contribution 段的台账);需要更强身份才需插件补字段(N3 最小设计)"
+  },
+  {
+   "id": "N6-5",
+   "title": "预算上限(部分不可观测)",
+   "battles": [],
+   "scope": "观测到的上限:facts.maxClasses, facts.maxLiveClasses, forensics.maxBuckets, forensics.maxPerBucket, givenApplies.maxRows, madnessApplies.maxRows, paramOwners.maxEntriesPerRead, paramOwners.maxEntryReadsPerBattle, paramOwners.maxUnionRows",
+   "evidence": "导出里**没有**计数器的上限:`FoldContext.MaxSteps=24`(只能用 foldDropped 间接看)、`_statusSnaps=256`、`BuildBuffText` 40 条上限",
+   "hypothesis": "这三者的真实触发率当前**不可证伪**,因为文件里没有它们的计数器",
+   "falsifiableTest": "补三个计数器后,任何一场都能直接验证是否触发(第四批的一次性插件改动)",
+   "nextStepCost": "低:三个 int 计数器;高:在长战/多召唤场景下排除静默截断"
+  }
+ ],
+ "rows": [
+  {
+   "file": "battle_411001_20261003_205449.json",
+   "version": "1.5.3",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 198588964.0,
+   "events": 6269,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.perBucketOverflow": 87
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2
+   },
+   "residual": {
+    "all": {
+     "1.0": 5218,
+     "1.9": 653,
+     "1.5": 149,
+     "1.65": 64,
+     "0.87": 56,
+     "1.899": 23,
+     "1.15": 17,
+     "1.652": 13,
+     "0.869": 12,
+     "1.898": 12,
+     "0.826": 11,
+     "1.901": 8
+    },
+    "withFolds": {
+     "1.0": 5174,
+     "1.9": 648,
+     "1.5": 149,
+     "1.65": 64,
+     "0.87": 56,
+     "1.899": 23,
+     "1.15": 17,
+     "1.652": 13
+    },
+    "noFolds": {
+     "1.0": 44,
+     "1.9": 5,
+     "1.848": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 835,
+      "1.65": 64,
+      "0.87": 12,
+      "0.0": 7,
+      "1.15": 3
+     },
+     "2": {
+      "1.0": 3106,
+      "1.9": 580,
+      "1.5": 138,
+      "0.87": 27,
+      "1.15": 12
+     },
+     "3": {
+      "1.0": 1277,
+      "1.9": 73,
+      "1.899": 21,
+      "0.87": 17,
+      "1.898": 12
+     }
+    },
+    "damageByHitType": {
+     "2": 66285582.0,
+     "3": 12676726.0,
+     "1": 119907872.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10701,
+      "given": 6118,
+      "global": 4109,
+      "madness": 3769
+     },
+     "1.9": {
+      "given": 772,
+      "text": 648,
+      "madness": 359
+     },
+     "1.65": {
+      "text": 512,
+      "given": 76,
+      "global": 64,
+      "madness": 27
+     },
+     "1.5": {
+      "given": 172,
+      "global": 149,
+      "text": 137,
+      "madness": 82
+     },
+     "0.87": {
+      "text": 130,
+      "given": 56,
+      "global": 36,
+      "madness": 36
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6183
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230040.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 181236937.0,
+   "events": 6128,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 38736
+   },
+   "overflow": {
+    "madnessApplies.rowsDropped": 603,
+    "forensics.perBucketOverflow": 59
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5123,
+     "1.9": 619,
+     "1.5": 145,
+     "1.65": 74,
+     "0.87": 33,
+     "1.899": 30,
+     "0.826": 17,
+     "1.15": 16,
+     "0.0": 10,
+     "1.901": 9,
+     "1.57": 7,
+     "1.002": 5
+    },
+    "withFolds": {
+     "1.0": 5056,
+     "1.9": 612,
+     "1.5": 145,
+     "1.65": 74,
+     "0.87": 33,
+     "1.899": 29,
+     "0.826": 17,
+     "1.15": 16
+    },
+    "noFolds": {
+     "1.0": 67,
+     "1.9": 7,
+     "1.848": 1,
+     "1.899": 1,
+     "0.623": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 764,
+      "1.65": 74,
+      "0.0": 10,
+      "0.87": 5,
+      "1.15": 5
+     },
+     "2": {
+      "1.0": 3125,
+      "1.9": 555,
+      "1.5": 138,
+      "0.87": 17,
+      "0.826": 15
+     },
+     "3": {
+      "1.0": 1234,
+      "1.9": 64,
+      "1.899": 28,
+      "0.87": 11,
+      "1.901": 9
+     }
+    },
+    "damageByHitType": {
+     "2": 62081534.0,
+     "3": 11217340.0,
+     "1": 108205673.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 9605,
+      "given": 4336,
+      "global": 3917,
+      "madness": 3709
+     },
+     "1.9": {
+      "text": 599,
+      "given": 544,
+      "madness": 346
+     },
+     "1.65": {
+      "text": 592,
+      "global": 73,
+      "given": 68,
+      "madness": 29
+     },
+     "1.5": {
+      "given": 154,
+      "global": 145,
+      "text": 143,
+      "madness": 75
+     },
+     "0.87": {
+      "text": 69,
+      "given": 34,
+      "madness": 21,
+      "global": 14
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5953
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230311.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "duration": 119.03,
+   "dealt": 189268037.0,
+   "events": 6213,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 43264
+   },
+   "overflow": {
+    "madnessApplies.rowsDropped": 603,
+    "forensics.perBucketOverflow": 94
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5184,
+     "1.9": 633,
+     "1.5": 120,
+     "1.65": 62,
+     "0.87": 49,
+     "1.899": 26,
+     "1.15": 25,
+     "1.652": 15,
+     "1.901": 14,
+     "1.898": 12,
+     "0.826": 11,
+     "0.0": 9
+    },
+    "withFolds": {
+     "1.0": 5139,
+     "1.9": 631,
+     "1.5": 120,
+     "1.65": 62,
+     "0.87": 49,
+     "1.899": 26,
+     "1.15": 25,
+     "1.652": 15
+    },
+    "noFolds": {
+     "1.0": 45,
+     "1.9": 2,
+     "1.848": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 808,
+      "1.65": 62,
+      "0.87": 10,
+      "0.0": 9,
+      "1.15": 4
+     },
+     "2": {
+      "1.0": 3123,
+      "1.9": 566,
+      "1.5": 115,
+      "0.87": 22,
+      "1.15": 16
+     },
+     "3": {
+      "1.0": 1253,
+      "1.9": 67,
+      "1.899": 23,
+      "0.87": 17,
+      "1.898": 12
+     }
+    },
+    "damageByHitType": {
+     "2": 64857296.0,
+     "3": 11932595.0,
+     "1": 112757557.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10151,
+      "given": 5558,
+      "global": 4065,
+      "madness": 3547
+     },
+     "1.9": {
+      "given": 672,
+      "text": 628,
+      "madness": 355
+     },
+     "1.65": {
+      "text": 496,
+      "given": 70,
+      "global": 62,
+      "madness": 28
+     },
+     "1.5": {
+      "given": 124,
+      "text": 120,
+      "global": 120,
+      "madness": 61
+     },
+     "0.87": {
+      "text": 112,
+      "given": 58,
+      "global": 30,
+      "madness": 28
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6106
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230615.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 196505136.0,
+   "events": 6271,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 41966
+   },
+   "overflow": {
+    "madnessApplies.rowsDropped": 602,
+    "forensics.perBucketOverflow": 80
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5251,
+     "1.9": 618,
+     "1.5": 128,
+     "1.65": 66,
+     "0.87": 35,
+     "1.899": 33,
+     "1.15": 29,
+     "1.901": 20,
+     "0.826": 12,
+     "0.0": 9,
+     "0.869": 9,
+     "1.002": 8
+    },
+    "withFolds": {
+     "1.0": 5185,
+     "1.9": 614,
+     "1.5": 128,
+     "1.65": 66,
+     "0.87": 35,
+     "1.899": 32,
+     "1.15": 29,
+     "1.901": 20
+    },
+    "noFolds": {
+     "1.0": 66,
+     "1.9": 4,
+     "1.85": 2,
+     "1.899": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 814,
+      "1.65": 66,
+      "0.87": 15,
+      "0.0": 9,
+      "1.15": 5
+     },
+     "2": {
+      "1.0": 3143,
+      "1.9": 559,
+      "1.5": 121,
+      "1.15": 18,
+      "0.87": 13
+     },
+     "3": {
+      "1.0": 1294,
+      "1.9": 59,
+      "1.899": 24,
+      "1.901": 20,
+      "1.002": 8
+     }
+    },
+    "damageByHitType": {
+     "2": 60440228.0,
+     "3": 12811741.0,
+     "1": 123514695.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10234,
+      "given": 4582,
+      "global": 4066,
+      "madness": 4035
+     },
+     "1.9": {
+      "text": 611,
+      "given": 598,
+      "madness": 382
+     },
+     "1.65": {
+      "text": 528,
+      "given": 68,
+      "global": 65,
+      "madness": 32
+     },
+     "1.5": {
+      "text": 128,
+      "global": 128,
+      "madness": 85,
+      "given": 74
+     },
+     "0.87": {
+      "text": 140,
+      "madness": 31,
+      "given": 28,
+      "global": 26
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6131
+   }
+  },
+  {
+   "file": "battle_411001_20261003_231044.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 197087773.0,
+   "events": 6281,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 44190
+   },
+   "overflow": {
+    "madnessApplies.rowsDropped": 603,
+    "forensics.perBucketOverflow": 89
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5238,
+     "1.9": 642,
+     "1.5": 130,
+     "1.65": 71,
+     "0.87": 52,
+     "1.899": 32,
+     "1.15": 32,
+     "1.901": 8,
+     "1.002": 8,
+     "2.185": 8,
+     "0.826": 7,
+     "0.0": 6
+    },
+    "withFolds": {
+     "1.0": 5175,
+     "1.9": 638,
+     "1.5": 130,
+     "1.65": 71,
+     "0.87": 52,
+     "1.15": 32,
+     "1.899": 31,
+     "1.901": 8
+    },
+    "noFolds": {
+     "1.0": 63,
+     "1.85": 4,
+     "1.9": 4,
+     "1.848": 1,
+     "1.899": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 815,
+      "1.65": 71,
+      "0.87": 16,
+      "1.15": 7,
+      "0.0": 6
+     },
+     "2": {
+      "1.0": 3153,
+      "1.9": 575,
+      "1.5": 123,
+      "0.87": 28,
+      "1.15": 19
+     },
+     "3": {
+      "1.0": 1270,
+      "1.9": 67,
+      "1.899": 29,
+      "0.87": 8,
+      "1.901": 8
+     }
+    },
+    "damageByHitType": {
+     "2": 63399508.0,
+     "3": 12024893.0,
+     "1": 121913461.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10240,
+      "given": 5658,
+      "global": 4084,
+      "madness": 3506
+     },
+     "1.9": {
+      "given": 698,
+      "text": 638,
+      "madness": 343
+     },
+     "1.65": {
+      "text": 568,
+      "global": 70,
+      "given": 50,
+      "madness": 32
+     },
+     "1.5": {
+      "given": 136,
+      "text": 130,
+      "global": 130,
+      "madness": 65
+     },
+     "0.87": {
+      "text": 162,
+      "given": 64,
+      "global": 49,
+      "madness": 34
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6165
+   }
+  },
+  {
+   "file": "battle_411001_20261003_231340.json",
+   "version": "1.5.4",
+   "quest": 411001,
+   "duration": 119.03,
+   "dealt": 209426327.0,
+   "events": 5655,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 62486
+   },
+   "overflow": {
+    "forensics.perBucketOverflow": 59
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4756,
+     "1.9": 677,
+     "1.65": 47,
+     "1.899": 21,
+     "0.87": 20,
+     "1.901": 18,
+     "0.756": 16,
+     "1.15": 16,
+     "0.826": 11,
+     "1.652": 10,
+     "0.0": 9,
+     "1.898": 9
+    },
+    "withFolds": {
+     "1.0": 4732,
+     "1.9": 677,
+     "1.65": 47,
+     "1.899": 21,
+     "0.87": 20,
+     "1.901": 18,
+     "0.756": 16,
+     "1.15": 16
+    },
+    "noFolds": {
+     "1.0": 24,
+     "1.85": 3,
+     "1.848": 2
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 826,
+      "1.65": 47,
+      "0.87": 10,
+      "0.0": 9,
+      "1.15": 4
+     },
+     "2": {
+      "1.0": 2486,
+      "1.9": 614,
+      "1.652": 10,
+      "0.756": 9,
+      "0.87": 8
+     },
+     "3": {
+      "1.0": 1444,
+      "1.9": 63,
+      "1.899": 20,
+      "1.901": 18,
+      "1.898": 9
+     }
+    },
+    "damageByHitType": {
+     "2": 65679518.0,
+     "3": 14512983.0,
+     "1": 129589629.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10901,
+      "global": 8015,
+      "given": 4790,
+      "madness": 856
+     },
+     "1.9": {
+      "given": 770,
+      "text": 677,
+      "global": 677
+     },
+     "1.65": {
+      "text": 376,
+      "global": 92,
+      "given": 54
+     },
+     "0.87": {
+      "text": 93,
+      "global": 32,
+      "given": 28,
+      "talent": 2
+     },
+     "1.15": {
+      "global": 32,
+      "text": 30,
+      "given": 12,
+      "talent": 1
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5594
+   }
+  },
+  {
+   "file": "battle_411001_20261003_235204.json",
+   "version": "1.5.5",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 203964758.0,
+   "events": 5602,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 179,
+    "forensics.perBucketOverflow": 101
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4689,
+     "1.9": 628,
+     "1.65": 64,
+     "0.87": 31,
+     "1.15": 24,
+     "1.899": 21,
+     "0.756": 17,
+     "0.826": 14,
+     "0.869": 11,
+     "0.769": 10,
+     "1.898": 10,
+     "1.323": 9
+    },
+    "withFolds": {
+     "1.0": 4626,
+     "1.9": 620,
+     "1.65": 64,
+     "0.87": 31,
+     "1.15": 24,
+     "1.899": 20,
+     "0.756": 17,
+     "0.826": 14
+    },
+    "noFolds": {
+     "1.0": 63,
+     "1.9": 8,
+     "1.85": 1,
+     "1.848": 1,
+     "1.899": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 823,
+      "1.65": 63,
+      "0.87": 11,
+      "0.0": 7,
+      "1.15": 5
+     },
+     "2": {
+      "1.0": 2489,
+      "1.9": 557,
+      "0.87": 16,
+      "0.756": 11,
+      "0.769": 10
+     },
+     "3": {
+      "1.0": 1377,
+      "1.9": 71,
+      "1.899": 12,
+      "0.869": 11,
+      "1.898": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 64870309.0,
+     "3": 13369235.0,
+     "1": 126023791.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10984,
+      "global": 7743,
+      "given": 5176,
+      "madness": 880
+     },
+     "1.9": {
+      "given": 716,
+      "text": 620,
+      "global": 608
+     },
+     "1.65": {
+      "text": 505,
+      "global": 120,
+      "given": 62
+     },
+     "0.87": {
+      "text": 124,
+      "global": 54,
+      "given": 38,
+      "madness": 5
+     },
+     "1.15": {
+      "text": 59,
+      "global": 42,
+      "given": 26,
+      "madness": 3
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5491
+   }
+  },
+  {
+   "file": "battle_411001_20261004_012328.json",
+   "version": "1.5.5",
+   "quest": 411001,
+   "duration": 119.03,
+   "dealt": 206931707.0,
+   "events": 5571,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 214,
+    "forensics.perBucketOverflow": 52
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4690,
+     "1.9": 665,
+     "1.65": 62,
+     "1.899": 21,
+     "0.87": 21,
+     "1.901": 13,
+     "0.756": 12,
+     "0.0": 10,
+     "0.826": 10,
+     "1.898": 9,
+     "1.15": 8,
+     "0.769": 6
+    },
+    "withFolds": {
+     "1.0": 4663,
+     "1.9": 663,
+     "1.65": 62,
+     "1.899": 21,
+     "0.87": 21,
+     "1.901": 13,
+     "0.756": 12,
+     "0.0": 10
+    },
+    "noFolds": {
+     "1.0": 27,
+     "1.9": 2,
+     "1.848": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 826,
+      "1.65": 62,
+      "0.0": 10,
+      "0.87": 10,
+      "1.15": 4
+     },
+     "2": {
+      "1.0": 2495,
+      "1.9": 598,
+      "0.756": 8,
+      "0.826": 8,
+      "0.769": 6
+     },
+     "3": {
+      "1.0": 1369,
+      "1.9": 67,
+      "1.899": 21,
+      "1.901": 13,
+      "1.898": 9
+     }
+    },
+    "damageByHitType": {
+     "2": 63730038.0,
+     "3": 12841999.0,
+     "1": 130716458.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11115,
+      "global": 7905,
+      "given": 4272,
+      "madness": 851
+     },
+     "1.9": {
+      "text": 663,
+      "global": 663,
+      "given": 628
+     },
+     "1.65": {
+      "text": 496,
+      "global": 124,
+      "given": 56
+     },
+     "0.87": {
+      "text": 101,
+      "global": 38,
+      "given": 18,
+      "madness": 8
+     },
+     "1.899": {
+      "given": 34,
+      "text": 21,
+      "global": 21
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5511
+   }
+  },
+  {
+   "file": "battle_411001_20261004_015919.json",
+   "version": "1.6.0",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 197273140.0,
+   "events": 5529,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 239,
+    "forensics.perBucketOverflow": 62
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4607,
+     "1.9": 685,
+     "1.65": 59,
+     "0.87": 22,
+     "1.899": 20,
+     "1.15": 20,
+     "1.898": 18,
+     "0.756": 14,
+     "1.901": 10,
+     "0.826": 10,
+     "0.0": 9,
+     "0.572": 6
+    },
+    "withFolds": {
+     "1.0": 4580,
+     "1.9": 684,
+     "1.65": 59,
+     "0.87": 22,
+     "1.899": 20,
+     "1.15": 20,
+     "1.898": 18,
+     "0.756": 14
+    },
+    "noFolds": {
+     "1.0": 27,
+     "1.848": 2,
+     "1.85": 1,
+     "1.9": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 801,
+      "1.65": 59,
+      "0.87": 11,
+      "0.0": 9,
+      "1.15": 4
+     },
+     "2": {
+      "1.0": 2443,
+      "1.9": 624,
+      "1.15": 9,
+      "0.756": 6,
+      "0.87": 6
+     },
+     "3": {
+      "1.0": 1363,
+      "1.9": 61,
+      "1.899": 20,
+      "1.898": 18,
+      "1.901": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 63613819.0,
+     "3": 13235779.0,
+     "1": 120754821.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10756,
+      "global": 7789,
+      "given": 3472,
+      "madness": 839
+     },
+     "1.9": {
+      "text": 684,
+      "global": 684,
+      "given": 558
+     },
+     "1.65": {
+      "text": 472,
+      "global": 116,
+      "given": 30
+     },
+     "0.87": {
+      "text": 109,
+      "global": 40,
+      "given": 12,
+      "madness": 5
+     },
+     "1.15": {
+      "text": 43,
+      "global": 32,
+      "madness": 6,
+      "given": 6
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5469
+   }
+  },
+  {
+   "file": "battle_411001_20261004_021914.json",
+   "version": "1.6.1",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 197859703.0,
+   "events": 5553,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 226,
+    "forensics.perBucketOverflow": 58
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4642,
+     "1.9": 676,
+     "1.65": 70,
+     "1.899": 30,
+     "0.87": 24,
+     "1.15": 14,
+     "1.901": 14,
+     "1.898": 11,
+     "0.826": 10,
+     "0.0": 8,
+     "1.323": 7,
+     "0.756": 6
+    },
+    "withFolds": {
+     "1.0": 4583,
+     "1.9": 673,
+     "1.65": 70,
+     "1.899": 30,
+     "0.87": 24,
+     "1.15": 14,
+     "1.901": 14,
+     "1.898": 11
+    },
+    "noFolds": {
+     "1.0": 59,
+     "1.9": 3,
+     "1.85": 2
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 799,
+      "1.65": 70,
+      "0.87": 12,
+      "0.0": 8,
+      "1.15": 6
+     },
+     "2": {
+      "1.0": 2463,
+      "1.9": 622,
+      "0.87": 6,
+      "0.826": 5,
+      "1.15": 4
+     },
+     "3": {
+      "1.0": 1380,
+      "1.9": 54,
+      "1.899": 26,
+      "1.901": 14,
+      "1.898": 11
+     }
+    },
+    "damageByHitType": {
+     "2": 63649116.0,
+     "3": 13332903.0,
+     "1": 121218699.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10806,
+      "global": 7774,
+      "given": 4302,
+      "madness": 863
+     },
+     "1.9": {
+      "text": 673,
+      "global": 673,
+      "given": 664
+     },
+     "1.65": {
+      "text": 560,
+      "global": 138,
+      "given": 86
+     },
+     "0.87": {
+      "text": 114,
+      "global": 43,
+      "given": 18,
+      "madness": 4
+     },
+     "1.899": {
+      "given": 32,
+      "text": 30,
+      "global": 30
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5457
+   }
+  },
+  {
+   "file": "battle_411001_20261004_023627.json",
+   "version": "1.7.0",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 212633192.0,
+   "events": 5576,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 235,
+    "forensics.perBucketOverflow": 76
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4640,
+     "1.9": 682,
+     "1.65": 71,
+     "0.87": 29,
+     "1.15": 22,
+     "1.899": 20,
+     "0.756": 17,
+     "0.826": 15,
+     "1.901": 14,
+     "1.898": 10,
+     "0.0": 9,
+     "1.437": 6
+    },
+    "withFolds": {
+     "1.0": 4607,
+     "1.9": 679,
+     "1.65": 71,
+     "0.87": 29,
+     "1.15": 22,
+     "1.899": 20,
+     "0.756": 17,
+     "0.826": 15
+    },
+    "noFolds": {
+     "1.0": 33,
+     "1.9": 3,
+     "1.848": 2
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 789,
+      "1.65": 71,
+      "0.87": 12,
+      "0.0": 9,
+      "1.15": 4
+     },
+     "2": {
+      "1.0": 2467,
+      "1.9": 620,
+      "0.756": 12,
+      "0.87": 12,
+      "1.15": 8
+     },
+     "3": {
+      "1.0": 1384,
+      "1.9": 62,
+      "1.899": 20,
+      "1.901": 14,
+      "1.898": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 66607053.0,
+     "3": 14696256.0,
+     "1": 131653034.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10792,
+      "global": 7826,
+      "given": 4758,
+      "madness": 832
+     },
+     "1.9": {
+      "given": 734,
+      "text": 679,
+      "global": 679
+     },
+     "1.65": {
+      "text": 568,
+      "global": 142,
+      "given": 80
+     },
+     "0.87": {
+      "text": 125,
+      "global": 57,
+      "given": 22,
+      "madness": 5
+     },
+     "1.15": {
+      "text": 54,
+      "global": 40,
+      "given": 18,
+      "madness": 9
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5515
+   }
+  },
+  {
+   "file": "battle_411001_20261004_033231.json",
+   "version": "1.7.2",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 200728856.0,
+   "events": 5565,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 208,
+    "forensics.perBucketOverflow": 87
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 56,
+    "paramOwners.keyOwnerNull": 56,
+    "paramOwners.entriesDropped": 8908
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4646,
+     "1.9": 641,
+     "1.65": 71,
+     "0.87": 36,
+     "1.899": 31,
+     "1.15": 26,
+     "0.756": 14,
+     "1.898": 14,
+     "0.0": 8,
+     "1.901": 8,
+     "0.826": 8,
+     "1.437": 8
+    },
+    "withFolds": {
+     "1.0": 4580,
+     "1.9": 633,
+     "1.65": 71,
+     "0.87": 36,
+     "1.899": 31,
+     "1.15": 26,
+     "0.756": 14,
+     "1.898": 14
+    },
+    "noFolds": {
+     "1.0": 66,
+     "1.9": 8,
+     "1.848": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 808,
+      "1.65": 71,
+      "0.87": 14,
+      "0.0": 8,
+      "1.15": 6
+     },
+     "2": {
+      "1.0": 2432,
+      "1.9": 582,
+      "1.15": 14,
+      "0.87": 12,
+      "0.756": 10
+     },
+     "3": {
+      "1.0": 1406,
+      "1.9": 59,
+      "1.899": 26,
+      "1.898": 14,
+      "0.87": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 63822633.0,
+     "3": 14253967.0,
+     "1": 122957611.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11040,
+      "global": 7740,
+      "given": 4414,
+      "madness": 886
+     },
+     "1.9": {
+      "text": 633,
+      "global": 633,
+      "given": 588
+     },
+     "1.65": {
+      "text": 568,
+      "global": 142,
+      "given": 68
+     },
+     "0.87": {
+      "text": 148,
+      "global": 61,
+      "given": 44,
+      "madness": 9
+     },
+     "1.15": {
+      "text": 66,
+      "global": 43,
+      "given": 24,
+      "talent": 1
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5451
+   }
+  },
+  {
+   "file": "battle_411001_20261004_035437.json",
+   "version": "1.7.3",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 195664426.0,
+   "events": 5599,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 175,
+    "forensics.perBucketOverflow": 81
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 44,
+    "paramOwners.keyOwnerNull": 44,
+    "paramOwners.entriesDropped": 8530
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4704,
+     "1.9": 636,
+     "1.65": 73,
+     "0.87": 28,
+     "1.15": 21,
+     "1.899": 18,
+     "0.756": 15,
+     "1.898": 10,
+     "1.901": 10,
+     "0.0": 9,
+     "0.826": 8,
+     "0.869": 6
+    },
+    "withFolds": {
+     "1.0": 4677,
+     "1.9": 636,
+     "1.65": 73,
+     "0.87": 28,
+     "1.15": 21,
+     "1.899": 18,
+     "0.756": 15,
+     "1.898": 10
+    },
+    "noFolds": {
+     "1.0": 27,
+     "1.85": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 822,
+      "1.65": 73,
+      "0.0": 9,
+      "0.87": 6,
+      "1.15": 6
+     },
+     "2": {
+      "1.0": 2445,
+      "1.9": 582,
+      "0.87": 16,
+      "0.756": 12,
+      "1.15": 8
+     },
+     "3": {
+      "1.0": 1437,
+      "1.9": 54,
+      "1.899": 17,
+      "1.898": 10,
+      "1.901": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 62348471.0,
+     "3": 13348768.0,
+     "1": 120285136.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11022,
+      "global": 7934,
+      "given": 3708,
+      "madness": 896
+     },
+     "1.9": {
+      "text": 636,
+      "global": 636,
+      "given": 502
+     },
+     "1.65": {
+      "text": 584,
+      "global": 144,
+      "given": 60
+     },
+     "0.87": {
+      "text": 86,
+      "global": 41,
+      "given": 24,
+      "madness": 4
+     },
+     "1.15": {
+      "text": 66,
+      "global": 36,
+      "given": 24,
+      "madness": 6
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5542
+   }
+  },
+  {
+   "file": "battle_411001_20261004_041309.json",
+   "version": "1.7.4",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 203853083.0,
+   "events": 5563,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 184,
+    "forensics.perBucketOverflow": 84
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 50,
+    "paramOwners.keyOwnerNull": 50,
+    "paramOwners.entriesDropped": 8545
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4644,
+     "1.9": 616,
+     "1.65": 81,
+     "0.87": 38,
+     "1.15": 29,
+     "1.899": 24,
+     "1.323": 13,
+     "1.898": 12,
+     "1.901": 12,
+     "0.756": 12,
+     "1.322": 11,
+     "0.0": 8
+    },
+    "withFolds": {
+     "1.0": 4632,
+     "1.9": 616,
+     "1.65": 81,
+     "0.87": 38,
+     "1.15": 29,
+     "1.899": 24,
+     "1.323": 13,
+     "1.898": 12
+    },
+    "noFolds": {
+     "1.0": 12
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 796,
+      "1.65": 81,
+      "0.87": 14,
+      "0.0": 8,
+      "1.15": 6
+     },
+     "2": {
+      "1.0": 2442,
+      "1.9": 570,
+      "0.87": 16,
+      "1.15": 10,
+      "1.323": 9
+     },
+     "3": {
+      "1.0": 1406,
+      "1.9": 46,
+      "1.899": 20,
+      "1.15": 13,
+      "1.898": 12
+     }
+    },
+    "damageByHitType": {
+     "2": 63160894.0,
+     "3": 13964911.0,
+     "1": 127047672.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10942,
+      "global": 7689,
+      "atkadd": 4391,
+      "given": 4378
+     },
+     "1.9": {
+      "atkadd": 616,
+      "given": 614,
+      "text": 600,
+      "global": 600
+     },
+     "1.65": {
+      "text": 648,
+      "global": 160,
+      "atkadd": 81,
+      "given": 80
+     },
+     "0.87": {
+      "text": 153,
+      "global": 70,
+      "given": 42,
+      "atkadd": 37
+     },
+     "1.15": {
+      "text": 95,
+      "global": 46,
+      "atkadd": 26,
+      "given": 16
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5421
+   }
+  },
+  {
+   "file": "battle_411001_20261004_042637.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "duration": 119.03,
+   "dealt": 200353734.0,
+   "events": 5543,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 212,
+    "forensics.perBucketOverflow": 78
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 54,
+    "paramOwners.keyOwnerNull": 54,
+    "paramOwners.entriesDropped": 8492
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4626,
+     "1.9": 643,
+     "1.65": 62,
+     "0.87": 34,
+     "1.15": 29,
+     "1.899": 26,
+     "1.901": 15,
+     "1.898": 13,
+     "0.826": 11,
+     "1.652": 10,
+     "0.756": 8,
+     "0.0": 6
+    },
+    "withFolds": {
+     "1.0": 4617,
+     "1.9": 643,
+     "1.65": 62,
+     "0.87": 34,
+     "1.15": 29,
+     "1.899": 26,
+     "1.901": 15,
+     "1.898": 13
+    },
+    "noFolds": {
+     "1.0": 9
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 807,
+      "1.65": 62,
+      "0.87": 10,
+      "0.0": 6,
+      "1.435": 4
+     },
+     "2": {
+      "1.0": 2425,
+      "1.9": 586,
+      "1.15": 19,
+      "0.87": 16,
+      "1.652": 7
+     },
+     "3": {
+      "1.0": 1394,
+      "1.9": 57,
+      "1.899": 21,
+      "1.901": 15,
+      "1.898": 13
+     }
+    },
+    "damageByHitType": {
+     "2": 64097138.0,
+     "3": 14028935.0,
+     "1": 122537931.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10782,
+      "global": 7792,
+      "given": 4900,
+      "atkadd": 4372
+     },
+     "1.9": {
+      "given": 704,
+      "text": 643,
+      "global": 643,
+      "atkadd": 643
+     },
+     "1.65": {
+      "text": 496,
+      "global": 124,
+      "given": 72,
+      "atkadd": 62
+     },
+     "0.87": {
+      "text": 100,
+      "global": 58,
+      "atkadd": 34,
+      "given": 28
+     },
+     "1.15": {
+      "text": 61,
+      "global": 49,
+      "atkadd": 27,
+      "given": 26
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5486
+   }
+  },
+  {
+   "file": "battle_411001_20261004_042844.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 196606611.0,
+   "events": 5544,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 200,
+    "forensics.perBucketOverflow": 54
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 37,
+    "paramOwners.keyOwnerNull": 37,
+    "paramOwners.entriesDropped": 8342
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4650,
+     "1.9": 638,
+     "1.65": 81,
+     "1.899": 31,
+     "0.87": 18,
+     "0.756": 11,
+     "1.901": 11,
+     "0.0": 10,
+     "1.898": 10,
+     "0.769": 8,
+     "1.15": 8,
+     "1.323": 8
+    },
+    "withFolds": {
+     "1.0": 4639,
+     "1.9": 638,
+     "1.65": 81,
+     "1.899": 31,
+     "0.87": 18,
+     "0.756": 11,
+     "1.901": 11,
+     "0.0": 10
+    },
+    "noFolds": {
+     "1.0": 11
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 788,
+      "1.65": 81,
+      "0.0": 10,
+      "0.87": 8,
+      "1.15": 3
+     },
+     "2": {
+      "1.0": 2443,
+      "1.9": 590,
+      "0.769": 8,
+      "0.756": 6,
+      "1.323": 6
+     },
+     "3": {
+      "1.0": 1419,
+      "1.9": 48,
+      "1.899": 30,
+      "1.901": 11,
+      "1.898": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 64339381.0,
+     "3": 13865865.0,
+     "1": 118675202.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10784,
+      "global": 7821,
+      "atkadd": 4395,
+      "given": 4346
+     },
+     "1.9": {
+      "text": 638,
+      "global": 638,
+      "atkadd": 638,
+      "given": 626
+     },
+     "1.65": {
+      "text": 648,
+      "global": 162,
+      "given": 82,
+      "atkadd": 81
+     },
+     "0.87": {
+      "text": 74,
+      "global": 32,
+      "given": 18,
+      "atkadd": 18
+     },
+     "1.899": {
+      "text": 31,
+      "global": 31,
+      "atkadd": 31,
+      "given": 30
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5483
+   }
+  },
+  {
+   "file": "battle_411001_20261004_113553.json",
+   "version": "1.7.5",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 198797524.0,
+   "events": 5553,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 236,
+    "forensics.perBucketOverflow": 41
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 27,
+    "paramOwners.keyOwnerNull": 27,
+    "paramOwners.entriesDropped": 8483
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4644,
+     "1.9": 678,
+     "1.65": 67,
+     "1.899": 33,
+     "0.87": 20,
+     "1.898": 15,
+     "1.15": 12,
+     "0.826": 12,
+     "1.901": 11,
+     "0.0": 10,
+     "0.756": 8,
+     "0.869": 6
+    },
+    "withFolds": {
+     "1.0": 4632,
+     "1.9": 678,
+     "1.65": 67,
+     "1.899": 33,
+     "0.87": 20,
+     "1.898": 15,
+     "1.15": 12,
+     "0.826": 12
+    },
+    "noFolds": {
+     "1.0": 12
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 828,
+      "1.65": 67,
+      "0.87": 11,
+      "0.0": 10,
+      "1.435": 2
+     },
+     "2": {
+      "1.0": 2412,
+      "1.9": 625,
+      "0.826": 10,
+      "1.15": 7,
+      "0.769": 5
+     },
+     "3": {
+      "1.0": 1404,
+      "1.9": 53,
+      "1.899": 30,
+      "1.898": 15,
+      "1.901": 11
+     }
+    },
+    "damageByHitType": {
+     "2": 62967587.0,
+     "3": 13157011.0,
+     "1": 122964319.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11055,
+      "global": 7808,
+      "given": 4470,
+      "atkadd": 4392
+     },
+     "1.9": {
+      "atkadd": 678,
+      "text": 676,
+      "global": 676,
+      "given": 664
+     },
+     "1.65": {
+      "text": 536,
+      "global": 132,
+      "given": 76,
+      "atkadd": 67
+     },
+     "0.87": {
+      "text": 105,
+      "global": 37,
+      "atkadd": 20,
+      "given": 14
+     },
+     "1.899": {
+      "given": 40,
+      "text": 33,
+      "global": 33,
+      "atkadd": 33
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5473
+   }
+  },
+  {
+   "file": "battle_411001_20261004_115024.json",
+   "version": "1.7.6",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 202081366.0,
+   "events": 5566,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 214,
+    "forensics.perBucketOverflow": 64
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 32,
+    "paramOwners.keyOwnerNull": 32,
+    "paramOwners.entriesDropped": 8409
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4665,
+     "1.9": 650,
+     "1.65": 68,
+     "0.87": 42,
+     "1.899": 33,
+     "1.898": 14,
+     "1.901": 11,
+     "1.15": 10,
+     "0.769": 9,
+     "0.756": 8,
+     "0.0": 7,
+     "0.869": 7
+    },
+    "withFolds": {
+     "1.0": 4657,
+     "1.9": 650,
+     "1.65": 68,
+     "0.87": 42,
+     "1.899": 33,
+     "1.898": 14,
+     "1.901": 11,
+     "1.15": 10
+    },
+    "noFolds": {
+     "1.0": 8
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 816,
+      "1.65": 68,
+      "0.87": 17,
+      "0.0": 7,
+      "1.15": 5
+     },
+     "2": {
+      "1.0": 2426,
+      "1.9": 604,
+      "0.87": 15,
+      "0.769": 9,
+      "1.899": 9
+     },
+     "3": {
+      "1.0": 1423,
+      "1.9": 46,
+      "1.899": 24,
+      "1.898": 14,
+      "1.901": 11
+     }
+    },
+    "damageByHitType": {
+     "2": 63172014.0,
+     "3": 13650621.0,
+     "1": 125547513.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11099,
+      "global": 7900,
+      "given": 4632,
+      "atkadd": 4412
+     },
+     "1.9": {
+      "text": 650,
+      "global": 650,
+      "atkadd": 650,
+      "given": 632
+     },
+     "1.65": {
+      "text": 544,
+      "global": 136,
+      "given": 90,
+      "atkadd": 68
+     },
+     "0.87": {
+      "text": 176,
+      "global": 74,
+      "atkadd": 42,
+      "given": 26
+     },
+     "1.899": {
+      "text": 33,
+      "global": 33,
+      "atkadd": 33,
+      "given": 30
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5541
+   }
+  },
+  {
+   "file": "battle_411001_20261004_115417.json",
+   "version": "1.7.6",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 190984342.0,
+   "events": 6265,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "madnessApplies.rowsDropped": 602,
+    "givenApplies.rowsDropped": 242,
+    "forensics.perBucketOverflow": 88
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 14,
+    "paramOwners.keyOwnerNull": 14,
+    "paramOwners.entriesDropped": 8806
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5206,
+     "1.9": 681,
+     "1.5": 135,
+     "1.65": 75,
+     "0.87": 36,
+     "1.901": 22,
+     "1.899": 21,
+     "1.15": 21,
+     "1.652": 11,
+     "1.002": 10,
+     "0.826": 10,
+     "0.869": 7
+    },
+    "withFolds": {
+     "1.0": 5199,
+     "1.9": 681,
+     "1.5": 135,
+     "1.65": 75,
+     "0.87": 36,
+     "1.901": 22,
+     "1.899": 21,
+     "1.15": 21
+    },
+    "noFolds": {
+     "1.0": 7
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 815,
+      "1.65": 75,
+      "0.87": 15,
+      "1.15": 8,
+      "0.0": 5
+     },
+     "2": {
+      "1.0": 3084,
+      "1.9": 621,
+      "1.5": 132,
+      "0.87": 16,
+      "1.652": 8
+     },
+     "3": {
+      "1.0": 1307,
+      "1.9": 60,
+      "1.901": 22,
+      "1.899": 20,
+      "1.002": 10
+     }
+    },
+    "damageByHitType": {
+     "2": 66332067.0,
+     "3": 12886578.0,
+     "1": 112031427.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10613,
+      "atkadd": 4964,
+      "global": 4070,
+      "given": 3944
+     },
+     "1.9": {
+      "atkadd": 681,
+      "text": 671,
+      "given": 556,
+      "madness": 357
+     },
+     "1.65": {
+      "text": 600,
+      "atkadd": 75,
+      "global": 74,
+      "given": 44
+     },
+     "1.5": {
+      "given": 148,
+      "text": 135,
+      "global": 135,
+      "atkadd": 135
+     },
+     "0.87": {
+      "text": 141,
+      "given": 50,
+      "atkadd": 36,
+      "global": 27
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6143
+   }
+  },
+  {
+   "file": "battle_411001_20261004_134524.json",
+   "version": "1.7.8",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 195026518.0,
+   "events": 6267,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "madnessApplies.rowsDropped": 602,
+    "givenApplies.rowsDropped": 268,
+    "forensics.perBucketOverflow": 99
+   },
+   "unknown": {
+    "paramOwners.entriesDropped": 8733,
+    "atkAdd.ownerUnknown": 27,
+    "ledger.unknownAttackerHits": 73,
+    "ledger.unknownAttackerDealt": 257056.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 5182,
+     "1.9": 688,
+     "1.5": 132,
+     "1.65": 61,
+     "0.87": 44,
+     "1.15": 28,
+     "1.899": 26,
+     "1.901": 21,
+     "1.652": 11,
+     "0.826": 9,
+     "0.0": 7,
+     "1.002": 7
+    },
+    "withFolds": {
+     "1.0": 5177,
+     "1.9": 688,
+     "1.5": 132,
+     "1.65": 61,
+     "0.87": 44,
+     "1.15": 28,
+     "1.899": 26,
+     "1.901": 21
+    },
+    "noFolds": {
+     "1.0": 5
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 816,
+      "1.65": 61,
+      "0.87": 15,
+      "0.0": 7,
+      "1.15": 6
+     },
+     "2": {
+      "1.0": 3064,
+      "1.9": 622,
+      "1.5": 129,
+      "1.15": 22,
+      "0.87": 21
+     },
+     "3": {
+      "1.0": 1302,
+      "1.9": 66,
+      "1.899": 24,
+      "1.901": 21,
+      "0.87": 8
+     }
+    },
+    "damageByHitType": {
+     "2": 70120932.0,
+     "3": 13380347.0,
+     "1": 111774323.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10432,
+      "atkadd": 4937,
+      "given": 4714,
+      "global": 4094
+     },
+     "1.9": {
+      "given": 692,
+      "atkadd": 688,
+      "text": 687,
+      "madness": 379
+     },
+     "1.65": {
+      "text": 488,
+      "global": 61,
+      "atkadd": 61,
+      "given": 58
+     },
+     "1.5": {
+      "given": 142,
+      "global": 132,
+      "atkadd": 132,
+      "text": 130
+     },
+     "0.87": {
+      "text": 163,
+      "atkadd": 44,
+      "given": 42,
+      "global": 34
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 6167
+   }
+  },
+  {
+   "file": "battle_411001_20261004_134853.json",
+   "version": "1.7.8",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 200853545.0,
+   "events": 5630,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 202,
+    "forensics.perBucketOverflow": 49
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 15,
+    "paramOwners.keyOwnerNull": 15,
+    "paramOwners.entriesDropped": 8503,
+    "atkAdd.ownerUnknown": 27,
+    "ledger.unknownAttackerHits": 76,
+    "ledger.unknownAttackerDealt": 305770.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4750,
+     "1.9": 644,
+     "1.65": 63,
+     "1.899": 27,
+     "0.87": 26,
+     "1.15": 26,
+     "1.898": 17,
+     "0.756": 9,
+     "0.826": 9,
+     "0.0": 7,
+     "1.901": 7,
+     "1.323": 5
+    },
+    "withFolds": {
+     "1.0": 4741,
+     "1.9": 644,
+     "1.65": 63,
+     "1.899": 27,
+     "0.87": 26,
+     "1.15": 26,
+     "1.898": 17,
+     "0.756": 9
+    },
+    "noFolds": {
+     "1.0": 9
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 831,
+      "1.65": 63,
+      "0.87": 9,
+      "0.0": 7,
+      "1.15": 7
+     },
+     "2": {
+      "1.0": 2470,
+      "1.9": 580,
+      "1.15": 14,
+      "0.87": 14,
+      "0.756": 8
+     },
+     "3": {
+      "1.0": 1449,
+      "1.9": 64,
+      "1.899": 24,
+      "1.898": 17,
+      "1.901": 7
+     }
+    },
+    "damageByHitType": {
+     "2": 62802668.0,
+     "3": 13956907.0,
+     "1": 124391768.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11127,
+      "global": 7955,
+      "atkadd": 4494,
+      "given": 4196
+     },
+     "1.9": {
+      "atkadd": 644,
+      "text": 639,
+      "global": 639,
+      "given": 622
+     },
+     "1.65": {
+      "text": 504,
+      "global": 126,
+      "atkadd": 63,
+      "given": 60
+     },
+     "0.87": {
+      "text": 94,
+      "global": 47,
+      "atkadd": 26,
+      "given": 24
+     },
+     "1.15": {
+      "text": 79,
+      "global": 51,
+      "atkadd": 24,
+      "given": 22
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5572
+   }
+  },
+  {
+   "file": "battle_411001_20261004_144548.json",
+   "version": "1.7.10",
+   "quest": 411001,
+   "duration": 119.07,
+   "dealt": 194811623.0,
+   "events": 5585,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 191,
+    "forensics.perBucketOverflow": 43
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 47,
+    "paramOwners.keyOwnerNull": 47,
+    "paramOwners.entriesDropped": 8558,
+    "atkAdd.ownerUnknown": 27,
+    "ledger.unknownAttackerHits": 74,
+    "ledger.unknownAttackerDealt": 325381.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4711,
+     "1.9": 645,
+     "1.65": 67,
+     "0.87": 27,
+     "1.899": 23,
+     "1.15": 15,
+     "1.901": 14,
+     "1.898": 13,
+     "0.826": 10,
+     "0.0": 9,
+     "0.756": 8,
+     "0.769": 6
+    },
+    "withFolds": {
+     "1.0": 4699,
+     "1.9": 645,
+     "1.65": 67,
+     "0.87": 27,
+     "1.899": 23,
+     "1.15": 15,
+     "1.901": 14,
+     "1.898": 13
+    },
+    "noFolds": {
+     "1.0": 12
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 793,
+      "1.65": 67,
+      "0.87": 12,
+      "0.0": 9,
+      "1.15": 5
+     },
+     "2": {
+      "1.0": 2463,
+      "1.9": 606,
+      "0.87": 8,
+      "0.769": 6,
+      "1.15": 6
+     },
+     "3": {
+      "1.0": 1455,
+      "1.9": 39,
+      "1.899": 23,
+      "1.901": 14,
+      "1.898": 13
+     }
+    },
+    "damageByHitType": {
+     "2": 63036860.0,
+     "3": 13558970.0,
+     "1": 118533202.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 10663,
+      "global": 7833,
+      "given": 4570,
+      "atkadd": 4458
+     },
+     "1.9": {
+      "given": 654,
+      "atkadd": 645,
+      "text": 639,
+      "global": 639
+     },
+     "1.65": {
+      "text": 536,
+      "global": 132,
+      "given": 84,
+      "atkadd": 67
+     },
+     "0.87": {
+      "text": 124,
+      "global": 47,
+      "given": 32,
+      "atkadd": 27
+     },
+     "1.15": {
+      "text": 44,
+      "global": 30,
+      "atkadd": 13,
+      "given": 12
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5499
+   }
+  },
+  {
+   "file": "battle_411001_20261004_170157.json",
+   "version": "1.7.11",
+   "quest": 411001,
+   "duration": 119.03,
+   "dealt": 211642633.0,
+   "events": 5612,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "givenApplies.rowsDropped": 205,
+    "forensics.perBucketOverflow": 60
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 56,
+    "paramOwners.keyOwnerNull": 56,
+    "paramOwners.entriesDropped": 8633,
+    "atkAdd.ownerUnknown": 27,
+    "ledger.unknownAttackerHits": 75,
+    "ledger.unknownAttackerDealt": 364786.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 4721,
+     "1.9": 650,
+     "1.65": 71,
+     "0.87": 32,
+     "1.899": 30,
+     "0.756": 15,
+     "1.15": 13,
+     "1.652": 12,
+     "0.826": 11,
+     "1.898": 10,
+     "1.901": 8,
+     "0.0": 5
+    },
+    "withFolds": {
+     "1.0": 4713,
+     "1.9": 650,
+     "1.65": 71,
+     "0.87": 32,
+     "1.899": 30,
+     "0.756": 15,
+     "1.15": 13,
+     "1.652": 12
+    },
+    "noFolds": {
+     "1.0": 8
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 822,
+      "1.65": 71,
+      "0.87": 10,
+      "0.0": 5,
+      "1.897": 3
+     },
+     "2": {
+      "1.0": 2460,
+      "1.9": 591,
+      "0.87": 17,
+      "1.652": 11,
+      "0.826": 8
+     },
+     "3": {
+      "1.0": 1439,
+      "1.9": 59,
+      "1.899": 27,
+      "1.898": 10,
+      "1.901": 8
+     }
+    },
+    "damageByHitType": {
+     "2": 64835611.0,
+     "3": 14593729.0,
+     "1": 132570107.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 11111,
+      "global": 7920,
+      "given": 5444,
+      "atkadd": 4467
+     },
+     "1.9": {
+      "given": 744,
+      "text": 650,
+      "global": 650,
+      "atkadd": 650
+     },
+     "1.65": {
+      "text": 568,
+      "global": 142,
+      "given": 102,
+      "atkadd": 71
+     },
+     "0.87": {
+      "text": 107,
+      "global": 56,
+      "atkadd": 32,
+      "given": 30
+     },
+     "1.899": {
+      "given": 44,
+      "text": 30,
+      "global": 30,
+      "atkadd": 30
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5572
+   }
+  },
+  {
+   "file": "battle_700817_20261004_114821.json",
+   "version": "1.7.6",
+   "quest": 700817,
+   "duration": 66.17,
+   "dealt": 2314831.0,
+   "events": 285,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {},
+   "unknown": {
+    "paramOwners.ownerNull": 42,
+    "paramOwners.keyOwnerNull": 42
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 242,
+     "0.276": 2,
+     "0.667": 2,
+     "0.295": 1,
+     "2.0": 1,
+     "0.779": 1,
+     "0.119": 1,
+     "1.496": 1,
+     "0.399": 1,
+     "0.5": 1,
+     "0.448": 1,
+     "0.541": 1
+    },
+    "withFolds": {
+     "1.0": 45,
+     "0.667": 2,
+     "0.779": 1,
+     "0.119": 1,
+     "1.496": 1,
+     "0.399": 1,
+     "0.448": 1,
+     "0.541": 1
+    },
+    "noFolds": {
+     "1.0": 197,
+     "0.295": 1,
+     "2.0": 1,
+     "0.5": 1,
+     "0.105": 1,
+     "0.321": 1,
+     "0.446": 1,
+     "0.358": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 60,
+      "2.0": 1,
+      "0.5": 1,
+      "0.895": 1,
+      "0.058": 1
+     },
+     "2": {
+      "1.0": 95,
+      "0.276": 2,
+      "0.295": 1,
+      "0.779": 1,
+      "0.119": 1
+     },
+     "3": {
+      "1.0": 87
+     }
+    },
+    "damageByHitType": {
+     "2": 2080967.0,
+     "1": 195008.0,
+     "3": 54625.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 37,
+      "atkadd": 29,
+      "talent": 1
+     },
+     "0.667": {
+      "text": 3,
+      "talent": 1
+     },
+     "1.496": {
+      "text": 2
+     },
+     "0.399": {
+      "text": 2
+     },
+     "0.29": {
+      "text": 2
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261003_205129.json",
+   "version": "1.5.3",
+   "quest": 9999,
+   "duration": 50.27,
+   "dealt": 7702608.0,
+   "events": 868,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.bucketsOverflow": 31,
+    "forensics.perBucketOverflow": 377
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2
+   },
+   "residual": {
+    "all": {
+     "1.0": 251,
+     "1.5": 65,
+     "1.441": 35,
+     "1.25": 30,
+     "1.6": 29,
+     "0.164": 28,
+     "0.011": 24,
+     "2.294": 21,
+     "2.5": 20,
+     "0.265": 20,
+     "2.6": 18,
+     "1.432": 18
+    },
+    "withFolds": {
+     "1.0": 207,
+     "1.5": 63,
+     "1.441": 35,
+     "1.25": 29,
+     "0.164": 28,
+     "1.6": 26,
+     "0.011": 24,
+     "2.294": 21
+    },
+    "noFolds": {
+     "1.0": 44,
+     "0.048": 11,
+     "0.03": 9,
+     "0.059": 7,
+     "1.598": 3,
+     "1.6": 3,
+     "1.5": 2,
+     "2.311": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 65,
+      "1.5": 8,
+      "14.33": 2
+     },
+     "2": {
+      "1.0": 130,
+      "1.5": 55,
+      "1.25": 27,
+      "1.6": 26,
+      "0.011": 24
+     },
+     "3": {
+      "1.0": 56,
+      "1.441": 35,
+      "0.164": 28,
+      "2.294": 21,
+      "2.5": 20
+     }
+    },
+    "damageByHitType": {
+     "1": 705226.0,
+     "2": 5669501.0,
+     "3": 1643509.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 686,
+      "given": 14
+     },
+     "1.5": {
+      "text": 145,
+      "given": 84
+     },
+     "1.25": {
+      "text": 149,
+      "given": 2
+     },
+     "0.011": {
+      "text": 144
+     },
+     "1.6": {
+      "text": 123
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261003_225530.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "duration": 19.8,
+   "dealt": 1680568.0,
+   "events": 102,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 54
+   },
+   "overflow": {
+    "forensics.perBucketOverflow": 26
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 50,
+     "1.25": 22,
+     "1.5": 7,
+     "0.056": 5,
+     "0.037": 4,
+     "4.688": 4,
+     "1.875": 3,
+     "3.126": 3,
+     "2.0": 1,
+     "3.125": 1,
+     "2.496": 1
+    },
+    "withFolds": {
+     "1.0": 26,
+     "1.25": 20,
+     "0.056": 5,
+     "1.5": 4,
+     "0.037": 4,
+     "4.688": 4,
+     "1.875": 3,
+     "3.126": 3
+    },
+    "noFolds": {
+     "1.0": 24,
+     "1.5": 3,
+     "1.25": 2
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 17,
+      "1.5": 2,
+      "2.0": 1
+     },
+     "2": {
+      "1.25": 18,
+      "1.0": 17,
+      "0.056": 5,
+      "1.5": 4,
+      "0.037": 4
+     },
+     "3": {
+      "1.0": 16,
+      "1.25": 4,
+      "1.5": 1
+     }
+    },
+    "damageByHitType": {
+     "2": 1269637.0,
+     "3": 250721.0,
+     "1": 201628.0
+    },
+    "kindsByBucket": {
+     "1.25": {
+      "text": 69
+     },
+     "1.0": {
+      "text": 48
+     },
+     "4.688": {
+      "text": 16,
+      "given": 12
+     },
+     "3.126": {
+      "text": 12,
+      "given": 9
+     },
+     "0.056": {
+      "text": 20
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261003_225647.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "duration": 19.0,
+   "dealt": 2579582.0,
+   "events": 146,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 92
+   },
+   "overflow": {
+    "forensics.perBucketOverflow": 6
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 95,
+     "2.0": 7,
+     "1.5": 7,
+     "1.25": 6,
+     "1.875": 4,
+     "0.007": 2,
+     "2.538": 2,
+     "0.002": 2,
+     "2.667": 2,
+     "0.025": 2,
+     "2.5": 2,
+     "0.909": 2
+    },
+    "withFolds": {
+     "1.0": 42,
+     "2.0": 7,
+     "1.25": 6,
+     "1.875": 4,
+     "1.5": 4,
+     "0.007": 2,
+     "2.538": 2,
+     "0.002": 2
+    },
+    "noFolds": {
+     "1.0": 53,
+     "1.5": 3,
+     "0.025": 2
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 29,
+      "2.0": 7,
+      "1.5": 3,
+      "0.025": 2,
+      "2.5": 2
+     },
+     "2": {
+      "1.0": 43,
+      "1.25": 6,
+      "1.875": 4,
+      "1.5": 3,
+      "0.007": 2
+     },
+     "3": {
+      "1.0": 23,
+      "1.5": 1,
+      "0.909": 1
+     }
+    },
+    "damageByHitType": {
+     "1": 410550.0,
+     "2": 1965565.0,
+     "3": 263983.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 63,
+      "given": 11
+     },
+     "1.25": {
+      "text": 25
+     },
+     "1.875": {
+      "text": 19
+     },
+     "4.688": {
+      "text": 8,
+      "given": 6
+     },
+     "3.125": {
+      "text": 8,
+      "given": 6
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261003_225905.json",
+   "version": "1.5.4",
+   "quest": 9999,
+   "duration": 17.63,
+   "dealt": 2718309.0,
+   "events": 176,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {
+    "giverErrors": 118
+   },
+   "overflow": {
+    "forensics.perBucketOverflow": 18
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 110,
+     "1.5": 15,
+     "1.25": 12,
+     "1.598": 6,
+     "3.604": 5,
+     "1.6": 4,
+     "14.293": 4,
+     "2.0": 3,
+     "14.416": 3,
+     "3.572": 2,
+     "2.5": 2,
+     "1.501": 2
+    },
+    "withFolds": {
+     "1.0": 78,
+     "1.25": 12,
+     "1.5": 11,
+     "1.598": 6,
+     "3.604": 5,
+     "1.6": 4,
+     "14.293": 4,
+     "14.416": 3
+    },
+    "noFolds": {
+     "1.0": 32,
+     "1.5": 4,
+     "0.854": 1,
+     "2.0": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 43,
+      "3.604": 5,
+      "1.5": 4,
+      "1.6": 4,
+      "14.416": 3
+     },
+     "2": {
+      "1.0": 36,
+      "1.25": 12,
+      "1.5": 8,
+      "14.293": 4,
+      "3.572": 2
+     },
+     "3": {
+      "1.0": 31,
+      "1.598": 6,
+      "1.5": 3,
+      "1.501": 2,
+      "1.305": 1
+     }
+    },
+    "damageByHitType": {
+     "2": 1894798.0,
+     "1": 761893.0,
+     "3": 62219.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 148,
+      "given": 5,
+      "global": 1
+     },
+     "1.25": {
+      "text": 62
+     },
+     "1.5": {
+      "text": 31,
+      "given": 1
+     },
+     "3.604": {
+      "given": 15
+     },
+     "14.293": {
+      "given": 12
+     }
+    }
+   },
+   "cancelMarks": {
+    "hits_with_cancel": 5
+   }
+  },
+  {
+   "file": "battle_9999_20261004_012138.json",
+   "version": "1.5.5",
+   "quest": 9999,
+   "duration": 18.5,
+   "dealt": 2147664.0,
+   "events": 105,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.perBucketOverflow": 13
+   },
+   "unknown": {},
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 59,
+     "1.5": 16,
+     "1.25": 11,
+     "1.112": 4,
+     "0.058": 3,
+     "4.688": 3,
+     "2.5": 2,
+     "3.125": 2,
+     "0.025": 2,
+     "1.667": 1,
+     "0.038": 1,
+     "0.938": 1
+    },
+    "withFolds": {
+     "1.0": 39,
+     "1.5": 12,
+     "1.25": 11,
+     "1.112": 4,
+     "0.058": 3,
+     "4.688": 3,
+     "2.5": 2,
+     "3.125": 2
+    },
+    "noFolds": {
+     "1.0": 20,
+     "1.5": 4
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 12,
+      "1.5": 1
+     },
+     "2": {
+      "1.0": 34,
+      "1.5": 11,
+      "1.25": 10,
+      "0.058": 3,
+      "4.688": 3
+     },
+     "3": {
+      "1.0": 13,
+      "1.5": 4,
+      "1.112": 4,
+      "1.667": 1,
+      "1.25": 1
+     }
+    },
+    "damageByHitType": {
+     "2": 1881316.0,
+     "3": 269113.0,
+     "1": 63129.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 58
+     },
+     "1.25": {
+      "text": 46
+     },
+     "4.688": {
+      "text": 12,
+      "given": 9
+     },
+     "1.5": {
+      "text": 16
+     },
+     "0.058": {
+      "text": 15
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261004_042458.json",
+   "version": "1.7.5",
+   "quest": 9999,
+   "duration": 41.3,
+   "dealt": 7024899.0,
+   "events": 614,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.perBucketOverflow": 248
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 422,
+    "paramOwners.keyOwnerNull": 422,
+    "atkAdd.skippedUnowned": 44
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 182,
+     "1.25": 44,
+     "1.5": 42,
+     "1.6": 25,
+     "2.5": 23,
+     "2.6": 18,
+     "4.0": 13,
+     "1.111": 13,
+     "0.03": 12,
+     "1.441": 12,
+     "0.082": 11,
+     "0.005": 10
+    },
+    "withFolds": {
+     "1.0": 153,
+     "1.25": 44,
+     "1.5": 41,
+     "1.6": 25,
+     "2.5": 23,
+     "2.6": 18,
+     "4.0": 13,
+     "1.111": 13
+    },
+    "noFolds": {
+     "1.0": 29,
+     "2.0": 3,
+     "1.5": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 45,
+      "1.5": 5,
+      "1.6": 2,
+      "2.0": 2,
+      "25.17": 2
+     },
+     "2": {
+      "1.0": 93,
+      "1.5": 35,
+      "1.25": 34,
+      "2.6": 18,
+      "1.6": 17
+     },
+     "3": {
+      "1.0": 44,
+      "2.5": 23,
+      "4.0": 13,
+      "1.111": 13,
+      "0.03": 12
+     }
+    },
+    "damageByHitType": {
+     "2": 5152692.0,
+     "3": 1693789.0,
+     "1": 460181.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 416,
+      "atkadd": 137,
+      "given": 4
+     },
+     "1.25": {
+      "text": 175,
+      "atkadd": 29,
+      "given": 2
+     },
+     "1.5": {
+      "text": 99,
+      "atkadd": 46,
+      "given": 26
+     },
+     "1.6": {
+      "text": 92,
+      "atkadd": 25
+     },
+     "2.6": {
+      "given": 54,
+      "text": 36,
+      "atkadd": 18
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261004_135214.json",
+   "version": "1.7.8",
+   "quest": 9999,
+   "duration": 85.1,
+   "dealt": 10710019.0,
+   "events": 1073,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.bucketsOverflow": 17,
+    "forensics.perBucketOverflow": 385
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 839,
+    "paramOwners.keyOwnerNull": 839,
+    "atkAdd.ownerUnknown": 7,
+    "atkAdd.skippedUnowned": 96,
+    "ledger.unknownAttackerHits": 28,
+    "ledger.unknownAttackerDealt": 635599.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 445,
+     "1.5": 54,
+     "1.6": 53,
+     "1.25": 44,
+     "1.441": 35,
+     "2.294": 31,
+     "1.111": 25,
+     "0.059": 23,
+     "2.0": 20,
+     "1.43": 19,
+     "0.004": 18,
+     "0.265": 18
+    },
+    "withFolds": {
+     "1.0": 361,
+     "1.5": 54,
+     "1.6": 53,
+     "1.25": 44,
+     "1.441": 35,
+     "2.294": 31,
+     "1.111": 25,
+     "0.059": 23
+    },
+    "noFolds": {
+     "1.0": 84,
+     "2.0": 6,
+     "1.598": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 96,
+      "2.0": 12,
+      "1.5": 8,
+      "1.6": 6
+     },
+     "2": {
+      "1.0": 225,
+      "1.5": 46,
+      "1.25": 33,
+      "1.6": 30,
+      "1.43": 19
+     },
+     "3": {
+      "1.0": 124,
+      "1.441": 35,
+      "2.294": 31,
+      "1.111": 25,
+      "0.059": 23
+     }
+    },
+    "damageByHitType": {
+     "1": 1008080.0,
+     "2": 6404143.0,
+     "3": 3929087.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "text": 877,
+      "atkadd": 354
+     },
+     "1.5": {
+      "text": 131,
+      "given": 99,
+      "atkadd": 66
+     },
+     "1.25": {
+      "text": 202,
+      "atkadd": 44
+     },
+     "1.6": {
+      "text": 136,
+      "atkadd": 50
+     },
+     "1.441": {
+      "given": 105,
+      "atkadd": 35
+     }
+    }
+   },
+   "cancelMarks": {}
+  },
+  {
+   "file": "battle_9999_20261004_165952.json",
+   "version": "1.7.11",
+   "quest": 9999,
+   "duration": 17.9,
+   "dealt": 1998474.0,
+   "events": 123,
+   "dropped": {
+    "hits": 0,
+    "steps": 0,
+    "damage": 0.0,
+    "share": 0.0,
+    "foldCounts": {}
+   },
+   "readErrors": {},
+   "overflow": {
+    "forensics.perBucketOverflow": 10
+   },
+   "unknown": {
+    "paramOwners.ownerNull": 209,
+    "paramOwners.keyOwnerNull": 209,
+    "atkAdd.ownerUnknown": 7,
+    "atkAdd.skippedUnowned": 27,
+    "ledger.unknownAttackerHits": 4,
+    "ledger.unknownAttackerDealt": 93772.0
+   },
+   "budgets": {
+    "facts.maxClasses": 2400,
+    "facts.maxLiveClasses": 900,
+    "forensics.maxBuckets": 80,
+    "forensics.maxPerBucket": 2,
+    "paramOwners.maxEntriesPerRead": 64,
+    "paramOwners.maxUnionRows": 1024,
+    "paramOwners.maxEntryReadsPerBattle": 20000,
+    "madnessApplies.maxRows": 512,
+    "givenApplies.maxRows": 512
+   },
+   "residual": {
+    "all": {
+     "1.0": 77,
+     "3.574": 7,
+     "1.25": 4,
+     "3.573": 4,
+     "3.572": 4,
+     "2.0": 3,
+     "10.25": 2,
+     "1.56": 2,
+     "6.697": 2,
+     "1.598": 1,
+     "4.476": 1,
+     "13.321": 1
+    },
+    "withFolds": {
+     "1.0": 61,
+     "3.574": 7,
+     "1.25": 4,
+     "3.573": 4,
+     "3.572": 4,
+     "10.25": 2,
+     "2.0": 2,
+     "1.56": 2
+    },
+    "noFolds": {
+     "1.0": 16,
+     "1.598": 1,
+     "2.0": 1
+    },
+    "byHitType": {
+     "1": {
+      "1.0": 17,
+      "3.574": 4,
+      "1.56": 2,
+      "13.321": 1,
+      "2.0": 1
+     },
+     "2": {
+      "1.0": 41,
+      "1.25": 4,
+      "3.573": 4,
+      "3.572": 4,
+      "3.574": 3
+     },
+     "3": {
+      "1.0": 19,
+      "10.25": 2,
+      "1.598": 1,
+      "3.5": 1,
+      "5.7": 1
+     }
+    },
+    "damageByHitType": {
+     "2": 1501608.0,
+     "3": 312364.0,
+     "1": 252640.0
+    },
+    "kindsByBucket": {
+     "1.0": {
+      "atkadd": 93,
+      "text": 80,
+      "talent": 3
+     },
+     "3.574": {
+      "given": 21,
+      "atkadd": 6
+     },
+     "1.25": {
+      "text": 16,
+      "atkadd": 5,
+      "talent": 1
+     },
+     "3.573": {
+      "given": 12,
+      "atkadd": 8
+     },
+     "3.572": {
+      "given": 12,
+      "atkadd": 4
+     }
+    }
+   },
+   "cancelMarks": {}
+  }
+ ],
+ "residualSummary": {
+  "all": {
+   "1.0": 112698,
+   "1.9": 14988,
+   "1.65": 1550,
+   "1.5": 1145,
+   "0.87": 753,
+   "1.899": 600,
+   "1.15": 461,
+   "1.901": 278,
+   "1.898": 219,
+   "0.826": 216,
+   "0.756": 190,
+   "1.25": 173,
+   "0.0": 165,
+   "1.6": 111,
+   "1.652": 82
+  },
+  "withFolds": {
+   "1.0": 111495,
+   "1.9": 14941,
+   "1.65": 1550,
+   "1.5": 1128,
+   "0.87": 753,
+   "1.899": 596,
+   "1.15": 445,
+   "1.25": 170,
+   "1.901": 167,
+   "0.756": 140
+  },
+  "noFolds": {
+   "1.0": 1203,
+   "1.9": 47,
+   "1.5": 17,
+   "1.85": 14,
+   "1.848": 13,
+   "2.0": 12,
+   "0.048": 11,
+   "0.03": 9,
+   "0.059": 7,
+   "1.598": 5
+  },
+  "kindsByBucket": {
+   "1.0": {
+    "text": 249368,
+    "global": 153850,
+    "given": 106772,
+    "atkadd": 45895
+   },
+   "1.9": {
+    "given": 14952,
+    "text": 14882,
+    "global": 10388,
+    "atkadd": 6533
+   },
+   "1.65": {
+    "text": 12393,
+    "global": 2601,
+    "given": 1576,
+    "atkadd": 696
+   },
+   "1.5": {
+    "text": 1345,
+    "given": 1160,
+    "global": 939,
+    "atkadd": 379
+   },
+   "0.87": {
+    "text": 2750,
+    "global": 1003,
+    "given": 750,
+    "atkadd": 316
+   },
+   "1.15": {
+    "text": 597,
+    "global": 401,
+    "given": 186,
+    "atkadd": 90
+   },
+   "1.899": {
+    "given": 210,
+    "text": 178,
+    "global": 178,
+    "atkadd": 127
+   },
+   "0.667": {
+    "text": 3,
+    "talent": 1
+   },
+   "1.496": {
+    "text": 2
+   },
+   "0.399": {
+    "text": 2
+   },
+   "0.29": {
+    "text": 2
+   },
+   "1.25": {
+    "text": 744,
+    "atkadd": 78,
+    "given": 4,
+    "talent": 1
+   },
+   "0.011": {
+    "text": 144
+   },
+   "1.6": {
+    "text": 351,
+    "atkadd": 75
+   },
+   "4.688": {
+    "text": 36,
+    "given": 27
+   },
+   "3.126": {
+    "text": 12,
+    "given": 9
+   },
+   "0.056": {
+    "text": 20
+   },
+   "1.875": {
+    "text": 19
+   },
+   "3.125": {
+    "text": 8,
+    "given": 6
+   },
+   "3.604": {
+    "given": 15
+   },
+   "14.293": {
+    "given": 12
+   },
+   "0.058": {
+    "text": 15
+   },
+   "2.6": {
+    "given": 54,
+    "text": 36,
+    "atkadd": 18
+   },
+   "1.441": {
+    "given": 105,
+    "atkadd": 35
+   },
+   "3.574": {
+    "given": 21,
+    "atkadd": 6
+   },
+   "3.573": {
+    "given": 12,
+    "atkadd": 8
+   },
+   "3.572": {
+    "given": 12,
+    "atkadd": 4
+   }
+  }
+ }
+}

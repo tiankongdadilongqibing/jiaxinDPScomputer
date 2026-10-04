@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# RF0 deny-by-default boundary (2026-10-04).
+#
+# Nothing is tracked unless it is re-included below, so a blanket `git add`
+# can never sweep in the game assets (3.0 GB), the export corpus, a 100 MB
+# evidence dump or a bin/obj tree. The excluded heavy/volatile files are NOT
+# lost -- they stay in place and are associated with the baseline by SHA256 in
+# _dpsm_work/baseline-manifest.json (see REPO-BOUNDARY.md).
+#
+# Rule of thumb: this file answers "what may a commit contain", the boundary
+# document answers "why is X out".
+# ---------------------------------------------------------------------------
+
+# --- root: deny every entry, then re-include the tracked entry documents ---
+/*
+!/.gitignore
+!/.gitattributes
+!/REPO-BOUNDARY.md
+!/DpsMeter-文档索引.md
+!/DpsMeter-使用说明-完整版.txt
+!/安装说明.txt
+!/changelog.txt
+!/dpsmeter_analyze.py
+!/dpsmeter_contrib.py
+!/_dpsm_work/
+
+# --- the live plugin config is small text and IS part of the baseline ---
+!/BepInEx/
+/BepInEx/*
+!/BepInEx/config/
+/BepInEx/config/*
+!/BepInEx/config/dev.dpsmeter.cfg
+
+# --- _dpsm_work: work products only; heavy dumps stay out ---
+/_dpsm_work/*
+!/_dpsm_work/*.py
+!/_dpsm_work/*.md
+!/_dpsm_work/*.txt
+!/_dpsm_work/*.json
+!/_dpsm_work/*.cfg
+!/_dpsm_work/src/
+!/_dpsm_work/tests/
+!/_dpsm_work/recon_probe/
+!/_dpsm_work/test/
+!/_dpsm_work/contrib/
+!/_dpsm_work/contrib_cs/
+!/_dpsm_work/review_contrib_core/
+!/_dpsm_work/acceptance_1.7.11/
+
+# --- derived output / caches, anywhere ---
+bin/
+obj/
+__pycache__/
+*.pyc
+*.pyo
+
+# --- heavy or volatile inputs and artefacts (recorded by hash, not tracked) ---
+BepInEx/plugins/
+BepInEx/interop/
+BepInEx/core/
+BepInEx/LogOutput.log
+BepInEx/config/dpsmeter_runtime.log*
+rlyehshoujotaix_cl_Data/
+D3D12/
+dotnet/
+DpsMeter-0.9.0-r2/
+汉化/
+*.zip
+*.dll
+*.exe
+*.bak

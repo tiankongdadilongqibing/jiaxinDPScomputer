@@ -1,0 +1,7 @@
+Phase E 干跑(真实导出 + 离线核心算出的 contribution 段)
+  导出:battle_411001_20261004_115417.json(23.31 MB)
+  段的来源:离线 Python 核心
+  段大小:40.1 KB(占导出 0.168%;actors 10 / rules 34 / links 26)
+  逐击明细变体大小:1489.3 KB(占导出 6.238%;6182 击 / 37863 条 credit 行)—— 供阶段 E 取舍
+  闸门1 check_export_schema:problems=0 missing=0
+  闸门2 crosscheck:WARNING(mismatches=0,checked={'totals': 6, 'actors': 10, 'rules': 34, 'links': 26})

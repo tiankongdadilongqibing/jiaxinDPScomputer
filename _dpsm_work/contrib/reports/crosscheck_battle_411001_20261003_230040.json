@@ -1,0 +1,11 @@
+{
+ "file": "battle_411001_20261003_230040.json",
+ "sectionPresent": false,
+ "mismatches": [],
+ "checked": {},
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "status": "ABSENT"
+}

@@ -1,0 +1,824 @@
+{
+ "method": "log-share/1",
+ "generatedFrom": [
+  "battle_411001_20261003_205449.json",
+  "battle_411001_20261003_230040.json",
+  "battle_411001_20261003_230311.json",
+  "battle_411001_20261003_230615.json",
+  "battle_411001_20261003_231044.json",
+  "battle_411001_20261003_231340.json",
+  "battle_411001_20261003_235204.json",
+  "battle_411001_20261004_012328.json",
+  "battle_411001_20261004_015919.json",
+  "battle_411001_20261004_021914.json"
+ ],
+ "groups": [
+  {
+   "quest": 411001,
+   "versions": [
+    "1.5.4",
+    "1.5.5",
+    "1.6.0",
+    "1.6.1"
+   ],
+   "samples": 5,
+   "results": [
+    "Lose"
+   ],
+   "files": [
+    "battle_411001_20261003_231340.json",
+    "battle_411001_20261003_235204.json",
+    "battle_411001_20261004_012328.json",
+    "battle_411001_20261004_015919.json",
+    "battle_411001_20261004_021914.json"
+   ],
+   "comp": [
+    "エヴァラス・フラウ",
+    "テトラ",
+    "ネーフェ＝ジアー",
+    "マッドシーカー",
+    "メアリー",
+    "メルティエル",
+    "ルナリス",
+    "生ける炎 クトゥグア"
+   ],
+   "analyzable": {
+    "mean": 202963669.4,
+    "min": 197128494.0,
+    "max": 209294474.0
+   },
+   "duration": {
+    "mean": 119.054
+   },
+   "coverage": {
+    "credited_share": 0.9698475318361076,
+    "unattributed_share": 0.03015246816389446,
+    "key_coverage": 0.9868439245629801
+   },
+   "actors": {
+    "マッドシーカー": {
+     "directShareMean": 0.1375450990658736,
+     "directShareRange": [
+      0.13050517549661558,
+      0.14340783225381917
+     ],
+     "totalShareMean": 0.29186556603412683,
+     "totalShareRange": [
+      0.2554792724360622,
+      0.3075900927855682
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      4,
+      5
+     ]
+    },
+    "ネーフェ＝ジアー": {
+     "directShareMean": 0.32311332374200924,
+     "directShareRange": [
+      0.31247931615609054,
+      0.35045445828752403
+     ],
+     "totalShareMean": 0.20862189851829127,
+     "totalShareRange": [
+      0.20001599797628003,
+      0.22516198885122557
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      2
+     ]
+    },
+    "メアリー": {
+     "directShareMean": 0.28631147429546855,
+     "directShareRange": [
+      0.26496006115048787,
+      0.2994722163567491
+     ],
+     "totalShareMean": 0.18724127470057433,
+     "totalShareRange": [
+      0.11418516061201048,
+      0.2144292705113157
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      7
+     ]
+    },
+    "メルティエル": {
+     "directShareMean": 0.035725092914570614,
+     "directShareRange": [
+      0.0317236663138898,
+      0.04064143563131974
+     ],
+     "totalShareMean": 0.15753570874799755,
+     "totalShareRange": [
+      0.15215301557336866,
+      0.16295927122186907
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      3,
+      5
+     ]
+    },
+    "エヴァラス・フラウ": {
+     "directShareMean": 0.10546410497180099,
+     "directShareRange": [
+      0.09351886490848958,
+      0.11207074931417271
+     ],
+     "totalShareMean": 0.06681389731500027,
+     "totalShareRange": [
+      0.059605015287557385,
+      0.0717951027309805
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      9
+     ]
+    },
+    "テトラ": {
+     "directShareMean": 0.09711027274002396,
+     "directShareRange": [
+      0.09416871656152756,
+      0.1013505700821075
+     ],
+     "totalShareMean": 0.0500248431424201,
+     "totalShareRange": [
+      0.04742173771520948,
+      0.053014519426770365
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      3,
+      4
+     ]
+    },
+    "火砲": {
+     "directShareMean": 0.01165500167529598,
+     "directShareRange": [
+      0.0112783931009833,
+      0.012053909365330007
+     ],
+     "totalShareMean": 0.00621536160597568,
+     "totalShareRange": [
+      0.006020048822929007,
+      0.0064694183538944496
+     ],
+     "samples": 5,
+     "summon": true,
+     "keys": [
+      11
+     ]
+    },
+    "ルナリス": {
+     "directShareMean": 0.0016842463269002481,
+     "directShareRange": [
+      0.0016251536760566176,
+      0.0017212985962343932
+     ],
+     "totalShareMean": 0.000826302937655668,
+     "totalShareRange": [
+      0.000786666317949224,
+      0.0008655278261632704
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      6
+     ]
+    },
+    "生ける炎 クトゥグア": {
+     "directShareMean": 0.0010492496197598504,
+     "directShareRange": [
+      0.0010049995324773859,
+      0.0010845926539742785
+     ],
+     "totalShareMean": 0.0005134196613745806,
+     "totalShareRange": [
+      0.000498635273341418,
+      0.0005291402094721288
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      14
+     ]
+    },
+    "クトゥグァ砲台R": {
+     "directShareMean": 0.00017140476172952023,
+     "directShareRange": [
+      0.0001662732474507638,
+      0.00018195809894385815
+     ],
+     "totalShareMean": 9.490315499431912e-05,
+     "totalShareRange": [
+      9.238714499827197e-05,
+      9.835814699110703e-05
+     ],
+     "samples": 5,
+     "summon": true,
+     "keys": [
+      103,
+      108,
+      110,
+      118,
+      119
+     ]
+    },
+    "クトゥグァ砲台": {
+     "directShareMean": 0.00017072988656751444,
+     "directShareRange": [
+      0.00016098291087819703,
+      0.00018195809894385815
+     ],
+     "totalShareMean": 9.435601769701772e-05,
+     "totalShareRange": [
+      9.038873941775816e-05,
+      9.835814699110703e-05
+     ],
+     "samples": 5,
+     "summon": true,
+     "keys": [
+      102,
+      107,
+      108,
+      117,
+      118
+     ]
+    }
+   },
+   "rules": {
+    "魔法与ダメージ+10%|text|atk|メルティエル": {
+     "name": "魔法与ダメージ+10%",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メルティエル",
+     "damage": 3808448.9606195195,
+     "hits": 587,
+     "samples": 5
+    },
+    "腐食の毒薬|text|atk|ネーフェ＝ジアー": {
+     "name": "腐食の毒薬",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 70897610.43551232,
+     "hits": 2371,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|ネーフェ＝ジアー": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 55930364.12732065,
+     "hits": 2371,
+     "samples": 5
+    },
+    "物理与ダメージ+10%|text|atk|ネーフェ＝ジアー": {
+     "name": "物理与ダメージ+10%",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 29238084.378144365,
+     "hits": 2371,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|メアリー": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 36334545.81966396,
+     "hits": 4036,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|エヴァラス・フラウ": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 18052185.395964563,
+     "hits": 828,
+     "samples": 5
+    },
+    "与ダメージ+30%|talent|atk|火砲": {
+     "name": "与ダメージ+30%",
+     "kind": "talent",
+     "side": "atk",
+     "owner": "火砲",
+     "damage": 1957593.208374518,
+     "hits": 325,
+     "samples": 5
+    },
+    "母なる変異の飛沫|global|vic|マッドシーカー": {
+     "name": "母なる変異の飛沫",
+     "kind": "global",
+     "side": "vic",
+     "owner": "マッドシーカー",
+     "damage": 155046970.99125278,
+     "hits": 18247,
+     "samples": 5
+    },
+    "海魔の残滓|global|vic|メルティエル": {
+     "name": "海魔の残滓",
+     "kind": "global",
+     "side": "vic",
+     "owner": "メルティエル",
+     "damage": 133445533.61638342,
+     "hits": 25364,
+     "samples": 5
+    },
+    "ド・マリニーの掛け時計|text|atk|メアリー": {
+     "name": "ド・マリニーの掛け時計",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 30436734.812591076,
+     "hits": 4575,
+     "samples": 5
+    },
+    "母なる変異の飛沫|text|atk|マッドシーカー": {
+     "name": "母なる変異の飛沫",
+     "kind": "text",
+     "side": "atk",
+     "owner": "マッドシーカー",
+     "damage": 35333215.21992692,
+     "hits": 8928,
+     "samples": 5
+    },
+    "海魔の残滓|text|atk|メルティエル": {
+     "name": "海魔の残滓",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メルティエル",
+     "damage": 5824392.463075206,
+     "hits": 1723,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|テトラ": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "テトラ",
+     "damage": 9066483.548094401,
+     "hits": 7203,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|メルティエル": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メルティエル",
+     "damage": 5318734.940766454,
+     "hits": 1696,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|メアリー": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 15450914.083011165,
+     "hits": 4500,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|エヴァラス・フラウ": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 13258187.173538057,
+     "hits": 873,
+     "samples": 5
+    },
+    "幻惑胞子の過密爆縮|text|atk|エヴァラス・フラウ": {
+     "name": "幻惑胞子の過密爆縮",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 13873812.393148048,
+     "hits": 873,
+     "samples": 5
+    },
+    "与ダメージ+50%|talent|atk|クトゥグァ砲台": {
+     "name": "与ダメージ+50%",
+     "kind": "talent",
+     "side": "atk",
+     "owner": "クトゥグァ砲台",
+     "damage": 41471.82632699881,
+     "hits": 65,
+     "samples": 5
+    },
+    "与ダメージ+50%|talent|atk|クトゥグァ砲台R": {
+     "name": "与ダメージ+50%",
+     "kind": "talent",
+     "side": "atk",
+     "owner": "クトゥグァ砲台R",
+     "damage": 41688.247928613,
+     "hits": 65,
+     "samples": 5
+    },
+    "被伤害+10%(赋予)|given|vic|マッドシーカー": {
+     "name": "被伤害+10%(赋予)",
+     "kind": "given",
+     "side": "vic",
+     "owner": "マッドシーカー",
+     "damage": 37928485.24113322,
+     "hits": 10196,
+     "samples": 4
+    },
+    "狂気 与伤害×2.50(狂気比250)|madness|atk|メアリー": {
+     "name": "狂気 与伤害×2.50(狂気比250)",
+     "kind": "madness",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 79015029.02220985,
+     "hits": 3492,
+     "samples": 4
+    }
+   },
+   "warnings": [
+    "samples span plugin versions 1.5.4/1.5.5/1.6.0/1.6.1: dealt is comparable (game number); attribution coverage is NOT -- read it per sample",
+    "run-to-run spread 5.8% of the mean: compare means, not single battles"
+   ]
+  },
+  {
+   "quest": 411001,
+   "versions": [
+    "1.5.3",
+    "1.5.4"
+   ],
+   "samples": 5,
+   "results": [
+    "Lose"
+   ],
+   "files": [
+    "battle_411001_20261003_205449.json",
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json"
+   ],
+   "comp": [
+    "エヴァラス・フラウ",
+    "テトラ",
+    "ネーフェ＝ジアー",
+    "マッドシーカー",
+    "メアリー",
+    "ルゥ=ルルサ",
+    "ルナリス",
+    "生ける炎 クトゥグア"
+   ],
+   "analyzable": {
+    "mean": 192389424.8,
+    "min": 181046593.0,
+    "max": 198463938.0
+   },
+   "duration": {
+    "mean": 119.06199999999998
+   },
+   "coverage": {
+    "credited_share": 0.8298203833789495,
+    "unattributed_share": 0.17017961662105124,
+    "key_coverage": 0.9886419624865128
+   },
+   "actors": {
+    "マッドシーカー": {
+     "directShareMean": 0.13519223931932361,
+     "directShareRange": [
+      0.12766248839068348,
+      0.1443927326623017
+     ],
+     "totalShareMean": 0.26181771274277,
+     "totalShareRange": [
+      0.2569362666579711,
+      0.2653587335256866
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      5
+     ]
+    },
+    "ネーフェ＝ジアー": {
+     "directShareMean": 0.32807654139746567,
+     "directShareRange": [
+      0.30890936468266594,
+      0.3457781102807039
+     ],
+     "totalShareMean": 0.2210239267721263,
+     "totalShareRange": [
+      0.2114007012126425,
+      0.2309602249516988
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      2
+     ]
+    },
+    "ルゥ=ルルサ": {
+     "directShareMean": 0.06236444449540154,
+     "directShareRange": [
+      0.05783139337231538,
+      0.06641897997438895
+     ],
+     "totalShareMean": 0.12605622927754237,
+     "totalShareRange": [
+      0.0340453338500192,
+      0.15458864392101412
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      3
+     ]
+    },
+    "メアリー": {
+     "directShareMean": 0.27648251441516736,
+     "directShareRange": [
+      0.26632456323245846,
+      0.2905914176427551
+     ],
+     "totalShareMean": 0.10410125933423393,
+     "totalShareRange": [
+      0.09935758572929378,
+      0.10837528429664356
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      7
+     ]
+    },
+    "エヴァラス・フラウ": {
+     "directShareMean": 0.10252302218320405,
+     "directShareRange": [
+      0.09639397175676859,
+      0.11167913034155354
+     ],
+     "totalShareMean": 0.06557459329985972,
+     "totalShareRange": [
+      0.06088615362308371,
+      0.07087730761391156
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      9
+     ]
+    },
+    "テトラ": {
+     "directShareMean": 0.0923416928127954,
+     "directShareRange": [
+      0.0877722794246666,
+      0.09700245505310337
+     ],
+     "totalShareMean": 0.04965139208238547,
+     "totalShareRange": [
+      0.0472807083304518,
+      0.05261095709908994
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      4
+     ]
+    },
+    "ルナリス": {
+     "directShareMean": 0.0016267523226171118,
+     "directShareRange": [
+      0.001571716268171601,
+      0.001703828924585301
+     ],
+     "totalShareMean": 0.0008601359413984973,
+     "totalShareRange": [
+      0.0008296329365278297,
+      0.0009197343652362146
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      6
+     ]
+    },
+    "生ける炎 クトゥグア": {
+     "directShareMean": 0.0010699375362540904,
+     "directShareRange": [
+      0.001033104114362748,
+      0.001124003476828752
+     ],
+     "totalShareMean": 0.0005412960415999025,
+     "totalShareRange": [
+      0.0005239172510302122,
+      0.0005748714953747506
+     ],
+     "samples": 5,
+     "summon": false,
+     "keys": [
+      13
+     ]
+    },
+    "クトゥグァ砲台R": {
+     "directShareMean": 0.00016203337085768675,
+     "directShareRange": [
+      0.00014623336137166464,
+      0.00017145862557049057
+     ],
+     "totalShareMean": 9.708545780874706e-05,
+     "totalShareRange": [
+      9.175271287665296e-05,
+      0.00010328998766602132
+     ],
+     "samples": 5,
+     "summon": true,
+     "keys": [
+      103,
+      106,
+      113,
+      124
+     ]
+    },
+    "クトゥグァ砲台": {
+     "directShareMean": 0.00016082214691344384,
+     "directShareRange": [
+      0.00014623336137166464,
+      0.000169387335557317
+     ],
+     "totalShareMean": 9.67524292246099e-05,
+     "totalShareRange": [
+      9.175271287665296e-05,
+      0.00010299533342973293
+     ],
+     "samples": 5,
+     "summon": true,
+     "keys": [
+      102,
+      105,
+      112,
+      123
+     ]
+    }
+   },
+   "rules": {
+    "腐食の毒薬|text|atk|ネーフェ＝ジアー": {
+     "name": "腐食の毒薬",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 70122140.87635237,
+     "hits": 2354,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|ネーフェ＝ジアー": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 55318604.51303958,
+     "hits": 2354,
+     "samples": 5
+    },
+    "物理与ダメージ+10%|text|atk|ネーフェ＝ジアー": {
+     "name": "物理与ダメージ+10%",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ネーフェ＝ジアー",
+     "damage": 28918281.71816566,
+     "hits": 2354,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|メアリー": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 30028737.73888751,
+     "hits": 3516,
+     "samples": 5
+    },
+    "与ダメージ+20%（前衛のみ）|text|atk|エヴァラス・フラウ": {
+     "name": "与ダメージ+20%（前衛のみ）",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 16650271.66804991,
+     "hits": 774,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|テトラ": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "テトラ",
+     "damage": 8206506.717375377,
+     "hits": 6900,
+     "samples": 5
+    },
+    "母なる変異の飛沫|global|vic|マッドシーカー": {
+     "name": "母なる変異の飛沫",
+     "kind": "global",
+     "side": "vic",
+     "owner": "マッドシーカー",
+     "damage": 151535741.573331,
+     "hits": 21330,
+     "samples": 5
+    },
+    "母なる変異の飛沫|text|atk|マッドシーカー": {
+     "name": "母なる変異の飛沫",
+     "kind": "text",
+     "side": "atk",
+     "owner": "マッドシーカー",
+     "damage": 33518870.97358632,
+     "hits": 8876,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|ルゥ=ルルサ": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "ルゥ=ルルサ",
+     "damage": 5462664.465657092,
+     "hits": 5085,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|エヴァラス・フラウ": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 9471053.11081678,
+     "hits": 806,
+     "samples": 5
+    },
+    "幻惑胞子の過密爆縮|text|atk|エヴァラス・フラウ": {
+     "name": "幻惑胞子の過密爆縮",
+     "kind": "text",
+     "side": "atk",
+     "owner": "エヴァラス・フラウ",
+     "damage": 12654808.200874075,
+     "hits": 806,
+     "samples": 5
+    },
+    "ド・マリニーの掛け時計|text|atk|メアリー": {
+     "name": "ド・マリニーの掛け時計",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 27866679.023044955,
+     "hits": 4542,
+     "samples": 5
+    },
+    "毒の短剣|text|atk|メアリー": {
+     "name": "毒の短剣",
+     "kind": "text",
+     "side": "atk",
+     "owner": "メアリー",
+     "damage": 14077356.800086878,
+     "hits": 4329,
+     "samples": 5
+    },
+    "与ダメージ+50%|talent|atk|クトゥグァ砲台": {
+     "name": "与ダメージ+50%",
+     "kind": "talent",
+     "side": "atk",
+     "owner": "クトゥグァ砲台",
+     "damage": 38688.90724097199,
+     "hits": 65,
+     "samples": 5
+    },
+    "与ダメージ+50%|talent|atk|クトゥグァ砲台R": {
+     "name": "与ダメージ+50%",
+     "kind": "talent",
+     "side": "atk",
+     "owner": "クトゥグァ砲台R",
+     "damage": 38905.42407966155,
+     "hits": 65,
+     "samples": 5
+    },
+    "狂気(受击方) 被伤害×1.50|madness|vic|ルゥ=ルルサ": {
+     "name": "狂気(受击方) 被伤害×1.50",
+     "kind": "madness",
+     "side": "vic",
+     "owner": "ルゥ=ルルサ",
+     "damage": 87671199.76325046,
+     "hits": 13455,
+     "samples": 4
+    }
+   },
+   "warnings": [
+    "samples span plugin versions 1.5.3/1.5.4: dealt is comparable (game number); attribution coverage is NOT -- read it per sample",
+    "run-to-run spread 8.8% of the mean: compare means, not single battles"
+   ]
+  }
+ ]
+}

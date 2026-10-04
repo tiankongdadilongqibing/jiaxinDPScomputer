@@ -1,0 +1,16 @@
+battle 235204  ver=1.5.5 dur=119.1s result=Lose hits=5521 dealt=204.0M
+team1: ネーフェ＝ジアー=65.1M | メアリー=58.5M | マッドシーカー=27.7M | エヴァラス・フラウ=22.1M | テトラ=19.6M | メルティエル=8.0M | 火砲=2.4M | ルナリス=0.3M | 生ける炎 クトゥグア=0.2M | クトゥグァ砲台=0.0M | クトゥグァ砲台R=0.0M
+
+[MADAPP] hook=8 recorded=8 selfApplied=8 nullOwner=0 nullGuest=8 errors=0 rows=8 dropped=0
+   row ('メアリー', None, True) x8
+
+[GIVAPP] hookCalls={'addTalent': 691} recorded=691 nullOwner=0 nullGuest=12 targets=1 multiGiver=0 lookupHits=31981 lookupMisses=0 errors=0 rows=512 dropped=179
+   row ('addTalent', 'マッドシーカー', 'ショゴス') x502
+   row ('addTalent', 'メアリー', None) x6
+   row ('addTalent', 'メルティエル', None) x3
+   row ('addTalent', 'ルナリス', None) x1
+
+byUnit coverage: {'given_with': 6110, 'madness_with': 897}
+attacker-mad hits by attacker: {'メアリー': 897}
+rosterAudit giver: resolved=29204 null=0 errors=0
+reconcile: exact=4675 exactWithCrit=5410 unexplained=160

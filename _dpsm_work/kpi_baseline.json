@@ -1,0 +1,200 @@
+{
+ "contract": "kpi-baseline/1",
+ "why": "The selector used to be implicit (same quest, version < 1.5.0) and became unreachable; this list makes the eligible samples explicit and hash-pinned.",
+ "eligibility": [
+  "listed in this file AND the file hashes to the pinned SHA256",
+  "quest == the target question",
+  "version strictly older than the target version",
+  "the metric exists and its definition matches (exact since 1.3.0, exactWithCrit since 1.3.9)",
+  "reconcile.withCalc > 0"
+ ],
+ "definitionVersions": {
+  "exact": "1.3.0",
+  "exactWithCrit": "1.3.9"
+ },
+ "regressionCriterion": "current exactWithCrit below the historical minimum by more than 3.0 percentage points",
+ "valuesSource": "read from the hashed export at run time; this file stores no KPI value",
+ "approved": [
+  {
+   "file": "battle_9999_20261003_205129.json",
+   "sha256": "ACDB30DC4115B923F5734BF2EFF2FC8CA936391B050F60EFA6482A75B5BD88C2",
+   "quest": 9999,
+   "version": "1.5.3"
+  },
+  {
+   "file": "battle_9999_20261003_225530.json",
+   "sha256": "776CB73144750C22A8F9E192FAA2E31AB0B96B65E4C4F68D7AE2FA4EF03180BF",
+   "quest": 9999,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_9999_20261003_225647.json",
+   "sha256": "19FDA06C775CB325C3DEA606981E74B7AC0330037B4172A70377BD71EE89EC60",
+   "quest": 9999,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_9999_20261003_225905.json",
+   "sha256": "DA469A0E32BB5CBBF529437AE4C4039812C561C17C559D5B1C9FEF61CC30F751",
+   "quest": 9999,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_9999_20261004_012138.json",
+   "sha256": "58555A9E2C8887A6325DD2687A6FF773210E340986C876634217B727EBD98FB4",
+   "quest": 9999,
+   "version": "1.5.5"
+  },
+  {
+   "file": "battle_9999_20261004_042458.json",
+   "sha256": "364B60F610468E52C27202C92CD0AD85BF18F3C2A731A0DDE43111FBCE73CA56",
+   "quest": 9999,
+   "version": "1.7.5"
+  },
+  {
+   "file": "battle_9999_20261004_135214.json",
+   "sha256": "D17A5A5BFD38EC6EEDDC7B32171C91255FEC63220871392AEF7A4E11E894A6BD",
+   "quest": 9999,
+   "version": "1.7.8"
+  },
+  {
+   "file": "battle_411001_20261003_205449.json",
+   "sha256": "6784F00C8948A1A0230A8F4BFC6C129CEDF93DB939E5C3D959B6F643CEA1CFE4",
+   "quest": 411001,
+   "version": "1.5.3"
+  },
+  {
+   "file": "battle_411001_20261003_230040.json",
+   "sha256": "5349C329880394746C65FA99C8558B4F3D71B8A2EDB047ED6F1629416FCB780C",
+   "quest": 411001,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_411001_20261003_230311.json",
+   "sha256": "A5D6AF9EE4A9106B78AC31E818609FF78E053C266198DFF60738C1E12278CB0B",
+   "quest": 411001,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_411001_20261003_230615.json",
+   "sha256": "983D039421F076215DC30ACD006BABEB2E9032CE892DD5F652D2C37F4828BC4C",
+   "quest": 411001,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_411001_20261003_231044.json",
+   "sha256": "514F2CD560E870B93CCE5DEF99C3688415615F701D0C8A353B558238201A64C7",
+   "quest": 411001,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_411001_20261003_231340.json",
+   "sha256": "CD52A4C83652CA1928A1B5CD443300B12A590DBA20FA64C9203EBCFFD6FBDDE1",
+   "quest": 411001,
+   "version": "1.5.4"
+  },
+  {
+   "file": "battle_411001_20261003_235204.json",
+   "sha256": "C51B38512EE3812CCB9282D091782AA0597EA67F538A5E02AF8476089D7F91B0",
+   "quest": 411001,
+   "version": "1.5.5"
+  },
+  {
+   "file": "battle_411001_20261004_012328.json",
+   "sha256": "32A429BB667E3BEDBD0F68555D36F4C66A1664B72B467F7DC96191F7C5A40D55",
+   "quest": 411001,
+   "version": "1.5.5"
+  },
+  {
+   "file": "battle_411001_20261004_021914.json",
+   "sha256": "510CA1AF15690CDB4DEC90392B9D14D7ED8447BFA2C1EB9DD8266678C1AB54BD",
+   "quest": 411001,
+   "version": "1.6.1"
+  },
+  {
+   "file": "battle_411001_20261004_023627.json",
+   "sha256": "41CBDAC7C5DFABC92E29C276987E48E67371A042648A41E69CF323EFA9026FAD",
+   "quest": 411001,
+   "version": "1.7.0"
+  },
+  {
+   "file": "battle_411001_20261004_033231.json",
+   "sha256": "B9A86752266BA18451D2649A134FD0E29A9DACE1E521DBE61B4AEAF07431092F",
+   "quest": 411001,
+   "version": "1.7.2"
+  },
+  {
+   "file": "battle_411001_20261004_035437.json",
+   "sha256": "55268089423019B97ACC4E0B7349288973056F10B8C2877AC3ACCFD98AD708D6",
+   "quest": 411001,
+   "version": "1.7.3"
+  },
+  {
+   "file": "battle_411001_20261004_041309.json",
+   "sha256": "D8347BC90EACE27C5BD9D8D62538D9BF0FEEC095B76D010AAB612A2326F1A750",
+   "quest": 411001,
+   "version": "1.7.4"
+  },
+  {
+   "file": "battle_411001_20261004_042637.json",
+   "sha256": "9A74BA7B167DC8167EF19FC717E26CC7CC65E5521823B0B92F5450DD8E34F40D",
+   "quest": 411001,
+   "version": "1.7.5"
+  },
+  {
+   "file": "battle_411001_20261004_042844.json",
+   "sha256": "2CC436A37736818A620D29E4A5832667A304E9B11CC35429F1D66DCC5F557D68",
+   "quest": 411001,
+   "version": "1.7.5"
+  },
+  {
+   "file": "battle_411001_20261004_113553.json",
+   "sha256": "8535CAC80AE048A9FB210A94B3DE6B3EDF8188CD5F8C871DB6C27B2A76FA0714",
+   "quest": 411001,
+   "version": "1.7.5"
+  },
+  {
+   "file": "battle_411001_20261004_115024.json",
+   "sha256": "9F80DA9A83B1366475ED33C67CE1E051B1A081BD61276637BAE7CA94CECE7DDA",
+   "quest": 411001,
+   "version": "1.7.6"
+  },
+  {
+   "file": "battle_411001_20261004_115417.json",
+   "sha256": "C4E6E80687CD03F30D842830CBC8A278F174D6D3BAF949817DC8DF8D303F8A17",
+   "quest": 411001,
+   "version": "1.7.6"
+  },
+  {
+   "file": "battle_411001_20261004_134524.json",
+   "sha256": "0863AE08E924A184D51F20C04F19B52AF07649FADCADA63156DFFF9501D14A84",
+   "quest": 411001,
+   "version": "1.7.8"
+  },
+  {
+   "file": "battle_411001_20261004_134853.json",
+   "sha256": "DB1C80B48F550D3CC9293BEB991BBEBD3A3B04FD29B0F79ABE1B4BBD9C02C262",
+   "quest": 411001,
+   "version": "1.7.8"
+  },
+  {
+   "file": "battle_411001_20261004_144548.json",
+   "sha256": "20B4ADC14BEBD5E101C45B56B79DB54D203B65A5D0FE40D21073638D60C50CA7",
+   "quest": 411001,
+   "version": "1.7.10"
+  },
+  {
+   "file": "battle_700817_20261004_114821.json",
+   "sha256": "83A558F61F5093C2520F6093D45E135EE9E15A5B998FA832AAED22F0A76D079A",
+   "quest": 700817,
+   "version": "1.7.6"
+  }
+ ],
+ "excluded": [
+  {
+   "file": "battle_411001_20261004_015919.json",
+   "sha256": "70D11547448BE0C9681CB1DCD634469BA1650C1CED0492B07F0DE1BA1D78BA87",
+   "why": "1.6.0 known damaged sample (58 factor-truncation mismatches): roadmap 2.2 keeps it as a NEGATIVE example, so it must never enter a KPI baseline"
+  }
+ ]
+}

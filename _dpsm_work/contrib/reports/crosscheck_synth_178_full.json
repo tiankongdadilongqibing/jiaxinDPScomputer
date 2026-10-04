@@ -1,0 +1,82 @@
+{
+ "file": "synth_178_full.json",
+ "pluginVersion": "1.7.8",
+ "quest": 411001,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfByNameFallback=7003 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit",
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfValues=7003 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+ ],
+ "checked": {
+  "totals": 4,
+  "actors": 10,
+  "rules": 34,
+  "links": 26
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfByNameFallback=7003 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfValues=7003 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.8)"
+  }
+ ],
+ "notes": [],
+ "modelApplicability": "full",
+ "trainingMode": false,
+ "atkAddCensus": {
+  "nonEmptyHits": 6006,
+  "rows": 6006,
+  "root": {
+   "hits": 6191,
+   "emitted": 6006,
+   "selfValues": 7003,
+   "skippedGuard": 131,
+   "skippedCollision": 50,
+   "skippedUnowned": 0,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0,
+   "selfByKey": 0,
+   "selfByNameFallback": 7003,
+   "nameCollision": 0,
+   "ownerUnknown": 0
+  }
+ },
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0000000000000009,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 31681,
+   "resolved": 31681,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ },
+ "status": "WARNING"
+}

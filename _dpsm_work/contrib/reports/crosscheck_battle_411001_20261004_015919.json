@@ -1,0 +1,325 @@
+{
+ "file": "battle_411001_20261004_015919.json",
+ "sectionPresent": true,
+ "mismatches": [
+  {
+   "field": "actors[key=4].baseCredit",
+   "offline": 13779850.192178948,
+   "plugin": 13779971.2773
+  },
+  {
+   "field": "actors[key=4].selfRuleCredit",
+   "offline": 8967509.821462462,
+   "plugin": 8967366.4194
+  },
+  {
+   "field": "actors[key=4].assistCredit",
+   "offline": 35890222.557993725,
+   "plugin": 35889499.2296
+  },
+  {
+   "field": "actors[key=4].totalCredit",
+   "offline": 58637582.571635135,
+   "plugin": 58636836.9263
+  },
+  {
+   "field": "actors[key=7].baseCredit",
+   "offline": 5603449.748631781,
+   "plugin": 5603502.5238
+  },
+  {
+   "field": "actors[key=7].selfRuleCredit",
+   "offline": 36666669.41678249,
+   "plugin": 36666785.8953
+  },
+  {
+   "field": "actors[key=7].totalCredit",
+   "offline": 42270119.165414274,
+   "plugin": 42270288.4191
+  },
+  {
+   "field": "actors[key=2].baseCredit",
+   "offline": 10870727.904720888,
+   "plugin": 10870867.0019
+  },
+  {
+   "field": "actors[key=2].selfRuleCredit",
+   "offline": 29698219.9302549,
+   "plugin": 29698360.326
+  },
+  {
+   "field": "actors[key=2].totalCredit",
+   "offline": 40568947.83497579,
+   "plugin": 40569227.3279
+  },
+  {
+   "field": "actors[key=5].baseCredit",
+   "offline": 2469899.4749998488,
+   "plugin": 2469922.8815
+  },
+  {
+   "field": "actors[key=5].selfRuleCredit",
+   "offline": 3414440.7870300114,
+   "plugin": 3414454.4416
+  },
+  {
+   "field": "actors[key=5].assistCredit",
+   "offline": 26239575.45727473,
+   "plugin": 26239681.3281
+  },
+  {
+   "field": "actors[key=5].totalCredit",
+   "offline": 32123915.71930459,
+   "plugin": 32124058.6512
+  },
+  {
+   "field": "actors[key=9].baseCredit",
+   "offline": 4011483.681007334,
+   "plugin": 4011516.5865
+  },
+  {
+   "field": "actors[key=9].selfRuleCredit",
+   "offline": 7738363.217475831,
+   "plugin": 7738387.8554
+  },
+  {
+   "field": "actors[key=9].totalCredit",
+   "offline": 11749846.898483165,
+   "plugin": 11749904.442
+  },
+  {
+   "field": "actors[key=3].baseCredit",
+   "offline": 8369666.235188607,
+   "plugin": 8369741.5143
+  },
+  {
+   "field": "actors[key=3].selfRuleCredit",
+   "offline": 1821551.9134778357,
+   "plugin": 1821559.2164
+  },
+  {
+   "field": "actors[key=3].totalCredit",
+   "offline": 10191218.148666443,
+   "plugin": 10191300.7306
+  },
+  {
+   "field": "actors[key=11].baseCredit",
+   "offline": 880280.0846205082,
+   "plugin": 880289.6282
+  },
+  {
+   "field": "actors[key=11].selfRuleCredit",
+   "offline": 395026.6125386635,
+   "plugin": 395028.4117
+  },
+  {
+   "field": "actors[key=11].totalCredit",
+   "offline": 1275306.6971591718,
+   "plugin": 1275318.0399
+  },
+  {
+   "field": "actors[key=6].baseCredit",
+   "offline": 169075.39311287907,
+   "plugin": 169076.7466
+  },
+  {
+   "field": "actors[key=6].totalCredit",
+   "offline": 169075.39311287907,
+   "plugin": 169076.7466
+  },
+  {
+   "field": "rules[母なる変異の飛沫|global|vic|マッドシーカー].damageEquivalent",
+   "offline": 29924704.861671876,
+   "plugin": 29923961.264
+  },
+  {
+   "field": "rules[海魔の残滓|global|vic|メルティエル].damageEquivalent",
+   "offline": 26239575.45727473,
+   "plugin": 26239681.3281
+  },
+  {
+   "field": "rules[狂気 与伤害×2.50(狂気比250)|madness|atk|メアリー].damageEquivalent",
+   "offline": 20091817.83643597,
+   "plugin": 20091880.2855
+  },
+  {
+   "field": "rules[腐食の毒薬|text|atk|ネーフェ＝ジアー].damageEquivalent",
+   "offline": 13491292.351014476,
+   "plugin": 13491356.1299
+  },
+  {
+   "field": "rules[与ダメージ+20%（前衛のみ）|text|atk|ネーフェ＝ジアー].damageEquivalent",
+   "offline": 10643135.77150424,
+   "plugin": 10643186.086
+  },
+  {
+   "field": "rules[被伤害+10%(赋予)|given|vic|マッドシーカー].damageEquivalent",
+   "offline": 7791886.258286286,
+   "plugin": 7791912.9206
+  },
+  {
+   "field": "rules[与ダメージ+20%（前衛のみ）|text|atk|メアリー].damageEquivalent",
+   "offline": 7335854.082151157,
+   "plugin": 7335878.7039
+  },
+  {
+   "field": "rules[母なる変異の飛沫|text|atk|マッドシーカー].damageEquivalent",
+   "offline": 7141141.259498,
+   "plugin": 7140991.4643
+  },
+  {
+   "field": "rules[ド・マリニーの掛け時計|text|atk|メアリー].damageEquivalent",
+   "offline": 6179656.916315871,
+   "plugin": 6179676.5214
+  },
+  {
+   "field": "rules[物理与ダメージ+10%|text|atk|ネーフェ＝ジアー].damageEquivalent",
+   "offline": 5563791.807736149,
+   "plugin": 5563818.1101
+  },
+  {
+   "field": "rules[毒の短剣|text|atk|メアリー].damageEquivalent",
+   "offline": 3059340.5818796507,
+   "plugin": 3059350.3844
+  },
+  {
+   "field": "rules[与ダメージ+20%（前衛のみ）|text|atk|エヴァラス・フラウ].damageEquivalent",
+   "offline": 2786871.082218936,
+   "plugin": 2786879.4325
+  },
+  {
+   "field": "rules[毒の短剣|text|atk|エヴァラス・フラウ].damageEquivalent",
+   "offline": 2554143.911350485,
+   "plugin": 2554152.3131
+  },
+  {
+   "field": "rules[幻惑胞子の過密爆縮|text|atk|エヴァラス・フラウ].damageEquivalent",
+   "offline": 2397348.2239063988,
+   "plugin": 2397356.1099
+  },
+  {
+   "field": "rules[毒の短剣|text|atk|テトラ].damageEquivalent",
+   "offline": 1821551.9134778357,
+   "plugin": 1821559.2164
+  },
+  {
+   "field": "rules[海魔の残滓|text|atk|メルティエル].damageEquivalent",
+   "offline": 1294001.6468019765,
+   "plugin": 1294006.8227
+  },
+  {
+   "field": "rules[毒の短剣|text|atk|メルティエル].damageEquivalent",
+   "offline": 1281727.684195712,
+   "plugin": 1281732.8601
+  },
+  {
+   "field": "rules[魔法与ダメージ+10%|text|atk|メルティエル].damageEquivalent",
+   "offline": 838711.4560323119,
+   "plugin": 838714.7588
+  },
+  {
+   "field": "rules[与ダメージ+30%|talent|atk|火砲].damageEquivalent",
+   "offline": 395026.6125386635,
+   "plugin": 395028.4117
+  },
+  {
+   "field": "links[(4, 2)].amount",
+   "offline": 13249892.635057418,
+   "plugin": 13249574.5726
+  },
+  {
+   "field": "links[(4, 7)].amount",
+   "offline": 9682796.918269746,
+   "plugin": 9682608.0595
+  },
+  {
+   "field": "links[(5, 2)].amount",
+   "offline": 7779736.529966834,
+   "plugin": 7779775.0995
+  },
+  {
+   "field": "links[(5, 7)].amount",
+   "offline": 6179656.916315871,
+   "plugin": 6179676.5214
+  },
+  {
+   "field": "links[(4, 3)].amount",
+   "offline": 5840624.858792899,
+   "plugin": 5840527.6711
+  },
+  {
+   "field": "links[(5, 4)].amount",
+   "offline": 5522409.986358591,
+   "plugin": 5522432.3033
+  },
+  {
+   "field": "links[(4, 9)].amount",
+   "offline": 4122812.2087140726,
+   "plugin": 4122746.2635
+  },
+  {
+   "field": "links[(5, 3)].amount",
+   "offline": 3657137.9925405793,
+   "plugin": 3657152.5983
+  },
+  {
+   "field": "links[(5, 9)].amount",
+   "offline": 2562573.892802777,
+   "plugin": 2562582.2945
+  },
+  {
+   "field": "links[(4, 5)].amount",
+   "offline": 2127244.737970149,
+   "plugin": 2127207.6769
+  },
+  {
+   "field": "links[(4, 11)].amount",
+   "offline": 680280.6346721682,
+   "plugin": 680267.375
+  },
+  {
+   "field": "links[(5, 11)].amount",
+   "offline": 420581.6681686607,
+   "plugin": 420583.585
+  },
+  {
+   "field": "links[(4, 6)].amount",
+   "offline": 105093.23315719349,
+   "plugin": 105091.6291
+  },
+  {
+   "field": "links[(4, 14)].amount",
+   "offline": 63088.01309486184,
+   "plugin": 63086.9817
+  }
+ ],
+ "checked": {
+  "totals": 4,
+  "actors": 11,
+  "rules": 21,
+  "links": 20
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "status": "MISMATCH",
+ "offline": {
+  "creditedShare": 0.9999999999999999,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 26054,
+   "resolved": 26054,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ }
+}

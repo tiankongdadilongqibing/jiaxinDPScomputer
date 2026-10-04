@@ -1,0 +1,10 @@
+# RF0: store every tracked file BYTE-VERBATIM. The guards in _dpsm_work hash
+# file contents (git_free_code_hash in n0_acceptance.py, the corpus manifest)
+# and several historical files are deliberately NOT valid UTF-8, so a CRLF or
+# encoding rewrite on checkout would silently break a guard. No text=auto, no
+# eol conversion.
+#
+# -text only: text DIFFS must keep working -- RF2/RF3 review a mechanical split
+# by reading the diff, and `-diff` would print "Binary files differ" for every
+# source file and hide exactly the review this baseline exists to support.
+* -text

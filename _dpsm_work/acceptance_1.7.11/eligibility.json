@@ -1,0 +1,4858 @@
+{
+ "contract": "ComparisonEligibility/1",
+ "n": 32,
+ "metrics": [
+  {
+   "metric": "team_damage",
+   "status": "RESTRICTED",
+   "reasons": [
+    "battle_411001_20261003_205449.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_230040.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_230311.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_230615.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_231044.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_231340.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261003_235204.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_012328.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_015919.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_021914.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_023627.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_033231.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_035437.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_041309.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_042637.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_042844.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_113553.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_115024.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_411001_20261004_115417.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_700817_20261004_114821.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261003_205129.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261003_225530.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261003_225647.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261003_225905.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261004_012138.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "battle_9999_20261004_042458.json: ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file",
+    "capability/definition split: comparing across it is not like-for-like ([411001, 'dealt'] -> 23 sample(s); [700817, 'dealt'] -> 1 sample(s); [9999, 'dealt'] -> 8 sample(s))"
+   ],
+   "members": {
+    "battle_411001_20261003_205449.json": "RESTRICTED",
+    "battle_411001_20261003_230040.json": "RESTRICTED",
+    "battle_411001_20261003_230311.json": "RESTRICTED",
+    "battle_411001_20261003_230615.json": "RESTRICTED",
+    "battle_411001_20261003_231044.json": "RESTRICTED",
+    "battle_411001_20261003_231340.json": "RESTRICTED",
+    "battle_411001_20261003_235204.json": "RESTRICTED",
+    "battle_411001_20261004_012328.json": "RESTRICTED",
+    "battle_411001_20261004_015919.json": "RESTRICTED",
+    "battle_411001_20261004_021914.json": "RESTRICTED",
+    "battle_411001_20261004_023627.json": "RESTRICTED",
+    "battle_411001_20261004_033231.json": "RESTRICTED",
+    "battle_411001_20261004_035437.json": "RESTRICTED",
+    "battle_411001_20261004_041309.json": "RESTRICTED",
+    "battle_411001_20261004_042637.json": "RESTRICTED",
+    "battle_411001_20261004_042844.json": "RESTRICTED",
+    "battle_411001_20261004_113553.json": "RESTRICTED",
+    "battle_411001_20261004_115024.json": "RESTRICTED",
+    "battle_411001_20261004_115417.json": "RESTRICTED",
+    "battle_411001_20261004_134524.json": "ELIGIBLE",
+    "battle_411001_20261004_134853.json": "ELIGIBLE",
+    "battle_411001_20261004_144548.json": "ELIGIBLE",
+    "battle_411001_20261004_170157.json": "ELIGIBLE",
+    "battle_700817_20261004_114821.json": "RESTRICTED",
+    "battle_9999_20261003_205129.json": "RESTRICTED",
+    "battle_9999_20261003_225530.json": "RESTRICTED",
+    "battle_9999_20261003_225647.json": "RESTRICTED",
+    "battle_9999_20261003_225905.json": "RESTRICTED",
+    "battle_9999_20261004_012138.json": "RESTRICTED",
+    "battle_9999_20261004_042458.json": "RESTRICTED",
+    "battle_9999_20261004_135214.json": "ELIGIBLE",
+    "battle_9999_20261004_165952.json": "ELIGIBLE"
+   },
+   "admissible": [
+    "battle_411001_20261003_205449.json",
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json",
+    "battle_411001_20261003_231340.json",
+    "battle_411001_20261003_235204.json",
+    "battle_411001_20261004_012328.json",
+    "battle_411001_20261004_015919.json",
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261003_205129.json",
+    "battle_9999_20261003_225530.json",
+    "battle_9999_20261003_225647.json",
+    "battle_9999_20261003_225905.json",
+    "battle_9999_20261004_012138.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ]
+  },
+  {
+   "metric": "actor_credit",
+   "status": "REJECTED",
+   "reasons": [
+    "battle_411001_20261003_205449.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_230040.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_230311.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_230615.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_231044.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_231340.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261003_235204.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261004_012328.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261004_015919.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_015919.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_015919.json: gate-status: gate status ERROR: this sample never enters a formal contribution ranking",
+    "battle_9999_20261003_205129.json: section-present: no contribution section: nothing to attribute",
+    "battle_9999_20261003_225530.json: section-present: no contribution section: nothing to attribute",
+    "battle_9999_20261003_225647.json: section-present: no contribution section: nothing to attribute",
+    "battle_9999_20261003_225905.json: section-present: no contribution section: nothing to attribute",
+    "battle_9999_20261004_012138.json: section-present: no contribution section: nothing to attribute",
+    "battle_411001_20261004_021914.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_021914.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_023627.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_023627.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_033231.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_033231.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_035437.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_035437.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_041309.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_041309.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_042637.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_042637.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_042844.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_042844.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_113553.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_113553.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_115024.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_115024.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_115417.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_115417.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_115417.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_411001_20261004_134524.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_134524.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_134524.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_411001_20261004_134853.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_134853.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_144548.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_144548.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_411001_20261004_170157.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_411001_20261004_170157.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_700817_20261004_114821.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_700817_20261004_114821.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_700817_20261004_114821.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_042458.json: special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+    "battle_9999_20261004_042458.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_9999_20261004_042458.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_9999_20261004_042458.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_135214.json: special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+    "battle_9999_20261004_135214.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_9999_20261004_135214.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_9999_20261004_135214.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_165952.json: special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+    "battle_9999_20261004_165952.json: config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+    "battle_9999_20261004_165952.json: identity: cross-battle identity is the NAME only: one name may be two entities",
+    "battle_9999_20261004_165952.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "capability/definition split: comparing across it is not like-for-like ([411001, '1.0', 'dealt', False] -> 4 sample(s); [411001, '1.0', 'dealt', True] -> 6 sample(s); [411001, '1.1', 'dealt', True] -> 4 sample(s); [700817, '1.0', 'dealt', True] -> 1 sample(s); [9999, '1.0', 'dealt', True] -> 1 sample(s); [9999, '1.1', 'dealt', True] -> 2 sample(s))",
+    "only 18 of 32 samples are admissible for this metric"
+   ],
+   "members": {
+    "battle_411001_20261003_205449.json": "REJECTED",
+    "battle_411001_20261003_230040.json": "REJECTED",
+    "battle_411001_20261003_230311.json": "REJECTED",
+    "battle_411001_20261003_230615.json": "REJECTED",
+    "battle_411001_20261003_231044.json": "REJECTED",
+    "battle_411001_20261003_231340.json": "REJECTED",
+    "battle_411001_20261003_235204.json": "REJECTED",
+    "battle_411001_20261004_012328.json": "REJECTED",
+    "battle_411001_20261004_015919.json": "REJECTED",
+    "battle_411001_20261004_021914.json": "RESTRICTED",
+    "battle_411001_20261004_023627.json": "RESTRICTED",
+    "battle_411001_20261004_033231.json": "RESTRICTED",
+    "battle_411001_20261004_035437.json": "RESTRICTED",
+    "battle_411001_20261004_041309.json": "RESTRICTED",
+    "battle_411001_20261004_042637.json": "RESTRICTED",
+    "battle_411001_20261004_042844.json": "RESTRICTED",
+    "battle_411001_20261004_113553.json": "RESTRICTED",
+    "battle_411001_20261004_115024.json": "RESTRICTED",
+    "battle_411001_20261004_115417.json": "RESTRICTED",
+    "battle_411001_20261004_134524.json": "RESTRICTED",
+    "battle_411001_20261004_134853.json": "RESTRICTED",
+    "battle_411001_20261004_144548.json": "RESTRICTED",
+    "battle_411001_20261004_170157.json": "RESTRICTED",
+    "battle_700817_20261004_114821.json": "RESTRICTED",
+    "battle_9999_20261003_205129.json": "REJECTED",
+    "battle_9999_20261003_225530.json": "REJECTED",
+    "battle_9999_20261003_225647.json": "REJECTED",
+    "battle_9999_20261003_225905.json": "REJECTED",
+    "battle_9999_20261004_012138.json": "REJECTED",
+    "battle_9999_20261004_042458.json": "RESTRICTED",
+    "battle_9999_20261004_135214.json": "RESTRICTED",
+    "battle_9999_20261004_165952.json": "RESTRICTED"
+   },
+   "admissible": [
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ]
+  },
+  {
+   "metric": "rule_coverage",
+   "status": "REJECTED",
+   "reasons": [
+    "battle_411001_20261003_205449.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_230040.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_230311.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_230615.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_231044.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_231340.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261003_235204.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261004_012328.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261004_015919.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_015919.json: gate-status: gate status ERROR: this sample never enters a formal contribution ranking",
+    "battle_9999_20261003_205129.json: rules-present: no rules in the contribution section",
+    "battle_9999_20261003_225530.json: rules-present: no rules in the contribution section",
+    "battle_9999_20261003_225647.json: rules-present: no rules in the contribution section",
+    "battle_9999_20261003_225905.json: rules-present: no rules in the contribution section",
+    "battle_9999_20261004_012138.json: rules-present: no rules in the contribution section",
+    "battle_411001_20261004_021914.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_023627.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_033231.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_035437.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_041309.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_042637.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_042844.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_113553.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_115024.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_115417.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_115417.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_411001_20261004_134524.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_134524.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_411001_20261004_134853.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_144548.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_411001_20261004_170157.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_700817_20261004_114821.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_700817_20261004_114821.json: gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_042458.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_9999_20261004_042458.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_135214.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_9999_20261004_135214.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "battle_9999_20261004_165952.json: coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+    "battle_9999_20261004_165952.json: gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)",
+    "capability/definition split: comparing across it is not like-for-like ([411001, '1.0'] -> 10 sample(s); [411001, '1.1'] -> 4 sample(s); [700817, '1.0'] -> 1 sample(s); [9999, '1.0'] -> 1 sample(s); [9999, '1.1'] -> 2 sample(s))",
+    "only 18 of 32 samples are admissible for this metric"
+   ],
+   "members": {
+    "battle_411001_20261003_205449.json": "REJECTED",
+    "battle_411001_20261003_230040.json": "REJECTED",
+    "battle_411001_20261003_230311.json": "REJECTED",
+    "battle_411001_20261003_230615.json": "REJECTED",
+    "battle_411001_20261003_231044.json": "REJECTED",
+    "battle_411001_20261003_231340.json": "REJECTED",
+    "battle_411001_20261003_235204.json": "REJECTED",
+    "battle_411001_20261004_012328.json": "REJECTED",
+    "battle_411001_20261004_015919.json": "REJECTED",
+    "battle_411001_20261004_021914.json": "RESTRICTED",
+    "battle_411001_20261004_023627.json": "RESTRICTED",
+    "battle_411001_20261004_033231.json": "RESTRICTED",
+    "battle_411001_20261004_035437.json": "RESTRICTED",
+    "battle_411001_20261004_041309.json": "RESTRICTED",
+    "battle_411001_20261004_042637.json": "RESTRICTED",
+    "battle_411001_20261004_042844.json": "RESTRICTED",
+    "battle_411001_20261004_113553.json": "RESTRICTED",
+    "battle_411001_20261004_115024.json": "RESTRICTED",
+    "battle_411001_20261004_115417.json": "RESTRICTED",
+    "battle_411001_20261004_134524.json": "RESTRICTED",
+    "battle_411001_20261004_134853.json": "RESTRICTED",
+    "battle_411001_20261004_144548.json": "RESTRICTED",
+    "battle_411001_20261004_170157.json": "RESTRICTED",
+    "battle_700817_20261004_114821.json": "RESTRICTED",
+    "battle_9999_20261003_205129.json": "REJECTED",
+    "battle_9999_20261003_225530.json": "REJECTED",
+    "battle_9999_20261003_225647.json": "REJECTED",
+    "battle_9999_20261003_225905.json": "REJECTED",
+    "battle_9999_20261004_012138.json": "REJECTED",
+    "battle_9999_20261004_042458.json": "RESTRICTED",
+    "battle_9999_20261004_135214.json": "RESTRICTED",
+    "battle_9999_20261004_165952.json": "RESTRICTED"
+   },
+   "admissible": [
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ]
+  },
+  {
+   "metric": "outcome",
+   "status": "RESTRICTED",
+   "reasons": [
+    "battle_411001_20261003_205449.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_230040.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_230311.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_230615.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_231044.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_231340.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261003_235204.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_012328.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_015919.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_021914.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_023627.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_033231.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_035437.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_041309.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_042637.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_042844.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_113553.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_115024.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_115417.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_134524.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_134853.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_144548.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_411001_20261004_170157.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_700817_20261004_114821.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261003_205129.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261003_225530.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261003_225647.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261003_225905.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261004_012138.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261004_042458.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261004_135214.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "battle_9999_20261004_165952.json: progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage",
+    "capability/definition split: comparing across it is not like-for-like ([411001] -> 23 sample(s); [700817] -> 1 sample(s); [9999] -> 8 sample(s))"
+   ],
+   "members": {
+    "battle_411001_20261003_205449.json": "RESTRICTED",
+    "battle_411001_20261003_230040.json": "RESTRICTED",
+    "battle_411001_20261003_230311.json": "RESTRICTED",
+    "battle_411001_20261003_230615.json": "RESTRICTED",
+    "battle_411001_20261003_231044.json": "RESTRICTED",
+    "battle_411001_20261003_231340.json": "RESTRICTED",
+    "battle_411001_20261003_235204.json": "RESTRICTED",
+    "battle_411001_20261004_012328.json": "RESTRICTED",
+    "battle_411001_20261004_015919.json": "RESTRICTED",
+    "battle_411001_20261004_021914.json": "RESTRICTED",
+    "battle_411001_20261004_023627.json": "RESTRICTED",
+    "battle_411001_20261004_033231.json": "RESTRICTED",
+    "battle_411001_20261004_035437.json": "RESTRICTED",
+    "battle_411001_20261004_041309.json": "RESTRICTED",
+    "battle_411001_20261004_042637.json": "RESTRICTED",
+    "battle_411001_20261004_042844.json": "RESTRICTED",
+    "battle_411001_20261004_113553.json": "RESTRICTED",
+    "battle_411001_20261004_115024.json": "RESTRICTED",
+    "battle_411001_20261004_115417.json": "RESTRICTED",
+    "battle_411001_20261004_134524.json": "RESTRICTED",
+    "battle_411001_20261004_134853.json": "RESTRICTED",
+    "battle_411001_20261004_144548.json": "RESTRICTED",
+    "battle_411001_20261004_170157.json": "RESTRICTED",
+    "battle_700817_20261004_114821.json": "RESTRICTED",
+    "battle_9999_20261003_205129.json": "RESTRICTED",
+    "battle_9999_20261003_225530.json": "RESTRICTED",
+    "battle_9999_20261003_225647.json": "RESTRICTED",
+    "battle_9999_20261003_225905.json": "RESTRICTED",
+    "battle_9999_20261004_012138.json": "RESTRICTED",
+    "battle_9999_20261004_042458.json": "RESTRICTED",
+    "battle_9999_20261004_135214.json": "RESTRICTED",
+    "battle_9999_20261004_165952.json": "RESTRICTED"
+   },
+   "admissible": [
+    "battle_411001_20261003_205449.json",
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json",
+    "battle_411001_20261003_231340.json",
+    "battle_411001_20261003_235204.json",
+    "battle_411001_20261004_012328.json",
+    "battle_411001_20261004_015919.json",
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261003_205129.json",
+    "battle_9999_20261003_225530.json",
+    "battle_9999_20261003_225647.json",
+    "battle_9999_20261003_225905.json",
+    "battle_9999_20261004_012138.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json"
+   ]
+  }
+ ],
+ "samples": [
+  {
+   "file": "battle_411001_20261003_205449.json",
+   "sha256": "6784F00C8948A1A0230A8F4BFC6C129CEDF93DB939E5C3D959B6F643CEA1CFE4",
+   "version": "1.5.3",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230040.json",
+   "sha256": "5349C329880394746C65FA99C8558B4F3D71B8A2EDB047ED6F1629416FCB780C",
+   "version": "1.5.4",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230311.json",
+   "sha256": "A5D6AF9EE4A9106B78AC31E818609FF78E053C266198DFF60738C1E12278CB0B",
+   "version": "1.5.4",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_230615.json",
+   "sha256": "983D039421F076215DC30ACD006BABEB2E9032CE892DD5F652D2C37F4828BC4C",
+   "version": "1.5.4",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_231044.json",
+   "sha256": "514F2CD560E870B93CCE5DEF99C3688415615F701D0C8A353B558238201A64C7",
+   "version": "1.5.4",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_231340.json",
+   "sha256": "CD52A4C83652CA1928A1B5CD443300B12A590DBA20FA64C9203EBCFFD6FBDDE1",
+   "version": "1.5.4",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261003_235204.json",
+   "sha256": "C51B38512EE3812CCB9282D091782AA0597EA67F538A5E02AF8476089D7F91B0",
+   "version": "1.5.5",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_012328.json",
+   "sha256": "32A429BB667E3BEDBD0F68555D36F4C66A1664B72B467F7DC96191F7C5A40D55",
+   "version": "1.5.5",
+   "quest": 411001,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_015919.json",
+   "sha256": "70D11547448BE0C9681CB1DCD634469BA1650C1CED0492B07F0DE1BA1D78BA87",
+   "version": "1.6.0",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "ERROR",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status ERROR: this sample never enters a formal contribution ranking"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "gate status ERROR: this sample never enters a formal contribution ranking"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status ERROR: this sample never enters a formal contribution ranking"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "21 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "gate status ERROR: this sample never enters a formal contribution ranking"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_021914.json",
+   "sha256": "510CA1AF15690CDB4DEC90392B9D14D7ED8447BFA2C1EB9DD8266678C1AB54BD",
+   "version": "1.6.1",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "21 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_023627.json",
+   "sha256": "41CBDAC7C5DFABC92E29C276987E48E67371A042648A41E69CF323EFA9026FAD",
+   "version": "1.7.0",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "21 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_033231.json",
+   "sha256": "B9A86752266BA18451D2649A134FD0E29A9DACE1E521DBE61B4AEAF07431092F",
+   "version": "1.7.2",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "21 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_035437.json",
+   "sha256": "55268089423019B97ACC4E0B7349288973056F10B8C2877AC3ACCFD98AD708D6",
+   "version": "1.7.3",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "21 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_041309.json",
+   "sha256": "D8347BC90EACE27C5BD9D8D62538D9BF0FEEC095B76D010AAB612A2326F1A750",
+   "version": "1.7.4",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_042637.json",
+   "sha256": "9A74BA7B167DC8167EF19FC717E26CC7CC65E5521823B0B92F5450DD8E34F40D",
+   "version": "1.7.5",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_042844.json",
+   "sha256": "2CC436A37736818A620D29E4A5832667A304E9B11CC35429F1D66DCC5F557D68",
+   "version": "1.7.5",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "38 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_113553.json",
+   "sha256": "8535CAC80AE048A9FB210A94B3DE6B3EDF8188CD5F8C871DB6C27B2A76FA0714",
+   "version": "1.7.5",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "38 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_115024.json",
+   "sha256": "9F80DA9A83B1366475ED33C67CE1E051B1A081BD61276637BAE7CA94CECE7DDA",
+   "version": "1.7.6",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_115417.json",
+   "sha256": "C4E6E80687CD03F30D842830CBC8A278F174D6D3BAF949817DC8DF8D303F8A17",
+   "version": "1.7.6",
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "WARNING",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "34 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_134524.json",
+   "sha256": "0863AE08E924A184D51F20C04F19B52AF07649FADCADA63156DFFF9501D14A84",
+   "version": "1.7.8",
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "WARNING",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "34 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_134853.json",
+   "sha256": "DB1C80B48F550D3CC9293BEB991BBEBD3A3B04FD29B0F79ABE1B4BBD9C02C262",
+   "version": "1.7.8",
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_144548.json",
+   "sha256": "20B4ADC14BEBD5E101C45B56B79DB54D203B65A5D0FE40D21073638D60C50CA7",
+   "version": "1.7.10",
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_411001_20261004_170157.json",
+   "sha256": "9B20FFE32E3CE53DAC2CE951DD1B73E7B8C4CB1D255FF51B728CDF7E9A02D4CA",
+   "version": "1.7.11",
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "PASS",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "37 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "gate status PASS"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=Lose"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_700817_20261004_114821.json",
+   "sha256": "83A558F61F5093C2520F6093D45E135EE9E15A5B998FA832AAED22F0A76D079A",
+   "version": "1.7.6",
+   "quest": 700817,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "WARNING",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "normal quest"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "7 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status WARNING is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261003_205129.json",
+   "sha256": "ACDB30DC4115B923F5734BF2EFF2FC8CA936391B050F60EFA6482A75B5BD88C2",
+   "version": "1.5.3",
+   "quest": 9999,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261003_225530.json",
+   "sha256": "776CB73144750C22A8F9E192FAA2E31AB0B96B65E4C4F68D7AE2FA4EF03180BF",
+   "version": "1.5.4",
+   "quest": 9999,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261003_225647.json",
+   "sha256": "19FDA06C775CB325C3DEA606981E74B7AC0330037B4172A70377BD71EE89EC60",
+   "version": "1.5.4",
+   "quest": 9999,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261003_225905.json",
+   "sha256": "DA469A0E32BB5CBBF529437AE4C4039812C561C17C559D5B1C9FEF61CC30F751",
+   "version": "1.5.4",
+   "quest": 9999,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261004_012138.json",
+   "sha256": "58555A9E2C8887A6325DD2687A6FF773210E340986C876634217B727EBD98FB4",
+   "version": "1.5.5",
+   "quest": 9999,
+   "schemaVersion": null,
+   "capability": {
+    "atkAdd": false,
+    "paramOwners": false,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "NOT_RUN",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "REJECTED",
+     "reasons": [
+      "section-present: no contribution section: nothing to attribute"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no contribution section: nothing to attribute"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "REJECTED",
+     "reasons": [
+      "rules-present: no rules in the contribution section"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "reject",
+       "reason": "no rules in the contribution section"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261004_042458.json",
+   "sha256": "364B60F610468E52C27202C92CD0AD85BF18F3C2A731A0DDE43111FBCE73CA56",
+   "version": "1.7.5",
+   "quest": 9999,
+   "schemaVersion": "1.0",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": false
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "LEGACY_NOT_APPLICABLE",
+   "intrinsic": {
+    "team_damage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "ledger-reconciliation: no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+     ],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no damageLedger (pre-1.7.8): the event-domain total cannot be reconciled from the file"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.0"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "7 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261004_135214.json",
+   "sha256": "D17A5A5BFD38EC6EEDDC7B32171C91255FEC63220871392AEF7A4E11E894A6BD",
+   "version": "1.7.8",
+   "quest": 9999,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "LEGACY_NOT_APPLICABLE",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "8 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "battle_9999_20261004_165952.json",
+   "sha256": "FAD510DA62B6C8F4EC84A23EA96C69001A5E74D860FF1D3F21877DA856EC8774",
+   "version": "1.7.11",
+   "quest": 9999,
+   "schemaVersion": "1.1",
+   "capability": {
+    "atkAdd": true,
+    "paramOwners": true,
+    "damageLedger": true
+   },
+   "identityStrength": "weak-name-only",
+   "configProvenanceKnown": false,
+   "gateStatus": "LEGACY_NOT_APPLICABLE",
+   "intrinsic": {
+    "team_damage": {
+     "status": "ELIGIBLE",
+     "reasons": [],
+     "checks": [
+      {
+       "check": "event-domain-basics",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "quest and duration present"
+      },
+      {
+       "check": "ledger-reconciliation",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "reconciliationGap=0"
+      },
+      {
+       "check": "window-definition",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "whole-battle total by definition (duration = the battle); any FIXED-WINDOW DPS claim is not covered"
+      }
+     ]
+    },
+    "actor_credit": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "special-mode: quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable",
+      "config-provenance: the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently",
+      "identity: cross-battle identity is the NAME only: one name may be two entities",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "section-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "contribution section present"
+      },
+      {
+       "check": "method",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "method=log-share/1"
+      },
+      {
+       "check": "damage-basis",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "damageBasis=dealt"
+      },
+      {
+       "check": "schema-ledger",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "schemaVersion=1.1"
+      },
+      {
+       "check": "special-mode",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "quest 9999 (training ground): x0.03/sub-unity mechanics are not comparable"
+      },
+      {
+       "check": "config-provenance",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "the export records no config switches (GivenTalent/Madness/Contribution): two runs may differ silently"
+      },
+      {
+       "check": "identity",
+       "ran": false,
+       "verdict": "restrict",
+       "reason": "cross-battle identity is the NAME only: one name may be two entities"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "rule_coverage": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "coverage-denominator: coverage is hit-weighted here; it must not be presented as time coverage",
+      "gate-status: gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+     ],
+     "checks": [
+      {
+       "check": "rules-present",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "7 rule rows"
+      },
+      {
+       "check": "coverage-denominator",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "coverage is hit-weighted here; it must not be presented as time coverage"
+      },
+      {
+       "check": "fold-dropped",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "no dropped fold steps"
+      },
+      {
+       "check": "gate-status",
+       "ran": true,
+       "verdict": "restrict",
+       "reason": "gate status LEGACY_NOT_APPLICABLE is not a yes (LEGACY is not a statement about the current capability)"
+      },
+      {
+       "check": "fold-leaks",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "0 unexplained fold leaks"
+      }
+     ]
+    },
+    "outcome": {
+     "status": "RESTRICTED",
+     "reasons": [
+      "progress-metadata: no wave/progress metadata: win rate cannot be derived from total damage"
+     ],
+     "checks": [
+      {
+       "check": "result",
+       "ran": true,
+       "verdict": "pass",
+       "reason": "result=None"
+      },
+      {
+       "check": "progress-metadata",
+       "ran": false,
+       "verdict": "unknown",
+       "reason": "no wave/progress metadata: win rate cannot be derived from total damage"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\v150_validate.py
+report -> D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\v150_validate.txt
+version=1.7.11 quest=411001 problems=0

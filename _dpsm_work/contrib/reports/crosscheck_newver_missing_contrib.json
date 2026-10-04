@@ -1,0 +1,11 @@
+{
+ "file": "newver_missing_contrib.json",
+ "sectionPresent": false,
+ "mismatches": [],
+ "checked": {},
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "status": "ABSENT"
+}

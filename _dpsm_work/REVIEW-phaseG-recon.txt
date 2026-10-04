@@ -1,0 +1,315 @@
+# 阶段 G 施工前侦察报告(只读)
+
+> 范围:攻击力加算来源拆分(Q1)+ 残差研究(Q2)+ 阶段 E schema 预留接口(Q3)。
+> 基线:插件 1.5.5,导出 battle_411001_20261003_235204.json(21.9 MB,quest 411001,119.07 s,result Lose)为主;
+> 佐证:同目录 1.5.3/1.5.4 共 10 份(含 quest 9999 四份)。
+> 证据纪律:每个数字标注【实测】(导出字段)/【离线重放】(用导出复算)/【推断】。
+> 本报告只新增本文件:未修改任何 src/*.cs、未动 BepInEx 下 DLL、未碰 *.crash.bak、未删除任何文件、未新增脚本文件。
+> 本次所有复算均在内存中直接解析导出的 JSON 得到。
+
+## 0. 方法与限制(先讲清楚)
+
+1. 反编译未做:本机 ilspycmd 不存在(Get-Command ilspycmd 无;dotnet 在 C:/Program Files/dotnet/dotnet.exe,6.x)。
+   因此"用 ilspycmd 找 BuffParam/AddParam/TalentAction 链"这一步本次未执行。替代来源:BepInEx interop 的导出签名、
+   只读的 _dpsm_work/src/*.cs、以及 _dpsm_work/SESSION-STATE.md / ARCHITECTURE.md 已留档的 API 发现。
+   凡涉及类型/字段的结论,本文一律标【推断】或引用既有记录。
+2. 路径更正:任务书写"用 _dpsm_work/exports 里的 battle_9999_*.json"。该目录不存在;
+   四份 9999 导出实际在 BepInEx/plugins/DpsMeter/exports/(205129 = 1.5.3,225530 / 225647 / 225905 = 1.5.4)。
+3. 本次未运行插件、未构建、未跑 recon_probe;全部结论来自导出文件的离线复算。
+
+---
+
+## 1. 结论摘要(先行)
+
+| 问题 | 判定 | 一句话 |
+|---|---|---|
+| Q1 攻击力加算:能否按 基础/固定/百分比 拆 | 做成离线原型可行(已证) | 算术模型在常量基座单位上 100% 精确;加算块约占可分析伤害 14.5% |
+| Q1 攻击力加算:能否按 自身 Buff/队友 Buff 拆 | NO-GO(现状不可做) | 导出里 BuffParam 条目没有 owner 字段,只能靠值撞库猜,违反"不得静默归因" |
+| Q1 现在是否值得做 | NO-GO(不现在做) | 高风险、需要插件侧新增"同刻 Buff 快照 + owner";按计划不得阻塞第一版 |
+| Q2a 1.15 实际生效次数 | GO(离线已可定位) | k_actual = k_folded + round(ln r / ln 1.15),1.5.5 场 96 击可判 |
+| Q2b 稳定会心观测通道 | 离线 NO-GO;需 1 场实机 | 唯一第一方通道在代码里已接好但 11 场恒 0;失败点在"匹配",不在"接线" |
+| Q2d 训练场 x0.03 独立建模 | NO-GO | 不是常数倍率:T.O.W.E.R 的 amount/theory 跨 0.002-2.31,城塞全部 >1.43 |
+| Q3 schema 预留 | GO | 见 §4 字段清单,全部可空、只加不改 |
+
+可解释比例估计(全部【离线重放】,方法见 §2.3):
+* 按命中数:72.4%(5520 击中的约 3998 击)的攻击力快照可由"平滑基座 x (1+ΣRate) + ΣActual"重建到 ±1.5%;
+* 按伤害加权:86.7%;
+* 这都是上限 —— 基座 B(t) 是用同一场数据估出来的,存在循环性,不能当作"独立可验证"的比例。
+
+---
+
+## 2. Q1 攻击力加算来源拆分
+
+### 2.1 导出里到底能拿到什么【实测】
+
+| 字段/位置 | 内容 | 1.5.5 场计数 |
+|---|---|---|
+| events[].calc.attackPower | 该击使用的攻击力快照(buff 后) | 5601 / 5601 有值 |
+| events[].calc.power / ratio | 计算威力 = attackPower x 系数 | 5601 |
+| events[].comp | "攻击力 3656 x 系数 1.00 = 计算威力 3654"文本 | 有 calc 即有 |
+| events[].comp2 | 逐击生效增益文本,含 增益:攻击力+9%、贯通率+5、攻击力+300(参照ExistenceTime3000%)、攻击力+7%、攻击力+10% | 盟友 dmg 击中 5520 条 |
+| params.units[] | 每单位 BuffParamData 行:{tgt,ty,val,vTgt,vTy,vParam,vRef},ty 属于 Rate/Actual/Fixed,vRef="/refExistenceTime3000" | 12 个单位,985 行读取 0 错误 |
+| actors[].abilities[] / .talents[] | 来源声明:slot(神器/被动/潜在/刻印/职业特性)+ abilityId + name + talent {type,typeName,p};攻击力相关 type 6=攻击力%+(32 处)、type 8=攻击力+(5 处) | 全 214 actor |
+| givenApplies | 只记录 TalentActionAddTalent(owner=マッドシーカー,guest=ショウゴス 敌人),与攻击力 buff 无关 | 691 调用 / rowsDropped 179 |
+
+没有的东西(这是 Q1 的硬边界):
+1. 基础攻击力(未加算的 Power)—— 任何字段都没有。
+2. BuffParam 条目的施加者/来源 —— params 行与 comp2 文本都只有 目标/类型/数值/参照,没有 owner/abilityId;
+   givenApplies 只覆盖"授予天赋"通道,不覆盖攻击力类 buff。
+3. IsPlus(正负号)—— 未导出(与既有记录一致:ParamData.IsPlus 只有 setter)。
+4. params 是终局快照 —— 无时刻,不能逐击使用;comp2 才是逐击的,但见 §2.4。
+
+### 2.2 算术模型与验证【离线重放】
+
+对每击,把 comp2 的"增益:"段落解析成:Rate = Σ(攻击力+N%),Actual = Σ(攻击力+N)(含 (参照...) 的也按原值先计入)。
+模型:attackPower = B(t) x (1 + Rate/100) + Actual。
+
+常量基座单位给出精确验证:
+
+| 单位 | 文本组 | 攻击力实测 | 反推 B | 命中数 |
+|---|---|---|---|---|
+| 火砲 | 攻击力+10% | 1971 | 1791.8 | 5 |
+| 火砲 | 攻击力+700%、攻击力+10% | 14515 | 1792.0 | 60 |
+| クトゥグァ砲台 / 砲台R | 攻击力+10% | 841 | 764.5 | 各 13 |
+
+即 1792 x 1.10 = 1971.2 -> 1971、1792 x 8.10 = 14515.2 -> 14515,整数截断下完全吻合;两个不同文本组反推出的 B 相差 0.01%。
+-> 百分比加算是可加的(ΣRate),固定加算是直接相加,基数只乘一次:模型成立。【离线重放,强证据】
+
+角色单位的 B(t) 不是常数,而是缓慢漂移:例如 テトラ 3674->3936(0-93 s,约 +7%)、メアリー 3955->4365(约 +10%)、
+ルナリス 1116->1495(约 +34%)。所以"基础攻击力"必须逐击重建,不能一场取一个值。
+
+### 2.3 可解释比例估计【离线重放】
+
+方法(可复现):对每个盟友攻击者,逐击算 B_implied = (attackPower - Actual)/(1+Rate);
+取该击 ±3 s 窗口内 B_implied 的 95 分位作为 B(t)(失配以"文本多报"为主 -> B_implied 偏低,故取高分位);
+再用 B(t)x(1+Rate)+Actual 预测 attackPower,相对误差 <=1.5% 记为"可重建"。
+
+| 攻击者 | 命中 | 可重建(命中口径) | 可重建(伤害加权) |
+|---|---|---|---|
+| エヴァラス・フラウ | 187 | 94.1% | 98.6% |
+| メルティエル | 345 | 99.1% | 99.8% |
+| ルナリス | 42 | 100.0% | 100.0% |
+| 火砲 / 两台砲台 | 91 | 100.0% | 100.0% |
+| テトラ | 1500 | 79.3% | 86.9% |
+| メアリー | 936 | 79.4% | 93.1% |
+| ネーフェ＝ジアー | 488 | 74.6% | 80.1% |
+| マッドシーカー | 1800 | 57.4% | 74.7% |
+| 生ける炎 クトゥグア | 131 | 9.9% | 29.4% |
+| 合计 | 5520 | 72.4% | 86.7% |
+
+加算块的规模(同样用上面的 B(t);块 = ((B·Rate + Actual)/attackPower) x 该击 baseCredit):
+
+* 盟友 baseCredit(Σ amount/knownMult)重算 = 46,899,247(字典口径 46,906,191,差 0.015%)【离线重放】;
+* 其中落在"可重建命中"上的 = 39,461,382(84.1% of baseCredit);
+* 攻击力加算块 ≈ 29,632,189 = 14.54% 的 analyzableDealt = 63.2% 的 baseCredit;
+* 其中百分比(Rate)部分 ≈ 64.7 个百分点、固定(Actual)部分 ≈ 2.6 个百分点(以可分析伤害为基);
+* 基础攻击力(B)部分 ≈ 9,878,638 = 4.85% 的 analyzableDealt。
+
+-> 结论:加算区确实是唯一还没拆的大块(占总量约 14.5%),值得做;但它整体在 baseCredit(23.0%)之内,拆它不改变任何既有 KPI 定义。
+
+### 2.4 为什么"自身 Buff / 队友 Buff"拆不出来【实测 + 离线重放】
+
+(a) 没有 owner 字段。params 行 = {i,tgt,ty,val,vTgt,vTy,vParam,vRef},没有施加者;comp2 只有文本。
+givenApplies 全指向敌人(授予天赋通道)。要在现有导出里区分"谁给的",只能拿数值去撞 actors[].abilities:
+例如 ルナリス 的 +20%/+10% 可撞到 クトゥルフの邪神像#10060,+150 撞到 被动:分子の衝撃#20051。
+但值是多源同值(9% 同时来自毒の短剣、刻印等),撞库不唯一;且撞不上的一律无法判定是队友还是全局。
+-> 任何"自身/队友"拆分都是 heuristic,违反数据字典"无法归因的规则不得静默塞给某人"。【推断风险,高】
+
+(b) comp2 文本与 attackPower 快照不是同一刻读的。硬证据【实测】:
+* 同一 (攻击者, 时刻 t, 同一段增益文本) 组内出现不同 attackPower:88 组 / 390 击 = 7.1%(5520 击)。
+  例:マッドシーカー t=2.63 同一文本 ...攻击力+150%、攻击力+300(参照ExistenceTime3000%)、攻击力+7%、攻击力+10%,
+  三条事件 attackPower=9608,三条=4213(比 2.28)。
+* 相邻同刻同文本事件对 3316 对中 83 对 attackPower 不同。
+* 另外命中 t=41.9 メアリー 同一秒有 18502 与 3703 两个值(后者 hitType=3/effectId=0,comp1 自带"同威力主档"标注)。
+* 既有记录(SESSION-STATE §7.2.29/7.2.31)已说明:攻击力在"攻击开始"取快照,而插件实时读到的 buff 列表/攻击力点位不同刻;
+  calc.attackPower 有两条来源:原始快照 与 "同威力主档反推"。
+
+-> 逐条增益按 comp2 拆,会把没生效的增益也算进去;离线只能"检测"(7.1% 的硬矛盾 + 约 28% 偏离平滑基座),不能纠正。
+要纠正必须在插件里在 attackPower 快照的同一时刻同时抓增益白名单(以及 owner)。
+
+### 2.5 Q1 判定
+
+* 能做:离线把某场 baseCredit 拆成 基础攻击力 / 固定加成 / 百分比加成 三块,并给出逐条增益的数值份额(用推断的 B(t))。
+* 做不了:自身 Buff vs 队友 Buff;逐条增益的"是否在快照刻生效";独立可验证的 B(基座不是实测字段)。
+* 现在做是否值得:不值得现在做。理由:
+  1. 它必然引入一类新的推断值进贡献表(违反"推断不得冒充实测");
+  2. 要真正做对必须改插件(同刻快照 + owner 字段),而计划明令"阶段 G 不得阻塞第一版总贡献";
+  3. 离线原型已证明方法;先把 §4 的字段预留好,等阶段 E 落地、且有一场"同刻快照"的新导出后再做。
+* 若用户坚持要一个小而稳的版本:只对常量基座单位(火砲/两台砲台,91 击,伤害占比 1.20%)做精确拆分,
+  这部分可以写成"实测级"而不需要推断 B。但价值极低。
+
+---
+
+## 3. 残差研究(Q2)
+
+### 3.a 1.15 规则实际生效次数 —— 可离线定位【离线重放,GO】
+
+方法(闭式,可复现):对一击,
+k_folded = calc.fold[] 中 factor ≈ 1.15 的条数;
+k_actual = k_folded + round( ln(calc.residual) / ln 1.15 )。
+过滤:排除 |residual - critDamageRate/100| <= 1% 的会心带(否则 1.9/1.65 会被误读),排除 residual<0.3(近零残差),要求 |round-x| <= 0.05。
+含义:k_actual 就是游戏真正生效的 +15% 份数,拿它和"按状态数应有的份数"对账即可结案。
+
+1.5.5 场结果(5601 击):
+
+| residual 带 | 击数 | 含义(k_actual - k_folded) |
+|---|---|---|
+| x1.1500 | 24 | 游戏多 1 份(插件少折 1) |
+| x1.3225(=1.15 的平方) | 9 | 游戏多 2 份 |
+| x0.8696(=1/1.15) | 42 | 插件多折 1 份 |
+| x0.7561(=1/1.15 的平方) | 17 | 插件多折 2 份 |
+| x0.6575(=1/1.15 的三次方) | 4 | 插件多折 3 份 |
+
+1.5.3 场结果(6269 击):x1.15 17 击;x0.8696 68 击。合计 85 击。
+-> 1.5.5 相比 1.5.3,"多折"从 68 降到 42,且出现"少折"33 击;两版合计仅约 100-130 击/场,与 HANDOFF §9c 的"144 击残差"同量级。
+
+与状态数的关系(1.5.5):x1.15 的 24 击中,受击方状态数=2 的 20 击、=1 的 3 击、=3 的 1 击;
+x1.3225 的 9 击中,状态数=2 的 7 击、=1 的 2 击。
+涉及的 1.15 折叠标签只有:[ド・マリニーの掛け時計] ...それぞれ+15%、[毒の短剣] 毒状態...+15%、
+[母なる変異の飛沫] ...それぞれ+15%(全局)、[海魔の残滓] ...それぞれ+15%(全局)。
+-> "それぞれ"(按每个匹配状态各 +15%)语义可从编号直接读出:状态数 2 而插件只折了 1 份,残差就正好 1.15。
+
+下一步最小实验(全离线,不需用户配合):把上面的 k_actual 计算固化成一个小脚本(或加进 contrib 的 diagnostics),
+对每一场输出 {hits_by_k_actual, hits_where_k_actual != status_count, 涉及规则标签计数};
+用 11 份导出一致性检验"状态数 = k_actual"这条规则,产出"1.15 实际生效次数"普查表。
+注意:这是"净差",若同一击还有别的未知倍率(如 x2.5 狂気)会串味,所以必须保留 §3.a 的会心/近零过滤。
+
+### 3.b 稳定会心观测通道【现状:NO-GO 离线;需 1 场实机】
+
+现状(实测,11 份导出全查):
+* events[].crit 恒 false / 缺失;actors[].crit 全 0;events[].critObserved 字段不出现;reconcile.critObserved = 0。
+* 唯一的会心信号是残差推断:residual ≈ critDamageRate/100。1.5.5 场命中 729 击(reconcile.critInferred=735),
+  按 critDamageRate 分布:190->664 击、165->63 击、185->2 击。
+* 也就是说:会心已能判真假(729/735 约 99%),缺的不是"判会心",而是"第一方观测"。
+
+通道其实已经存在,且接线完整(只读 src,【实测代码事实】):
+Plugin.TryPatchCritProbe()(src/Plugin.cs:136)-> AccessTools.Method(typeof(DamageCalculater), "GetFlyTextNumberSizeForAttack"),
+手动打 Postfix;CalcFlyTextSizeHook(src/Hooks/DamageCalculaterHooks.cs:121)拿到 (float attributeRate, bool isCritical, bool isDefenseGreaterThanAttack),
+调 CompositionProbe.NoteCrit;ObservedCrit(blocker)(src/Composition/CompositionProbe.Crit.cs:57)按
+"同一 blocker + 时间差属于 [-0.05, 0.25] s"给出三态;Aggregator.cs:1289 把它写进 RecordHitDetail -> BattleEvent.CritObserved;ExportService.cs:275 导出。
+这条链是通的,却 11 场恒 0。失败点只可能在三处【推断】:
+(1) TryPatchCritProbe 没找到方法(会打印 GetFlyTextNumberSizeForAttack not found; crit probe skipped.);
+(2) NoteCrit 里 calc.m_blocker 为空 -> GameRef.Same 恒 false;
+(3) 时间窗:fly-text 调用与 NoteHitDetail 的时刻差超出 0.25 s(或 Now() 在无会话时为 0)。
+
+下一步最小实验(需用户配合:1 场,10 秒训练场即可):
+1. 战前把 RuntimeLog 日志留一份(注意 RuntimeLog.Init() 每次启动会清日志 —— 必须打完立刻拷贝);
+2. 只看两件事:[DpsMeter] GetFlyTextNumberSizeForAttack not found 是否出现;Probe.Hit("Calc.GetFlyTextNumberSizeForAttack")
+   计数是否 >0(现成计数器,不需要改代码);
+3. 若钩子有命中而 critObserved 仍 0,则问题在 (2)/(3),下一步只在诊断侧加计数器(记录 blocker 是否空、dt 直方图),
+   不动伤害路径。
+禁止事项(用户已明确):绝不照抄 1.0.48/49 的 ActDamage 参数物化补丁 —— 那是崩溃源。
+给贡献模型的建议:第一版不需要 CritObserved;会心已作为"残差 = critDamageRate/100"的等效倍率存在,
+只要在报告里标注"会心为残差推断"即可。
+
+### 3.c totals 与逐事件求和差异
+
+已定位,按用户要求跳过(口径 = "攻击者已识别的全部命中,不分敌我";复现脚本 _dpsm_work/contrib_gap_dealt.py)。
+本报告仅确认:本次复算未发现与之一致性冲突。
+
+### 3.d 训练场 quest 9999 的 x0.03 —— 不是常数,不可独立建模【离线重放,NO-GO】
+
+实测(1.5.3 场 battle_9999_20261003_205129.json,867 击,50.27 s):
+以 ratio = amount / calc.theory 计量:
+
+| 受击者 | 击数 | ratio 主要带 | ratio<0.5 | ratio<0.1 | ratio>1.2 | min-max |
+|---|---|---|---|---|---|---|
+| T.O.W.E.R.typeR | 472 | 1.0000x171、1.4999x31、1.5993x31、0.1644x28、0.0114x24、0.2648x20、0.1137x14 | 203 (43%) | 110 (23%) | 92 (19%) | 0.0020-2.31 |
+| 城塞 | 224 | 1.4381x53、2.2933x31、2.5017x30、1.5000x28、4.0032x24 | 0 | 0 | 224 (100%) | 1.4322-22.91 |
+| レヴナント | 167 | 1.0000x86、1.2500x16、1.5996x15 | - | - | - | - |
+
+* 不是 x0.03:T.O.W.E.R 的缩小带横跨 0.002-0.265(主力 0.011-0.26),既有记录 SESSION-STATE §7.2.56 的分布一致;
+* 城塞相反:全部 224 击的 amount 都大于 model 的 theory(1.43-22.9 倍),即"理论小于实际",不是减伤;
+* 按 vicKey 也不恒定:T.O.W.E.R key=5(n=345)与 key=7(n=127)的比值分布完全不同;城塞 key=12(n=196)与 key=18(n=28)同。
+
+-> 结论:不能用"quest==9999 => x0.03"这种独立模式建模;它随目标个体/状态/技能变化,缺的字段是"结构体的实际防御/减伤状态"。
+建议保持现状:报告里标 trainingMode=true,不参与跨场比较、不进贡献模型。
+下一步最小实验(可选、纯离线):按 (victim name, vicKey, attacker, effectId) 分组看 ratio 是否在组内恒定;
+若连"同技能同目标"都不恒定,则彻底放弃建模(预计如此,本次已见同键不同值)。
+
+---
+
+## 4. 给主线的接口:阶段 E schema 该预留什么(Q3)
+
+阶段 E 已有干跑件 _dpsm_work/contrib/phase_e_dryrun.py + contrib/report_json.py(当前 contribution.schemaVersion = "0.1-draft")。
+为了让攻击力拆分以后能加而不破坏兼容,在 E 落地时就应把这些可空占位写进 schema(现在全部输出 null 或 status:"unavailable"):
+
+```json
+"contribution": {
+  "schemaVersion": "0.2-draft",
+  "attackPower": {
+    "status": "unavailable|partial|measured",
+    "method": null,
+    "basis": "per-hit attackPower snapshot",
+    "snapshotAt": "attack-start",
+    "coverage": { "hits": 0, "shareOfHits": 0.0, "shareOfBaseCredit": 0.0 },
+    "components": { "base": null, "fixed": null, "rate": null },
+    "actors": [ { "key": 0, "name": "", "basePower": null, "fixedAdd": null,
+                  "rateAdd": null, "selfBuffAdd": null, "allyBuffAdd": null,
+                  "unresolved": null, "confidence": null } ],
+    "entries": [ { "target": "攻击力", "type": "Rate|Actual|Fixed", "param": 0,
+                   "reference": null, "ownerKey": null, "ownerName": null,
+                   "ruleName": null, "abilityId": null, "slot": null,
+                   "source": "self|ally|global|unknown",
+                   "evidence": "measured|replayed|inferred" } ],
+    "residual": null
+  },
+  "diagnostics": {
+    "critObservation": { "status": "unavailable", "source": null,
+                         "hits": 0, "yes": 0, "no": 0 },
+    "residualBreakdown": {
+      "unexplainedHits": 0,
+      "onePointFifteen": { "folded": 0, "actual": 0, "deltaDown": 0, "deltaUp": 0 },
+      "bands": {}
+    },
+    "trainingMode": false,
+    "attackPowerTextMismatch": { "conflictGroups": 0, "conflictHits": 0 }
+  }
+}
+```
+
+可选的逐击扩展(若阶段 E 要一次到位):events[].calc.apSplit = null,以后填 {base, fixed, rate, entries:[...]}。
+兼容纪律(必须写进 check_export_schema / crosscheck):
+1. schemaVersion 必须升;BuildInfo.cs 仍是版本唯一真源;
+2. 新字段只加不改,旧字段一律不动(尤其 baseCredit 仍是"含未拆加算");
+3. checker 必须把 null / 缺字段当作"未测量",不得当 0;未知键必须容忍(旧 checker 读新导出要能过);
+4. crosscheck 只对非 null 字段做"插件值 vs 离线复算"比对;
+5. evidence 字段显式区分 measured/replayed/inferred,推断值不得伪装成实测;
+6. attackPower.status="unavailable" 时报告里仍沿用现在的 knownLimits 文案。
+
+---
+
+## 5. 风险清单
+
+| # | 风险 | 影响 | 缓解 |
+|---|---|---|---|
+| R1 | 基座 B(t) 用同场数据估 -> 循环性 | §2.3 的比例是上限,不是独立验证 | 要先有"同刻 Buff 快照/基础攻击力"导出,或至少一个"零攻击力加算"的对照击 |
+| R2 | comp2 与 attackPower 不同刻(7.1% 硬矛盾,约 28% 偏离平滑基座) | 逐条增益拆分会把未生效增益计入 | 把 7.1% 当已知载体打印;拆分必须给 coverage,不能全覆盖 |
+| R3 | BuffParam 无 owner | "自身/队友"拆分只能是启发式 | 字段预留 ownerKey/source,插件侧确认后再填;现在不填 |
+| R4 | params 是终局无时刻快照 | 不能逐击使用,易被误用 | schema 里把 params 限定为"对账用",不进贡献计算 |
+| R5 | 会心通道"看起来已接好" | 贸然"修"有重演 1.0.48/49 崩溃的风险 | 只加诊断计数器;绝不物化 ActDamage 参数 |
+| R6 | 9999 若强行建模 | 会误套普通战斗(计划明令禁止) | 保持 trainingMode 排除 |
+| R7 | 1.15 的 k_actual 是"净差" | 与其它未知倍率(x2.5 狂気等)串味会算错份数 | 保留会心带/近零过滤,先按规则标签分组再解释 |
+
+---
+
+## 6. 复算入口(本次实际用的方法,便于复核)
+
+* 没有新增脚本文件:全部为内存中解析导出的一次性复算。等价命令(用户可自行复跑):
+  * python -c "import json;d=json.load(open('BepInEx/plugins/DpsMeter/exports/battle_411001_20261003_235204.json',encoding='utf-8'));..."(注意控制台 GBK,输出请用 ASCII/转义);
+  * 或任意 JSON 工具按本节公式复算。
+* 关键公式:
+  1. B_implied = (attackPower - ΣActual) / (1 + ΣRate/100);
+  2. B(t) = 该击 ±3 s 窗口内 B_implied 的 95 分位;
+  3. 重建判定:|B(t)(1+ΣRate)+ΣActual - attackPower| / attackPower <= 0.015;
+  4. 加算块份额:((B·ΣRate + ΣActual) / attackPower) x (amount / knownMult);
+  5. 1.15 实际份数:k_actual = k_folded + round(ln(residual)/ln 1.15)。
+* 未运行:构建、recon_probe、五个守卫(本次为只读侦察,无代码改动)。
+
+---
+
+## 7. 给下一手的一句话
+
+Q1 的算术已证、边界已定量(加算块约 14.5% 可分析伤害;自身/队友拆不了;7.1% 文本-快照不同刻)——
+把它从"高风险独立项目"降级为"等阶段 E 预留字段 + 等一次同刻快照导出"的排期项;
+现在真正可以立即做的只有 Q2a(离线 1.15 实际生效次数普查)。

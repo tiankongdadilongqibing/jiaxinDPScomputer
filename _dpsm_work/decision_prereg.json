@@ -1,0 +1,34 @@
+{
+ "contract": "decision-prereg/1",
+ "registered": "2026-10-04",
+ "why": "写于**看结果之前**。阈值、alpha、自助单位/种子、每组样本下限都在这里定死,事后不得更改 —— 否则\"是否达到改善标准\"就变成了按结果挑标准。",
+ "metric": "analyzable_per_battle",
+ "metricDefinition": "每场的 analyzableDealt(team-1 事件域伤害),每场一个值;不是 DPS,也不是贡献份额",
+ "contrast": {
+  "groupMetric": "team_damage",
+  "groupAIndex": 0,
+  "groupBIndex": 1,
+  "labels": [
+   "观察到的阵容 A(样本较多的分层)",
+   "观察到的阵容 B"
+  ],
+  "note": "两组是**观察到的阵容**,不是随机分配的实验组;cross-sectional 对照只能给倾向,不能给因果。"
+ },
+ "minimumMeaningfulEffectPct": 10,
+ "alpha": 0.05,
+ "bootstrap": {
+  "unit": "battle",
+  "resamples": 5000,
+  "seed": 20261004,
+  "method": "percentile"
+ },
+ "minimumSamplesPerGroup": 3,
+ "stopRule": "只有同时满足 (a) 两组样本数 >= minimumSamplesPerGroup、(b) 百分位自助区间不覆盖 0、(c) |点估计| >= minimumMeaningfulEffectPct、(d) 没有已命名的混杂,才允许给出「达到预先定义的改善标准」;否则只能是「有倾向但不确定」或「描述性观察(证据不足,暂不换人)」。",
+ "confounderPolicy": "组内换过装、两组能力集/开关观测不同、跨越的插件版本不同、两组时长相差 >20% —— 任一出现即把结论上限压到「有倾向但不确定」,并把混杂逐条列出。",
+ "notClaimed": [
+  "换人边际收益",
+  "随机化因果",
+  "胜率差异",
+  "把一场的命中数当样本量"
+ ]
+}

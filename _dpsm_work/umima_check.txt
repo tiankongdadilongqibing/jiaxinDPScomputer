@@ -1,0 +1,16 @@
+海魔の残滓 in battle 231340 (comp B):
+  hits carrying it: 5519 / 5561 (99.2%)
+  factors: {1.15: 227, 1.3225: 5292}
+  sides: {'vic': 5129, 'atk': 390}
+  folds-per-hit distribution: {0: 42, 1: 5519}
+  sample[global]: {"side": "vic", "kind": "global", "origin": "global#2388592810624/0", "factor": 1.15, "label": "[海魔の残滓] 毒/火傷状態の敵全ての被ダメージがそれぞれ+15%(全局:敌方受伤)"}
+  sample[text]: {"side": "atk", "kind": "text", "origin": "text#4/20042/c2", "factor": 1.15, "label": "[海魔の残滓] 毒/火傷状態の敵全ての被ダメージがそれぞれ+15%"}
+
+victim statuses on hits where 海魔の残滓 folds (is it status-gated?):
+  with 海魔の残滓: [('凍結,毒,火傷', 3443), ('毒,火傷', 1855), ('毒', 115), ('火傷', 60), ('凍結,毒', 28), ('凍結,火傷', 18)]
+  all team hits : [('凍結,毒,火傷', 3443), ('毒,火傷', 1855), ('毒', 115), ('火傷', 61), ('', 41), ('凍結,毒', 28)]
+
+母なる変異の飛沫 (both comps) 與 holdership:
+  231044: マッドシーカー holds 母なる変異の飛沫 (slot=被动 id=20056)
+  231340: メルティエル holds 海魔の残滓 (slot=被动 id=20042)
+  231340: マッドシーカー holds 母なる変異の飛沫 (slot=被动 id=20056)
