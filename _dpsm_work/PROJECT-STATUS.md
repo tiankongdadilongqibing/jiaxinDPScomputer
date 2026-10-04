@@ -292,6 +292,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 24 轮 RF7c(证据哈希索引)** | 归档的第二前置:新增 `archive_index.py`,把 `evidence_*`/`probe_*`/`review_contrib_core` 的 **56 份 / 212,552 字节**连同 SHA256 记入 `archive-index.json` 与 [ARCHIVE-INDEX.md](<ARCHIVE-INDEX.md>);`--verify` 对改动/丢失/未记录新增报红(4 个自测对照);**不移动不删除任何证据**,也未接进验收(留给单独一轮);新脚本一落地即被注册表守卫 B 检查点名并登记为 active | [REFACTOR-BATCH-RF7C.md](<REFACTOR-BATCH-RF7C.md>) |
 | **第 25 轮 RF7d(索引接入)** | 把第 24 轮刻意留在流水线外的 `archive_index.py` 接进来(2 条 run:校验 + 自测),命令/检查数 **35/67 → 37/69** 并同步四处文档说法;自测只改临时副本,故可安全入线;插件源码零变化 | [REFACTOR-BATCH-RF7D.md](<REFACTOR-BATCH-RF7D.md>) |
 | **第 26 轮 RF5h(内联格式收尾)** | `DisplayFormat.Whole`(F0,**不带千分位**,刻意不是 `Num`)接入 3 处"秒伤",行内 `:F0` 剩余 0;697 用例 / 100 例负控。**更正**:此前"除一处外已无直接 `:N0`/`:F2`"的说法不准确——`OverlayUGUI.Chart.cs` 仍有 4 处,统一它们会改变用户所见,需一次**决定**;另记录一次 shell 重写源码导致 167 个错误、已还原并用定点编辑重做 | [REFACTOR-BATCH-RF5H.md](<REFACTOR-BATCH-RF5H.md>) |
+| **第 27 轮(全面复核,无代码改动)** | 对已达成的部分做一次端到端复核:**部署 DLL** 387,072 B / `36EC96D4…8BC42`(15–27 轮未替换);验收 **37 条命令 / 69 条检查 / 0 项**;行为套件 **697 用例 0 失败**;变异负控 **100 例 0 失败**;`refactor_final_check` blocks=0;文档收敛 **0/12**;docs123 62 份 0 损伤;工具注册表 PASS;布局守卫 35 份 0 违规;证据哈希索引 PASS;`repo_manifest --verify` drift=0;git 干净于 `4c92e10` | 本轮无产物;证据见本行与 [HANDOFF.md](<HANDOFF.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
