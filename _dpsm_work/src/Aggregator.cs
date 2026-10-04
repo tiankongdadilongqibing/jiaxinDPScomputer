@@ -13,7 +13,7 @@ public static partial class Aggregator
 
 	public static readonly List<BattleSummary> History = new List<BattleSummary>();
 
-	public const int MaxHistory = 20;
+	public const int MaxHistory = BattleHistoryRing.Max;
 
 	/// <summary>
 	/// RF4, third family: the per-battle counters. Their state, their doc-level ownership and their reset

@@ -39,8 +39,9 @@ public static partial class Aggregator
 		}
 		battleSummary.ActorCount = battleSummary.Actors.Count;
 		try { battleSummary.Events.AddRange(s.Events); } catch { }
-		History.Insert(0, battleSummary);
-		while (History.Count > 20) History.RemoveAt(History.Count - 1);
+		// RF4h: the ring rule (insert newest-first, drop the oldest, cap at MaxHistory) is a tested helper;
+		// the cap used to be a second literal 20 next to Aggregator.MaxHistory.
+		BattleHistoryRing.Push(History, battleSummary, BattleHistoryRing.Max);
 
 		StringBuilder sb = new StringBuilder();
 		sb.Append($"[DpsMeter] Battle {why}: result={result} dur={BattleTime.Log(s.ActiveSeconds)} idle={BattleTime.Log(s.IdleCombatSeconds)} quest={s.QuestId} actors={s.OrderedActors.Count} unattributed={s.UnattributedDamage}(x{s.UnattributedHits})\n");

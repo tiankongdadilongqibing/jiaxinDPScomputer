@@ -62,6 +62,7 @@
     <Compile Include="$(SrcRoot)\Runtime\BattleRuntimeCounters.cs" />
     <Compile Include="$(SrcRoot)\Runtime\CalcActivityLog.cs" />
     <Compile Include="$(SrcRoot)\Runtime\AttackSnapshot.cs" />
+    <Compile Include="$(SrcRoot)\Runtime\BattleHistoryRing.cs" />
     <!-- RF5b: the overlay text layout. No Unity type is involved, which is why it can be compiled here
          and executed as production code instead of being mirrored by a Python replica. -->
     <Compile Include="$(SrcRoot)\Ui\DisplayFormat.cs" />

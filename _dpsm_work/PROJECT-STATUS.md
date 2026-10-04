@@ -18,12 +18,12 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**87 个 .cs / 22,985 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **117** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**88 个 .cs / 23,026 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **119** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–g+RF6a+RF7b):**679 个命名用例 / 25 组**,**96 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**691 个命名用例 / 26 组**,**99 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
 | 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**95 条登记 / 21 条活跃 / 43 条已索引 / 31 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
@@ -89,7 +89,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 |---|---|---|---|---|
 | 纯函数/模型 | `Model/StatusKey.cs`、`Model/ClauseStatusRun.cs`、`Model/FoldStep.cs`、`Model/BattleTime.cs`、`Composition/TieredModifier.cs` | 约 1.1k | **不依赖 IL2CPP / Plugin** | **能**:`recon_probe` 直接编译执行 |
 | **纯判据(RF3–RF6a)** | `Policy/`(8:时钟 / 会话转换 / 归属 / 全局规则分类 / 全局规则算术 / 缓存判据 / 主数据选名 / **composition 容差**) | 740 | **不依赖 IL2CPP / Plugin / 时钟源 / 配置** | **能**:`tests/BehaviorTests` 直接编译执行(RF3 起) |
-| **状态容器(RF4)** | `Runtime/`(5:跨场衔接 / 战场规则注册表 / 单场计数 / 活动环 / **攻击快照**) | 396 | 不依赖 IL2CPP / Plugin(只用 `BattleSession`) | **能**:`tests/BehaviorTests` 的 `runtime/*` 组 |
+| **状态容器(RF4)** | `Runtime/`(6:跨场衔接 / 战场规则注册表 / 单场计数 / 活动环 / 攻击快照 / **历史环**) | 436 | 不依赖 IL2CPP / Plugin(只用 `BattleSession`) | **能**:`tests/BehaviorTests` 的 `runtime/*` 组 |
 | 数据模型 | `Model/`(12 文件) | 1,958 | 无逻辑 | 部分 |
 | 中枢/组合根 | `src` 根(10 文件:Plugin、GameRef、GameSystemAccess、BuildInfo + **Aggregator 6 个 partial**) | 1,970 | 单例 + 静态 + 时间源 | 否(编排留在门面;判据已下沉到 `Policy/`) |
 | 取数与补丁 | `Hooks/`(5)+`Diagnostics/`(13) | 495 + 3,692 | IL2CPP | 否(每个探针一个开关) |
@@ -288,6 +288,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 20 轮 RF4g(攻击快照)** | 第三族最后一块:`_activeCalc`/`_activeCalcT` 迁到 `src/Runtime/AttackSnapshot.cs`,`Valid = calc 非空 且 戳 ≥ 0`(直接指向 1.5.0"上一场 calc 标注本场命中"的缺陷);接线 8 处;679 用例 / 96 例负控。第三族仅剩 `_lastCalcSrc`(单条草稿,已写明理由) | [REFACTOR-BATCH-RF4G.md](<REFACTOR-BATCH-RF4G.md>) |
 | **第 21 轮 RF8a(状态收敛)** | 把 R0–R5 表里"仍未做"的陈述逐条与代码核对并收敛(R2 的链窗口/`IdleSeconds`、R3 的 RowViewModel、R4 的 MasterDataAccess 进度、R5 的第 3 族、R0 的索引 vs 归档);**写明状态句仍只能靠人核对**这一缺口与补法(R12 需要自测才能加);插件源码零变化 | [REFACTOR-BATCH-RF8A.md](<REFACTOR-BATCH-RF8A.md>) |
 | **第 22 轮 RF8b(状态可验证)** | 文档收敛守卫新增 **R12**:产物存在时,当前文档集**不得**再说该事项"未做";短语须同时含否定词与特征名词,历史批次记录被豁免;配套对照 **M12** 证明它可红(12 条规则 0 失败);插件源码零变化 | [REFACTOR-BATCH-RF8B.md](<REFACTOR-BATCH-RF8B.md>) |
+| **第 23 轮 RF4h(历史环)** | 第四族(进程级)里唯一有真实规则的部分:`History` 的上限/新→旧/淘汰进 `src/Runtime/BattleHistoryRing.cs`;顺带修掉"结算里是字面量 20、`MaxHistory` 也是 20"的双份上限(现在 `MaxHistory = BattleHistoryRing.Max`);691 用例 / 99 例负控 | [REFACTOR-BATCH-RF4H.md](<REFACTOR-BATCH-RF4H.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
