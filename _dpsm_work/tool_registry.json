@@ -469,7 +469,7 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/validate.py": {
-   "evidence": "RF7l: named inside n0_acceptance.py as a DATA string (a fixed-path map key), not as a call; the J check refuses to index anything the pipeline script names, so it stays unclassified until either a caller or a status for this case exists",
+   "evidence": "RF7n: the only n0_acceptance.py mention is a COMMENT about v150_validate.py (not a RUN entry); its live namers are comments/docstrings too, so no live caller exists",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [
@@ -477,11 +477,11 @@
    ],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 236,
    "outputs": [],
    "purpose": "Identity, accounting and coverage checks (dictionary section 9).",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib_gap_dealt.py": {
    "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
@@ -1331,6 +1331,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 1
+  "unclassified_max": 0
  }
 }

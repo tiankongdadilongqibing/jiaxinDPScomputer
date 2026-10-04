@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**697 个命名用例 / 27 组**,**100 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 27 条活跃 / 66 条已索引 / 2 条被引用输入 / 1 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 27 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -302,6 +302,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 34 轮 RF7k(孤岛判定)** | 把判据补全为"无活脚本导入 / 无活脚本点名 / 不在流水线脚本里",据此判定 5 条包内子图(死根 `contrib/run.py`);未判定 10 → **5**;留下的 5 条**每条都有活脚本点名**,只需读那一行点名(导入/调用/文本模式)即可全部落定——人工读的边界已收窄到 **5 处** | [REFACTOR-BATCH-RF7K.md](<REFACTOR-BATCH-RF7K.md>) |
 | **第 35 轮 RF7l(读点名行)** | 逐处读了第 34 轮留下的 5 处点名,**结论:全部是文本(注释/docstring/列表),没有一处是调用**——即"活点名"从来不是"有活调用者"的证据,第 31 轮把它当保留理由过强;判据回到**真依赖**(流水线文本 J + 活闸门输入清单);3 条判死,未判定 5 → **3**;并自查改正一处误判(`dpsmeter_contrib.py` 在仓库根,我的路径前缀没匹配上);剩下 3 条缺的是状态词汇("被引用的输入")而非证据 | [REFACTOR-BATCH-RF7L.md](<REFACTOR-BATCH-RF7L.md>) |
 | **第 36 轮 RF7m(状态词汇)** | 判定的缺口是**词汇**而非证据:新增状态 **`referenced-input`**(有人读、没人跑的输入文件)+ 守卫检查 **K**(必须声明读者、读者须为 active 且其源码文本确实含该文件、且不得在流水线);`contrib/report_text.py` 与 `dpsmeter_contrib.py`(被活闸门 `check_docs_123.py` 读取)归入此类;未判定 3 → **1**;最后 1 条卡在 J 把**注释**也当成"流水线点名",收尾需单独一次 J 判据改动 | [REFACTOR-BATCH-RF7M.md](<REFACTOR-BATCH-RF7M.md>) |
+| **第 37 轮 RF7n(J 只看运行行)** | 把 J 的判据从"整份文本出现"改为"**同时含 `PY` 的运行行**出现",配两个对照(RUN 行⇒红;注释⇒不报);据此 `contrib/validate.py`(唯一提及是注释)判为 indexed —— **未判定 1 → 0**,RF7 工具治理收口:96 = 27 active + 67 indexed + 2 referenced-input + 0 unclassified | [REFACTOR-BATCH-RF7N.md](<REFACTOR-BATCH-RF7N.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

@@ -52,7 +52,7 @@ def load_registry(path=None):
         return json.load(fh)
 
 
-def verify(reg, fresh, pipe, repo=None):
+def verify(reg, fresh, pipe, repo=None, n0_text=None):
     """Every check, as a list of ASCII failure lines."""
     repo = repo or tool_census.REPO
     entries = reg.get("entries", {})
@@ -157,18 +157,24 @@ def verify(reg, fresh, pipe, repo=None):
     # runs things -- the tools are CLIs invoked from the pipeline script and from each other by name. Relying
     # on imports alone marked n0_acceptance.py and tests/negative_control.py as dead when I first computed it,
     # which is why this check exists: an `indexed` entry must not be NAMED inside the pipeline script's text.
-    try:
-        with io.open(os.path.join(tool_census.REPO, "_dpsm_work", "n0_acceptance.py"),
-                     "r", encoding="utf-8") as fh:
-            n0_text = fh.read()
-    except Exception:
-        n0_text = ""
+    # RF7n: only a mention on a line that ALSO invokes the interpreter counts as "the pipeline runs it".
+    # Before this, any occurrence of the basename counted -- and contrib/validate.py was blocked by a COMMENT
+    # in n0 that speaks about a different file (v150_validate.py). A real run entry is written as
+    # ("name", [PY, os.path.join(HERE, "script.py")]).
+    if n0_text is None:
+        try:
+            with io.open(os.path.join(tool_census.REPO, "_dpsm_work", "n0_acceptance.py"),
+                         "r", encoding="utf-8") as fh:
+                n0_text = fh.read()
+        except Exception:
+            n0_text = ""
+    n0_run_lines = "\n".join(ln for ln in n0_text.splitlines() if "PY" in ln)
     for rel in sorted(entries):
         if entries[rel].get("status") != "indexed":
             continue
         base = os.path.basename(rel)
-        if base and base in n0_text:
-            fail.append("J marked indexed but the pipeline script names it: " + rel)
+        if base and base in n0_run_lines:
+            fail.append("J marked indexed but a pipeline RUN entry names it: " + rel)
     # F: the unclassified count may only go down
     unclassified = len([1 for e in entries.values() if e.get("status") == "unclassified"])
     pin = reg.get("pins", {}).get("unclassified_max")
@@ -296,6 +302,24 @@ def selftest():
             fails.append(name)
     case_absent("an indexed script imported only by a DEAD script is NOT reported (G)", _dead_imports_indexed,
                 "G marked indexed but a LIVE script imports it")
+
+    def case_n0(name, n0_text, want, unjust=None):
+        tampered = json.loads(json.dumps(reg))
+        got = verify(tampered, fresh, pipe, n0_text=n0_text)
+        if unjust is not None:
+            ok = not any(unjust in f for f in got)
+        else:
+            ok = any(want in f for f in got)
+        print("  [%s] %s" % ("PASS" if ok else "FAIL", name))
+        if not ok:
+            fails.append(name)
+
+    case_n0("an indexed script named on a RUN line of the pipeline is caught (J)",
+            "    (\"x\", [PY, os.path.join(HERE, \"%s\")])," % os.path.basename(indexed_rels[0]),
+            "J marked indexed but a pipeline RUN entry names it")
+    case_n0("an indexed script named only in a COMMENT is NOT reported (J)",
+            "# see %s for the historical note" % os.path.basename(indexed_rels[0]),
+            "", unjust="J marked indexed but a pipeline RUN entry names it")
 
     def _k_no_readers(reg2):
         for r, x in reg2["entries"].items():
