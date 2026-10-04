@@ -431,8 +431,8 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "   全队总贡献相加 = 可分析伤害(不是他打出的伤害);直接占比=他实际打出的伤害占比;分池按「倍率对数份额」", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef
 		{
-			Text = "  " + DisplayFormat.PadR("角色", 16) + DisplayFormat.PadL("总贡献", 11) + DisplayFormat.PadL("占比", 8) + DisplayFormat.PadL("自身", 11)
-				 + DisplayFormat.PadL("他人因你", 11) + DisplayFormat.PadL("被队友分走", 11) + DisplayFormat.PadL("直接占比", 9) + DisplayFormat.PadL("命中", 6),
+			// RF5c: the header is BUILT from the column spec, so its widths cannot drift from the labels.
+			Text = ContributionColumns.HeaderLine(ContributionColumns.T1),
 			Color = DimColor, Height = 15f,
 		});
 		for (int i = 0; i < res.Actors.Count; i++)
@@ -473,9 +473,7 @@ public static partial class OverlayUGUI
 		}
 		rows.Add(new RowDef
 		{
-			Text = "  " + DisplayFormat.PadR("合计", 16) + DisplayFormat.Amt(res.Stats.Attributed, 11) + DisplayFormat.PadL("", 8)
-				 + DisplayFormat.Amt(sumBase + sumSelf, 11) + DisplayFormat.Amt(sumAssist, 11) + DisplayFormat.Amt(sumReceived, 11)
-				 + DisplayFormat.PadL("", 9) + DisplayFormat.PadL("", 6),
+			Text = ContributionColumns.T1TotalsLine(res.Stats.Attributed, sumBase + sumSelf, sumAssist, sumReceived),
 			Color = NeutralColor, Height = 16f,
 		});
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;
@@ -497,8 +495,7 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "【规则当量】(该规则带来的份额之和;归属由 byUnit/持有者/全局规则名解析)", Color = HeaderColor, Height = 17f });
 		rows.Add(new RowDef
 		{
-			Text = "  " + DisplayFormat.PadR("规则", 22) + DisplayFormat.PadR("通道", 8) + DisplayFormat.PadR("侧", 5) + DisplayFormat.PadR("持有者", 14)
-				 + DisplayFormat.PadL("命中", 7) + DisplayFormat.PadL("折叠", 7) + DisplayFormat.PadL("当量", 12),
+			Text = ContributionColumns.HeaderLine(ContributionColumns.T2),
 			Color = DimColor, Height = 15f,
 		});
 		int shown = 0;
@@ -530,8 +527,7 @@ public static partial class OverlayUGUI
 			{
 				// 1.7.7: the header used to end with "  主要规则", a column no data row ever filled (the link
 				// row carries no rule field) -- it made the header 10 columns wider than its own table.
-				Text = "  " + DisplayFormat.PadR("提供者", 14) + DisplayFormat.PadR("→", 4) + DisplayFormat.PadR("受益者", 14)
-					 + DisplayFormat.PadL("命中", 7) + DisplayFormat.PadL("当量", 12),
+				Text = ContributionColumns.HeaderLine(ContributionColumns.T3),
 				Color = DimColor, Height = 15f,
 			});
 			int ln = 0;

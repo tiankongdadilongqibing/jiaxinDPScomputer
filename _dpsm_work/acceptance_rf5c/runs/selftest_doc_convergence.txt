@@ -1,0 +1,17 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_doc_convergence.py --selftest --applicability D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_rf5c\applicability.json --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+baseline: 11 rules, 0 failing
+  [PASS] M1 a document forgets the current version -- R1; failing=['R1']
+  [PASS] M2 a document claims an older version is deployed -- R2; failing=['R2']
+  [PASS] M2b a BATTLE described as latest must NOT trip R2 (negative control) -- R2; failing=[]
+  [PASS] M3 the deployed hash disappears from a status document -- R3; failing=['R3']
+  [PASS] M4 the schema is called 0.1-draft again -- R4; failing=['R4']
+  [PASS] M5 a corpus total says 15 files -- R5; failing=['R5']
+  [PASS] M5b a SUBSET count must NOT trip R5 (negative control) -- R5; failing=[]
+  [PASS] M6 the training ground is called comparable -- R6; failing=['R6']
+  [PASS] M7 the unsplit attackPower claim returns -- R7; failing=['R7']
+  [PASS] M9 a stated acceptance command count drifts -- R9; failing=['R9']
+  [PASS] M10 a version that has a section is called section-less -- R10; failing=['R10']
+  [PASS] M11 a largest-N list lists a different number -- R11; failing=['R11']
+  [PASS] M8 the offline knownLimits list diverges -- R8 fails
+---- selftest: PASS

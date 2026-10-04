@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 518;
+	public const int ExpectedCases = 542;
 
 	private static int Main(string[] args)
 	{
@@ -39,6 +39,8 @@ internal static class Program
 		Cases.Counters(r);
 		// RF5b: the display formatter (widths, padding, numbers, fitting), executed as production code.
 		Cases.DisplayFormatCases(r);
+		// RF5c: the column definition of the three overlay tables.
+		Cases.Columns(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

@@ -223,6 +223,27 @@ def _numeric_selftest():
 SRC_ROWS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src', 'Ui', 'OverlayUGUI.Rows.cs')
 RE_CS_CELL = re.compile(r'Pad[RL]\("([^"]*)",\s*(\d+)\)')
 RE_CS_NUM = re.compile(r'(?:Amt|PadL)\([^,]+,\s*(\d+)\)')
+# RF5c: the column DEFINITION moved from the renderer into src/Ui/ContributionColumns.cs. The guard reads
+# the definition (labels + widths), the renderer's remaining inline row widths, and requires both to agree
+# with this file's replica -- so the panel cannot move without the guard moving with it.
+SRC_SPEC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src', 'Ui', 'ContributionColumns.cs')
+RE_SPEC_CONST = re.compile(r'public const int (\w+) = (\d+);')
+RE_SPEC_ENTRY = re.compile(r'C\("([^"]*)",\s*(\w+),\s*(?:true|false)\)')
+# Only the OUTER cell call carries a column width: matching Amt/PadL/PadR keeps Fit's inner width out.
+RE_WIDTH_LITERAL = re.compile(r'(?:Amt|PadL|PadR)\([^,]+,\s*(\d+)\)')
+T1_CELLS = [
+    ('\u89d2\u8272', 16), ('\u603b\u8d21\u732e', 11), ('\u5360\u6bd4', 8),
+    ('\u81ea\u8eab', 11), ('\u4ed6\u4eba\u56e0\u4f60', 11),
+    ('\u88ab\u961f\u53cb\u5206\u8d70', 11), ('\u76f4\u63a5\u5360\u6bd4', 9), ('\u547d\u4e2d', 6),
+]
+T2_CELLS = [
+    ('\u89c4\u5219', 22), ('\u901a\u9053', 8), ('\u4fa7', 5), ('\u6301\u6709\u8005', 14),
+    ('\u547d\u4e2d', 7), ('\u6298\u53e0', 7), ('\u5f53\u91cf', 12),
+]
+T3_CELLS = [
+    ('\u63d0\u4f9b\u8005', 14), ('\u2192', 4), ('\u53d7\u76ca\u8005', 14),
+    ('\u547d\u4e2d', 7), ('\u5f53\u91cf', 12),
+]
 
 def _csharp_block(text, start, end):
     i = text.find(start)
@@ -245,54 +266,85 @@ def _cs_nums(text, start, end):
         return None
     return [int(w) for w in RE_CS_NUM.findall(blk)]
 
-def check_source_replica():
-    """Return a list of drift problems between the C# renderer and this file's replica."""
-    if not os.path.isfile(SRC_ROWS):
-        return ['renderer source not found at %s' % SRC_ROWS]
-    with io.open(SRC_ROWS, 'r', encoding='utf-8') as fh:
+def spec_columns(path=None):
+    """The C# column definition, resolved to [(label, width), ...] per table, or None when unparseable."""
+    p = path or SRC_SPEC
+    if not os.path.isfile(p):
+        return None
+    with io.open(p, 'r', encoding='utf-8') as fh:
         text = fh.read()
+    consts = dict((n, int(v)) for n, v in RE_SPEC_CONST.findall(text))
+    out = []
+    for arr in ('T1', 'T2', 'T3'):
+        blk = _csharp_block(text, arr + ' =', '};')
+        if blk is None:
+            return None
+        cols = []
+        for lbl, name in RE_SPEC_ENTRY.findall(blk):
+            if name not in consts:
+                return None
+            cols.append((lbl, consts[name]))
+        out.append(cols)
+    return out
+
+
+def _widths_in_order(text, start, end):
+    """The column widths of a row block, one per cell, in the order the row writes them."""
+    blk = _csharp_block(text, start, end)
+    if blk is None:
+        return None
+    return [int(w) for w in RE_WIDTH_LITERAL.findall(blk)]
+
+
+def check_source_replica():
+    """Return a list of drift problems between the C# definition/renderer and this file's replica."""
+    if not os.path.isfile(SRC_SPEC):
+        return ['column definition not found at %s' % SRC_SPEC]
+    spec = spec_columns()
+    if spec is None:
+        return ['the column definition could not be parsed (%s)' % os.path.basename(SRC_SPEC)]
     problems = []
-    want_cells = [('\u89d2\u8272', 16), ('\u603b\u8d21\u732e', 11), ('\u5360\u6bd4', 8),
-                  ('\u81ea\u8eab', 11), ('\u4ed6\u4eba\u56e0\u4f60', 11),
-                  ('\u88ab\u961f\u53cb\u5206\u8d70', 11), ('\u76f4\u63a5\u5360\u6bd4', 9), ('\u547d\u4e2d', 6)]
-    got = _cs_cells(text, 'PadR("\u89d2\u8272"', 'Color = DimColor')
-    if got is None:
-        problems.append('T1 header not found in %s' % os.path.basename(SRC_ROWS))
-    elif got != want_cells:
-        problems.append('T1 header drifted: renderer=%s replica=%s' % (got, want_cells))
-    want_nums = [w for _lbl, w in want_cells]
-    got2 = _cs_nums(text, 'Text = "  " + label', 'Color = AllyColor')
-    if got2 is None:
+    want_tables = [T1_CELLS, T2_CELLS, T3_CELLS]
+    for i, name in enumerate(('T1', 'T2', 'T3')):
+        if spec[i] != want_tables[i]:
+            problems.append('%s drifted: definition=%s replica=%s' % (name, spec[i], want_tables[i]))
+    if not os.path.isfile(SRC_ROWS):
+        problems.append('renderer source not found at %s' % SRC_ROWS)
+        return problems
+    with io.open(SRC_ROWS, 'r', encoding='utf-8') as fh:
+        rows = fh.read()
+    # The block starts at the label line so the name column is included; each cell contributes exactly one
+    # width because only the outer Amt/PadL/PadR call matches.
+    row_w = _widths_in_order(rows, 'string label = DisplayFormat.PadR', 'Color = AllyColor')
+    if row_w is None:
         problems.append('T1 data row not found in %s' % os.path.basename(SRC_ROWS))
-    elif got2 != want_nums[1:]:
-        problems.append('T1 data row drifted: renderer=%s replica=%s' % (got2, want_nums[1:]))
-    got3 = _cs_nums(text, 'PadR("\u5408\u8ba1"', 'Color = NeutralColor')
-    if got3 is None:
-        problems.append('T1 totals row not found in %s' % os.path.basename(SRC_ROWS))
-    elif len(got3) != 7:
-        problems.append('T1 totals row width list = %s (want 7 entries)' % (got3,))
+    elif row_w != [w for _lbl, w in T1_CELLS]:
+        problems.append('T1 data row widths = %s, definition says %s'
+                        % (row_w, [w for _lbl, w in T1_CELLS]))
     return problems
 
+
 def _source_selftest():
-    """Prove the drift check has teeth: widen one renderer column and require a problem."""
-    global SRC_ROWS
+    """Prove the drift check has teeth now that the geometry lives in the definition file."""
+    global SRC_SPEC
     tmp = tempfile.mkdtemp(prefix='layout_src_')
     try:
-        with io.open(SRC_ROWS, 'r', encoding='utf-8') as fh:
+        with io.open(SRC_SPEC, 'r', encoding='utf-8') as fh:
             text = fh.read()
-        bad = text.replace('PadL("\u81ea\u8eab", 11)', 'PadL("\u81ea\u8eab", 12)')
+        bad = text.replace('public const int T1Total = 11;', 'public const int T1Total = 12;')
         if bad == text:
-            return (False, 'tamper target PadL(自身, 11) not found -- the check may be reading nothing')
-        tp = os.path.join(tmp, 'Rows.cs')
+            return (False, 'tamper target T1Total = 11 not found -- the check may be reading nothing')
+        tp = os.path.join(tmp, 'ContributionColumns.cs')
         with io.open(tp, 'w', encoding='utf-8') as fh:
             fh.write(bad)
-        keep = SRC_ROWS
-        SRC_ROWS = tp
+        keep = SRC_SPEC
+        SRC_SPEC = tp
         probs = check_source_replica()
-        SRC_ROWS = keep
-        return (bool(probs), 'tampered renderer -> %d problem(s)' % len(probs))
+        SRC_SPEC = keep
+        return (bool(probs), 'tampered definition -> %d problem(s)' % len(probs))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
 
 def main():
     ap = argparse.ArgumentParser()

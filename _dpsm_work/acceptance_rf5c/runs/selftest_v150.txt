@@ -1,0 +1,25 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\v150_validate.py --selftest
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_low.txt
+version=1.7.10 quest=411001 problems=1
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_ok.txt
+version=1.7.10 quest=411001 problems=0
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_one.txt
+version=1.7.10 quest=411001 problems=0
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_none.txt
+version=1.7.10 quest=411001 problems=0
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_drift.txt
+version=1.7.10 quest=411001 problems=0
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_liar.txt
+version=1.7.10 quest=411001 problems=0
+report -> C:\Users\24134\AppData\Local\Temp\kpi_l4j4az2s\r_samever.txt
+version=1.7.10 quest=411001 problems=0
+  [PASS] a KPI below the baseline minimum - 3pp is called a regression rc=1
+  [PASS] a KPI inside the baseline range is not a regression      rc=0
+  [PASS] one usable sample -> no verdict (样本不足)                   rc=0
+  [PASS] an empty baseline -> 不可判, no claim                       rc=0
+  [PASS] a hash-drifted entry is reported and NOT used            rc=0
+  [PASS] an entry whose declared version disagrees with its file is not used rc=0
+  [PASS] a baseline entry that is not OLDER than the target is not used rc=0
+  [PASS] the real baseline EXCLUDES the 1.6.0 damaged sample      excluded=1 approved=29
+---- selftest: PASS
