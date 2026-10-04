@@ -24,6 +24,7 @@ Usage:
     python check_tool_registry.py --selftest      # tamper a temp registry/n0 copy, expect the right failure
 """
 import io
+import re
 import json
 import os
 import shutil
@@ -173,7 +174,10 @@ def verify(reg, fresh, pipe, repo=None, n0_text=None):
         if entries[rel].get("status") != "indexed":
             continue
         base = os.path.basename(rel)
-        if base and base in n0_run_lines:
+        # RF7n fix: a plain substring test is wrong -- "validate.py" matches inside "v150_validate.py",
+        # which is how contrib/validate.py was reported as a pipeline run entry. Require a PATH/quote
+        # boundary before the basename.
+        if base and re.search(r'[^A-Za-z0-9_]' + re.escape(base), n0_run_lines):
             fail.append("J marked indexed but a pipeline RUN entry names it: " + rel)
     # F: the unclassified count may only go down
     unclassified = len([1 for e in entries.values() if e.get("status") == "unclassified"])
@@ -337,8 +341,10 @@ def selftest():
     case("a referenced-input whose reader is not active (or does not read it) is caught (K)", _k_fake_reader,
          "K referenced-input is not actually read by any ACTIVE listed reader")
 
+    # RF7n: with the real count at 0, tampering the pin to 0 no longer contradicts anything (0 > 0 is
+    # false), so this falsifier had to move to -1 to stay alive.
     def _pin_down(reg2):
-        reg2["pins"]["unclassified_max"] = 0
+        reg2["pins"]["unclassified_max"] = -1
     case("the unclassified pin is enforced (F)", _pin_down, "F unclassified grew to")
 
     print("---- selftest: %s" % ("PASS" if not fails else "FAIL %s" % fails))
