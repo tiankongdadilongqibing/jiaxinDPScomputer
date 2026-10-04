@@ -8,7 +8,7 @@
 |---|---|
 | 已注册脚本 | 96 |
 | 其中活跃(有 CLI、有预期退出码与输出声明) | 27 |
-| 尚未判定(只登记,计数只能下降) | 5 / 上限 5 |
+| 尚未判定(只登记,计数只能下降) | 3 / 上限 3 |
 | 验收流水线实际运行的脚本 | 21 |
 
 ## 活跃工具
@@ -115,4 +115,4 @@
 | `_dpsm_work/verify_155.py` | 45 | 1.5.5 acceptance: self-applied madness attribution + give-applier hook. |  |
 | `_dpsm_work/victim_check.py` | 27 | Control: same enemy set / same front-line structure in the two battles? |  |
 | `dpsmeter_analyze.py` | 201 | DpsMeter 离线精细分析器 |  |
-| `dpsmeter_contrib.py` | 164 | DpsMeter per-character contribution analyzer (Stage 0, 2026-10-03). |  |
+| `dpsmeter_contrib.py` | 164 |  |  |

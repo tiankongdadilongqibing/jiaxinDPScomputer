@@ -354,20 +354,20 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/report_json.py": {
-   "evidence": "",
+   "evidence": "RF7l: no live caller -- every live mention is a comment, a docstring or a list entry, not a call; not in the pipeline, not an input of an active gate",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 181,
    "outputs": [],
    "purpose": "Contribution JSON draft (schemaVersion 0.1-draft). Not part of the plugin export.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/report_text.py": {
-   "evidence": "",
+   "evidence": "RF7l: listed as an INPUT of the active check_docs_123.py (it reads the file for CJK damage), so something live does depend on it -- but it is not a CLI anyone runs; the registry has no status for that and one is needed",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
@@ -438,7 +438,7 @@
    "status": "active"
   },
   "_dpsm_work/contrib/tests/test_golden_155.py": {
-   "evidence": "",
+   "evidence": "RF7l: no live caller -- every live mention is a comment, a docstring or a list entry, not a call; not in the pipeline, not an input of an active gate",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [
@@ -446,11 +446,11 @@
    ],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "indexed",
    "lines": 145,
    "outputs": [],
    "purpose": "Golden test on the real 1.5.5 export: pins every number the project publishes.",
-   "status": "unclassified"
+   "status": "indexed"
   },
   "_dpsm_work/contrib/tests/test_samples.py": {
    "evidence": "RF7b: no pipeline entry, nobody imports it, and the current document set never names it",
@@ -466,7 +466,7 @@
    "status": "indexed"
   },
   "_dpsm_work/contrib/validate.py": {
-   "evidence": "",
+   "evidence": "RF7l: named inside n0_acceptance.py as a DATA string (a fixed-path map key), not as a call; the J check refuses to index anything the pipeline script names, so it stays unclassified until either a caller or a status for this case exists",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [
@@ -1311,20 +1311,20 @@
    "status": "indexed"
   },
   "dpsmeter_contrib.py": {
-   "evidence": "",
+   "evidence": "RF7l: listed as an INPUT of the active check_docs_123.py (it reads the file for CJK damage), so something live does depend on it -- but it is not a CLI anyone runs; the registry has no status for that and one is needed",
    "expected_exit": "",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "",
    "lines": 164,
    "outputs": [],
-   "purpose": "DpsMeter per-character contribution analyzer (Stage 0, 2026-10-03).",
+   "purpose": "",
    "status": "unclassified"
   }
  },
  "pins": {
-  "unclassified_max": 5
+  "unclassified_max": 3
  }
 }
