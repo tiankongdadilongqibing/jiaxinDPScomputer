@@ -303,6 +303,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 35 轮 RF7l(读点名行)** | 逐处读了第 34 轮留下的 5 处点名,**结论:全部是文本(注释/docstring/列表),没有一处是调用**——即"活点名"从来不是"有活调用者"的证据,第 31 轮把它当保留理由过强;判据回到**真依赖**(流水线文本 J + 活闸门输入清单);3 条判死,未判定 5 → **3**;并自查改正一处误判(`dpsmeter_contrib.py` 在仓库根,我的路径前缀没匹配上);剩下 3 条缺的是状态词汇("被引用的输入")而非证据 | [REFACTOR-BATCH-RF7L.md](<REFACTOR-BATCH-RF7L.md>) |
 | **第 36 轮 RF7m(状态词汇)** | 判定的缺口是**词汇**而非证据:新增状态 **`referenced-input`**(有人读、没人跑的输入文件)+ 守卫检查 **K**(必须声明读者、读者须为 active 且其源码文本确实含该文件、且不得在流水线);`contrib/report_text.py` 与 `dpsmeter_contrib.py`(被活闸门 `check_docs_123.py` 读取)归入此类;未判定 3 → **1**;最后 1 条卡在 J 把**注释**也当成"流水线点名",收尾需单独一次 J 判据改动 | [REFACTOR-BATCH-RF7M.md](<REFACTOR-BATCH-RF7M.md>) |
 | **第 37 轮 RF7n(J 只看运行行)** | 把 J 的判据从"整份文本出现"改为"**同时含 `PY` 的运行行**出现",配两个对照(RUN 行⇒红;注释⇒不报);据此 `contrib/validate.py`(唯一提及是注释)判为 indexed —— **未判定 1 → 0**,RF7 工具治理收口:96 = 27 active + 67 indexed + 2 referenced-input + 0 unclassified | [REFACTOR-BATCH-RF7N.md](<REFACTOR-BATCH-RF7N.md>) |
+| **第 38 轮(全量复核,无代码改动)** | 第 37 轮先后留下一次红提交,故本轮把**整条验收重跑**一遍作最终核对:`acceptance_r38` **37 条命令 / 69 条检查 / 0 项**;行为套件 697 用例 0 失败;`check_tool_registry`(G/J/K 全部有牙)PASS;`refactor_final_check` blocks=0;docs123 72 份 0 损伤;文档收敛 0/12;工具治理 **0 条未判定**;部署 DLL 未替换 | 证据即本轮归档 `acceptance_r38` |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
