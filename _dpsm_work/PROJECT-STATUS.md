@@ -180,12 +180,12 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 
 | 批次 | 内容 | 出口验证 |
 |---|---|---|
-| **R0 前置** | ~~①纳入版本控制~~ **已完成(RF0:本地 git,标签 `baseline-1.7.11`)**,并补上仓库边界 / 基线清单 / 冻结输入快照 / 输出隔离;②把 `evidence_*`/`probe_*`/旧验证目录打包归档(**仍未做**,属 RF7,只索引不删除);~~③文档集加自测~~ 已完成(现 32 份 + 6 例自测) | `repo_manifest --verify` drift=0 + `n0_acceptance.py` 33 命令 / 65 检查全绿 |
+| **R0 前置** | ~~①纳入版本控制~~ **已完成(RF0:本地 git,标签 `baseline-1.7.11`)**,并补上仓库边界 / 基线清单 / 冻结输入快照 / 输出隔离;②把 `evidence_*`/`probe_*`/旧验证目录打包归档(**仍未做**,属 RF7;RF7b 已完成**脚本层索引**(43 条 `indexed`),归档动作本身留待前置满足);~~③文档集加自测~~ 已完成(现 32 份 + 6 例自测) | `repo_manifest --verify` drift=0 + `n0_acceptance.py` 33 命令 / 65 检查全绿 |
 | **R1 无风险拆分** | ~~`Aggregator` 拆 partial~~ **已完成(RF2:6 文件,IL 级等价,见 §12)**;时间窗提为命名常量**已完成(RF3c:composition 容差、时钟上界复用)** | 构建 0 警 0 错 + 174 用例 + `recon_probe` + IL 等价 |
-| **R2 纯函数下沉** | ~~时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口~~ **已完成(RF3:3 个策略文件,269 用例,20 例负控,见 §12)**;仍留:composition 链自身窗口、`IdleSeconds`、候选扫描(读原生对象) | 用例 + 网格对照 + 变异负控 |
-| **R3 界面** | ~~测量/截断/行构造~~ **测量/截断/数字格式**(RF5b:`Ui/DisplayFormat.cs`)+ **列定义**(RF5c:`Ui/ContributionColumns.cs`,表头与合计行由定义构造,守卫对账数据行)已完成;剩**行数据模型/RowViewModel** | 布局守卫语料 0 违规 + 目视 |
-| **R4 数据侧** | `MasterDataAccess` 合并两处表查找;`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
-| **R5 状态生命周期(方案 RF4)** | ~~先交 `StateLifetimeMatrix`~~ **已交**([STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>));第 1 族(跨场衔接)已迁到 `Runtime/SessionContinuity`,并删掉矩阵查出的死状态;第 2 族**两半都完成**:判据半在 `Policy/GlobalRuleClassifier`,状态半在 `Runtime/GlobalRuleRegistry`(结算不清表/只回收死持有者/枚举序都有用例);其余族的前置条件写在矩阵 §7;**RF5a**:缓存判据抽到 `Policy/ContributionCachePolicy`(行为不变,既有 24 条 `cache/` 用例原样通过),缓存语义的**三个待决问题**写进 [CACHE-SEMANTICS-ADR.md](<CACHE-SEMANTICS-ADR.md>);**RF4d**:应用侧算术(属性门取值/副本数/逐状态幂)抽到 `Policy/GlobalRuleApplyPolicy`,门梯本体经三条代码证据论证**不再抽取**(矩阵 §8);**RF4e**:第三族(单场运行态)的第一片 —— 12 个计数/自报字段迁到 `Runtime/BattleRuntimeCounters`,重置规则从散文变成可执行方法(resume 与 finalize 故意不清) | 475 用例 + 58 例负控 + 全量验收;每族/每半批后重跑 |
+| **R2 纯函数下沉** | ~~时钟增量 / run 归组 / 软恢复闸门 / 归属配对判据与窗口~~ **已完成(RF3:3 个策略文件,269 用例,20 例负控,见 §12)**;**composition 链自身窗口**已完成(RF3c),`IdleSeconds` 已完成(RF4e);仅剩候选扫描(要读 IL2CPP 字段) | 用例 + 网格对照 + 变异负控 |
+| **R3 界面** | ~~测量/截断/行构造~~ **测量/截断/数字格式**(RF5b:`Ui/DisplayFormat.cs`)+ **列定义**(RF5c:`Ui/ContributionColumns.cs`,表头与合计行由定义构造,守卫对账数据行)已完成;**行数据模型/RowViewModel** 也已完成(RF5f + RF5g:`Ui/ContributionRowModel.cs`) | 布局守卫语料 0 违规 + 目视 |
+| **R4 数据侧** | `MasterDataAccess` 合并两处表查找(**RF6a 已定位并逐项对照**,抽取待实机验证机会;选名规则已抽出并覆盖);`HitRecord` 会心通道接线(见 §9) | schema 守卫 + 残差 `exact` 比例不下降 |
+| **R5 状态生命周期(方案 RF4)** | ~~先交 `StateLifetimeMatrix`~~ **已交**([STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>));第 1 族(跨场衔接)已迁到 `Runtime/SessionContinuity`,并删掉矩阵查出的死状态;第 2 族**两半都完成**:判据半在 `Policy/GlobalRuleClassifier`,状态半在 `Runtime/GlobalRuleRegistry`(结算不清表/只回收死持有者/枚举序都有用例);其余族的前置条件写在矩阵 §7;**RF5a**:缓存判据抽到 `Policy/ContributionCachePolicy`(行为不变,既有 24 条 `cache/` 用例原样通过),缓存语义的**三个待决问题**写进 [CACHE-SEMANTICS-ADR.md](<CACHE-SEMANTICS-ADR.md>);**RF4d**:应用侧算术(属性门取值/副本数/逐状态幂)抽到 `Policy/GlobalRuleApplyPolicy`,门梯本体经三条代码证据论证**不再抽取**(矩阵 §8);**RF4e**:第三族(单场运行态)的第一片 —— 12 个计数/自报字段迁到 `Runtime/BattleRuntimeCounters`,重置规则从散文变成可执行方法(resume 与 finalize 故意不清) | 475 用例 + 58 例负控 + 全量验收;每族/每半批后重跑 ;第 3 族(单场运行态)已完成(计数 RF4e / 活动环 RF4f / 攻击快照 RF4g;仅剩一条字符串草稿 `_lastCalcSrc`,理由见 RF4g 记录) |
 
 **顺序原则**:先有护栏再动刀;一次只动一层;每批都能单独回滚(回滚锚点 = 上一版 DLL + 源码快照)。
 
@@ -286,6 +286,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 18 轮 RF5f(行值模型)** | RF5 的最后一项 RowViewModel:贡献表的"哪些演员上表 / 两个占比 / 页脚四个求和"抽到 `src/Ui/ContributionRowModel.cs`;渲染器由**两遍遍历**并为一遍;用例分别钉住"显示集合"与"求和集合"(前者过滤、后者覆盖全部演员);645 用例 / 90 例负控 | [REFACTOR-BATCH-RF5F.md](<REFACTOR-BATCH-RF5F.md>) |
 | **第 19 轮 RF5g(两张表)** | 规则表(T2)与关系表(T3)的行值也进 `ContributionRowModel`(过滤/上限 12 具名/端点命名 + `#key` 兜底);渲染器两个循环改为遍历模型行;664 用例 / 93 例负控 | [REFACTOR-BATCH-RF5G.md](<REFACTOR-BATCH-RF5G.md>) |
 | **第 20 轮 RF4g(攻击快照)** | 第三族最后一块:`_activeCalc`/`_activeCalcT` 迁到 `src/Runtime/AttackSnapshot.cs`,`Valid = calc 非空 且 戳 ≥ 0`(直接指向 1.5.0"上一场 calc 标注本场命中"的缺陷);接线 8 处;679 用例 / 96 例负控。第三族仅剩 `_lastCalcSrc`(单条草稿,已写明理由) | [REFACTOR-BATCH-RF4G.md](<REFACTOR-BATCH-RF4G.md>) |
+| **第 21 轮 RF8a(状态收敛)** | 把 R0–R5 表里"仍未做"的陈述逐条与代码核对并收敛(R2 的链窗口/`IdleSeconds`、R3 的 RowViewModel、R4 的 MasterDataAccess 进度、R5 的第 3 族、R0 的索引 vs 归档);**写明状态句仍只能靠人核对**这一缺口与补法(R12 需要自测才能加);插件源码零变化 | [REFACTOR-BATCH-RF8A.md](<REFACTOR-BATCH-RF8A.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
