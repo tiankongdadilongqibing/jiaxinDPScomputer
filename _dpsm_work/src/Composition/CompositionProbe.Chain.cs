@@ -297,7 +297,7 @@ public static partial class CompositionProbe
 			string shownSrc = "";
 			int mainAtk = (dominant > 0.0 && pow > 0) ? (int)System.Math.Round(pow / dominant) : 0;
 			int samePowAtk = SamePowerAttack(pow);
-			bool samePowOk = (samePowAtk <= 0) || Within(atkPower, samePowAtk, 0.005);
+			bool samePowOk = (samePowAtk <= 0) || Within(atkPower, samePowAtk, CompositionTolerancePolicy.TightRate);
 			if (!samePowOk)
 			{
 				// The same 计算威力 was read with a different attack on other hits -> that other value is
@@ -305,18 +305,18 @@ public static partial class CompositionProbe
 				shownAtk = samePowAtk;
 				shownSrc = "同威力主档";
 			}
-			else if (dominant > 0.0 && pow > 0 && !MatchesRate(atkPower, pow, dominant, 0.005))
+			else if (dominant > 0.0 && pow > 0 && !MatchesRate(atkPower, pow, dominant, CompositionTolerancePolicy.TightRate))
 			{
 				// 1) a candidate that reproduces the skill's rate EXACTLY (<=0.5%) is the value the power
 				//    was built from -> show it as read;
-				if (MatchesRate(ctorAtk, pow, dominant, 0.005)) { shownAtk = ctorAtk; shownSrc = "构造前"; }
-				else if (MatchesRate(liveAtkPower, pow, dominant, 0.005)) { shownAtk = liveAtkPower; shownSrc = "结算时"; }
-				else if (MatchesRate(ownerPower, pow, dominant, 0.005)) { shownAtk = ownerPower; shownSrc = "归属者"; }
+				if (MatchesRate(ctorAtk, pow, dominant, CompositionTolerancePolicy.TightRate)) { shownAtk = ctorAtk; shownSrc = "构造前"; }
+				else if (MatchesRate(liveAtkPower, pow, dominant, CompositionTolerancePolicy.TightRate)) { shownAtk = liveAtkPower; shownSrc = "结算时"; }
+				else if (MatchesRate(ownerPower, pow, dominant, CompositionTolerancePolicy.TightRate)) { shownAtk = ownerPower; shownSrc = "归属者"; }
 				// 2) a candidate that is merely CLOSE (<=2%) is a stale read of the right object ->
 				//    display the exact value implied by the rate and mention the read in the note;
-				else if (MatchesRate(ctorAtk, pow, dominant, 0.02)) { shownAtk = ctorAtk; shownSrc = "构造前"; }
-				else if (MatchesRate(atkPower, pow, dominant, 0.02) || MatchesRate(liveAtkPower, pow, dominant, 0.02)
-					|| MatchesRate(ownerPower, pow, dominant, 0.02))
+				else if (MatchesRate(ctorAtk, pow, dominant, CompositionTolerancePolicy.LooseRate)) { shownAtk = ctorAtk; shownSrc = "构造前"; }
+				else if (MatchesRate(atkPower, pow, dominant, CompositionTolerancePolicy.LooseRate) || MatchesRate(liveAtkPower, pow, dominant, CompositionTolerancePolicy.LooseRate)
+					|| MatchesRate(ownerPower, pow, dominant, CompositionTolerancePolicy.LooseRate))
 				{ shownAtk = mainAtk; shownSrc = "按主档校正"; }
 				// 3) nothing explains the power -> derive the attack from the rate itself
 				else { shownAtk = mainAtk; shownSrc = "按主档反推"; }
@@ -334,7 +334,7 @@ public static partial class CompositionProbe
 			if (ratio > 0.0)
 			{
 				double scaled = ratio * 10.0;
-				ratioClean = System.Math.Abs(scaled - System.Math.Round(scaled)) <= 0.05;
+				ratioClean = System.Math.Abs(scaled - System.Math.Round(scaled)) <= CompositionTolerancePolicy.LinearWindow;
 			}
 			if (shownSrc == "同威力主档")
 			{
@@ -913,7 +913,7 @@ public static partial class CompositionProbe
 	/// <summary>Does 计算威力 ÷ candidate reproduce the rate the skill's own hits agree on?</summary>
 	private static bool MatchesRate(int candidate, int pow, double rate)
 	{
-		return MatchesRate(candidate, pow, rate, 0.02);
+		return MatchesRate(candidate, pow, rate, CompositionTolerancePolicy.LooseRate);
 	}
 
 	private static bool MatchesRate(int candidate, int pow, double rate, double tolerance)

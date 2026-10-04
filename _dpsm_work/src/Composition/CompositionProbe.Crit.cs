@@ -62,7 +62,8 @@ public static partial class CompositionProbe
 			if (GameRef.IsNull(blocker)) return 0;
 			if (!GameRef.Same(_critBlocker, blocker)) return 0;
 			double dt = Now() - _critT;
-			if (dt < -0.05 || dt > 0.25) return 0;
+			// RF3c: the two bounds are named, and the upper one IS the clock's frame-delta bound.
+			if (!CompositionTolerancePolicy.CritDeltaUsable(dt)) return 0;
 			return _critFlag ? (byte)2 : (byte)1;
 		}
 		catch { return 0; }

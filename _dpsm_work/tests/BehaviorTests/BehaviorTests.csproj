@@ -53,6 +53,7 @@
     <Compile Include="$(SrcRoot)\Policy\GlobalRuleClassifier.cs" />
     <Compile Include="$(SrcRoot)\Policy\ContributionCachePolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\MasterDataLabelPolicy.cs" />
+    <Compile Include="$(SrcRoot)\Policy\CompositionTolerancePolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\GlobalRuleApplyPolicy.cs" />
     <!-- RF4: the first state family. Game-free by construction (BattleSession only), which is what makes
          the Start/End/resume sequences executable here instead of only in a battle. -->
