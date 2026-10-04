@@ -36,6 +36,16 @@ from __future__ import print_function
 import argparse, glob, hashlib, io, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# R12 (RF8b): artifacts whose EXISTENCE falsifies a "not done" sentence. Keep the phrases negative AND
+# distinctive; whitespace is normalised before matching. Motivated by the round-21 status pass (RF8A).
+STATUS_ARTIFACTS = [
+    ("src/Ui/DisplayFormat.cs", ["DisplayFormat\u672a\u62bd\u51fa", "\u6d4b\u91cf\u622a\u65ad\u672a\u505a"]),
+    ("src/Policy/CompositionTolerancePolicy.cs", ["\u94fe\u81ea\u8eab\u7a97\u53e3\u4ecd\u672a\u505a",
+                                                 "\u5bb9\u5dee\u4ecd\u662f\u88f8\u5b57\u9762\u91cf"]),
+    ("src/Ui/ContributionRowModel.cs", ["RowViewModel\u672a\u505a", "\u884c\u6570\u636e\u6a21\u578b\u672a\u505a"]),
+    ("src/Runtime/AttackSnapshot.cs", ["\u653b\u51fb\u5feb\u7167\u672a\u8fc1\u79fb"]),
+]
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 EXPORTS = os.path.join(ROOT, "BepInEx", "plugins", "DpsMeter", "exports")
 LIVE_DLL = os.path.join(ROOT, "BepInEx", "plugins", "DpsMeter", "DpsMeter.dll")
@@ -331,6 +341,20 @@ def audit(docs, truth):
             if got != int(m.group(1)):
                 bad.append("%s:%d says %s files, lists %d" % (n, i + 1, m.group(1), got))
     add("R11 a largest-N-files list contains exactly N entries", not bad, "; ".join(bad[:4]))
+    # R12 (RF8b): a live document may not call an item UNDONE while its artifact exists. Each phrase carries
+    # a negative marker AND a distinctive noun, so the positive sentences that legitimately name the same
+    # artifact cannot trip it. Historical batch records are not in DOCS, so they are untouched: they are
+    # allowed to describe the state of their own round.
+    bad = []
+    for rel, phrases in STATUS_ARTIFACTS:
+        if not os.path.exists(os.path.join(HERE, rel)):
+            continue
+        for n, text in docs.items():
+            flat = re.sub(r"\s+", "", text)
+            for ph in phrases:
+                if ph in flat:
+                    bad.append("%s: %s says %s" % (rel, n, ph))
+    add("R12 no live document calls a finished item undone", not bad, "; ".join(bad[:4]))
     return out
 
 
@@ -372,6 +396,9 @@ def selftest(app_path=None, exports_dir=None):
          lambda d: d.__setitem__("status", d["status"] + "\n\u9a8c\u6536 99 \u6761\u547d\u4ee4 / 999 \u68c0\u67e5\u3002\n")),
         ("M10 a version that has a section is called section-less", "R10",
          lambda d: d.__setitem__("status", d["status"] + "\n\u65e0\u6bb5 13 \u4efd = 1.5.3\u20131.5.5 / 1.6.0\u3002\n")),
+        # RF8b: the rule that keeps "current status" sentences honest needs its own falsifier.
+        ("M12 a live document calls a finished item undone", "R12",
+         lambda d: d.__setitem__("status", d["status"] + "\nRowViewModel \u672a\u505a\u3002\n")),
         ("M11 a largest-N list lists a different number", "R11",
          lambda d: d.__setitem__("status", d["status"] + "\n\u6700\u5927\u7684 3 \u4e2a\u6587\u4ef6: a **111**\u3001b **222**\u3002\n")),
     ]

@@ -1,0 +1,39 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\repo_manifest.py --verify --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+verify: tracked=1335 hashed_excluded=342 corpus=35
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/CACHE-SEMANTICS-ADR.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF0-RF2.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF3.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF3C.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4B.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4C.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4D.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4E.md
+GREW (new since the baseline; not drift): tracked_sources/_dpsm_work/REFACTOR-BATCH-RF4F.md
+NOTE (game/vendor tree moved; its fingerprint is informational): excluded_aggregate/rlyehshoujotaix_cl_Data
+CHANGED (source file this batch works on; review, not drift): tracked_sources/.gitignore
+CHANGED (source file this batch works on; review, not drift): tracked_sources/REPO-BOUNDARY.md
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/CONTRIBUTION-TABLE-REPORT.md
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/HANDOFF.md
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/PROJECT-STATUS.md
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/budget_census.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/check_contribution_layout.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/check_doc_convergence.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/check_docs_123.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/check_live_log.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/contrib/tests/test_gate.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/n0_acceptance.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/refactor_final_check.py
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Aggregator.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Composition/CompositionProbe.Chain.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Composition/CompositionProbe.Crit.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Composition/CompositionProbe.GlobalRules.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/MasterData/MasterDataNames.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Output/CalcReconcile.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Output/ContributionSession.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Output/ExportService.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Ui/OverlayCore.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Ui/OverlayUGUI.Rows.cs
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/v150_validate.txt
+manifest verify: drift=0 changed=24 grew=955 notes=1

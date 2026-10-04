@@ -1,0 +1,118 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contribution_applicability.py --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0 --json D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_rf8b\applicability.json
+[scan] battle_411001_20261003_205449.json v=1.5.3 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_230040.json v=1.5.4 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_230311.json v=1.5.4 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_230615.json v=1.5.4 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_231044.json v=1.5.4 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_231340.json v=1.5.4 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261003_235204.json v=1.5.5 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261004_012328.json v=1.5.5 q=411001 sec=False cc=NOT_RUN app=partial leaks=0/0
+[scan] battle_411001_20261004_015919.json v=1.6.0 q=411001 sec=True cc=ERROR app=not_comparable leaks=0/0
+[scan] battle_411001_20261004_021914.json v=1.6.1 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_023627.json v=1.7.0 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_033231.json v=1.7.2 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_035437.json v=1.7.3 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_041309.json v=1.7.4 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_042637.json v=1.7.5 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_042844.json v=1.7.5 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_113553.json v=1.7.5 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_115024.json v=1.7.6 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_115417.json v=1.7.6 q=411001 sec=True cc=WARNING app=full leaks=0/0
+[scan] battle_411001_20261004_134524.json v=1.7.8 q=411001 sec=True cc=WARNING app=full leaks=0/0
+[scan] battle_411001_20261004_134853.json v=1.7.8 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_144548.json v=1.7.10 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_170157.json v=1.7.11 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_180353.json v=1.7.11 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_411001_20261004_180834.json v=1.7.11 q=411001 sec=True cc=PASS app=full leaks=0/0
+[scan] battle_700817_20261004_114821.json v=1.7.6 q=700817 sec=True cc=WARNING app=partial leaks=0/59
+[scan] battle_9999_20261003_205129.json v=1.5.3 q=9999 sec=False cc=NOT_RUN app=not_comparable leaks=0/2
+[scan] battle_9999_20261003_225530.json v=1.5.4 q=9999 sec=False cc=NOT_RUN app=not_comparable leaks=0/5
+[scan] battle_9999_20261003_225647.json v=1.5.4 q=9999 sec=False cc=NOT_RUN app=not_comparable leaks=0/7
+[scan] battle_9999_20261003_225905.json v=1.5.4 q=9999 sec=False cc=NOT_RUN app=not_comparable leaks=0/12
+[scan] battle_9999_20261004_012138.json v=1.5.5 q=9999 sec=False cc=NOT_RUN app=not_comparable leaks=0/2
+[scan] battle_9999_20261004_042458.json v=1.7.5 q=9999 sec=True cc=LEGACY_NOT_APPLICABLE app=not_comparable leaks=0/8
+[scan] battle_9999_20261004_135214.json v=1.7.8 q=9999 sec=True cc=LEGACY_NOT_APPLICABLE app=not_comparable leaks=0/1
+[scan] battle_9999_20261004_165952.json v=1.7.11 q=9999 sec=True cc=LEGACY_NOT_APPLICABLE app=not_comparable leaks=0/0
+[scan] battle_9999_20261004_175957.json v=1.7.11 q=9999 sec=True cc=LEGACY_NOT_APPLICABLE app=not_comparable leaks=0/8
+
+file                               version quest   sec  crosscheck            mm  applicability   strictV  unexpV  
+411001_20261003_205449.json        1.5.3   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_230040.json        1.5.4   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_230311.json        1.5.4   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_230615.json        1.5.4   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_231044.json        1.5.4   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_231340.json        1.5.4   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261003_235204.json        1.5.5   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261004_012328.json        1.5.5   411001  -    NOT_RUN               0   partial         0        0       
+411001_20261004_015919.json        1.6.0   411001  Y    ERROR                 58  not_comparable  0        0       
+411001_20261004_021914.json        1.6.1   411001  Y    PASS                  0   full            0        0       
+411001_20261004_023627.json        1.7.0   411001  Y    PASS                  0   full            0        0       
+411001_20261004_033231.json        1.7.2   411001  Y    PASS                  0   full            0        0       
+411001_20261004_035437.json        1.7.3   411001  Y    PASS                  0   full            0        0       
+411001_20261004_041309.json        1.7.4   411001  Y    PASS                  0   full            0        0       
+411001_20261004_042637.json        1.7.5   411001  Y    PASS                  0   full            0        0       
+411001_20261004_042844.json        1.7.5   411001  Y    PASS                  0   full            0        0       
+411001_20261004_113553.json        1.7.5   411001  Y    PASS                  0   full            0        0       
+411001_20261004_115024.json        1.7.6   411001  Y    PASS                  0   full            0        0       
+411001_20261004_115417.json        1.7.6   411001  Y    WARNING               0   full            0        0       
+411001_20261004_134524.json        1.7.8   411001  Y    WARNING               0   full            0        0       
+411001_20261004_134853.json        1.7.8   411001  Y    PASS                  0   full            0        0       
+411001_20261004_144548.json        1.7.10  411001  Y    PASS                  0   full            0        0       
+411001_20261004_170157.json        1.7.11  411001  Y    PASS                  0   full            0        0       
+411001_20261004_180353.json        1.7.11  411001  Y    PASS                  0   full            0        0       
+411001_20261004_180834.json        1.7.11  411001  Y    PASS                  0   full            0        0       
+700817_20261004_114821.json        1.7.6   700817  Y    WARNING               0   partial         0        0       
+9999_20261003_205129.json          1.5.3   9999    -    NOT_RUN               0   not_comparable  15       0       
+9999_20261003_225530.json          1.5.4   9999    -    NOT_RUN               0   not_comparable  0        0       
+9999_20261003_225647.json          1.5.4   9999    -    NOT_RUN               0   not_comparable  0        0       
+9999_20261003_225905.json          1.5.4   9999    -    NOT_RUN               0   not_comparable  2        0       
+9999_20261004_012138.json          1.5.5   9999    -    NOT_RUN               0   not_comparable  0        0       
+9999_20261004_042458.json          1.7.5   9999    Y    LEGACY_NOT_APPLICABLE 0   not_comparable  16       0       
+9999_20261004_135214.json          1.7.8   9999    Y    LEGACY_NOT_APPLICABLE 0   not_comparable  13       0       
+9999_20261004_165952.json          1.7.11  9999    Y    LEGACY_NOT_APPLICABLE 0   not_comparable  0        0       
+9999_20261004_175957.json          1.7.11  9999    Y    LEGACY_NOT_APPLICABLE 0   not_comparable  0        0       
+
+file                               knfHits  knfAttr   knfUnexp  attrHits    subUnityFold 
+411001_20261003_205449.json        0        0         0         0           0            
+411001_20261003_230040.json        0        0         0         0           0            
+411001_20261003_230311.json        0        0         0         0           10           
+411001_20261003_230615.json        0        0         0         0           9            
+411001_20261003_231044.json        0        0         0         0           7            
+411001_20261003_231340.json        0        0         0         0           9            
+411001_20261003_235204.json        0        0         0         0           0            
+411001_20261004_012328.json        0        0         0         0           0            
+411001_20261004_015919.json        0        0         0         0           0            
+411001_20261004_021914.json        0        0         0         0           0            
+411001_20261004_023627.json        0        0         0         0           0            
+411001_20261004_033231.json        0        0         0         0           0            
+411001_20261004_035437.json        0        0         0         0           0            
+411001_20261004_041309.json        0        0         0         0           0            
+411001_20261004_042637.json        0        0         0         0           0            
+411001_20261004_042844.json        0        0         0         0           0            
+411001_20261004_113553.json        0        0         0         0           0            
+411001_20261004_115024.json        0        0         0         0           0            
+411001_20261004_115417.json        0        0         0         0           0            
+411001_20261004_134524.json        0        0         0         0           0            
+411001_20261004_134853.json        0        0         0         0           0            
+411001_20261004_144548.json        0        0         0         0           0            
+411001_20261004_170157.json        0        0         0         0           0            
+411001_20261004_180353.json        0        0         0         0           0            
+411001_20261004_180834.json        0        0         0         0           0            
+700817_20261004_114821.json        59       59        0         62          0            
+9999_20261003_205129.json          2        2         0         34          750          
+9999_20261003_225530.json          5        5         0         16          38           
+9999_20261003_225647.json          7        7         0         8           61           
+9999_20261003_225905.json          12       12        0         46          91           
+9999_20261004_012138.json          2        2         0         17          71           
+9999_20261004_042458.json          8        8         0         16          487          
+9999_20261004_135214.json          1        1         0         1           806          
+9999_20261004_165952.json          0        0         0         0           71           
+9999_20261004_175957.json          8        8         0         17          70           
+
+verdicts by quest:
+  quest 411001  exports=25 versions=1.5.3,1.5.4,1.5.5,1.6.0,1.6.1,1.7.0,1.7.10,1.7.11,1.7.2,1.7.3,1.7.4,1.7.5,1.7.6,1.7.8 app=full,not_comparable,partial scope=invalid-plugin-value-trust,normal-benchmark,offline-recompute-only knf=0/0 unexp=0
+  quest 700817  exports=1  versions=1.7.6 app=partial scope=caveat-attribute-affinity knf=59/59 unexp=0
+  quest 9999    exports=9  versions=1.5.3,1.5.4,1.5.5,1.7.11,1.7.5,1.7.8 app=not_comparable scope=training-ground-only knf=45/45 unexp=0
+
+wrote D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_rf8b\applicability.json (35 exports)

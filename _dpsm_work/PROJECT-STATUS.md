@@ -287,6 +287,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 19 轮 RF5g(两张表)** | 规则表(T2)与关系表(T3)的行值也进 `ContributionRowModel`(过滤/上限 12 具名/端点命名 + `#key` 兜底);渲染器两个循环改为遍历模型行;664 用例 / 93 例负控 | [REFACTOR-BATCH-RF5G.md](<REFACTOR-BATCH-RF5G.md>) |
 | **第 20 轮 RF4g(攻击快照)** | 第三族最后一块:`_activeCalc`/`_activeCalcT` 迁到 `src/Runtime/AttackSnapshot.cs`,`Valid = calc 非空 且 戳 ≥ 0`(直接指向 1.5.0"上一场 calc 标注本场命中"的缺陷);接线 8 处;679 用例 / 96 例负控。第三族仅剩 `_lastCalcSrc`(单条草稿,已写明理由) | [REFACTOR-BATCH-RF4G.md](<REFACTOR-BATCH-RF4G.md>) |
 | **第 21 轮 RF8a(状态收敛)** | 把 R0–R5 表里"仍未做"的陈述逐条与代码核对并收敛(R2 的链窗口/`IdleSeconds`、R3 的 RowViewModel、R4 的 MasterDataAccess 进度、R5 的第 3 族、R0 的索引 vs 归档);**写明状态句仍只能靠人核对**这一缺口与补法(R12 需要自测才能加);插件源码零变化 | [REFACTOR-BATCH-RF8A.md](<REFACTOR-BATCH-RF8A.md>) |
+| **第 22 轮 RF8b(状态可验证)** | 文档收敛守卫新增 **R12**:产物存在时,当前文档集**不得**再说该事项"未做";短语须同时含否定词与特征名词,历史批次记录被豁免;配套对照 **M12** 证明它可红(12 条规则 0 失败);插件源码零变化 | [REFACTOR-BATCH-RF8B.md](<REFACTOR-BATCH-RF8B.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

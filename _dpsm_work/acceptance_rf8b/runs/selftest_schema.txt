@@ -1,0 +1,57 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_export_schema.py --selftest
+selftest cases=54 failed=0
+PASS accepts a well-formed 1.5.2 export                   caught=0
+PASS accepts a 1.5.1 export without the 1.5.2 keys        caught=0
+PASS accepts a 1.4.0 export without the 1.5.0 keys        caught=0
+PASS REJECTS a 1.5.0 export missing a root key            caught=1  [root.facts (since 1.5.0)]
+PASS REJECTS a wrong event field type                     caught=1  [event.factId type=str want=int]
+PASS REJECTS a fold entry missing its factor              caught=3  [calc.fold[] entry missing kind; calc.fold[] entry missing factor; calc.fold[] entry missing label]
+PASS REJECTS a wrong reconcile field type                 caught=1  [reconcile.critInferredTolerance type=str want=int|float]
+PASS REJECTS a fact item without its 1.5.2 identity       caught=1  [facts.items[0] missing atkName]
+PASS REJECTS a non-integer hitValue                       caught=1  [event.hitValue type=str want=int]
+PASS accepts a well-formed contribution section           caught=0
+PASS REJECTS a contribution section missing method        caught=1  [contribution.method missing]
+PASS REJECTS a non-numeric actor credit                   caught=1  [contribution.actors[].totalCredit type=str]
+PASS REJECTS a broken attributed+unattributed=total identity caught=1  [contribution identity broken: attributed(2900)+unattributed(0) != total(3000)]
+PASS accepts a 1-unit rounding gap in the totals identity caught=0
+PASS REJECTS a broken per-actor base+self+assist=total identity caught=1  [contribution.actors[key=2] identity broken: base+self+assist(1) != total(1000)]
+PASS REJECTS a broken per-actor base+self+received=direct identity caught=1  [contribution.actors[key=1] identity broken: base+self+received(3500) != direct(3000)]
+PASS REJECTS an actor without receivedAssist              caught=1  [contribution.actors[] entry missing receivedAssist]
+PASS REJECTS a broken credited+unattributed share identity caught=1  [contribution share identity broken: credited+unattributed = 1.200000000]
+PASS REJECTS a degraded contribution error stub           caught=8  [contribution reported an internal error (the export itself is intact): NullReferenceException: boom; contribution.totalDamage missing; contribution.attributedDamage missing]
+PASS REJECTS a ledger that disagrees with the game's totals.taken caught=1  [contribution ledger: eventSumAll(9999) != totals.taken(1400): the ledger must account for exactly the damage the game itself reports as taken]
+PASS REJECTS totals.taken != dealt+unattributedDamage     caught=2  [totals identity broken: taken(12345) != dealt(1000)+unattributedDamage(400); contribution ledger: eventSumAll(1400) != totals.taken(12345): the ledger must account for exactly the damage the game itself reports as taken]
+PASS accepts a per-hit givenFoldOn                        caught=0
+PASS REJECTS a non-boolean per-hit givenFoldOn            caught=1  [calc.givenFoldOn type=str want=bool (first hit t=1.0)]
+PASS accepts a 1.5.1 export with no contribution section  caught=0
+PASS accepts a well-formed 1.7.2 paramOwners section      caught=0
+PASS REJECTS a 1.7.2 export without paramOwners           caught=1  [root.paramOwners (since 1.7.2)]
+PASS accepts a 1.7.1 export carrying paramOwners          caught=0
+PASS REJECTS a wrong paramOwners counter type             caught=1  [paramOwners.entryReads type=str want=int]
+PASS REJECTS a paramOwners row without its value          caught=1  [paramOwners.rows[0].val]
+PASS REJECTS a paramOwners row without an owner field     caught=1  [paramOwners.rows[0].owner]
+PASS accepts a rev2 paramOwners section with the scan counters caught=0
+PASS REJECTS a wrong optional paramOwners counter type    caught=1  [paramOwners.entriesTotal type=str want=int]
+PASS accepts a well-formed 1.7.4 atkAdd counter block     caught=0
+PASS REJECTS a 1.7.4 export without the atkAdd counters   caught=1  [root.atkAdd (since 1.7.4)]
+PASS REJECTS a wrong atkAdd counter type                  caught=1  [atkAdd.emitted type=str want=int]
+PASS REJECTS an atkAdd fold without a giver               caught=1  [calc.atkAdd[] entry missing byUnit (no giver)]
+PASS accepts the 1.7.8 self-attribution counters          caught=0
+PASS REJECTS a 1.7.8 export without selfByKey             caught=1  [atkAdd.selfByKey (since 1.7.8)]
+PASS REJECTS a broken selfValues == selfByKey + selfByNameFallback caught=1  [atkAdd self identity broken: selfValues(9) != selfByKey(5) + selfByNameFallback(2)]
+PASS accepts a well-formed atkAdd fold                    caught=0
+PASS accepts a row whose owner is unreadable (a reportable result) caught=0
+PASS accepts the 1.7.8 schema 1.1 acceptance sample (P0-B) caught=0
+PASS REJECTS the pre-1.7.8 totalDamage convention (analyzable+unattributed) caught=1  [contribution.totalDamage(700) != analyzableDealt(600) [schema 1.1]]
+PASS REJECTS a 1.1 file where attributed+unattributed != analyzableDealt caught=1  [contribution identity broken [schema 1.1]: attributed(500)+unattributed(200) != analyzableDealt(600)]
+PASS REJECTS a 1.1 file with no damageLedger              caught=1  [contribution.damageLedger missing [schema 1.1]]
+PASS REJECTS excludedDamage that was merged with out-of-scope damage caught=1  [contribution.coverage.excludedDamage(800) != damageLedger.unknownAttackerDealt(400): excludedDamage must not be merged with out-of-scope damage]
+PASS REJECTS a wrong analysisDamageCoverage               caught=1  [contribution.coverage.analysisDamageCoverage = 0.500000 but analyzableDealt/totalsDealt = 0.600000]
+PASS REJECTS a broken ledger identity (analyzable+outsideTeam != totalsDealt) caught=1  [contribution ledger identity broken: analyzable(600)+outsideTeam(100) != totalsDealt(1000)]
+PASS REJECTS unknownAttackerDealt that disagrees with totals.unattributedDamage caught=2  [contribution ledger: unknownAttackerDealt(400) != totals.unattributedDamage(999); totals identity broken: taken(1400) != dealt(1000)+unattributedDamage(999)]
+PASS REJECTS a broken ledger hit identity                 caught=1  [contribution ledger hit identity broken: events(11) != analyzable(5)+outsideTeam(3)+unknown(2)]
+PASS REJECTS a null ratio whose denominator is known      caught=1  [contribution.coverage.analysisDamageCoverage is null but its denominator is known]
+PASS accepts an empty battle (ratios null, zero denominators) caught=0
+PASS accepts a 1-unit ledger drift on a 500M battle       caught=0
+PASS REJECTS a dropped outside-team bucket on a 1e4 battle caught=1  [contribution ledger identity broken: analyzable(600)+outsideTeam(0) != totalsDealt(1000)]
