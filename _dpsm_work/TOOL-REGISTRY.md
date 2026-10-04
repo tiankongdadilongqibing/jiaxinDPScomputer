@@ -9,13 +9,13 @@
 | 已注册脚本 | 96 |
 | 其中活跃(有 CLI、有预期退出码与输出声明) | 22 |
 | 尚未判定(只登记,计数只能下降) | 31 / 上限 31 |
-| 验收流水线实际运行的脚本 | 20 |
+| 验收流水线实际运行的脚本 | 21 |
 
 ## 活跃工具
 
 | 脚本 | 类别 | 用途 | 预期退出码 | 输出 | 自测 | 在流水线 |
 |---|---|---|---|---|---|---|
-| `_dpsm_work/archive_index.py` | cli | RF7c: record every historical evidence file (evidence_*/probe_*/review_contrib_core) with size and sha256, and fail when one changes, vanishes or appears unrecorded. | 0 clean / 1 findings | archive-index.json; ARCHIVE-INDEX.md | no | no |
+| `_dpsm_work/archive_index.py` | cli | RF7c: record every historical evidence file (evidence_*/probe_*/review_contrib_core) with size and sha256, and fail when one changes, vanishes or appears unrecorded. | 0 clean / 1 findings | archive-index.json; ARCHIVE-INDEX.md | no | yes |
 | `_dpsm_work/budget_census.py` | census | N6 budget & residual census (read-only over the export corpus). | 0 = 普查/自测通过;1 = 自测红或有预算异常 | BUDGET-CENSUS.md/.json 或 --out | yes | yes |
 | `_dpsm_work/check_contribution_layout.py` | guard | Contribution table LAYOUT guard (added with 1.7.7). | 0 = 布局合规;1 = 有布局回归 | none (read-only over exports) | yes | yes |
 | `_dpsm_work/check_doc_convergence.py` | guard | P1-B acceptance guard: the five main documents must not contradict the repository. | 0 = 无矛盾(0/11);1 = 有 R1–R11 违规 | none (read-only) | yes | yes |

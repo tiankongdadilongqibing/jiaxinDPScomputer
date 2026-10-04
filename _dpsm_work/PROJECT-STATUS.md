@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**691 个命名用例 / 26 组**,**99 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**95 条登记 / 21 条活跃 / 43 条已索引 / 31 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**95 条登记 / 21 条活跃 / 43 条已索引 / 31 条未判定**(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -63,7 +63,7 @@
 ```
 PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
 
-验收(最全,35 条命令 / 67 条检查)   python n0_acceptance.py
+验收(最全,37 条命令 / 69 条检查)   python n0_acceptance.py
 冻结批次输入                      python batch_snapshot.py --name rf0 --verify
 基线清单核对                      python repo_manifest.py --verify --exports batch_inputs\rf0
 C# 行为测试                       dotnet run --project tests\BehaviorTests\BehaviorTests.csproj -c Release -- --quiet
@@ -262,7 +262,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 - 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
 - 每次改动后跑:`python n0_acceptance.py`(33 命令 / 65 检查,全绿);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
 - **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
-- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"35 条命令 / 67 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
+- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"37 条命令 / 69 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
 
 ## 12. 重构批次记录(按 REFACTOR-PLAN-POST-1.7.11.md)
 
@@ -290,6 +290,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 22 轮 RF8b(状态可验证)** | 文档收敛守卫新增 **R12**:产物存在时,当前文档集**不得**再说该事项"未做";短语须同时含否定词与特征名词,历史批次记录被豁免;配套对照 **M12** 证明它可红(12 条规则 0 失败);插件源码零变化 | [REFACTOR-BATCH-RF8B.md](<REFACTOR-BATCH-RF8B.md>) |
 | **第 23 轮 RF4h(历史环)** | 第四族(进程级)里唯一有真实规则的部分:`History` 的上限/新→旧/淘汰进 `src/Runtime/BattleHistoryRing.cs`;顺带修掉"结算里是字面量 20、`MaxHistory` 也是 20"的双份上限(现在 `MaxHistory = BattleHistoryRing.Max`);691 用例 / 99 例负控 | [REFACTOR-BATCH-RF4H.md](<REFACTOR-BATCH-RF4H.md>) |
 | **第 24 轮 RF7c(证据哈希索引)** | 归档的第二前置:新增 `archive_index.py`,把 `evidence_*`/`probe_*`/`review_contrib_core` 的 **56 份 / 212,552 字节**连同 SHA256 记入 `archive-index.json` 与 [ARCHIVE-INDEX.md](<ARCHIVE-INDEX.md>);`--verify` 对改动/丢失/未记录新增报红(4 个自测对照);**不移动不删除任何证据**,也未接进验收(留给单独一轮);新脚本一落地即被注册表守卫 B 检查点名并登记为 active | [REFACTOR-BATCH-RF7C.md](<REFACTOR-BATCH-RF7C.md>) |
+| **第 25 轮 RF7d(索引接入)** | 把第 24 轮刻意留在流水线外的 `archive_index.py` 接进来(2 条 run:校验 + 自测),命令/检查数 **35/67 → 37/69** 并同步四处文档说法;自测只改临时副本,故可安全入线;插件源码零变化 | [REFACTOR-BATCH-RF7D.md](<REFACTOR-BATCH-RF7D.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

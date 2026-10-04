@@ -83,6 +83,7 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF4H.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF7C.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\ARCHIVE-INDEX.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-RF7D.md',
 ]
 
 

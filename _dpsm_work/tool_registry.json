@@ -2,10 +2,10 @@
  "_comment": "RF7 tool registry. Mechanical keys are refreshed by tool_census.py --seed; the judgement keys are hand-owned.",
  "entries": {
   "_dpsm_work/archive_index.py": {
-   "evidence": "RF7c batch record; --selftest tampers temp copies (4 falsifiers)",
+   "evidence": "RF7d: wired into n0_acceptance (run + selftest); selftest tampers TEMP copies only",
    "expected_exit": "0 clean / 1 findings",
    "imports_local": [],
-   "in_pipeline": false,
+   "in_pipeline": true,
    "input_versions": "none (reads the evidence trees)",
    "kind": "cli",
    "outputs": [
