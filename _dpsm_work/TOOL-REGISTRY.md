@@ -7,8 +7,8 @@
 | 项 | 值 |
 |---|---|
 | 已注册脚本 | 96 |
-| 其中活跃(有 CLI、有预期退出码与输出声明) | 23 |
-| 尚未判定(只登记,计数只能下降) | 14 / 上限 14 |
+| 其中活跃(有 CLI、有预期退出码与输出声明) | 25 |
+| 尚未判定(只登记,计数只能下降) | 12 / 上限 12 |
 | 验收流水线实际运行的脚本 | 21 |
 
 ## 活跃工具
@@ -32,7 +32,9 @@
 | `_dpsm_work/contrib/crosscheck.py` | gate | Phase E acceptance: cross-implementation check (plugin contribution vs offline core). | 0 = 通过;1 = 有断言失败 | none (read-only) | yes | yes |
 | `_dpsm_work/contrib/tests/test_gate.py` | gate | P0-A gate regression: prove the fixed gates now cave in where they used to exit 0. | 0 = 通过;1 = 有断言失败 | none (read-only) | yes | yes |
 | `_dpsm_work/contribution_applicability.py` | census | P0-D: task applicability scanner for DpsMeter battle exports. | 0 = 生成;1 = 语料不足 | applicability.json(--out) | yes | yes |
+| `_dpsm_work/contribution_gate.py` | cli | Contribution validation GATE: one status vocabulary and one exit-code contract. | 0 ok / 1 findings | none (read-only) | no | no |
 | `_dpsm_work/decision_report.py` | report | N5 decision report: from the audited comparison layer to a decision (roadmap N5). | 0 = 生成;1 = 数据不足 | --out 报告(MD/JSON) | yes | yes |
+| `_dpsm_work/identity_map.py` | cli | N3 / P1 stage-1 offline cross-battle identity mapping (read-only). | 0 ok / 1 findings | none (read-only) | yes | no |
 | `_dpsm_work/pairtrusted_impact.py` | report | P0-C: offline quantification of the PairTrusted / PairCorroborated effect on contribution. | 0 = 生成;1 = 数据不足 | pairtrusted_impact_report.json/.txt(已在 .gitignore 声明为派生) | yes | yes |
 | `_dpsm_work/refactor_final_check.py` | guard | Integrity + consistency check of the refactored source tree -- with REAL blocking (N1). | 0 = 无孤儿/无违规;1 = 有 blocks | none (read-only) | yes | yes |
 | `_dpsm_work/repo_manifest.py` | guard | RF0: the machine-readable half of the local Git baseline. | 0 = 无漂移(drift=0);1 = 有漂移 | baseline-manifest.json(--write) | no | yes |
@@ -65,7 +67,6 @@
 | `_dpsm_work/contrib_recon_155b.py` | 76 | Second recon: rule identity (kind/side/origin/label -> owner) + cancel shape. |  |
 | `_dpsm_work/contrib_recon_155c.py` | 93 | Third recon: attribution correctness checks. ASCII stdout; CJK -> contrib_recon_155c.txt |  |
 | `_dpsm_work/contrib_recon_155d.py` | 77 | Fourth recon: do holder-owned 'text' folds duplicate the global folds on the same hit? |  |
-| `_dpsm_work/contribution_gate.py` | 505 | Contribution validation GATE: one status vocabulary and one exit-code contract. |  |
 | `_dpsm_work/evidence_1152_probe_151.py` | 138 | Ad-hoc 1.5.1 first-run diagnosis. ASCII stdout, UTF-8 report. |  |
 | `_dpsm_work/evidence_1152_residuals_150_vs_151.py` | 99 | Compare residual structure between the 1.5.0 battle and the 1.5.1 battle, and dump |  |
 | `_dpsm_work/evidence_152live_compare.py` | 75 | 1.5.2 vs 1.5.1 export comparison: counting, hitValue, residual structure. |  |
@@ -99,7 +100,6 @@
 | `_dpsm_work/evidence_why_lower7.py` | 34 | how often the two key statuses co-occur |  |
 | `_dpsm_work/evidence_why_lower8.py` | 23 |  |  |
 | `_dpsm_work/evidence_why_lower9.py` | 42 | madnessRatio field |  |
-| `_dpsm_work/identity_map.py` | 1314 | N3 / P1 stage-1 offline cross-battle identity mapping (read-only). |  |
 | `_dpsm_work/madness_owner_check.py` | 32 | Who is mad on OUR side, and are the guest-unreadable hook rows that same unit (self-application)? |  |
 | `_dpsm_work/n0_acceptance.py` | 715 | N0 acceptance closure for the CONTRIBUTION-NEXT-PHASE-ROADMAP.md (section N0). |  |
 | `_dpsm_work/probe_contrib_struct.py` | 55 | Structural probe for the contribution-attribution question: what identity/source info does a |  |

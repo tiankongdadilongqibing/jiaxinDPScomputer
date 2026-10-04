@@ -561,17 +561,19 @@
    "status": "active"
   },
   "_dpsm_work/contribution_gate.py": {
-   "evidence": "",
-   "expected_exit": "",
+   "evidence": "RF7i: imported by the active _dpsm_work/check_live_log.py, so it is inside the liveness closure; purpose from its own docstring",
+   "expected_exit": "0 ok / 1 findings",
    "has_selftest": false,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "cli",
    "lines": 505,
-   "outputs": [],
+   "outputs": [
+    "none (read-only)"
+   ],
    "purpose": "Contribution validation GATE: one status vocabulary and one exit-code contract.",
-   "status": "unclassified"
+   "status": "active"
   },
   "_dpsm_work/decision_report.py": {
    "evidence": "PROJECT-STATUS §5",
@@ -1020,17 +1022,19 @@
    "status": "indexed"
   },
   "_dpsm_work/identity_map.py": {
-   "evidence": "",
-   "expected_exit": "",
+   "evidence": "RF7i: imported by the active _dpsm_work/contrib/compare.py, so it is inside the liveness closure; purpose from its own docstring",
+   "expected_exit": "0 ok / 1 findings",
    "has_selftest": true,
    "imports_local": [],
    "in_pipeline": false,
    "input_versions": "",
-   "kind": "unclassified",
+   "kind": "cli",
    "lines": 1314,
-   "outputs": [],
+   "outputs": [
+    "none (read-only)"
+   ],
    "purpose": "N3 / P1 stage-1 offline cross-battle identity mapping (read-only).",
-   "status": "unclassified"
+   "status": "active"
   },
   "_dpsm_work/madness_owner_check.py": {
    "evidence": "RF7h: nobody imports it, nobody names it in source text, and it is not in the pipeline",
@@ -1317,6 +1321,6 @@
   }
  },
  "pins": {
-  "unclassified_max": 14
+  "unclassified_max": 12
  }
 }
