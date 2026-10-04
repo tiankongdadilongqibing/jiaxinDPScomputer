@@ -441,20 +441,11 @@ public static partial class OverlayUGUI
 			if (a.Total <= 0.0 && a.Direct <= 0.0) continue;
 			double share = total > 0.0 ? 100.0 * a.Total / total : 0.0;
 			double dshare = total > 0.0 ? 100.0 * a.Direct / total : 0.0;
-			// 1.7.7: the summon marker goes INSIDE Fit, and Fit is given the column width (16 columns).
-			// Before, DisplayFormat.Fit(name,11) counted characters and the '*' was appended afterwards, so a name of
-			// 8 full-width characters + '*' was 17 columns wide and pushed the whole row right.
-			string label = DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(a.Name) + (a.Summon ? "*" : ""), 16), 16);
 			rows.Add(new RowDef
 			{
-				Text = "  " + label
-					 + DisplayFormat.Amt(a.Total, 11)
-					 + DisplayFormat.PadL(DisplayFormat.Pct(share), 8)
-					 + DisplayFormat.Amt(a.Base + a.Self, 11)
-					 + DisplayFormat.Amt(a.Assist, 11)
-					 + DisplayFormat.Amt(a.Received, 11)
-					 + DisplayFormat.PadL(DisplayFormat.Pct(dshare), 9)
-					 + DisplayFormat.Amt(a.Hits, 6),
+				// RF5d: the row is BUILT from the column definition (the widths live there, not here).
+				Text = ContributionColumns.T1Row(a.Name, a.Summon, a.Total, share, a.Base + a.Self, a.Assist,
+				                                 a.Received, dshare, a.Hits),
 				Color = AllyColor, Height = 16f,
 			});
 		}
@@ -507,10 +498,7 @@ public static partial class OverlayUGUI
 			{
 				// 1.7.7 rev2: kind/side were the last padded cells with no width guard -- a future kind
 				// string longer than 8 columns would have shifted the row exactly like the names did.
-				Text = "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Name), 22), 22) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Kind), 8), 8) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.Side), 5), 5)
-					 + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rr.OwnerName), 14), 14)
-					 + DisplayFormat.Amt(rr.Hits, 7) + DisplayFormat.Amt(rr.Folds, 7)
-					 + DisplayFormat.Amt(rr.Damage, 12),
+				Text = ContributionColumns.T2Row(rr.Name, rr.Kind, rr.Side, rr.OwnerName, rr.Hits, rr.Folds, rr.Damage),
 				Color = NeutralColor, Height = 15f,
 			});
 			shown++;
@@ -538,8 +526,7 @@ public static partial class OverlayUGUI
 				string to = LinkName(res, l.To);
 				rows.Add(new RowDef
 				{
-					Text = "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(from), 14), 14) + DisplayFormat.PadR("→", 4) + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(to), 14), 14)
-						 + DisplayFormat.Amt(l.Hits, 7) + DisplayFormat.Amt(l.Amount, 12),
+					Text = ContributionColumns.T3Row(from, to, l.Hits, l.Amount),
 					Color = AllyColor, Height = 15f,
 				});
 				ln++;

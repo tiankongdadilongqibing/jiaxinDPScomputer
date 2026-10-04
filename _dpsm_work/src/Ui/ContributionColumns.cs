@@ -123,4 +123,46 @@ internal static class ContributionColumns
 		     + DisplayFormat.PadL("", T1Direct)
 		     + DisplayFormat.PadL("", T1Hits);
 	}
+
+	/// <summary>
+	/// A T1 data row. The summon marker goes INSIDE the fit (1.7.7): appending it afterwards made an
+	/// 8-column name + "*" 17 columns wide and pushed the whole row right.
+	/// </summary>
+	public static string T1Row(string name, bool summon, double total, double sharePct, double baseAndSelf,
+	                           double assist, double received, double directPct, double hits)
+	{
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(name) + (summon ? "*" : ""), T1Name), T1Name)
+		     + DisplayFormat.Amt(total, T1Total)
+		     + DisplayFormat.PadL(DisplayFormat.Pct(sharePct), T1Share)
+		     + DisplayFormat.Amt(baseAndSelf, T1Self)
+		     + DisplayFormat.Amt(assist, T1Other)
+		     + DisplayFormat.Amt(received, T1Stolen)
+		     + DisplayFormat.PadL(DisplayFormat.Pct(directPct), T1Direct)
+		     + DisplayFormat.Amt(hits, T1Hits);
+	}
+
+	/// <summary>A T2 data row: four fitted/padded text cells, then three amounts.</summary>
+	public static string T2Row(string rule, string kind, string side, string owner, double hits, double folds,
+	                           double amount)
+	{
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(rule), T2Rule), T2Rule)
+		     + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(kind), T2Kind), T2Kind)
+		     + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(side), T2Side), T2Side)
+		     + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(owner), T2Owner), T2Owner)
+		     + DisplayFormat.Amt(hits, T2Hits)
+		     + DisplayFormat.Amt(folds, T2Folds)
+		     + DisplayFormat.Amt(amount, T2Amount);
+	}
+
+	/// <summary>A T3 data row. The arrow is a plain padded cell: it appears in the header AND in every row,
+	/// so a mis-measured arrow moves both by the same amount and the columns stay aligned with each other.
+	/// </summary>
+	public static string T3Row(string from, string to, double hits, double amount)
+	{
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(from), T3From), T3From)
+		     + DisplayFormat.PadR("→", T3Arrow)
+		     + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(to), T3To), T3To)
+		     + DisplayFormat.Amt(hits, T3Hits)
+		     + DisplayFormat.Amt(amount, T3Amount);
+	}
 }

@@ -231,6 +231,11 @@ RE_SPEC_CONST = re.compile(r'public const int (\w+) = (\d+);')
 RE_SPEC_ENTRY = re.compile(r'C\("([^"]*)",\s*(\w+),\s*(?:true|false)\)')
 # Only the OUTER cell call carries a column width: matching Amt/PadL/PadR keeps Fit's inner width out.
 RE_WIDTH_LITERAL = re.compile(r'(?:Amt|PadL|PadR)\([^,]+,\s*(\d+)\)')
+# Every T1/T2/T3 identifier; the builders' own names are filtered out below, so the column constants
+# never have to be listed here (a list would be one more thing to keep in sync).
+RE_BUILDER_CONST = re.compile(r'\b(T[123][A-Z][A-Za-z]*)\b')
+BUILDER_NAMES = ('T1Row', 'T2Row', 'T3Row')
+RE_BARE_WIDTH = re.compile(r',\s*\d+\)')
 T1_CELLS = [
     ('\u89d2\u8272', 16), ('\u603b\u8d21\u732e', 11), ('\u5360\u6bd4', 8),
     ('\u81ea\u8eab', 11), ('\u4ed6\u4eba\u56e0\u4f60', 11),
@@ -296,6 +301,22 @@ def _widths_in_order(text, start, end):
     return [int(w) for w in RE_WIDTH_LITERAL.findall(blk)]
 
 
+def spec_names(path=None):
+    """The definition's constant NAMES per table, in column order."""
+    p = path or SRC_SPEC
+    if not os.path.isfile(p):
+        return None
+    with io.open(p, 'r', encoding='utf-8') as fh:
+        text = fh.read()
+    out = []
+    for arr in ('T1', 'T2', 'T3'):
+        blk = _csharp_block(text, arr + ' =', '};')
+        if blk is None:
+            return None
+        out.append([name for _lbl, name in RE_SPEC_ENTRY.findall(blk)])
+    return out
+
+
 def check_source_replica():
     """Return a list of drift problems between the C# definition/renderer and this file's replica."""
     if not os.path.isfile(SRC_SPEC):
@@ -308,9 +329,33 @@ def check_source_replica():
     for i, name in enumerate(('T1', 'T2', 'T3')):
         if spec[i] != want_tables[i]:
             problems.append('%s drifted: definition=%s replica=%s' % (name, spec[i], want_tables[i]))
-    if not os.path.isfile(SRC_ROWS):
-        problems.append('renderer source not found at %s' % SRC_ROWS)
+    # RF5d: the data rows are built by T1Row/T2Row/T3Row in the SAME definition file, so there is nothing
+    # left to cross-check in the renderer. What IS checked: each builder references the definition's
+    # constants in column order, and carries no bare width literal (a copy that could drift).
+    names = spec_names()
+    if names is None:
+        problems.append('the column definition could not be parsed for builder names')
         return problems
+    with io.open(SRC_SPEC, 'r', encoding='utf-8') as fh:
+        spec_text = fh.read()
+    for builder, want in (('T1Row', names[0]), ('T2Row', names[1]), ('T3Row', names[2])):
+        blk = _csharp_block(spec_text, 'public static string ' + builder + '(', '\n\t}')
+        if blk is None:
+            problems.append('%s not found in %s' % (builder, os.path.basename(SRC_SPEC)))
+            continue
+        used = []
+        for c in RE_BUILDER_CONST.findall(blk):
+            if c in BUILDER_NAMES:
+                continue
+            if c not in used:
+                used.append(c)
+        if used != want:
+            problems.append('%s uses %s, definition order is %s' % (builder, used, want))
+        bare = RE_BARE_WIDTH.findall(blk)
+        if bare:
+            problems.append('%s carries bare width literal(s) %s -- the width belongs to the definition'
+                            % (builder, bare))
+    return problems
     with io.open(SRC_ROWS, 'r', encoding='utf-8') as fh:
         rows = fh.read()
     # The block starts at the label line so the name column is included; each cell contributes exactly one
