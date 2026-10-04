@@ -1,6 +1,20 @@
 {
  "_comment": "RF7 tool registry. Mechanical keys are refreshed by tool_census.py --seed; the judgement keys are hand-owned.",
  "entries": {
+  "_dpsm_work/archive_index.py": {
+   "evidence": "RF7c batch record; --selftest tampers temp copies (4 falsifiers)",
+   "expected_exit": "0 clean / 1 findings",
+   "imports_local": [],
+   "in_pipeline": false,
+   "input_versions": "none (reads the evidence trees)",
+   "kind": "cli",
+   "outputs": [
+    "archive-index.json",
+    "ARCHIVE-INDEX.md"
+   ],
+   "purpose": "RF7c: record every historical evidence file (evidence_*/probe_*/review_contrib_core) with size and sha256, and fail when one changes, vanishes or appears unrecorded.",
+   "status": "active"
+  },
   "_dpsm_work/atkadd_sensitivity.py": {
    "evidence": "",
    "expected_exit": "",

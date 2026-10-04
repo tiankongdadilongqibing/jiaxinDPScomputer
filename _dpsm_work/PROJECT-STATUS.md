@@ -289,6 +289,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 21 轮 RF8a(状态收敛)** | 把 R0–R5 表里"仍未做"的陈述逐条与代码核对并收敛(R2 的链窗口/`IdleSeconds`、R3 的 RowViewModel、R4 的 MasterDataAccess 进度、R5 的第 3 族、R0 的索引 vs 归档);**写明状态句仍只能靠人核对**这一缺口与补法(R12 需要自测才能加);插件源码零变化 | [REFACTOR-BATCH-RF8A.md](<REFACTOR-BATCH-RF8A.md>) |
 | **第 22 轮 RF8b(状态可验证)** | 文档收敛守卫新增 **R12**:产物存在时,当前文档集**不得**再说该事项"未做";短语须同时含否定词与特征名词,历史批次记录被豁免;配套对照 **M12** 证明它可红(12 条规则 0 失败);插件源码零变化 | [REFACTOR-BATCH-RF8B.md](<REFACTOR-BATCH-RF8B.md>) |
 | **第 23 轮 RF4h(历史环)** | 第四族(进程级)里唯一有真实规则的部分:`History` 的上限/新→旧/淘汰进 `src/Runtime/BattleHistoryRing.cs`;顺带修掉"结算里是字面量 20、`MaxHistory` 也是 20"的双份上限(现在 `MaxHistory = BattleHistoryRing.Max`);691 用例 / 99 例负控 | [REFACTOR-BATCH-RF4H.md](<REFACTOR-BATCH-RF4H.md>) |
+| **第 24 轮 RF7c(证据哈希索引)** | 归档的第二前置:新增 `archive_index.py`,把 `evidence_*`/`probe_*`/`review_contrib_core` 的 **56 份 / 212,552 字节**连同 SHA256 记入 `archive-index.json` 与 [ARCHIVE-INDEX.md](<ARCHIVE-INDEX.md>);`--verify` 对改动/丢失/未记录新增报红(4 个自测对照);**不移动不删除任何证据**,也未接进验收(留给单独一轮);新脚本一落地即被注册表守卫 B 检查点名并登记为 active | [REFACTOR-BATCH-RF7C.md](<REFACTOR-BATCH-RF7C.md>) |
 | **未做** | RF3b(composition 链自身窗口 / 候选扫描)、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
