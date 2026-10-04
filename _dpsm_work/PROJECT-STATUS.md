@@ -24,7 +24,7 @@
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF4+RF5a):**452 个命名用例 / 14 组**,**52 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **33 条命令 / 65 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `acceptance_rf2`);**RF0–RF2 与 RF3 两轮终验收都是 65/65 全绿**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12) |
+| 离线守卫 | **35 条命令 / 67 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -63,7 +63,7 @@
 ```
 PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
 
-验收(最全,33 条命令 / 65 条检查)   python n0_acceptance.py
+验收(最全,35 条命令 / 67 条检查)   python n0_acceptance.py
 冻结批次输入                      python batch_snapshot.py --name rf0 --verify
 基线清单核对                      python repo_manifest.py --verify --exports batch_inputs\rf0
 C# 行为测试                       dotnet run --project tests\BehaviorTests\BehaviorTests.csproj -c Release -- --quiet
@@ -262,7 +262,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 - 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
 - 每次改动后跑:`python n0_acceptance.py`(33 命令 / 65 检查,全绿);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
 - **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
-- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"33 条命令 / 65 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
+- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"35 条命令 / 67 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
 
 ## 12. 重构批次记录(按 REFACTOR-PLAN-POST-1.7.11.md)
 

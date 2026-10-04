@@ -301,7 +301,7 @@ def main():
     ap.add_argument("--exports", default=DEF_INPUTS if os.path.isdir(DEF_INPUTS) else DEF_EXPORTS)
     # Per-batch output directory. The default names the CURRENT batch, so a plain run reproduces the
     # archive the documents describe; the round-6 archive stays frozen in acceptance_1.7.11 (watched).
-    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_rf4d"))
+    ap.add_argument("--out", default=os.path.join(HERE, "acceptance_rf7a"))
     ap.add_argument("--dll", default=DEF_DLL)
     ap.add_argument("--cfg", default=DEF_CFG)
     ap.add_argument("--log", default=DEF_LOG)
@@ -416,6 +416,11 @@ def main():
             ("selftest/pairtrusted", [PY, os.path.join(HERE, "pairtrusted_impact.py"), "--selftest"]),
             ("refactor_final_check", [PY, os.path.join(HERE, "refactor_final_check.py")]),
             ("selftest/refactor", [PY, os.path.join(HERE, "refactor_final_check.py"), "--selftest"]),
+            # RF7: the tool registry. The verify run is the drift check (a script the pipeline runs but the
+            # registry does not call active, or an unclassified script added without a pin update, is red);
+            # the selftest tampers a temp copy for each of the six checks A-F.
+            ("tool_registry", [PY, os.path.join(HERE, "check_tool_registry.py")]),
+            ("selftest/tool_registry", [PY, os.path.join(HERE, "check_tool_registry.py"), "--selftest"]),
             ("v150_validate", [PY, os.path.join(HERE, "v150_validate.py"), "--exports", exports_dir]),
             ("selftest/v150", [PY, os.path.join(HERE, "v150_validate.py"), "--selftest"]),
             ("selftest/eligibility", [PY, os.path.join(HERE, "comparison_eligibility.py"), "--selftest"]),

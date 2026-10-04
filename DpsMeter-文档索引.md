@@ -26,7 +26,7 @@
 | 开关 | `BepInEx\config\dev.dpsmeter.cfg`(DamageComposition/Forensics/ReconcileCalc/GivenTalent/StatusResist/Madness/StateTimeline/FactStore/MadnessApplier/GivenGiverHook/**Contribution/ShowContribution** 全 true) |
 | 导出 | **冻结快照 35 份**(`_dpsm_work\batch-inputs-rf0.json`;`exports\` 本身是活的):411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;其中 **22 份含 `contribution` 段**(schema 1.1 ×9 = 1.7.8×3 + 1.7.10×1 + 1.7.11×5;schema 1.0 ×13),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算 |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动被删,只留最新一场) |
-| 验收 | `python n0_acceptance.py` → **33 条命令 / 65 条检查**(默认读冻结快照、写 `acceptance_rf2`);RF0–RF2 与 RF3 两轮终轮均 **65 ok / 0 项**;RF0–RF2 基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
+| 验收 | `python n0_acceptance.py` → **35 条命令 / 67 条检查**(默认读冻结快照、写 `--out`);RF2 起的各轮终轮均 **0 项**;RF0–RF2 基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
 | 契约 | `log-share/1` / `ComparisonEligibility/1` / `compare/2` / `decision/1` / `budget-census/1` / 身份映射;入口与退出码见 PROJECT-STATUS §3 |
 
 ## 3. 已验证的能力(全部实机)
@@ -38,7 +38,7 @@
   ルゥ=ルルサ 给敌方 ×1.5)、赋予(マッドシーカー 的刻印授予 +10%)、全局规则(母なる変異の飛沫、海魔の残滓)。
 * **队伍贡献表**:每角色 自伤 / 自身规则 / 受队友赋能 / 为团队赋能(对数份额口径),**域内 creditedShare 100%(未归因池 0.0%)**;**整场覆盖率是 `overallAttributedCoverage`,并非 100%**。
 * **时间线**:受击方 18 抗性槽 + 10 状态位,只在变化时出行。
-* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **33 条命令 / 65 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **452 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术)与 **52 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
+* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **35 条命令 / 67 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **452 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术)与 **52 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
 * **阶段 E(1.6.0 起,1.6.1 实机验收通过)**:导出新增 `contribution` 段 —— 每角色 基础/自身规则/辅助/总贡献、
   规则当量、提供者→受益者关系,全部由逐击折叠导出现算。**验收 = 与独立 Python 核心逐字段一致**
   (`contrib.crosscheck` status=OK / mismatches=0,11 角色/21 规则/20 关系);schema 与 v150 problems=0。
@@ -100,7 +100,7 @@
        python -m contrib.legacy_diff(回归证据:新核心 ↔ 旧 Stage-0 表逐列对照,裁决 MATCHES-LEGACY)
        python -m contrib.tests.test_golden_155(把已公布的 1.5.5 数字钉成回归测试;导出缺失时 SKIP)
        python -m contrib.rule115_census(8 场 1.15 生效次数普查:98.3% 对齐,多折 481 vs 少折 220)
-验收   python n0_acceptance.py(全量:33 条命令 / 65 条检查;默认读冻结快照、写 `acceptance_rf2`)/ python n0_acceptance.py --selftest(负控 20 例)
+验收   python n0_acceptance.py(全量:35 条命令 / 67 条检查;默认读冻结快照、写 `--out`)/ python n0_acceptance.py --selftest(负控用例见工具注册表)
 批次   python batch_snapshot.py --name rf0 --verify(冻结输入)/ python repo_manifest.py --verify --exports batch_inputs\rf0(基线清单)
 测试   python tests\negative_control.py(10 例变异负控)/ python tests\il_equiv.py <pre> <post> <report>(IL 等价)/ python tests\rf2_split.py(RF2 拆分器)
        python check_doc_convergence.py(--selftest)/ python check_docs_123.py(--selftest)/ python check_live_log.py --log ..\BepInEx\LogOutput.log
@@ -138,7 +138,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 
 1. **不要为了验证一个假设就让用户再打一场** —— 能离线判的必须离线判完;探针一次上齐。
 2. 每个数字都要能在磁盘上复算;文档标注**实测 / 离线重放 / 推断**。
-3. 改完立刻跑验收:`python n0_acceptance.py`(33 条命令 / 65 条检查,且工具哈希零漂移);只改文档至少跑
+3. 改完立刻跑验收:`python n0_acceptance.py`(35 条命令 / 67 条检查,且工具哈希零漂移);只改文档至少跑
    `check_doc_convergence.py` + `check_docs_123.py`;改插件还要构建 + `recon_probe`。
 4. 文件交换用编辑/写文件工具,**不要用 PowerShell 整文件读写含中文的文件**(控制台是 GBK)。
 5. **两个 crash.bak 绝不回滚/删除**;`.bak` 是回滚档案不是文档。可再生的 artifact(反编译 dumps、`__pycache__`)用完即删。
@@ -205,7 +205,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 * **2026-10-04(第 6 轮,纯文档 + 工具)**:新增 [`PROJECT-STATUS.md`](<_dpsm_work/PROJECT-STATUS.md>)(现状快照 + 重构地图);
   本索引改为「现状数字在 §4 顶部、历史数字标注口径」;`check_docs_123.py` 的文档集由 17 份扩到 **29 份**并新增 `--selftest`(6 例,含 U+FFFD / mojibake / 非 UTF-8 / 缺失文件四种红灯),
   同时进入验收流水线(命令数 +1;**当时的计数见当时的 PROJECT-STATUS**,本行不重复写具体数字,因为"命令数"是流动的)。**未删任何文件、未改插件。**
-* **2026-10-04(重构第 1 轮 RF0–RF2,按 `REFACTOR-PLAN-POST-1.7.11.md`)**:建立**本地 git 基线**(`a2a09c2` / 标签 `baseline-1.7.11`,默认拒绝的 `.gitignore`)、**冻结批次输入快照** 35 份(hard-link,清单可提交)、**输出隔离**检查(历史档案必须一点不动);新增 **174 用例**的规范化行为测试 + 10 例变异负控;**`Aggregator` 拆成 6 个 partial**(IL 级等价);`check_docs_123.py` 文档集 29 → **32 份**,验收 **33 条命令 / 65 条检查**;顺手修掉活日志检查的取整误判与 `test_gate` 的 fixture 选择缺陷,并补 R9/R10/R11 让"文档数字与工具矛盾"会红。**未替换部署 DLL、未改任何历史证据。** 详见 [_dpsm_work\REFACTOR-BATCH-RF0-RF2.md](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>)。
+* **2026-10-04(重构第 1 轮 RF0–RF2,按 `REFACTOR-PLAN-POST-1.7.11.md`)**:建立**本地 git 基线**(`a2a09c2` / 标签 `baseline-1.7.11`,默认拒绝的 `.gitignore`)、**冻结批次输入快照** 35 份(hard-link,清单可提交)、**输出隔离**检查(历史档案必须一点不动);新增 **174 用例**的规范化行为测试 + 10 例变异负控;**`Aggregator` 拆成 6 个 partial**(IL 级等价);`check_docs_123.py` 文档集 29 → **32 份**,验收流水线**当时**的命令/检查数为 33/65(这两个数字是流动的,以当时的 PROJECT-STATUS 为准);顺手修掉活日志检查的取整误判与 `test_gate` 的 fixture 选择缺陷,并补 R9/R10/R11 让"文档数字与工具矛盾"会红。**未替换部署 DLL、未改任何历史证据。** 详见 [_dpsm_work\REFACTOR-BATCH-RF0-RF2.md](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>)。
 * **2026-10-03 深夜(阶段 A/B/C)**:新增贡献指标字典 + `contrib/` 离线核心(纯新增,未删任何文件;
   只删了自己刚生成的旧命名 `compare_all.*`);`check_docs_123.py` 的 FILES 追加 4 个新增 CJK 文件;
   记录见 §7.2.82。
