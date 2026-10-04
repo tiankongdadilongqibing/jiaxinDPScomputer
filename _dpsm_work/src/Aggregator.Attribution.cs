@@ -54,10 +54,10 @@ public static partial class Aggregator
 			double now = (Session != null) ? Session.ActiveSeconds : 0.0;
 
 			// ---- 0) the currently executing calc ----
-			DamageCalculater live = _activeCalc;
-			if (live != null && _activeCalcT >= 0.0)
+			DamageCalculater live = _active.Calc;
+			if (_active.Valid)
 			{
-				double age = now - _activeCalcT;
+				double age = _active.Age(now);
 				// RF3: the live-pairing window is a policy decision (AttributionPolicy); the native blocker
 				// read stays inside the window check, exactly where it was.
 				if (AttributionPolicy.LiveAgeEligible(age, AttributionPolicy.LivePairMinAge,
@@ -261,8 +261,7 @@ public static partial class Aggregator
 
 	public static void NoteActiveCalc(DamageCalculater calc)
 	{
-		_activeCalc = calc;
-		_activeCalcT = (Session != null) ? Session.ActiveSeconds : 0.0;
+		_active.Begin(calc, (Session != null) ? Session.ActiveSeconds : 0.0);
 		// attack start: remember the target's statuses, because the game judges status conditions here
 		// (a debuff applied by this very hit must not raise its own hit)
 		try { CompositionProbe.SnapshotStatuses(calc); } catch { }

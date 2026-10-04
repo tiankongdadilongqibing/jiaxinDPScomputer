@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 664;
+	public const int ExpectedCases = 679;
 
 	private static int Main(string[] args)
 	{
@@ -54,6 +54,8 @@ internal static class Program
 		// RF5f: the contribution table's row values (shown rows vs summed rows).
 		Cases.ContributionRowModelCases(r);
 		Cases.ContributionRowModelTables(r);
+		// RF4g: the attack snapshot (both halves required).
+		Cases.AttackSnapshotCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

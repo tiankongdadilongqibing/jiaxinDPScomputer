@@ -1,0 +1,654 @@
+{
+ "extra": {
+  "crosscheckSummary": "{\"ERROR\": 1, \"LEGACY_NOT_APPLICABLE\": 17, \"PASS\": 14, \"WARNING\": 3}"
+ },
+ "meta": {
+  "config": "BepInEx/config/dev.dpsmeter.cfg",
+  "config_sha256": "97A1037D843637A910B558F06D455575C69280DCB01E81D1DEF0C1D0712AF568",
+  "config_switches": {
+   "AbilityDump": "true",
+   "AbilityRoster": "true",
+   "ChartBothSides": "true",
+   "ChartPerSecond": "false",
+   "Contribution": "true",
+   "DamageComposition": "true",
+   "FactStore": "true",
+   "FilterFriendlyFire": "false",
+   "Forensics": "true",
+   "GivenGiverHook": "true",
+   "GivenTalent": "true",
+   "Madness": "true",
+   "MadnessApplier": "true",
+   "MadnessVictim": "true",
+   "MasterDataDump": "true",
+   "ParamOwners": "true",
+   "PowerProbe": "true",
+   "ReconcileCalc": "true",
+   "RosterRouteA": "true",
+   "ShowContribution": "true",
+   "ShowEnemies": "true",
+   "ShowSkills": "false",
+   "SlotProbe": "false",
+   "StateTimeline": "true",
+   "StatusResist": "true",
+   "TalentTriggers": "true",
+   "TimerUsesGameTime": "false",
+   "TraceCandidates": "true",
+   "VerboseEvents": "false",
+   "WheelScrolls": "true"
+  },
+  "deployed_dll": "BepInEx/plugins/DpsMeter/DpsMeter.dll",
+  "deployed_dll_sha256": "36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42",
+  "export_count": 35,
+  "exports_dir": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0",
+  "frozen_input": {
+   "count": 35,
+   "source": "_dpsm_work/batch-inputs-rf0.json"
+  },
+  "generated": "2026-10-05T04:13:53",
+  "notes": [
+   "logs are associated only when the log names the export path",
+   "no historical export, DLL, config or evidence file is modified by this script"
+  ],
+  "python": "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+  "schema": "n0-1",
+  "source_version_BuildInfo": "1.7.11",
+  "tool": "n0_acceptance",
+  "tool_sha256": {
+   "_dpsm_work/check_contribution_layout.py": "9BB83A2EB00FD0044E886BC0657AF11411793A627CF7E09CD17433A1E9AF4672",
+   "_dpsm_work/check_doc_convergence.py": "1815B342223C5DC0A031066FC19223DF3D235796231F2748866732D85BF59AA6",
+   "_dpsm_work/check_docs_123.py": "115B06FDC2DF69F19C8298D7F67870B8383EE14AF8EADA8967254F3AB8B61437",
+   "_dpsm_work/check_export_schema.py": "FEEAD9105353A7B81A782BCF44353C2CE8C49A47B440E26FF9AB0761CB4BBAC9",
+   "_dpsm_work/check_fact_signature.py": "ADE5EEBED199342863159302FDD583B415B0B80A66D5EEDEB465C85DBC9979EE",
+   "_dpsm_work/check_given_fold_coupling.py": "7E5BA04330363C4F664FB60A65B25388518C462A7B650D93BE76A1A13FE6B60C",
+   "_dpsm_work/check_live_log.py": "9C96EF1C059435524CC0F7016465D9F5B547F5F9F9B13FC7517E0D198454F4BD",
+   "_dpsm_work/check_p2a_summary_and_lastbattle.py": "C4D6DC13D6547605DFEAEF4A7319DF76C10B0CE6F38A02B8479160061431DF8B",
+   "_dpsm_work/contrib/compare.py": "14648A1D403FD24EE220C7C95625D6984E063115D4C0211D8BE2B6A603AE12C7",
+   "_dpsm_work/contrib/crosscheck.py": "EE749E0BEBA2F2C72FCDBC984ADFD6D1B9EAF78D3B43479252015040AF66BDFD",
+   "_dpsm_work/contribution_applicability.py": "EAAEDB3ADA5535723D454D7D7DAA190DAE38DD6B920E01821228B89A1BB7D467",
+   "_dpsm_work/contribution_gate.py": "267AF3F044F93FBEBC1571768754B6ADA404D6E59DDF7A4399695923AB5E5651",
+   "_dpsm_work/n0_acceptance.py": "5AEA63B6DC35065CA8789D289B9E685C797783C3A34DE7D569B5265E7B6DCD69",
+   "_dpsm_work/pairtrusted_impact.py": "9A0AC5F10A9F1D0E1512C1372B7AD7E7677E70CAC28BDADBE58F56159FA98669",
+   "_dpsm_work/refactor_final_check.py": "D6FAAE5633AEE52404E25ED8BCBCF71A20CED72CB8EAD74155470A0112CB8CC1",
+   "_dpsm_work/repo_manifest.py": "B4AC9B818EDE6EA5338F6D2E0DE9E53B1F3C17E33B95083EFECF2793151A86F6",
+   "_dpsm_work/tests/BehaviorTests/BehaviorTests.csproj": "7AD9E95CBB73F03F382C3682B9ECB5D51A217945ED092A57F8B1FC888937532A",
+   "_dpsm_work/tests/BehaviorTests/Cases.Cache.cs": "CA1057A7D35B19B971C3127D1D88291344DCCDDBA5872441A859A703B493453A",
+   "_dpsm_work/tests/BehaviorTests/Cases.Clock.cs": "53B6713744EA9B384ACF3C98AA7E32930455CE8123DC9B3B984A5059A46D1BE1",
+   "_dpsm_work/tests/BehaviorTests/Cases.HitWindow.cs": "70C67F9E5CDF60F0C78F45E1CB349E33CEDDC7194A29C2856738D1CF8F7CA080",
+   "_dpsm_work/tests/BehaviorTests/Cases.Series.cs": "BB0D71042D2CAD6E3BD50A4BFEB1BBF3C85D4D94CC80B9669F30A06CC3F62224",
+   "_dpsm_work/tests/BehaviorTests/Cases.SessionState.cs": "EBE361481C4974BDD506CE336BA1B78F67ECDA575A3BAB64C47C49B31C5DF195",
+   "_dpsm_work/tests/BehaviorTests/Cases.Tiered.cs": "71B184FBF42E88F7C8FDA5D477CA418DEDF7FA6FD865A979EB3C82E21CD36E59",
+   "_dpsm_work/tests/BehaviorTests/Program.cs": "7796CB9E7903AD1026D96868A477615A4040CBC621B0FBE0034759BF4E192EC0",
+   "_dpsm_work/tests/BehaviorTests/Runner.cs": "D5FD3BC0E06D814F9A3F3D5D969C6E3F57B80E620AE3F6C821663077D1F83594",
+   "_dpsm_work/tests/BehaviorTests/Stubs.cs": "74B1517BF0BCC11B0BAECA7B6C73D1F79DB21D4DF8A33E813D0F7925CF33A3B5",
+   "_dpsm_work/tests/negative_control.py": "B08B327A867CF24E8C05B48A3F076F49E6DB393159EDA5842A6C7436E6D736CF"
+  }
+ },
+ "runs": [
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\contribution_applicability.py",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0",
+    "--json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\applicability.json"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/applicability_all_.txt",
+   "name": "applicability(all)",
+   "seconds": 48.81,
+   "tail": "verdicts by quest:\n  quest 411001  exports=25 versions=1.5.3,1.5.4,1.5.5,1.6.0,1.6.1,1.7.0,1.7.10,1.7.11,1.7.2,1.7.3,1.7.4,1.7.5,1.7.6,1.7.8 app=full,not_comparable,partial scope=invalid-plugin-value-trust,normal-benchmark,offline-recompute-only knf=0/0 unexp=0\n  quest 700817  exports=1  versions=1.7.6 app=partial scope=caveat-attribute-affinity knf=59/59 unexp=0\n  quest 9999    exports=9  versions=1.5.3,1.5.4,1.5.5,1.7.11,1.7.5,1.7.8 app=not_comparable scope=training-ground-only knf=45/45 unexp=0\n\nwrote D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\applicability.json (35 exports)"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "contrib.crosscheck",
+    "--batch",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_*.json",
+    "--outdir",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\crosscheck"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 1,
+   "log": "_dpsm_work/acceptance_rf4g/runs/crosscheck_batch_.txt",
+   "name": "crosscheck(batch)",
+   "seconds": 23.39,
+   "tail": "    [warning] atkAdd.emitted=137 exceeds atkAdd.hits=108: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit\n    [ok] contribution section present (plugin version 1.7.11)\nbattle_9999_20261004_175957.json           version=1.7.11 status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0\n    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS\n    [ok] contribution section present (plugin version 1.7.11)\nbatch: 35 file(s) {\"ERROR\": 1, \"LEGACY_NOT_APPLICABLE\": 17, \"PASS\": 14, \"WARNING\": 3} -> worst=ERROR exit=1"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\pairtrusted_impact.py",
+    "--files",
+    "battle_411001_20261003_205449.json",
+    "battle_411001_20261003_230040.json",
+    "battle_411001_20261003_230311.json",
+    "battle_411001_20261003_230615.json",
+    "battle_411001_20261003_231044.json",
+    "battle_411001_20261003_231340.json",
+    "battle_411001_20261003_235204.json",
+    "battle_411001_20261004_012328.json",
+    "battle_411001_20261004_015919.json",
+    "battle_411001_20261004_021914.json",
+    "battle_411001_20261004_023627.json",
+    "battle_411001_20261004_033231.json",
+    "battle_411001_20261004_035437.json",
+    "battle_411001_20261004_041309.json",
+    "battle_411001_20261004_042637.json",
+    "battle_411001_20261004_042844.json",
+    "battle_411001_20261004_113553.json",
+    "battle_411001_20261004_115024.json",
+    "battle_411001_20261004_115417.json",
+    "battle_411001_20261004_134524.json",
+    "battle_411001_20261004_134853.json",
+    "battle_411001_20261004_144548.json",
+    "battle_411001_20261004_170157.json",
+    "battle_411001_20261004_180353.json",
+    "battle_411001_20261004_180834.json",
+    "battle_700817_20261004_114821.json",
+    "battle_9999_20261003_205129.json",
+    "battle_9999_20261003_225530.json",
+    "battle_9999_20261003_225647.json",
+    "battle_9999_20261003_225905.json",
+    "battle_9999_20261004_012138.json",
+    "battle_9999_20261004_042458.json",
+    "battle_9999_20261004_135214.json",
+    "battle_9999_20261004_165952.json",
+    "battle_9999_20261004_175957.json",
+    "--out-json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\pairtrusted_impact_report.json",
+    "--out-txt",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\pairtrusted_impact_report.txt"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/pairtrusted_all_.txt",
+   "name": "pairtrusted(all)",
+   "seconds": 62.2,
+   "tail": "  diff Cstar_vs_A   poolDelta=     -534871.83 (-99.9760% of A pool) attributedDelta=    -2280628.00\n       denominatorChanged=True maxAbsActorCreditDelta=1019679.18 maxAbsActorShareDelta=64.2056pp top1Changed=True top3SetChanged=True rulesRemoved=6 rulesAppeared=0\n       component deltas: maxBase=630301.10 maxSelf=388146.23 maxAssist=87046.75 anyAssistMoved=True\n\nwrote D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\pairtrusted_impact_report.json\nwrote D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\pairtrusted_impact_report.txt"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_export_schema.py",
+    "--report",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\export_schema_report.txt",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_205449.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230040.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230311.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230615.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231044.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231340.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_235204.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_012328.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_015919.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_021914.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_023627.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_033231.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_035437.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_041309.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042637.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042844.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_113553.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115024.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115417.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134524.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134853.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_144548.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_170157.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180353.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180834.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_700817_20261004_114821.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_205129.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225530.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225647.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225905.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_012138.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_042458.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_135214.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_165952.json",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_175957.json"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/export_schema_all_.txt",
+   "name": "export_schema(all)",
+   "seconds": 13.11,
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_export_schema.py --report D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\export_schema_report.txt D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_205449.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230040.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230311.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230615.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231044.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231340.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_235204.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_012328.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_015919.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_021914.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_023627.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_033231.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_035437.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_041309.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042637.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042844.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_113553.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115024.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115417.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134524.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134853.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_144548.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_170157.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180353.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180834.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_700817_20261004_114821.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_205129.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225530.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225647.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225905.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_012138.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_042458.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_135214.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_165952.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_175957.json\nchecked 35 file(s), problems=0, report=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\export_schema_report.txt"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_contribution_layout.py",
+    "--dir",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/layout_all_.txt",
+   "name": "layout(all)",
+   "seconds": 3.06,
+   "tail": "OK   battle_700817_20261004_114821.json  rows=25\nOK   battle_9999_20261004_042458.json  rows=21\nOK   battle_9999_20261004_135214.json  rows=25\nOK   battle_9999_20261004_165952.json  rows=25\nOK   battle_9999_20261004_175957.json  rows=24\n---- layout: files=35 with-section=22 absent=13 bad=0 rows-checked=730"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_live_log.py",
+    "--log",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\BepInEx\\LogOutput.log"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/live_log.txt",
+   "name": "live_log",
+   "seconds": 0.26,
+   "tail": "  note: no DpsMeter [Error] line in the log\n  note: 8 exported battle(s) paired with the machine log; version 1.7.11\n  note: history counter non-decreasing across 41 frame(s) (max 8)\n  note: 41 frame(s) carry unattrRow but none held a comparable figure\n  warn: 2 overlay frame(s) printed a ??? row WITHOUT a hit count (a live partial surface, e.g. '????? 1,683   ???(??????) 0   (????????)'): no export can corroborate those, and they are not claimed to be correct\n---- exit 0"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_contribution_layout.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_layout.txt",
+   "name": "selftest/layout",
+   "seconds": 9.44,
+   "tail": "OK   battle_9999_20261004_165952.json  rows=25\nOK   battle_9999_20261004_175957.json  rows=24\nOK   battle_9999_20261004_194948.json  rows=25\n---- layout: files=45 with-section=32 absent=13 bad=0 rows-checked=842\nselftest: old(1.7.6 Fit) bad=32 rows=842 violations=315 | new(1.7.7 Fit) bad=0 rows=842 violations=0\nselftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_export_schema.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_schema.txt",
+   "name": "selftest/schema",
+   "seconds": 0.15,
+   "tail": "PASS REJECTS unknownAttackerDealt that disagrees with totals.unattributedDamage caught=2  [contribution ledger: unknownAttackerDealt(400) != totals.unattributedDamage(999); totals identity broken: taken(1400) != dealt(1000)+unattributedDamage(999)]\nPASS REJECTS a broken ledger hit identity                 caught=1  [contribution ledger hit identity broken: events(11) != analyzable(5)+outsideTeam(3)+unknown(2)]\nPASS REJECTS a null ratio whose denominator is known      caught=1  [contribution.coverage.analysisDamageCoverage is null but its denominator is known]\nPASS accepts an empty battle (ratios null, zero denominators) caught=0\nPASS accepts a 1-unit ledger drift on a 500M battle       caught=0\nPASS REJECTS a dropped outside-team bucket on a 1e4 battle caught=1  [contribution ledger identity broken: analyzable(600)+outsideTeam(0) != totalsDealt(1000)]"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_live_log.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_live_log.txt",
+   "name": "selftest/live_log",
+   "seconds": 0.21,
+   "tail": "  [PASS] in_domain_row_beyond_rounding_is_an_error -- status=ERROR want=ERROR; overlay frame printed '?? 194,697,612   ??? 9,326,600(4.75%)' but no export carries that in-domain unattribute\n  [PASS] real_f6_summary_row_agrees -- status=PASS want=PASS\n  [PASS] real_f6_summary_row_mismatch -- status=ERROR want=ERROR; overlay frame printed '?? 194,697,612   ??? 0(0.00%)   ?? 5,493   ??? 168,197,251' but no export carries that \n  [PASS] live_enemy_line_is_unverifiable_not_wrong -- status=WARNING want=WARNING\n  [PASS] placeholder_header -- status=ERROR want=ERROR; a Contribution frame printed a placeholder header: '?? 0   0'\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_doc_convergence.py",
+    "--applicability",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\applicability.json",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/doc_convergence.txt",
+   "name": "doc_convergence",
+   "seconds": 0.35,
+   "tail": "  [PASS] R7 no live document claims the attack-power addends are unsplit\n  [PASS] R8 plugin and offline knownLimits are the same 6 strings\n  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_rf5g)\n  [PASS] R10 a version called section-less really has none (and the count is exact)\n  [PASS] R11 a largest-N-files list contains exactly N entries\n---- P1-B doc convergence: PASS (0/11 failing)"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_doc_convergence.py",
+    "--selftest",
+    "--applicability",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\applicability.json",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_doc_convergence.txt",
+   "name": "selftest/doc_convergence",
+   "seconds": 1.65,
+   "tail": "  [PASS] M7 the unsplit attackPower claim returns -- R7; failing=['R7']\n  [PASS] M9 a stated acceptance command count drifts -- R9; failing=['R9']\n  [PASS] M10 a version that has a section is called section-less -- R10; failing=['R10']\n  [PASS] M11 a largest-N list lists a different number -- R11; failing=['R11']\n  [PASS] M8 the offline knownLimits list diverges -- R8 fails\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_docs_123.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/docs123.txt",
+   "name": "docs123",
+   "seconds": 0.25,
+   "tail": "REFACTOR-BATCH-RF7B.md                         bytes=3097     cjk=611    U+FFFD=0   mojibake=0   OK\nREFACTOR-BATCH-RF5F.md                         bytes=2668     cjk=558    U+FFFD=0   mojibake=0   OK\nREFACTOR-BATCH-RF5G.md                         bytes=1879     cjk=358    U+FFFD=0   mojibake=0   OK\nREFACTOR-BATCH-RF4G.md                         bytes=2767     cjk=523    U+FFFD=0   mojibake=0   OK\nfiles=55\nTOTAL DAMAGE MARKERS: 0"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_docs_123.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_docs123.txt",
+   "name": "selftest/docs123",
+   "seconds": 0.27,
+   "tail": "U+FFFD                             want_red=True  got_red=True  ok\nmojibake                           want_red=True  got_red=True  ok\nnon-utf8                           want_red=True  got_red=True  ok\nmissing-file                       want_red=True  got_red=True  ok\nall 55 listed docs exist           want_red=False got_red=False ok\nselftest: 6 case(s), 0 failed"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "contrib.tests.test_gate"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/test_gate.txt",
+   "name": "test_gate",
+   "seconds": 14.62,
+   "tail": "PASS classify_section(1.5.5, absent) == LEGACY_NOT_APPLICABLE\nPASS classify_section(1.6.0, absent) == DATA_MISSING\nPASS classify_section(1.7.7, absent) == DATA_MISSING\nPASS classify_section(1.7.7, present) == PASS\n\ngate regression: 64 passed, 0 failed (fixtures in C:\\Users\\24134\\AppData\\Local\\Temp\\p0a_gate_2zc9hnfp)"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_given_fold_coupling.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/given_coupling.txt",
+   "name": "given_coupling",
+   "seconds": 0.06,
+   "tail": "  [PASS] 6b. CalcReconcile writes \"givenFoldOn\" -- per-hit writer\n  [PASS] 6c. Forensics writes \"givenFoldOn\" -- per-hit writer\n  [PASS] 7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage -- looked for the call ending in \", false, <switch>)\n  [PASS] 7b. the diagnostics madness multiply is gated on Plugin.CfgMadness -- looked for the CfgMadness switch next to the madness multiply\n  [PASS] 7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim -- looked for the CfgMadnessVictim gate on the incoming ×1.5 fold\n---- given-talent fold coupling guard: PASS (0/20 failing)"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_given_fold_coupling.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_given_coupling.txt",
+   "name": "selftest/given_coupling",
+   "seconds": 0.06,
+   "tail": "  [PASS] M5 Madness (outgoing) registration escapes its if -- 1 check(s) failing\n  [PASS] M6 CalcReconcile stops writing givenFoldOn -- expected \"6b. CalcReconcile writes \"givenFoldOn\"\" to fail; failing=['6b. CalcReconcile writes \"givenFoldOn\"']\n  [PASS] M9 diagnostics drops the given switch again -- expected \"7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage\" to fail; failing=['7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage']\n  [PASS] M10 diagnostics madness multiply loses its switch -- expected \"7b. the diagnostics madness multiply is gated on Plugin.CfgMadness\" to fail; failing=['7b. the diagnostics madness multiply is gated on Plugin.CfgMadness']\n  [PASS] M11 diagnostics loses the victim madness channel -- expected \"7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim\" to fail; failing=['7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim']\n---- selftest: 9/9 mutations caught"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_p2a_summary_and_lastbattle.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/p2a.txt",
+   "name": "p2a",
+   "seconds": 25.97,
+   "tail": "  [PASS] model: new prints the real battle id -- new -> 411001\nD. the value the caption must show exists in the export corpus (export fact)\n     newest 1.7.6 export: battle_411001_20261004_115417.json  totals.unattributedDamage=273702  totals.unattributedHits=71\n  [PASS] unattributedDamage is a real non-zero measurement -- value=273702\n  [PASS] the pre-fix caption would print 0 instead -- FromSummary leaves the field at 0 until task 6 is fixed\n---- P2-A guard: PASS (0 failing contract(s))"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_fact_signature.py",
+    "--outdir",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/factsig.txt",
+   "name": "factsig",
+   "seconds": 0.09,
+   "tail": "   n=66    ('?? ????????', 1, '????', 2, 0, 3, 1.0, None, None, 0, 0, None, ())\n   n=28    ('[??]????', 1, '????', 2, 0, 3, 1.0, None, 150, 0, 0, None, ())\n   n=22    ('????', 1, '????', 2, 0, 3, 1.0, None, 150, 0, 0, None, ())\n   n=15    ('?????????', 1, '????', 2, 10024, 2, 1.0, None, 150, 0, 0, None, ())\n   n=10    ('????', 1, '????', 2, 10027, 2, 1.0, None, 150, 0, 0, None, ())\nreport -> D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\fact_signature.txt"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\contribution_applicability.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_applicability.txt",
+   "name": "selftest/applicability",
+   "seconds": 0.14,
+   "tail": "  [PASS] 700817 retired rule flags hits                       got=59 want=59\n  [PASS] 700817 corrected rule flags no leak                  got=0 want=0\n  real 700817: retired=59 corrected=0 (attrMult-explained=59)\nFAILING-BEFORE (retired knownMult criterion): 700817 leaks=59 -> judged a fold leak\nPASSING-AFTER  (corrected prod(fold) criterion): unexplained=0\nselftest OK (18/18)"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\pairtrusted_impact.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_pairtrusted.txt",
+   "name": "selftest/pairtrusted",
+   "seconds": 16.71,
+   "tail": "[PASS] T3c in-domain untrusted hits occur only in pre-1.7 exports or the training ground :: all=[('battle_9999_20261003_205129.json', '1.5.3', 9999, 19), ('battle_9999_20261003_225530.json', '1.5.4', 9999, 9), ('battle_9999_20261003_225647.json', '1.5.4', 9999, 5), ('battle_9999_20261004_012138.json', '1.5.5', 9999, 6), ('battle_9999_20261004_135214.json', '1.7.8', 9999, 12), ('battle_9999_20261004_175957.json', '1.7.11', 9999, 7), ('battle_9999_20261004_194948.json', '1.7.11', 9999, 17)] outliers=[]\n[PASS] T4 training untrusted hits exist but are all OUT of domain (B no-op there too) :: out-of-domain=104 (with folds=104, would-be pool=1958.98) in-domain=0\n[PASS] T4c 1.7.8 training export: in-domain untrusted hits are measured and bounded :: in-domain=12 (with folds=7) B moves=62.7391 of poolA=842871.87 (0.007443%); quest=9999\n[PASS] T4b B moves exactly zero pool on 411001_115417 :: poolA=162689426.881162 poolB=162689426.881162\n[PASS] T5 criterion C retains <1%% of A's pool on 411001_115417 :: C pool=20986.30 A pool=162689426.88 retained=0.012900%\nselftest: 11/11 passed"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\refactor_final_check.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/refactor_final_check.txt",
+   "name": "refactor_final_check",
+   "seconds": 0.32,
+   "tail": "version truth       : BuildInfo=1.7.11 csproj=1.7.11 agree=True\nCompositionProbe         10 partial files, all declare partial: True\nOverlayUGUI              4 partial files, all declare partial: True\nAggregator               6 partial files, all declare partial: True\nCharacterNames rows : 105\nrefactor check: blocks=0 warns=0"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\refactor_final_check.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_refactor.txt",
+   "name": "selftest/refactor",
+   "seconds": 4.84,
+   "tail": "  [PASS] an Aggregator partial that forgot `partial` blocks       rc=1\n  [PASS] dead symbol in CODE blocks                               rc=1\n  [PASS] dead symbol in a COMMENT only warns (exit 0)             rc=0\n  [PASS] mojibake suspect warns but does not block                rc=0\n  [PASS] an empty root blocks on the required inputs              rc=1\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_tool_registry.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/tool_registry.txt",
+   "name": "tool_registry",
+   "seconds": 0.21,
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_tool_registry.py\ntool registry: registered=95 active=21 unclassified=31 (pin 31) pipeline=20\n---- tool registry: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_tool_registry.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_tool_registry.txt",
+   "name": "selftest/tool_registry",
+   "seconds": 0.22,
+   "tail": "  [PASS] a pipeline script missing from the registry is caught (C)\n  [PASS] an in_pipeline flag the pipeline disagrees with is caught (D)\n  [PASS] an active entry without an expected exit code is caught (E)\n  [PASS] an active entry without declared outputs is caught (E)\n  [PASS] the unclassified pin is enforced (F)\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.py",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/v150_validate.txt",
+   "name": "v150_validate",
+   "seconds": 11.02,
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.py --exports D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\nreport -> D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.txt\nversion=1.7.11 quest=411001 problems=0"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_v150.txt",
+   "name": "selftest/v150",
+   "seconds": 16.3,
+   "tail": "  [PASS] an empty baseline -> 不可判, no claim                       rc=0\n  [PASS] a hash-drifted entry is reported and NOT used            rc=0\n  [PASS] an entry whose declared version disagrees with its file is not used rc=0\n  [PASS] a baseline entry that is not OLDER than the target is not used rc=0\n  [PASS] the real baseline EXCLUDES the 1.6.0 damaged sample      excluded=1 approved=29\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\comparison_eligibility.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_eligibility.txt",
+   "name": "selftest/eligibility",
+   "seconds": 1.37,
+   "tail": "  [PASS] no dropped steps is a pass on that check                 pass\n  [PASS] a clean gate record adds no new restriction              pass\n  [PASS] real 1.7.10 export is not REJECTED                       RESTRICTED\n  [PASS] deleted section in a real copy -> REJECTED               REJECTED\n  [PASS] changed nested damageBasis in a real copy is caught      REJECTED\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\comparison_eligibility.py",
+    "--selftest-e2e"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_eligibility_e2e.txt",
+   "name": "selftest/eligibility_e2e",
+   "seconds": 3.45,
+   "tail": "  [PASS] a section-less sample alone: nothing may be ranked (exit 4) rc=4\n  [PASS] a section-less member restricts the pooled total (no silent pooling) rc=4\n  [PASS] a changed nested damageBasis is caught at the CLI        rc=0\n  [PASS] no valid input exits 2                                   rc=2\n  [PASS] --applicability is wired into the CLI (recorded per sample) {'battle_411001_20261004_134853.json': 'WARNING', 'battle_411001_20261004_134524.json': None}\n---- selftest-e2e: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "contrib.compare",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_compare.txt",
+   "name": "selftest/compare",
+   "seconds": 55.75,
+   "tail": "  [PASS] a different observed config flag is a different stratum    caps=[[False], [True]]\n  [PASS] training ground is its own stratum and is not pooled with a normal quest strata=3\n  [PASS] the gate-ERROR sample is listed as rejected, not silently averaged rejected=2\n  [PASS] a single sample is not a comparison (exit 4)               rc=4\n  [PASS] strata with different sizes keep their own n (no pooled average) n=[1, 2]\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\decision_report.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_decision.txt",
+   "name": "selftest/decision",
+   "seconds": 120.51,
+   "tail": "  [PASS] the pre-registration and the interval are printed          \n  [PASS] the report states whether the interval covers 0            \n  [PASS] the cross-check against compare/2 ran                      \n  [PASS] a pre-registration that does not match the corpus publishes NOTHING (exit 4) rc=4\n  [PASS] a tampered compare/2 share is caught by the cross-check (exit 4) rc=4\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\budget_census.py",
+    "--selftest",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/selftest_budget.txt",
+   "name": "selftest/budget",
+   "seconds": 1.08,
+   "tail": "  [PASS] read errors, overflow and unknown identity are kept separate {'triggerErrors': 3} | {'timeline.rowsDropped': 5} | {'paramOwners.ownerUnknown': 7, 'ledger.unknownAttackerHits': 2, 'ledger.unknownAttackerDealt': 123.0}\n  [PASS] the per-battle table is ranked by affected DAMAGE, not by hit count big.json first\n  [PASS] every issue carries the four required fields               5 issues\n  [PASS] the dropped share is a share of dealt                      0.057197\n  [PASS] a real export censuses and the residual detector sees residuals battle_411001_20261003_205449.json dealt=198588964 buckets=12\n---- selftest: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\repo_manifest.py",
+    "--verify",
+    "--exports",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/repo_manifest_verify.txt",
+   "name": "repo_manifest_verify",
+   "seconds": 12.44,
+   "tail": "CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Output/ContributionSession.cs\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Output/ExportService.cs\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Ui/OverlayCore.cs\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/src/Ui/OverlayUGUI.Rows.cs\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/v150_validate.txt\nmanifest verify: drift=0 changed=24 grew=867 notes=1"
+  },
+  {
+   "argv": [
+    "D:\\dmmplayer\\dotnet-sdk6\\dotnet.exe",
+    "run",
+    "--project",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\recon_probe\\ReconProbe.csproj",
+    "-c",
+    "Release",
+    "-v",
+    "quiet",
+    "--",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\recon_probe_out.json"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/recon_probe.txt",
+   "name": "recon_probe",
+   "seconds": 6.03,
+   "tail": "PASS atkadd keyless teammate is counted as owner-unknown: got=1 want=1\nPASS atkadd keyless teammate is not a self fallback: got=0 want=0\nPASS atkadd missing attacker key falls back to name: got=1 want=1\nPASS atkadd missing attacker key is counted: got=1 want=1\nwrote D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_rf4g\\recon_probe_out.json\nALL CHECKS PASSED"
+  },
+  {
+   "argv": [
+    "D:\\dmmplayer\\dotnet-sdk6\\dotnet.exe",
+    "run",
+    "--project",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\tests\\BehaviorTests\\BehaviorTests.csproj",
+    "-c",
+    "Release",
+    "-v",
+    "quiet",
+    "--",
+    "--quiet"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/csharp_behavior.txt",
+   "name": "csharp_behavior",
+   "seconds": 5.32,
+   "tail": "== rowmodel/rules\n== rowmodel/links\n== rowmodel/empty-tables\n== runtime/attack-snapshot\nbehavior tests: cases=679 failed=0 pinned=679\n== ALL PASS =="
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\tests\\negative_control.py",
+    "--only",
+    "window-constant-0.45",
+    "--only",
+    "comment-only-control"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_rf4g/runs/csharp_behavior_negctl.txt",
+   "name": "csharp_behavior_negctl",
+   "seconds": 42.82,
+   "tail": "# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\tests\\negative_control.py --only window-constant-0.45 --only comment-only-control\nnegative control: 2 mutation(s), temp copies of src (the real sources are never modified)\n  [PASS] window-constant-0.45             -> window/constants/hit-match-window-is-0.35s went red\n  [PASS] comment-only-control             prose-only mutation stays GREEN (replaced 1 occurrence in Model/BattleSession.cs)\n         cases=679 failed=0 pinned=679\nnegative control: 0 failure(s) of 2"
+  }
+ ]
+}

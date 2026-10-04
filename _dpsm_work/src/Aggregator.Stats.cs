@@ -178,7 +178,7 @@ public static partial class Aggregator
 			actorStats.SourceDamage.TryGetValue((int)hitRecord.Source, out var v3);
 			actorStats.SourceDamage[(int)hitRecord.Source] = v3 + damage;
 		}
-		else if (actorStats != null && _activeCalc != null)
+		else if (actorStats != null && _active.Calc != null)
 		{
 			try
 			{
@@ -186,13 +186,13 @@ public static partial class Aggregator
 				// none, so a calc left over from the previous battle could label this battle's opening
 				// hits -- and `_activeCalc` was not even cleared when a session started (fixed in
 				// StartSession below). The composition path was protected; this one was not.
-				double age = Session.ActiveSeconds - _activeCalcT;
+				double age = _active.Age(Session.ActiveSeconds);
 				// RF3: literally the same window as the composition pairing now, via one definition.
 				if (AttributionPolicy.LiveAgeEligible(age, AttributionPolicy.LivePairMinAge,
 				                                      AttributionPolicy.LivePairMaxAge)
-					&& GameRef.Same(_activeCalc.Attacker, source))
+					&& GameRef.Same(_active.Calc.Attacker, source))
 				{
-					int effectId = _activeCalc.m_effectId;
+					int effectId = _active.Calc.m_effectId;
 					if (effectId != 0)
 					{
 						actorStats.SkillDamage.TryGetValue(effectId, out var v4);

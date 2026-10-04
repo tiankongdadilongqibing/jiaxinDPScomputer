@@ -71,8 +71,7 @@ public static partial class Aggregator
 		// only cleared when a session was resumed, never when one started, so a calc from the previous
 		// battle could label this battle's opening hits -- and the pending-hit channel would have carried
 		// stale figures across the boundary too.
-		_activeCalc = null;
-		_activeCalcT = -1.0;
+		_active.Clear();
 		// diagnostic only: GameTime keeps counting across battles, so remember where this one started
 		// (the battle clock itself is accumulated from dt in Tick -- GameTime is a frame counter).
 		// Native read -> it stays here and is written INTO the container.
@@ -153,8 +152,7 @@ public static partial class Aggregator
 				if (!st.IsSummonMerge && GameRef.IsNull(st.Source)) st.Source = kv.Key;
 			}
 			Session = s;
-			_activeCalc = null;
-			_activeCalcT = -1.0;
+			_active.Clear();
 			_calcEvents.Clear();
 			string text = $"[DpsMeter] Battle session resumed: {gap:F2}s after an idle close, clock continues at {BattleTime.Log(s.ActiveSeconds)} ({s.OrderedActors.Count} actors)";
 			Plugin.LogSource.LogInfo(text);

@@ -58,8 +58,9 @@ public static partial class Aggregator
 
 	private static long _lastGsPointer;
 
-	private static DamageCalculater _activeCalc;
-	private static double _activeCalcT = -1.0;
+	/// <summary>RF4g: the attack snapshot (calc + its clock stamp) and their set/clear rules live in
+	/// <see cref="AttackSnapshot{TCalc}"/>; the readers below ask it whether it is Valid.</summary>
+	private static readonly AttackSnapshot<DamageCalculater> _active = new AttackSnapshot<DamageCalculater>();
 
 	/// <summary>Recent damage-calculation events, used to attribute "attacker-less" damage to the calc's owner/attacker.</summary>
 	private struct CalcActivity
