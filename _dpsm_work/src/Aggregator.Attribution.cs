@@ -23,8 +23,8 @@ public static partial class Aggregator
 				Dmg = dmg,
 				Calc = calc
 			});
-			while (_calcEvents.Count > CalcEventMax) _calcEvents.RemoveAt(0);
-			// RF4: the two "last calc" fields that were written here every hit had no reader (see Aggregator.cs).
+			// RF4f: the cap/FIFO trim is part of Add now, so the readers cannot see an over-full ring.
+			// (RF4: the two "last calc" fields that were written here every hit had no reader.)
 		}
 		catch { }
 	}

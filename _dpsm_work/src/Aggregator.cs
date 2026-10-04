@@ -76,8 +76,9 @@ public static partial class Aggregator
 		public bool Used;
 	}
 
-	private static readonly List<CalcActivity> _calcEvents = new List<CalcActivity>();
-	private const int CalcEventMax = 64;
+	/// <summary>RF4f: the recent-activity ring. Its cap, its ordering and its clearing rules live in
+	/// <see cref="CalcActivityLog{T}"/>; the readers below index it exactly as before.</summary>
+	private static readonly CalcActivityLog<CalcActivity> _calcEvents = new CalcActivityLog<CalcActivity>();
 
 	// RF4: two fields were DELETED here (_lastCompT, _lastPow). The matrix found them write-only: they were
 	// assigned on every calc-activity note and read nowhere in src (PowerProbe has its own pair with the

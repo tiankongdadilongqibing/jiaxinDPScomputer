@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 607;
+	public const int ExpectedCases = 625;
 
 	private static int Main(string[] args)
 	{
@@ -49,6 +49,8 @@ internal static class Program
 		Cases.MasterDataLabel(r);
 		// RF3c: the composition chain's tolerances and the crit observation window.
 		Cases.CompositionTolerance(r);
+		// RF4f: the per-battle activity ring (order, cap, clearing).
+		Cases.CalcActivityLog(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
