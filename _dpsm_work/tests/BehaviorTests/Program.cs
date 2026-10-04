@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 691;
+	public const int ExpectedCases = 697;
 
 	private static int Main(string[] args)
 	{
@@ -58,6 +58,8 @@ internal static class Program
 		Cases.AttackSnapshotCases(r);
 		// RF4h: the process-level history ring.
 		Cases.BattleHistoryRingCases(r);
+		// RF5h: the no-separator whole-number formatter.
+		Cases.DisplayFormatWholeCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

@@ -439,6 +439,11 @@ MUTATIONS = [
          find="\tpublic const int Max = 20;",
          repl="\tpublic const int Max = 21;",
          expect="runtime/history-ring/the-cap-is-20"),
+    # ---- RF5h: the no-separator whole-number formatter ----
+    dict(name="whole-adds-separators", file="Ui/DisplayFormat.cs",
+         find="\t\treturn v.ToString(\"F0\", System.Globalization.CultureInfo.InvariantCulture);",
+         repl="\t\treturn v.ToString(\"N0\", System.Globalization.CultureInfo.InvariantCulture);",
+         expect="format/whole/and-no-thousands-separators"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

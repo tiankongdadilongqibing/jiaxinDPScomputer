@@ -222,6 +222,17 @@ internal static class DisplayFormat
 		return v.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
 	}
 
+	/// <summary>RF5h: a whole number WITHOUT thousands separators, for the "秒伤 12345" cells. This is
+	/// deliberately not <see cref="Num"/>: those cells are drawn in a proportional font where a separator
+	/// shifts the text, and the pre-RF5 code interpolated {x:F0} there. Moving it here does not change one
+	/// character of what the user sees -- that is the point -- and it removes the last inline format
+	/// specifier from the overlay rows. (The chart view still has its own :N0/:F0 sites; see the batch
+	/// record RF5H for why unifying those needs a decision, not a refactor.)</summary>
+	internal static string Whole(double v)
+	{
+		return v.ToString("F0", System.Globalization.CultureInfo.InvariantCulture);
+	}
+
 
 
 

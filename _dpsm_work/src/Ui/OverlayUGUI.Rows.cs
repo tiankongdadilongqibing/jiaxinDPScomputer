@@ -1150,7 +1150,7 @@ public static partial class OverlayUGUI
 		{
 			if (a.DamageDealt == 0L && a.DamageTaken == 0L && a.HealingGiven == 0L && a.HealingTaken == 0L) continue;
 			rows.Add(new RowDef { Text = Aclabel(a), Color = AllyColor, Height = 18f });
-			rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {a.Dps(secs):F0}   最大 {a.MaxHitDamage:N0}   受击 {a.DamageTaken:N0}   受回复 {a.HealingTaken:N0}", Color = NeutralColor, Height = 16f });
+			rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {DisplayFormat.Whole(a.Dps(secs))}   最大 {a.MaxHitDamage:N0}   受击 {a.DamageTaken:N0}   受回复 {a.HealingTaken:N0}", Color = NeutralColor, Height = 16f });
 		}
 		if (showEnemies)
 		{
@@ -1159,7 +1159,7 @@ public static partial class OverlayUGUI
 			{
 				if (a.DamageDealt == 0L && a.DamageTaken == 0L && a.HealingGiven == 0L) continue;
 				rows.Add(new RowDef { Text = Aclabel(a), Color = EnemyColor, Height = 18f });
-				rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {a.Dps(secs):F0}   受击 {a.DamageTaken:N0}", Color = NeutralColor, Height = 16f });
+				rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {DisplayFormat.Whole(a.Dps(secs))}   受击 {a.DamageTaken:N0}", Color = NeutralColor, Height = 16f });
 			}
 		}
 	}
@@ -1197,7 +1197,7 @@ public static partial class OverlayUGUI
 		{
 			string tag = dup.Contains(a.Name) ? (sideAlly ? "  [我方]" : "  [敌方]") : "";
 			rows.Add(new RowDef { Text = Aclabel(a) + tag, Color = nameColor, Height = 18f });
-			rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {a.Dps(secs):F0}   最大单次 {a.MaxHitDamage:N0}   受击 {a.DamageTaken:N0}", Color = NeutralColor, Height = 16f });
+			rows.Add(new RowDef { Text = $"  伤害 {a.DamageDealt:N0}   秒伤 {DisplayFormat.Whole(a.Dps(secs))}   最大单次 {a.MaxHitDamage:N0}   受击 {a.DamageTaken:N0}", Color = NeutralColor, Height = 16f });
 			if (a.DamageFriendly > 0L)
 				rows.Add(new RowDef { Text = $"  自伤/回复反噬 {a.DamageFriendly:N0}({a.FriendlyHits} 次,已含在伤害内)", Color = WarnColor, Height = 16f });
 			if (sideAlly && (a.HealingTaken != 0L || a.HealingGivenNominal != 0L || a.HealingSelf != 0L || a.HealingGiven != 0L))
