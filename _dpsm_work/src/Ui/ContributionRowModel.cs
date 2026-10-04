@@ -19,6 +19,27 @@ internal struct ContributionActorValues
 	public double Hits;
 }
 
+/// <summary>One rule row's values (table 2).</summary>
+internal struct ContributionRuleValues
+{
+	public string Name;
+	public string Kind;
+	public string Side;
+	public string Owner;
+	public double Hits;
+	public double Folds;
+	public double Damage;
+}
+
+/// <summary>One relation row's values (table 3), with both endpoint names already resolved.</summary>
+internal struct ContributionLinkValues
+{
+	public string From;
+	public string To;
+	public double Hits;
+	public double Amount;
+}
+
 /// <summary>The contribution table's row values plus the four sums its footer prints.</summary>
 internal sealed class ContributionTableValues
 {
@@ -27,6 +48,10 @@ internal sealed class ContributionTableValues
 	public double SumSelf;
 	public double SumAssist;
 	public double SumReceived;
+	public readonly List<ContributionRuleValues> Rules = new List<ContributionRuleValues>();
+	public int RuleTotal;
+	public readonly List<ContributionLinkValues> Links = new List<ContributionLinkValues>();
+	public int LinkTotal;
 }
 
 /// <summary>
@@ -71,5 +96,57 @@ internal static class ContributionRowModel
 			});
 		}
 		return v;
+	}
+
+	/// <summary>How many rows of the rule and link tables are shown before the "... 共 N 条" line. Named
+	/// because it decides what the user sees, and it was a bare 12 in two loops.</summary>
+	public const int ShownLimit = 12;
+
+	/// <summary>
+	/// Table 2 (rule equivalents): rules with a positive equivalent, capped at ShownLimit. <see
+	/// cref="ContributionTableValues.RuleTotal"/> is the FULL rule count, because the overflow line reports
+	/// the total rather than the remainder.
+	/// </summary>
+	public static void BuildRules(ContributionResult res, ContributionTableValues v)
+	{
+		if (res == null || res.Rules == null) return;
+		v.RuleTotal = res.Rules.Count;
+		for (int i = 0; i < res.Rules.Count && v.Rules.Count < ShownLimit; i++)
+		{
+			ContributionRuleRow rr = res.Rules[i];
+			if (rr == null || rr.Damage <= 0.0) continue;
+			v.Rules.Add(new ContributionRuleValues
+			{
+				Name = rr.Name, Kind = rr.Kind, Side = rr.Side, Owner = rr.OwnerName,
+				Hits = rr.Hits, Folds = rr.Folds, Damage = rr.Damage,
+			});
+		}
+	}
+
+	/// <summary>Table 3 (relations): every link up to ShownLimit, with both endpoints NAMED. There is no
+	/// value filter here -- unlike the rules table -- because a link only exists when something moved.</summary>
+	public static void BuildLinks(ContributionResult res, ContributionTableValues v)
+	{
+		if (res == null || res.Links == null) return;
+		v.LinkTotal = res.Links.Count;
+		for (int i = 0; i < res.Links.Count && v.Links.Count < ShownLimit; i++)
+		{
+			ContributionLinkRow l = res.Links[i];
+			if (l == null) continue;
+			v.Links.Add(new ContributionLinkValues
+			{
+				From = LinkName(res, l.From), To = LinkName(res, l.To), Hits = l.Hits, Amount = l.Amount,
+			});
+		}
+	}
+
+	/// <summary>The display name of a link endpoint: the actor's own name when the key is known, else
+		/// "#key" (a link can name a unit the result does not list).</summary>
+	public static string LinkName(ContributionResult res, int key)
+	{
+		if (res != null && res.Actors != null)
+			for (int i = 0; i < res.Actors.Count; i++)
+				if (res.Actors[i] != null && res.Actors[i].Key == key) return res.Actors[i].Name;
+		return "#" + key;
 	}
 }

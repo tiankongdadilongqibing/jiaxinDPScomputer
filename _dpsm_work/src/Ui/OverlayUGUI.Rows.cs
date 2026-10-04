@@ -438,6 +438,8 @@ public static partial class OverlayUGUI
 		// RF5f: the VALUES come from the pure row model (which actors are shown, both shares, and the four
 		// sums the footer prints); the renderer only turns them into rows.
 		ContributionTableValues t1 = ContributionRowModel.Build(res, total);
+		ContributionRowModel.BuildRules(res, t1);
+		ContributionRowModel.BuildLinks(res, t1);
 		for (int i = 0; i < t1.Rows.Count; i++)
 		{
 			ContributionActorValues a = t1.Rows[i];
@@ -483,22 +485,20 @@ public static partial class OverlayUGUI
 			Text = ContributionColumns.HeaderLine(ContributionColumns.T2),
 			Color = DimColor, Height = 15f,
 		});
-		int shown = 0;
-		for (int i = 0; i < res.Rules.Count && shown < 12; i++)
+		// 1.7.7 rev2: kind/side were the last padded cells with no width guard -- a future kind string longer
+		// than 8 columns would have shifted the row exactly like the names did. RF5g: the filter and the cap
+		// are the row model's now.
+		for (int i = 0; i < t1.Rules.Count; i++)
 		{
-			ContributionRuleRow rr = res.Rules[i];
-			if (rr.Damage <= 0.0) continue;
+			ContributionRuleValues rr = t1.Rules[i];
 			rows.Add(new RowDef
 			{
-				// 1.7.7 rev2: kind/side were the last padded cells with no width guard -- a future kind
-				// string longer than 8 columns would have shifted the row exactly like the names did.
-				Text = ContributionColumns.T2Row(rr.Name, rr.Kind, rr.Side, rr.OwnerName, rr.Hits, rr.Folds, rr.Damage),
+				Text = ContributionColumns.T2Row(rr.Name, rr.Kind, rr.Side, rr.Owner, rr.Hits, rr.Folds, rr.Damage),
 				Color = NeutralColor, Height = 15f,
 			});
-			shown++;
 		}
-		if (res.Rules.Count > shown)
-			rows.Add(new RowDef { Text = $"  ... 共 {res.Rules.Count} 条规则(按当量降序)", Color = DimColor, Height = 14f });
+		if (t1.RuleTotal > t1.Rules.Count)
+			rows.Add(new RowDef { Text = $"  ... 共 {t1.RuleTotal} 条规则(按当量降序)", Color = DimColor, Height = 14f });
 
 		// table 3: relations
 		if (res.Links.Count > 0)
@@ -512,21 +512,19 @@ public static partial class OverlayUGUI
 				Text = ContributionColumns.HeaderLine(ContributionColumns.T3),
 				Color = DimColor, Height = 15f,
 			});
-			int ln = 0;
-			for (int i = 0; i < res.Links.Count && ln < 12; i++)
+			// RF5g: the link rows (both endpoint names resolved) come from the row model; there is no value
+			// filter here, unlike the rules table.
+			for (int i = 0; i < t1.Links.Count; i++)
 			{
-				ContributionLinkRow l = res.Links[i];
-				string from = LinkName(res, l.From);
-				string to = LinkName(res, l.To);
+				ContributionLinkValues l = t1.Links[i];
 				rows.Add(new RowDef
 				{
-					Text = ContributionColumns.T3Row(from, to, l.Hits, l.Amount),
+					Text = ContributionColumns.T3Row(l.From, l.To, l.Hits, l.Amount),
 					Color = AllyColor, Height = 15f,
 				});
-				ln++;
 			}
-			if (res.Links.Count > ln)
-				rows.Add(new RowDef { Text = $"  ... 共 {res.Links.Count} 组关系", Color = DimColor, Height = 14f });
+			if (t1.LinkTotal > t1.Links.Count)
+				rows.Add(new RowDef { Text = $"  ... 共 {t1.LinkTotal} 组关系", Color = DimColor, Height = 14f });
 		}
 
 		// 1.7.5: the old text still claimed the attack-power addends stay in 基础 -- false since 1.7.4,
@@ -540,13 +538,6 @@ public static partial class OverlayUGUI
 		Font mono = GetMonoFont();
 		if (!GameRef.IsNull(mono))
 			for (int i = firstRow; i < rows.Count; i++) rows[i].Font = mono;
-	}
-
-	private static string LinkName(ContributionResult res, int key)
-	{
-		for (int i = 0; i < res.Actors.Count; i++)
-			if (res.Actors[i].Key == key) return res.Actors[i].Name;
-		return "#" + key;
 	}
 
 	private static List<RowDef> BuildRows()
