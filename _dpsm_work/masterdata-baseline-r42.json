@@ -1,0 +1,86 @@
+{
+ "_comment": "R43 baseline: the LIVE masterdata dump copied read-only out of the plugin directory.",
+ "files": {
+  "_table_registry.json": {
+   "bytes": 5915,
+   "sha256": "bf94c1d45d2896b3d96f0eee09472bf62b9a2af9bb76aa342749d0b458c0e421"
+  },
+  "ability.json": {
+   "bytes": 105978,
+   "sha256": "63fab7dbf41dd943a56a8f814832fd8ecfbb24f38b51c340731ac40b71b6e8b2"
+  },
+  "artifact.json": {
+   "bytes": 73000,
+   "sha256": "66a0d26f4bd83e2eb4124770cccf573e2d95b25e463d1a797afc0f48ee23853c"
+  },
+  "attribute.json": {
+   "bytes": 405,
+   "sha256": "bd5cc62f2ddac0434e33f387e1b4b9d0d230d4157d40d8da87a56bc0b7a3b0a2"
+  },
+  "awake_potential.json": {
+   "bytes": 86908,
+   "sha256": "42503a7f0c4c4acd57793c501da1ea953b5ea7d97c93ec5386344c22d63584c3"
+  },
+  "battle_define.json": {
+   "bytes": 1293,
+   "sha256": "194efddebcbe7e071968a6813bf78940931e92c8833cc8d9588948072de2cd1b"
+  },
+  "chasing_config.json": {
+   "bytes": 210,
+   "sha256": "b0ec3891eb569c79c7b77fae932d9b0771af7360d0cbda796bb4c43fc589c602"
+  },
+  "description.json": {
+   "bytes": 426,
+   "sha256": "ca663bc4f02693e0897499b27fcda904f09e31b8b8c848179905e28a5aa28483"
+  },
+  "detail_text.json": {
+   "bytes": 9082,
+   "sha256": "489dd9a2b0f47dcfee2454c67004fac81142946f52aa93f91cdd8d2489eb05ef"
+  },
+  "dot_damage.json": {
+   "bytes": 646,
+   "sha256": "b0340c630fd8010392e157cd712f8d03de5b654619a75f307edf1edebb463548"
+  },
+  "engraving.json": {
+   "bytes": 822,
+   "sha256": "1fc043ca8f1fdc65aebadaa879c77c0e947e0a96ade34a8756c2a9113ba2cbd8"
+  },
+  "engraving_ability.json": {
+   "bytes": 17522,
+   "sha256": "fa7bc01a5396a8169b6ec7832b764cdd000316b014dcacbf377135d80333c96f"
+  },
+  "engraving_mutate.json": {
+   "bytes": 11118,
+   "sha256": "085c307cf0b71db92fe6bf086e00b295088fe3868502792906f275eaa29482a1"
+  },
+  "engraving_reinforce.json": {
+   "bytes": 2057,
+   "sha256": "81eae76127cbc4480dac0572835d97722996bf2cc4e53fa5ed2bd6530a2cc120"
+  },
+  "equipment.json": {
+   "bytes": 60836,
+   "sha256": "4305fd6e35ff1b59c0c76cd9dcd5a4b65475b94c4bcfa46014cf79e4ebd623f3"
+  },
+  "job.json": {
+   "bytes": 20623,
+   "sha256": "06e9a129c01ebcf2e27f1e0c457d094b46ac2606e52559d58979d6730ce1173d"
+  },
+  "potential.json": {
+   "bytes": 11640,
+   "sha256": "c2b33eb6454109b5a904e0bd8dc14aa5a16c4dcc1e38e3898e1f090f6f24a9cd"
+  },
+  "rarity.json": {
+   "bytes": 1066,
+   "sha256": "fd776ab1e0ce28285bd470a762a40caf1fd0c831b85cc8358ff5ddb944145053"
+  },
+  "trait_tag.json": {
+   "bytes": 426,
+   "sha256": "6bec0811a64ea01e1acf58c5445132c75895143af3abf58937f6c121a7ef3923"
+  },
+  "tribe.json": {
+   "bytes": 621,
+   "sha256": "7b42195d12263a6d989bd98de51c09c945122b63910b156cb1eee9d2393a8e21"
+  }
+ },
+ "source": "D:\\dmmplayer\\rlyehshoujotaix_cl\\BepInEx\\plugins\\DpsMeter\\masterdata"
+}
