@@ -6,7 +6,7 @@ namespace BehaviorTests;
 internal static partial class Cases
 {
 	/// <summary>
-	/// R64: the auto-skill cadence arithmetic, exercised as production code.
+	/// R64 (relabelled in R65): the auto-skill cadence arithmetic, exercised as production code.
 	///
 	/// Why this group exists. The round's question is "how often does the auto skill actually fire, and
 	/// does that match the master row R63 published?". The measurement itself can only be taken in a live
@@ -16,9 +16,9 @@ internal static partial class Cases
 	///
 	///   * the charge rate, which is the ONLY way to check the 30-units-per-game-second rule against the
 	///     auto skill itself rather than against an active skill's `CoolTimeFrame / CoolTime`;
-	///   * the charge expressed in seconds, which is the number that has to be compared with the
-	///     master's `minCoolTime`/`maxCoolTime` -- printing 7200 next to a 240 is exactly the mistake
-	///     R63's unit rule exists to prevent;
+	///   * the charge expressed in seconds -- R65's correction lives here: the master's numbers ARE the
+	///     charge unit (measured verbatim-equal to the live `CoolTimeFrame` on 9 of 9 auto skills), so the
+	///     seconds are a DIVISION by that rate, never a multiplication;
 	///   * the interval between two activations, on one clock, tabulated as a median.
 	/// </summary>
 	public static void AutoSkillCadence(Runner r)
@@ -39,18 +39,25 @@ internal static partial class Cases
 		r.EqD("a-negative-time-span-is-not-a-rate", AutoSkillCadencePolicy.UnitsPerSecond(90, -2.0), 0.0);
 		r.EqD("a-nan-time-span-is-not-a-rate", AutoSkillCadencePolicy.UnitsPerSecond(90, double.NaN), 0.0);
 
-		// ---- the whole charge, back in the master's own unit ----
-		// THE headline conversion: 暗沌への導き's dumped frame counts must come back as the master's own
-		// seconds, and the two clocks must give the two different real-world answers.
-		r.EqD("the-9000-frame-charge-is-the-masters-300s", AutoSkillCadencePolicy.SecondsFor(9000, 30.0), 300.0);
-		r.EqD("the-7200-frame-charge-is-the-masters-240s", AutoSkillCadencePolicy.SecondsFor(7200, 30.0), 240.0);
-		r.EqD("the-same-charge-is-160-real-seconds-at-the-wall-rate", AutoSkillCadencePolicy.SecondsFor(7200, 45.0), 160.0);
-		r.EqD("the-same-charge-is-200-real-seconds-at-the-wall-rate", AutoSkillCadencePolicy.SecondsFor(9000, 45.0), 200.0);
+		// ---- the whole charge, back in SECONDS ----
+		// THE headline conversion, and the one R65 corrected: the master's numbers ARE the charge unit, so
+		// the seconds come from a DIVISION by the measured rate. These six are the values a live battle
+		// actually reported on 2026-10-06 (`Skill.CoolTimeFrame` per unit, and the master's own
+		// `maxCoolTime`/`minCoolTime` was equal to each of them VERBATIM -- 9 of 9, none of them x30).
+		r.EqD("the-measured-240-unit-charge-is-8-game-seconds", AutoSkillCadencePolicy.SecondsFor(240, 30.0), 8.0);
+		r.EqD("the-measured-150-unit-charge-is-5-game-seconds", AutoSkillCadencePolicy.SecondsFor(150, 30.0), 5.0);
+		r.EqD("the-measured-210-unit-charge-is-7-game-seconds", AutoSkillCadencePolicy.SecondsFor(210, 30.0), 7.0);
+		r.EqD("the-measured-420-unit-charge-is-14-game-seconds", AutoSkillCadencePolicy.SecondsFor(420, 30.0), 14.0);
+		r.EqD("the-measured-2970-unit-charge-is-99-game-seconds", AutoSkillCadencePolicy.SecondsFor(2970, 30.0), 99.0);
+		// The same charge measured against the OTHER clock. The game clock runs 1.5x real time (measured:
+		// 30 units per game second vs ~44.8 per real second), so the real duration is SHORTER -- which is
+		// exactly the direction a "the master is in seconds, so it takes 240 seconds" reading gets wrong.
+		r.EqD("the-same-charge-is-shorter-in-real-seconds", AutoSkillCadencePolicy.SecondsFor(240, 45.0), 16.0 / 3.0);
 		r.EqD("a-zero-charge-is-not-a-zero-second-cooldown", AutoSkillCadencePolicy.SecondsFor(0, 30.0), 0.0);
 		r.EqD("a-negative-charge-has-no-duration", AutoSkillCadencePolicy.SecondsFor(-1, 30.0), 0.0);
-		r.EqD("a-zero-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(9000, 0.0), 0.0);
-		r.EqD("a-negative-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(9000, -30.0), 0.0);
-		r.EqD("a-nan-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(9000, double.NaN), 0.0);
+		r.EqD("a-zero-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(240, 0.0), 0.0);
+		r.EqD("a-negative-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(240, -30.0), 0.0);
+		r.EqD("a-nan-rate-has-no-duration", AutoSkillCadencePolicy.SecondsFor(240, double.NaN), 0.0);
 
 		// ---- the interval between two activations ----
 		r.EqD("consecutive-activations-give-their-difference", AutoSkillCadencePolicy.IntervalSeconds(10.0, 26.0), 16.0);

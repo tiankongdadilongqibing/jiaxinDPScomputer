@@ -57,10 +57,10 @@
     <Compile Include="$(SrcRoot)\Policy\MasterDataLabelPolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\CompositionTolerancePolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\GlobalRuleApplyPolicy.cs" />
-    <!-- R63: the master-data skill cooldown unit conversion (master SECONDS -> the game's update count at
-         the measured 30 units per game second). Game-free by construction, which is what lets the new
-         auto-skill dump's unit be executed here instead of only argued about. -->
-    <Compile Include="$(SrcRoot)\Policy\SkillCooldownPolicy.cs" />
+    <!-- R63's `SkillCooldownPolicy` was DELETED in R65: its only caller published the auto-skill
+         cooldown x30, and a live battle falsified the "the master stores seconds" premise (the live
+         `Skill.CoolTimeFrame` equals the master value verbatim on 9 of 9 auto skills). The knowledge that
+         replaced it is a DIVISION, and it lives in `AutoSkillCadencePolicy.SecondsFor` just below. -->
     <!-- R64: the auto-skill cadence arithmetic (charge units/second, the charge expressed in seconds, the
          interval between activations, its median). Pure by construction: the readings themselves need the
          IL2CPP surface and live in the probe, the conversions that publish them do not. -->

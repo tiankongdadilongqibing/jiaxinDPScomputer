@@ -33,18 +33,21 @@ namespace DpsMeter;
 ///     machine `Status { NotHave, Charge, Usable, Using }`. `Skill.Type` is read too, so a slot holding
 ///     an ACTIVE skill is labelled as such instead of being reported as an auto skill.
 ///
-/// TWO CHANNELS, ON PURPOSE (they cross-check each other)
+/// TWO CHANNELS, ON PURPOSE -- BUT ONLY ONE OF THEM IS AN ACTIVATION (corrected in R65)
 ///   1. `via=cmd` -- a postfix on the game's own command entry point
 ///      `GameCmdExecuter.ActExecutePlayerAutoSkillForPassive(Player, int index, Vector3)`. This is the
-///      exact activation instant and it carries the game's own return value.
-///   2. `via=poll` -- the charge sampler detects the rising edge of `GetStatus() == Using` (or of
-///      `IsActivated`) on the same `Skill` objects. If the patch ever stops resolving, the moments are
-///      still recorded, and if the two channels disagree the counts say so instead of one being assumed
-///      true. Same "two independent routes" rule as the 1.5.4 madness-applier channel.
+///      activation, and it carries the game's own return value. **Every published interval comes from
+///      here.** The raw `index` is printed as `gameIdx=` and the resolution used is printed inside `via=`
+///      (`cmd/named` vs `cmd/rosterPos`), because the game's index semantics are not yet settled.
+///   2. `via=usingEdge` -- the rising edge of `GetStatus() == Using` on the same `Skill` objects. R64
+///      treated this as a second activation channel and let it into the median. **MEASURED 2026-10-06: it
+///      is not an activation.** `Using` flickers, so for トレイラ it produced 9 "events" with a 1.10 s
+///      median gap while the command channel showed real firing gaps of 8.08 and 10.18 s. It is kept as
+///      evidence of the flicker, labelled `not an activation`, and excluded from every interval.
 ///
 /// The sampler is read-only, bounded (one line per slot per <see cref="SampleSeconds"/>, at most
-/// <see cref="MaxSlots"/> slots, at most <see cref="MaxActivationRows"/> activation rows), and counts
-/// every failure, so "this unit has no auto skill" and "the probe could not read it" never look alike.
+/// <see cref="MaxSlots"/> slots, at most <see cref="MaxActivationRows"/> intervals), and counts every
+/// failure, so "this unit has no auto skill" and "the probe could not read it" never look alike.
 ///
 /// CLOCK DISCIPLINE. The command channel runs OUTSIDE the frame loop, so it reads the clocks itself; the
 /// sampler is handed the battle session by `Aggregator.Tick`. Both print the same pair (real seconds
@@ -58,16 +61,20 @@ internal static class AutoSkillProbe
 	internal const double SampleSeconds = 2.0;
 
 	private const double ScanSeconds = 0.5;
-	private const int MaxSlots = 24;
+	private const int MaxSlots = 64;
 	private const int MaxActivationRows = 400;
 	private const int MaxFallbackPassives = 8;
 
 	/// <summary>Charge lines written.</summary>
 	internal static int SampleRows;
-	/// <summary>Activation rows written from the command postfix.</summary>
+	/// <summary>Activation rows written from the command postfix. THIS is the channel the published
+	/// interval comes from.</summary>
 	internal static int CommandActivations;
-	/// <summary>Activation rows written from the charge sampler's rising edge.</summary>
-	internal static int PollActivations;
+	/// <summary>Rows written from the sampler's `GetStatus() == Using` rising edge. R65: NOT an activation
+	/// and deliberately EXCLUDED from every interval. Measured 2026-10-06: `Using` flickers, so this edge
+	/// fired 9 times in 44 s for トレイラ (median gap 1.10 s) while her real firing gaps were 8.08 and
+	/// 10.18 s. It is kept only as evidence of that flicker.</summary>
+	internal static int UsingEdges;
 	/// <summary>Field reads that threw (an unreadable slot, not a missing one).</summary>
 	internal static int ReadErrors;
 	/// <summary>Slot READS that found no auto skill at all (the normal case for most units, and most units
@@ -77,7 +84,7 @@ internal static class AutoSkillProbe
 	internal static int PlayersSeen;
 	/// <summary>Players reached only through `Skill.m_owner` because the standby row's player was null.</summary>
 	internal static int PlayersViaOwner;
-	/// <summary>Slots reached only by scanning `Player.PassiveSkills` (both named slots empty).</summary>
+	/// <summary>Slots reached by scanning `Player.PassiveSkills`.</summary>
 	internal static int PassiveFallbacks;
 	/// <summary>Intervals that exceeded <see cref="MaxActivationRows"/> and were therefore not kept for
 	/// the median. The activation ROWS themselves are all written to the runtime log regardless.</summary>
@@ -87,22 +94,41 @@ internal static class AutoSkillProbe
 	internal static int NullPlayers;
 	/// <summary>Slots dropped after <see cref="MaxSlots"/>.</summary>
 	internal static int SlotsDropped;
+	/// <summary>R65: command postfix calls whose slot index the probe could NOT resolve to a `Skill`.
+	/// These used to create a nameless slot (measured 2026-10-06: 32 rows) and, worse, those junk slots
+	/// consumed the slot budget so that 9 REAL slots were evicted. Now they are counted here and write a
+	/// single row each, so "the game passed an index I do not understand" is visible instead of silent.
+	/// The game's raw index is printed verbatim in `gameIdx=`.</summary>
+	internal static int CommandUnresolved;
+	/// <summary>R65: slots that hold a placeholder `Skill` (no name, `CoolTimeFrame == 0`, `WaitCountFrame
+	/// == 0`) -- measured 2026-10-06: `Player.AutoSkill2` is such a placeholder on most units. They are
+	/// printed ONCE each (so the fact is recorded) and then left silent, which is what frees the slot
+	/// budget for real skills.</summary>
+	internal static int PlaceholderSlots;
 
 	private static readonly Dictionary<string, SlotState> Slots = new Dictionary<string, SlotState>();
 
+	/// <summary>Units whose `[AUTOSK] roster` line has already been printed (once per battle).</summary>
+	private static readonly HashSet<string> RosterLogged = new HashSet<string>();
+
 	private static double _lastScanWall = double.MinValue;
 
-	/// <summary>Per (unit, slot) state. Keyed by `EntryId|name|index`.</summary>
+	/// <summary>Per (unit, slot) state. R65: keyed by `EntryId|name|skillId` -- NOT by the slot index --
+	/// because `Player.AutoSkill1` can hand back a DIFFERENT `Skill` over time (measured 2026-10-06:
+	/// T.O.W.E.R.typeR's slot read `CoolTimeFrame` 420 in two `cmd` rows and 300 in every `chg` sample),
+	/// and keying by index merged the two into one contradiction.</summary>
 	private sealed class SlotState
 	{
 		internal string Unit;
 		internal string SkillName;
+		internal int SkillId;
 		internal int Index;
 		internal int LastType = int.MinValue;
 		internal string LastStatus = "";
 		internal int LastUsing;
 		internal bool Scanned;
 		internal bool Logged;
+		internal bool Quiet;
 		internal double LastWall;
 		internal double LastActive;
 		internal int LastWait;
@@ -117,10 +143,13 @@ internal static class AutoSkillProbe
 	internal static void Reset()
 	{
 		Slots.Clear();
+		RosterLogged.Clear();
 		_lastScanWall = double.MinValue;
 		SampleRows = 0;
 		CommandActivations = 0;
-		PollActivations = 0;
+		UsingEdges = 0;
+		CommandUnresolved = 0;
+		PlaceholderSlots = 0;
 		ReadErrors = 0;
 		EmptySlots = 0;
 		PlayersSeen = 0;
@@ -142,6 +171,13 @@ internal static class AutoSkillProbe
 	/// materialising an argument is the part of a detour that has crashed this plugin before
 	/// (`Hooks/BattleObjectHooks.cs`) and nothing here needs the position.
 	///
+	/// R65: the game's `index` is reported VERBATIM as `gameIdx=` and is NOT assumed to be the probe's own
+	/// slot number. Measured 2026-10-06 it is 0 or 1: `1` resolved to a `Skill.Type == 3`
+	/// (AutoSkill1ForPassiveSkill) through `Player.AutoSkill1`, and `0` resolved to nothing at all. So the
+	/// probe resolves the skill first and, when it cannot, records the raw index and ONE row instead of
+	/// inventing a nameless slot. What that `0` actually selects is still open; the roster printed by
+	/// `Scan` (`Player.PassiveSkills` with each `passiveIdx`) is what will settle it.
+	///
 	/// Never throws outwards: a probe must not be able to break the game's activation path.
 	/// </summary>
 	internal static void NoteCommand(Player player, int index, bool result)
@@ -157,7 +193,17 @@ internal static class AutoSkillProbe
 			// fire during the post-battle sequence, and dropping those rows would lose real activations.
 			if (Aggregator.Session == null) return;
 			if (player == null) { NullPlayers++; return; }
-			NoteActivation(player, index, SlotSkill(player, index), "cmd", result ? 1 : 0);
+			string resolvedBy;
+			Skill sk = ResolveCommandSkill(player, index, out resolvedBy);
+			if (sk == null)
+			{
+				CommandUnresolved++;
+				if (CommandUnresolved <= 8) RuntimeLog.Write(
+					"[AUTOSK] cmdunres unit=" + UnitLabel(player) + " gameIdx=" + index
+					+ " ok=" + (result ? 1 : 0) + " (no Skill resolved for this index; not counted as an activation)");
+				return;
+			}
+			NoteActivation(player, index, sk, "cmd/" + resolvedBy, result ? 1 : 0);
 		}
 		catch { ReadErrors++; }
 	}
@@ -226,11 +272,15 @@ internal static class AutoSkillProbe
 
 	private static void ObservePlayer(Player p, BattleSession s, double wall)
 	{
+		// R65: the passive roster is printed ONCE per unit per battle. It is the data that settles what the
+		// game's `index` means -- without it the raw index in the `cmd` rows cannot be matched to anything.
+		LogRoster(p);
+
 		int live = 0;
 		try
 		{
-			live += SampleSlot(p, 1, SlotSkill(p, 1), s, wall);
-			live += SampleSlot(p, 2, SlotSkill(p, 2), s, wall);
+			live += SampleSlot(p, 1, NamedSlotSkill(p, 1), s, wall);
+			live += SampleSlot(p, 2, NamedSlotSkill(p, 2), s, wall);
 		}
 		catch { ReadErrors++; }
 		if (live > 0) return;
@@ -261,6 +311,50 @@ internal static class AutoSkillProbe
 		catch { ReadErrors++; }
 	}
 
+	/// <summary>R65: one `[AUTOSK] roster` line per unit per battle -- every `Player.PassiveSkills` entry
+	/// with its `Index`, its `AutoSkill`'s name/`Skill.Type`/`CoolTimeFrame`/`WaitCountFrame`, and the
+	/// two named slots beside them. Bounded and printed once, so "which passive carries which auto skill,
+	/// and what number does the game's `index` refer to" is answered from data instead of assumed.</summary>
+	private static void LogRoster(Player p)
+	{
+		try
+		{
+			string unit = UnitLabel(p);
+			// Keyed by EntryId AND name: two units can share a display name, and hiding the second one's
+			// roster would hide exactly the case this line exists to expose.
+			string rosterKey;
+			try { rosterKey = p.EntryId + "|" + unit; } catch { rosterKey = unit; }
+			if (!RosterLogged.Add(rosterKey)) return;
+			StringBuilder sb = new StringBuilder(300);
+			sb.Append("[AUTOSK] roster unit=").Append(unit)
+				.Append(" auto1=").Append(SkillLabel(NamedSlotSkill(p, 1)))
+				.Append(" auto2=").Append(SkillLabel(NamedSlotSkill(p, 2)));
+			Il2CppReferenceArray<PassiveSkill> arr = null;
+			try { arr = p.PassiveSkills; } catch { ReadErrors++; }
+			if (arr == null) { sb.Append(" passiveSkills=null"); RuntimeLog.Write(sb.ToString()); return; }
+			sb.Append(" passiveSkills=").Append(arr.Length);
+			int n = arr.Length;
+			if (n > MaxFallbackPassives) n = MaxFallbackPassives;
+			for (int i = 0; i < n; i++)
+			{
+				PassiveSkill ps = null;
+				try { ps = arr[i]; } catch { ReadErrors++; continue; }
+				if (ps == null) continue;
+				int pidx = int.MinValue;
+				Skill sk = null;
+				try { pidx = ps.Index; } catch { ReadErrors++; }
+				try { sk = ps.AutoSkill; } catch { ReadErrors++; }
+				sb.Append(" [pos=").Append(i).Append(" passiveIdx=").Append(pidx)
+					.Append(" skill=").Append(SkillLabel(sk))
+					.Append(" type=").Append(TypeNumber(ReadType(sk)))
+					.Append(" wait=").Append(ReadWait(sk)).Append('/').Append(ReadCoolFrames(sk))
+					.Append(']');
+			}
+			RuntimeLog.Write(sb.ToString());
+		}
+		catch { ReadErrors++; }
+	}
+
 	private static bool HasPassiveAutoSkill(Player p)
 	{
 		try { return p.HasAutoSkillForPassiveSkill; }
@@ -275,12 +369,12 @@ internal static class AutoSkillProbe
 	{
 		if (sk == null) { EmptySlots++; return 0; }
 		string unit = UnitLabel(p);
-		string key = KeyOf(p, index);
+		string key = KeyOf(p, sk);
 		SlotState st;
 		if (!Slots.TryGetValue(key, out st))
 		{
 			if (Slots.Count >= MaxSlots) { SlotsDropped++; return 1; }
-			st = new SlotState { Unit = unit, Index = index };
+			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk) };
 			Slots[key] = st;
 		}
 		st.Unit = unit;
@@ -291,14 +385,47 @@ internal static class AutoSkillProbe
 		int cool = ReadCoolFrames(sk);
 		int usingNow = ((status == "Using") || ReadActivated(sk)) ? 1 : 0;
 
-		// ---- channel 2: the rising edge of "in use" on the game's own state machine ----
-		if (st.Scanned && st.LastUsing == 0 && usingNow == 1) NoteActivation(p, index, sk, "poll", -1);
+		// ---- the `Using` rising edge: evidence of the game's own state machine, NOT an activation ----
+		// R65: this used to be recorded (and counted) as an activation. Measured 2026-10-06 it is not one:
+		// `Using` flickers, so for トレイラ it produced 9 "events" with a 1.10 s median gap while her real
+		// firing gaps were 8.08 and 10.18 s. It is now labelled `via=usingEdge` and EXCLUDED from every
+		// interval; the published cadence comes from the command channel only.
+		if (st.Scanned && st.LastUsing == 0 && usingNow == 1)
+		{
+			UsingEdges++;
+			string line = "[AUTOSK] usingEdge wall=" + wall.ToString("F2") + "s"
+				+ " active=" + s.ActiveSeconds.ToString("F2") + "s"
+				+ " unit=" + unit + " idx=" + index + " skill=" + SkillLabel(sk)
+				+ " type=" + TypeNumber(type) + " wait=" + wait + "/" + cool
+				+ " (not an activation; excluded from the median)";
+			RuntimeLog.Write(line);
+		}
 		st.Scanned = true;
 		st.LastUsing = usingNow;
 		st.LastType = type;
 		st.LastStatus = status;
 
-		// ---- channel 1: the charge trajectory ----
+		// ---- R65: a placeholder slot is printed ONCE and then left silent ----
+		// Measured: `Player.AutoSkill2` is a nameless `Skill` with CoolTimeFrame=0 and WaitCountFrame=0 on
+		// most units. Printing it every 2 s was pure noise AND it consumed the slot budget (24 slots, 9
+		// of them placeholders, so 9 real slots were evicted). Printing it once keeps the fact.
+		bool placeholder = (cool == 0 && wait == 0);
+		if (placeholder)
+		{
+			if (!st.Logged)
+			{
+				PlaceholderSlots++;
+				st.Logged = true;
+				st.Quiet = true;
+				RuntimeLog.Write("[AUTOSK] placeholder unit=" + unit + " idx=" + index + " skillId=" + st.SkillId
+					+ " type=" + TypeNumber(type) + " name=" + SkillLabel(sk)
+					+ " (CoolTimeFrame=0 and WaitCountFrame=0; printed once, then silent)");
+			}
+			return 1;
+		}
+		st.Quiet = false;
+
+		// ---- the charge trajectory ----
 		if (st.Logged && (wall - st.LastWall) < SampleSeconds) return 1;
 		double dWall = st.Logged ? AutoSkillCadencePolicy.IntervalSeconds(st.LastWall, wall) : 0.0;
 		double dActive = st.Logged ? AutoSkillCadencePolicy.IntervalSeconds(st.LastActive, s.ActiveSeconds) : 0.0;
@@ -312,15 +439,17 @@ internal static class AutoSkillProbe
 		st.LastWait = wait;
 		st.SkillName = SkillLabel(sk);
 
-		StringBuilder sb = new StringBuilder(260);
+		StringBuilder sb = new StringBuilder(280);
 		sb.Append("[AUTOSK] chg wall=").Append(wall.ToString("F2")).Append('s')
 			.Append(" active=").Append(s.ActiveSeconds.ToString("F2")).Append('s')
 			.Append(" unit=").Append(unit)
 			.Append(" idx=").Append(index)
+			.Append(" skillId=").Append(st.SkillId)
 			.Append(" skill=").Append(st.SkillName)
 			.Append(" type=").Append(TypeNumber(type)).Append('(').Append(TypeName(type)).Append(')')
 			.Append(" status=").Append(status)
 			.Append(" wait=").Append(wait).Append('/').Append(cool)
+			.Append(" ct=").Append(ReadCoolSeconds(sk))
 			.Append(" dur=").Append(ReadDuration(sk))
 			.Append(" stock=").Append(ReadStock(sk))
 			.Append(" passiveAuto=").Append(ReadIsPassiveAuto(sk) ? 1 : 0)
@@ -332,8 +461,11 @@ internal static class AutoSkillProbe
 				.Append(" dWall=").Append(dWall.ToString("F2"))
 				.Append(" dActive=").Append(dActive.ToString("F2"))
 				.Append(" upsGame=").Append(upsGame.ToString("F1"))
-				.Append(" upsWall=").Append(upsWall.ToString("F1"))
-				.Append(" chargeSec=").Append(AutoSkillCadencePolicy.SecondsFor(cool, upsGame).ToString("F1")).Append('s');
+				.Append(" upsWall=").Append(upsWall.ToString("F1"));
+			// R65: only when the counter really drained. A reset sample makes `upsGame` non-positive, and
+			// printing `chargeSec=0.0s` there reads like "a zero-second cooldown" instead of "not derivable".
+			if (upsGame > 0.0)
+				sb.Append(" chargeSec=").Append(AutoSkillCadencePolicy.SecondsFor(cool, upsGame).ToString("F1")).Append('s');
 		}
 		RuntimeLog.Write(sb.ToString());
 		SampleRows++;
@@ -341,21 +473,23 @@ internal static class AutoSkillProbe
 	}
 
 	/// <summary>
-	/// One activation row. `via` names the channel, so a `cmd` row and a `poll` row for the same instant
-	/// stay individually identifiable instead of being silently deduplicated.
+	/// One activation row. `via` names the channel AND how the skill was resolved
+	/// (`cmd/named`, `cmd/rosterPos`), so the two readings of the game's index stay distinguishable.
+	/// R65: only `cmd*` rows feed the interval; the `usingEdge` rows are written by `SampleSlot` and are
+	/// deliberately not routed here at all.
 	/// </summary>
 	private static void NoteActivation(Player player, int index, Skill sk, string via, int result)
 	{
 		string unit = UnitLabel(player);
-		string key = KeyOf(player, index);
+		string key = KeyOf(player, sk);
 		SlotState st;
 		if (!Slots.TryGetValue(key, out st))
 		{
 			if (Slots.Count >= MaxSlots) { SlotsDropped++; return; }
-			st = new SlotState { Unit = unit, Index = index };
+			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk) };
 			Slots[key] = st;
 		}
-		if (via == "cmd") CommandActivations++; else PollActivations++;
+		CommandActivations++;
 		st.Activations++;
 
 		double wall, active;
@@ -378,16 +512,18 @@ internal static class AutoSkillProbe
 			st.PrevActActive = active;
 		}
 
-		StringBuilder sb = new StringBuilder(220);
+		StringBuilder sb = new StringBuilder(250);
 		sb.Append("[AUTOSK] act via=").Append(via)
 			.Append(" wall=").Append(clocked ? wall.ToString("F2") + "s" : "-")
 			.Append(" active=").Append(clocked ? active.ToString("F2") + "s" : "-")
 			.Append(" unit=").Append(unit)
-			.Append(" idx=").Append(index)
+			.Append(" gameIdx=").Append(index)
+			.Append(" skillId=").Append(st.SkillId)
 			.Append(" skill=").Append(SkillLabel(sk))
 			.Append(" type=").Append(TypeNumber(ReadType(sk))).Append('(').Append(TypeName(ReadType(sk))).Append(')')
 			.Append(" status=").Append(StatusName(sk))
 			.Append(" wait=").Append(ReadWait(sk)).Append('/').Append(ReadCoolFrames(sk))
+			.Append(" ct=").Append(ReadCoolSeconds(sk))
 			.Append(" dur=").Append(ReadDuration(sk))
 			.Append(" stock=").Append(ReadStock(sk))
 			.Append(" level=").Append(ReadLevel(sk))
@@ -401,7 +537,9 @@ internal static class AutoSkillProbe
 
 	// ---- readers: each one counted, so an unreadable field is never a silent 0 ----
 
-	private static Skill SlotSkill(Player p, int index)
+	/// <summary>The two NAMED auto-skill slots the game exposes on `Player` (1 = `AutoSkill1`,
+	/// 2 = `AutoSkill2`). The sampler walks exactly these two.</summary>
+	private static Skill NamedSlotSkill(Player p, int index)
 	{
 		try
 		{
@@ -410,6 +548,51 @@ internal static class AutoSkillProbe
 			return null;
 		}
 		catch { ReadErrors++; return null; }
+	}
+
+	/// <summary>
+	/// R65: resolve the GAME's raw `index` (from `ActExecutePlayerAutoSkillForPassive`) to a `Skill`.
+	///
+	/// Two readings are tried, and `ResolvedBy` records which one answered, because the data does not yet
+	/// say which is correct:
+	///   1. `named`     -- the game's index as the probe's own slot number (1 -> `AutoSkill1`,
+	///                      2 -> `AutoSkill2`). This is what the 2026-10-06 battle supports: the only
+	///                      index that resolved at all was 1, and it resolved to a `Skill.Type == 3`
+	///                      (AutoSkill1ForPassiveSkill) skill.
+	///   2. `rosterPos` -- the game's index as a 0-based position in `Player.PassiveSkills`, taking the
+	///                      entries that actually carry an `AutoSkill`.
+	/// Returning null is a legitimate answer: the caller counts it and writes ONE row saying so, instead
+	/// of inventing a nameless slot the way 1.7.16 did.
+	/// </summary>
+	private static Skill ResolveCommandSkill(Player p, int gameIdx, out string resolvedBy)
+	{
+		resolvedBy = "none";
+		if (gameIdx == 1 || gameIdx == 2)
+		{
+			Skill named = NamedSlotSkill(p, gameIdx);
+			if (named != null) { resolvedBy = "named"; return named; }
+		}
+		try
+		{
+			Il2CppReferenceArray<PassiveSkill> arr = p.PassiveSkills;
+			if (arr == null) return null;
+			int n = arr.Length;
+			if (n > MaxFallbackPassives) n = MaxFallbackPassives;
+			int seen = 0;
+			for (int i = 0; i < n; i++)
+			{
+				PassiveSkill ps = null;
+				try { ps = arr[i]; } catch { ReadErrors++; continue; }
+				if (ps == null) continue;
+				Skill sk = null;
+				try { sk = ps.AutoSkill; } catch { ReadErrors++; continue; }
+				if (sk == null) continue;
+				if (seen == gameIdx) { resolvedBy = "rosterPos"; return sk; }
+				seen++;
+			}
+		}
+		catch { ReadErrors++; }
+		return null;
 	}
 
 	private static int ReadType(Skill sk)
@@ -489,6 +672,18 @@ internal static class AutoSkillProbe
 		try { return sk.CoolTimeFrame; } catch { ReadErrors++; return int.MinValue; }
 	}
 
+	private static int ReadCoolSeconds(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return sk.CoolTime; } catch { ReadErrors++; return int.MinValue; }
+	}
+
+	private static int ReadSkillId(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return sk.m_data.Id; } catch { ReadErrors++; return int.MinValue; }
+	}
+
 	private static int ReadDuration(Skill sk)
 	{
 		if (sk == null) return int.MinValue;
@@ -534,10 +729,14 @@ internal static class AutoSkillProbe
 		catch { return 0L; }
 	}
 
-	private static string KeyOf(Player p, int index)
+	/// <summary>R65: keyed by the SKILL's identity, not by the slot number -- `Player.AutoSkill1` can hand
+	/// back a different `Skill` over time (measured 2026-10-06: T.O.W.E.R.typeR's slot read CoolTimeFrame
+	/// 420 in two `cmd` rows and 300 in every `chg` sample), and keying by index silently merged the two
+	/// into one self-contradictory row.</summary>
+	private static string KeyOf(Player p, Skill sk)
 	{
-		try { return p.EntryId + "|" + p.Name + "|" + index; }
-		catch { return "?|" + index; }
+		try { return p.EntryId + "|" + p.Name + "|" + ReadSkillId(sk) + "|" + (sk == null ? "-" : sk.Name); }
+		catch { return "?|" + ReadSkillId(sk); }
 	}
 
 	/// <summary>The two clocks an activation is stamped with, or false when there is no live session
@@ -562,17 +761,23 @@ internal static class AutoSkillProbe
 	/// The battle-end summary: the measured cadence per slot (median of the activation intervals, on both
 	/// clocks) plus every counter, so one line answers "did it fire, how often, and was anything
 	/// unreadable". Returns "" when the probe never saw a slot.
+	///
+	/// R65: `medianWall`/`medianActive` are computed from the COMMAND channel only. If `actCmd=0` they read
+	/// `-`, which means "no activation was observed", NOT "no interval" -- the `usingEdge` rows are
+	/// evidence of the game's own state machine and are never an interval.
 	/// </summary>
 	internal static string Summary()
 	{
 		if (Slots.Count == 0) return "";
-		StringBuilder sb = new StringBuilder(420);
+		StringBuilder sb = new StringBuilder(480);
 		sb.Append("[AUTOSK] SUM samples=").Append(SampleRows)
 			.Append(" actCmd=").Append(CommandActivations)
-			.Append(" actPoll=").Append(PollActivations)
+			.Append(" cmdUnresolved=").Append(CommandUnresolved)
+			.Append(" useEdges=").Append(UsingEdges)
 			.Append(" players=").Append(PlayersSeen)
 			.Append(" viaOwner=").Append(PlayersViaOwner)
-			.Append(" passiveFallback=").Append(PassiveFallbacks)
+			.Append(" passive=").Append(PassiveFallbacks)
+			.Append(" placeholders=").Append(PlaceholderSlots)
 			.Append(" emptySlotReads=").Append(EmptySlots)
 			.Append(" nullPlayers=").Append(NullPlayers)
 			.Append(" readErrors=").Append(ReadErrors)
@@ -582,12 +787,13 @@ internal static class AutoSkillProbe
 		{
 			SlotState st = kv.Value;
 			sb.Append("\n  ").Append(st.Unit).Append(" idx=").Append(st.Index)
+				.Append(" skillId=").Append(st.SkillId)
 				.Append(" skill=").Append(string.IsNullOrEmpty(st.SkillName) ? "-" : st.SkillName)
 				.Append(" type=").Append(TypeNumber(st.LastType)).Append('(').Append(TypeName(st.LastType)).Append(')')
 				.Append(" last=").Append(string.IsNullOrEmpty(st.LastStatus) ? "-" : st.LastStatus)
-				// `rows`, not `act`: BOTH channels increment this (they are two independent routes to the
-				// same event), so a normal battle with both channels live counts each activation twice.
-				// The un-ambiguous per-activation totals are actCmd / actPoll in the header.
+				.Append(st.Quiet ? " QUIET(placeholder)" : "")
+				// `rows`, not `act`: this counts every row written for the slot. The un-ambiguous
+				// activation total is actCmd in the header.
 				.Append(" rows=").Append(st.Activations)
 				.Append(" nInterval=").Append(st.WallIntervals.Count)
 				.Append(" medianWall=").Append(Fmt(AutoSkillCadencePolicy.Median(st.WallIntervals.ToArray())))

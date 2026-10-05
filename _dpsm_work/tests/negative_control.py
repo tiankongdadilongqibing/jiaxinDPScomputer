@@ -632,27 +632,20 @@ MUTATIONS = [
          find="\t\tHitMatchRejected = 0;\n",
          repl="\t\tHitMatchRejected = 1;\n",
          expect="runtime/counters/a-new-session-zeroes-the-rejected"),
-    # ---- R63: the auto-skill master row's cooldown unit. The master stores SECONDS, the live Skill counts
-    # game updates, and the dump publishes both. Dropping the unit rate here is the exact mistake the
-    # both-columns design exists to prevent, so it must redden the case that pins the conversion -- and the
-    # rate is a PARAMETER, so the default cannot quietly substitute for a rate the game actually measured.
-    dict(name="skill-cooldown-forgets-the-unit-rate", file="Policy/SkillCooldownPolicy.cs",
-         find="		double f = seconds * unitsPerGameSecond;",
-         repl="		double f = seconds;",
-         expect="policy/skill-cooldown/the-master-seconds-become-frames"),
-    dict(name="skill-cooldown-decouples-the-fallback", file="Policy/SkillCooldownPolicy.cs",
-         find="	public const double FallbackUnitsPerGameSecond = BattleClockPolicy.DefaultUnitsPerGameSecond;",
-         repl="	public const double FallbackUnitsPerGameSecond = 40.0;",
-         expect="policy/skill-cooldown/the-fallback-rate-is-the-clock-policy-default"),
-    # ---- R64: the auto-skill charge/cadence arithmetic. The probe can only be read in a live battle, so
-    # the executable half is these three conversions -- and each mutation removes one of the three things
-    # the round claims: that the charge must be divided by the measured rate before it can be compared with
-    # the master's seconds, that a counter which ran BACKWARDS is a reset and not a small positive rate,
+    # ---- R63's two `skill-cooldown-*` mutations were DELETED in R65, together with the policy they
+    # mutated: `Policy/SkillCooldownPolicy.cs` published the auto-skill cooldown x30, and a live battle
+    # falsified its premise (`Skill.CoolTimeFrame` equals the master value verbatim on 9 of 9 auto skills).
+    # A mutation can only guard code that exists, and keeping a mutant for a deleted false rule would be a
+    # gate on nothing.
+    # ---- R64/R65: the auto-skill charge/cadence arithmetic. The probe can only be read in a live battle,
+    # so the executable half is these conversions -- and each mutation removes one of the things the round
+    # claims: that the charge must be DIVIDED by the measured rate before it can be compared with the
+    # master's own numbers, that a counter which ran BACKWARDS is a reset and not a small positive rate,
     # and that the median must not be dragged onto IntervalSeconds' own "no interval" sentinel.
     dict(name="autoskill-charge-forgets-the-clock", file="Policy/AutoSkillCadencePolicy.cs",
          find="		double v = units / unitsPerSecond;",
          repl="		double v = units;",
-         expect="policy/autoskill-cadence/the-9000-frame-charge-is-the-masters-300s"),
+         expect="policy/autoskill-cadence/the-measured-240-unit-charge-is-8-game-seconds"),
     dict(name="autoskill-rate-clamps-a-backwards-counter", file="Policy/AutoSkillCadencePolicy.cs",
          find="		if (double.IsNaN(v) || double.IsInfinity(v)) return 0.0;\n		return v;\n	}\n\n	/// <summary>\n	/// How many seconds a charge of `units`",
          repl="		if (double.IsNaN(v) || double.IsInfinity(v)) return 0.0;\n		return (v < 0.0) ? 0.0 : v;\n	}\n\n	/// <summary>\n	/// How many seconds a charge of `units`",

@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 1016;
+	public const int ExpectedCases = 1002;
 
 	private static int Main(string[] args)
 	{
@@ -67,9 +67,10 @@ internal static class Program
 		Cases.ExtractionCases(r);
 		// R56: the battle reference -- format, lifecycle, launch namespace, collision handling.
 		Cases.BattleRefCases(r);
-		// R63: the master-data skill cooldown unit conversion (master seconds -> the game's update count).
-		Cases.SkillCooldown(r);
-		// R64: the auto-skill cadence arithmetic (charge rate, charge in seconds, interval, median).
+		// R63's `Cases.SkillCooldown` and the policy it executed were DELETED in R65: the premise ("the
+		// auto-skill master stores seconds") was falsified by a live battle, so the group that pinned the
+		// x30 conversion is gone with it. 1016 -> 1002 cases (16 removed, 2 added in the cadence group).
+		// R64/R65: the auto-skill cadence arithmetic (charge rate, charge in seconds, interval, median).
 		Cases.AutoSkillCadence(r);
 
 		int fail = r.Failed;

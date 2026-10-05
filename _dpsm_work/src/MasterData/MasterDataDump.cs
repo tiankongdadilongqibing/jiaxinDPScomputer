@@ -213,9 +213,15 @@ public static class MasterDataDump
 			// second slot. Until this table was dumped the auto skill's cycle could only be INFERRED from
 			// battle data (effect-channel cadence); these are the game's own numbers.
 			//
-			// UNITS: the cooldown columns are SECONDS in the master, while the live Skill counts game
-			// updates (30/game second). Both are published -- `*CoolTime` verbatim, `*CoolTimeFrames`
-			// converted -- so nobody has to guess which one they are holding (see SkillCooldownPolicy).
+			// UNITS -- CORRECTED IN R65. R63 published two extra columns (`*CoolTimeFrames`) computed as
+			// `seconds * 30` from the claim "the master stores SECONDS". That claim is FALSIFIED for this
+			// table: measured 2026-10-06 on a live battle, `Skill.CoolTimeFrame` equals the master's
+			// `maxCoolTime` (or `minCoolTime` for a unit below max level) **VERBATIM** for 9 of 9 auto
+			// skills -- 150, 210, 240, 300, 420, 2970 all matched exactly and NOT ONE matched x30. So the
+			// numbers here ARE the game's own charge unit and the x30 columns were wrong by a factor of 30.
+			// They are gone. What a reader needs instead is the RATE, so the envelope carries the
+			// process-measured `unitsPerGameSecond` (30.0 measured: the charge counter drains 30 units per
+			// game second) -- divide, do not multiply.
 			Table<int, AutoSkillMasterTable, AutoSkillMasterData>("auto_skill", "自动技能", (AutoSkillMasterTable t) => t.m_cache, delegate (AutoSkillMasterData r, RowJson o)
 			{
 				o.OI("id", r.id);
@@ -228,8 +234,6 @@ public static class MasterDataDump
 				o.OI("maxFirstCoolTime", r.maxFirstCoolTime);
 				o.OI("minCoolTime", r.minCoolTime);
 				o.OI("maxCoolTime", r.maxCoolTime);
-				o.N("minCoolTimeFrames", SkillCooldownPolicy.Frames(GameRef.Dec(r.minCoolTime), LiveUnitsPerGameSecond()));
-				o.N("maxCoolTimeFrames", SkillCooldownPolicy.Frames(GameRef.Dec(r.maxCoolTime), LiveUnitsPerGameSecond()));
 				o.OI("minDurationTime", r.minDurationTime);
 				o.OI("maxDurationTime", r.maxDurationTime);
 				o.OI("skillRange", r.skillRange);
@@ -242,7 +246,7 @@ public static class MasterDataDump
 				o.Arr("talents", TalentsJson(r.talentList));
 				o.N("triggerTimingCount", CountOf(r.triggerTimings));
 				o.Arr("triggerTimings", TriggerTimingsJson(r.triggerTimings));
-			});
+			}, "unitsPerGameSecond", LiveUnitsPerGameSecond());
 			// 战斗定义 -- a BattleDefine.Id -> string table (21 rows, one per enum member).
 			// CORRECTED 2026-10-03 (1.4.0): the earlier "this is where the battle's coefficients live"
 			// note was WRONG and the data falsifies it -- 18 of the 21 values are ids in an id space no
@@ -419,9 +423,16 @@ public static class MasterDataDump
 	/// int) so the ValueTuple-keyed 刻印强化 table can use the same path; TKey is never read, only the
 	/// ValueCollection is, which is why a non-int key costs nothing.
 	/// </summary>
+	/// <summary>
+	/// Dump one game table. `envelopeKey`/`envelopeValue` (R65, optional) add ONE measured scalar to the
+	/// envelope beside `table`/`key`/`count`, for a table whose numbers are expressed in a unit the reader
+	/// cannot see. Only `auto_skill` uses it today: its cooldowns are counts of game updates, and the
+	/// update rate is a measurement, not a constant of the file (see the R65 note at the call site).
+	/// </summary>
 	private static void Table<TKey, TTable, TRow>(string key, string label,
 		Func<TTable, Il2CppSystem.Collections.Generic.Dictionary<TKey, TRow>> getRows,
-		Action<TRow, RowJson> write)
+		Action<TRow, RowJson> write,
+		string envelopeKey = null, double envelopeValue = 0.0)
 		where TTable : MasterTableBase
 		where TRow : Il2CppObjectBase
 	{
@@ -493,7 +504,13 @@ public static class MasterDataDump
 
 			StringBuilder sb = new StringBuilder();
 			sb.Append("{\"table\":\"").Append(Esc(label)).Append("\",\"key\":\"").Append(Esc(key))
-			  .Append("\",\"count\":").Append(count).Append(",\"rows\":[");
+			  .Append("\",\"count\":").Append(count);
+			if (!string.IsNullOrEmpty(envelopeKey))
+			{
+				sb.Append(",\"").Append(Esc(envelopeKey)).Append("\":")
+				  .Append(envelopeValue.ToString("F1", System.Globalization.CultureInfo.InvariantCulture));
+			}
+			sb.Append(",\"rows\":[");
 			int written = 0;
 			for (int i = 0; i < arr.Length; i++)
 			{
@@ -638,10 +655,11 @@ public static class MasterDataDump
 	}
 
 	/// <summary>
-	/// R63: the game units per game second as THE LIVE GAME reported them (`Skill.CoolTimeFrame /
-	/// Skill.CoolTime`, read by TimeProbe), falling back to the configured default while the probe has not
-	/// seen a usable ratio yet. The fallback is a documented constant, not a guess: 30.0 was measured for
-	/// every loaded skill (750/25, 1500/50, 1050/35).
+	/// R63/R65: the game units per game second as THE LIVE GAME reported them (`Skill.CoolTimeFrame /
+	/// Skill.CoolTime`, read by TimeProbe), falling back to the clock policy's default while the probe has
+	/// not seen a usable ratio yet. The fallback is a documented constant, not a guess: 30.0 was measured
+	/// for every loaded skill (750/25, 1500/50, 1050/35), and R65 confirmed it independently from the AUTO
+	/// skill's own charge counter (it drains exactly 30 units per game second).
 	/// </summary>
 	private static double LiveUnitsPerGameSecond()
 	{
@@ -651,7 +669,7 @@ public static class MasterDataDump
 			if (u > 0.0) return u;
 		}
 		catch { }
-		return SkillCooldownPolicy.FallbackUnitsPerGameSecond;
+		return BattleClockPolicy.DefaultUnitsPerGameSecond;
 	}
 
 	/// <summary>AbilityTalent.Param is just an array of anti-cheat ints; each element is decrypted

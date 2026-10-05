@@ -1,0 +1,17 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\decision_report.py --selftest
+  [PASS] a large separation gives an interval that excludes 0       [98.7, 102.0]
+  [PASS] identical groups give an interval covering 0               [-1.3, 1.3]
+  [PASS] interval excludes 0 + clears the threshold -> the top level 达到预先定义的改善标准
+  [PASS] a named confounder caps the level                          有倾向但不确定
+  [PASS] an interval covering 0 -> descriptive only, no direction   描述性观察(证据不足,暂不换人)
+  [PASS] too few samples per group -> descriptive only              描述性观察(证据不足,暂不换人)
+  [PASS] a real but sub-threshold effect does not reach the top level 描述性观察(证据不足,暂不换人)
+  [PASS] the current corpus produces a decision report (exit 0)     rc=0
+  [PASS] all five sections are present                              
+  [PASS] the pre-registration and the interval are printed          
+  [PASS] the report states whether the interval covers 0            
+  [PASS] the cross-check against compare/2 ran                      
+  [PASS] a pre-registration that does not match the corpus publishes NOTHING (exit 4) rc=4
+  [PASS] a tampered compare/2 share is caught by the cross-check (exit 4) rc=4
+---- selftest: PASS

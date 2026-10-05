@@ -1,0 +1,4 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_tool_registry.py
+tool registry: registered=100 active=31 unclassified=0 (pin 0) pipeline=25
+---- tool registry: PASS

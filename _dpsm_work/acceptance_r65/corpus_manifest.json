@@ -1,0 +1,1448 @@
+{
+ "checks": [
+  {
+   "bucket": "ERROR",
+   "expected": 1,
+   "kind": "crosscheck_batch",
+   "observed": 1,
+   "ok": true
+  },
+  {
+   "bucket": "LEGACY_NOT_APPLICABLE",
+   "expected": 17,
+   "kind": "crosscheck_batch",
+   "observed": 17,
+   "ok": true
+  },
+  {
+   "bucket": "PASS",
+   "expected": 14,
+   "kind": "crosscheck_batch",
+   "observed": 14,
+   "ok": true
+  },
+  {
+   "bucket": "WARNING",
+   "expected": 3,
+   "kind": "crosscheck_batch",
+   "observed": 3,
+   "ok": true
+  },
+  {
+   "bucket": "ERROR",
+   "expected": 1,
+   "kind": "crosscheck_embedded",
+   "observed": 1,
+   "ok": true
+  },
+  {
+   "bucket": "LEGACY_NOT_APPLICABLE",
+   "expected": 4,
+   "kind": "crosscheck_embedded",
+   "observed": 4,
+   "ok": true
+  },
+  {
+   "bucket": "NOT_RUN",
+   "expected": 13,
+   "kind": "crosscheck_embedded",
+   "observed": 13,
+   "ok": true
+  },
+  {
+   "bucket": "PASS",
+   "expected": 14,
+   "kind": "crosscheck_embedded",
+   "observed": 14,
+   "ok": true
+  },
+  {
+   "bucket": "WARNING",
+   "expected": 3,
+   "kind": "crosscheck_embedded",
+   "observed": 3,
+   "ok": true
+  },
+  {
+   "bucket": "full",
+   "expected": 16,
+   "kind": "applicability",
+   "observed": 16,
+   "ok": true
+  },
+  {
+   "bucket": "not_comparable",
+   "expected": 10,
+   "kind": "applicability",
+   "observed": 10,
+   "ok": true
+  },
+  {
+   "bucket": "partial",
+   "expected": 9,
+   "kind": "applicability",
+   "observed": 9,
+   "ok": true
+  },
+  {
+   "bucket": "batch.LEGACY == embedded.NOT_RUN + embedded.LEGACY",
+   "expected": 17,
+   "kind": "identity",
+   "observed": 17,
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_015919.json",
+   "expected": 1,
+   "kind": "known_bad",
+   "observed": 1,
+   "ok": true
+  },
+  {
+   "allowListed": false,
+   "bucket": "applicability(all)",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": true,
+   "bucket": "crosscheck(batch)",
+   "expected": 1,
+   "kind": "run_exit",
+   "observed": 1,
+   "ok": true,
+   "why": "the pinned 1.6.0 sample 015919 is KNOWN_BAD, so `crosscheck --batch` exits 1 by design"
+  },
+  {
+   "allowListed": false,
+   "bucket": "pairtrusted(all)",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "export_schema(all)",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "layout(all)",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "live_log",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/layout",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/schema",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/live_log",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "doc_convergence",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/doc_convergence",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "docs123",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/docs123",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "test_gate",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "given_coupling",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/given_coupling",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "p2a",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "factsig",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/applicability",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/pairtrusted",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/attribution_census",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/extract_verify",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/negctl_driver",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "extract_contract",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/extract_contract",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "battle_select",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/battle_select",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "refactor_final_check",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/refactor",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "tool_registry",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/tool_registry",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "archive_index",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/archive_index",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "v150_validate",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/v150",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/eligibility",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/eligibility_e2e",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/compare",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/decision",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/budget",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "repo_manifest_verify",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "recon_probe",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "csharp_behavior",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "csharp_behavior_negctl",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "bucket": "crosscheck(batch)",
+   "expected": "present",
+   "kind": "allowlist_used",
+   "observed": "present",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_144548.json.crosscheck",
+   "expected": "PASS",
+   "kind": "per_file",
+   "observed": "PASS",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_144548.json.applicability",
+   "expected": "full",
+   "kind": "per_file",
+   "observed": "full",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_170157.json.crosscheck",
+   "expected": "PASS",
+   "kind": "per_file",
+   "observed": "PASS",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_170157.json.applicability",
+   "expected": "full",
+   "kind": "per_file",
+   "observed": "full",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_180353.json.crosscheck",
+   "expected": "PASS",
+   "kind": "per_file",
+   "observed": "PASS",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_180353.json.applicability",
+   "expected": "full",
+   "kind": "per_file",
+   "observed": "full",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_180834.json.crosscheck",
+   "expected": "PASS",
+   "kind": "per_file",
+   "observed": "PASS",
+   "ok": true
+  },
+  {
+   "bucket": "battle_411001_20261004_180834.json.applicability",
+   "expected": "full",
+   "kind": "per_file",
+   "observed": "full",
+   "ok": true
+  },
+  {
+   "bucket": "battle_9999_20261004_165952.json.crosscheck",
+   "expected": "LEGACY_NOT_APPLICABLE",
+   "kind": "per_file",
+   "observed": "LEGACY_NOT_APPLICABLE",
+   "ok": true
+  },
+  {
+   "bucket": "battle_9999_20261004_165952.json.applicability",
+   "expected": "not_comparable",
+   "kind": "per_file",
+   "observed": "not_comparable",
+   "ok": true
+  },
+  {
+   "bucket": "battle_9999_20261004_175957.json.crosscheck",
+   "expected": "LEGACY_NOT_APPLICABLE",
+   "kind": "per_file",
+   "observed": "LEGACY_NOT_APPLICABLE",
+   "ok": true
+  },
+  {
+   "bucket": "battle_9999_20261004_175957.json.applicability",
+   "expected": "not_comparable",
+   "kind": "per_file",
+   "observed": "not_comparable",
+   "ok": true
+  },
+  {
+   "bucket": "file count",
+   "expected": 35,
+   "kind": "input_freeze",
+   "observed": 35,
+   "ok": true
+  },
+  {
+   "bucket": "file set",
+   "expected": "0 missing / 0 extra",
+   "kind": "input_freeze",
+   "observed": "0 missing / 0 extra",
+   "ok": true
+  },
+  {
+   "bucket": "changes outside --out",
+   "expected": "0 undeclared",
+   "kind": "output_isolation",
+   "observed": "0 undeclared",
+   "ok": true
+  },
+  {
+   "bucket": "_dpsm_work/export_schema_selftest.txt",
+   "expected": "declared",
+   "kind": "current_output",
+   "observed": "written",
+   "ok": true,
+   "why": "check_export_schema.py --selftest spills its transcript next to the script; the RUN report is redirected via --report"
+  },
+  {
+   "bucket": "_dpsm_work/v150_validate.txt",
+   "expected": "declared",
+   "kind": "current_output",
+   "observed": "written",
+   "ok": true,
+   "why": "v150_validate.py writes its report to a fixed path next to the script (this pipeline has no --out for it yet)"
+  }
+ ],
+ "corpus": [
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_205449.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "6784F00C8948A1A0230A8F4BFC6C129CEDF93DB939E5C3D959B6F643CEA1CFE4",
+   "size": 22099027,
+   "version": "1.5.3"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_230040.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "5349C329880394746C65FA99C8558B4F3D71B8A2EDB047ED6F1629416FCB780C",
+   "size": 21024858,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_230311.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "A5D6AF9EE4A9106B78AC31E818609FF78E053C266198DFF60738C1E12278CB0B",
+   "size": 21674665,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_230615.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "983D039421F076215DC30ACD006BABEB2E9032CE892DD5F652D2C37F4828BC4C",
+   "size": 21858359,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_231044.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "514F2CD560E870B93CCE5DEF99C3688415615F701D0C8A353B558238201A64C7",
+   "size": 21690543,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_231340.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "CD52A4C83652CA1928A1B5CD443300B12A590DBA20FA64C9203EBCFFD6FBDDE1",
+   "size": 22091439,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261003_235204.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "C51B38512EE3812CCB9282D091782AA0597EA67F538A5E02AF8476089D7F91B0",
+   "size": 22964452,
+   "version": "1.5.5"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "offline-recompute-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_411001_20261004_012328.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": null,
+   "sha256": "32A429BB667E3BEDBD0F68555D36F4C66A1664B72B467F7DC96191F7C5A40D55",
+   "size": 22775413,
+   "version": "1.5.5"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "invalid-plugin-value-trust",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "ERROR",
+   "crosscheckCode": 1,
+   "file": "battle_411001_20261004_015919.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "70D11547448BE0C9681CB1DCD634469BA1650C1CED0492B07F0DE1BA1D78BA87",
+   "size": 22357790,
+   "version": "1.6.0"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_021914.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "510CA1AF15690CDB4DEC90392B9D14D7ED8447BFA2C1EB9DD8266678C1AB54BD",
+   "size": 22758572,
+   "version": "1.6.1"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_023627.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "41CBDAC7C5DFABC92E29C276987E48E67371A042648A41E69CF323EFA9026FAD",
+   "size": 23076813,
+   "version": "1.7.0"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_033231.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "B9A86752266BA18451D2649A134FD0E29A9DACE1E521DBE61B4AEAF07431092F",
+   "size": 22985344,
+   "version": "1.7.2"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_035437.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "55268089423019B97ACC4E0B7349288973056F10B8C2877AC3ACCFD98AD708D6",
+   "size": 23070034,
+   "version": "1.7.3"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_041309.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "D8347BC90EACE27C5BD9D8D62538D9BF0FEEC095B76D010AAB612A2326F1A750",
+   "size": 24953593,
+   "version": "1.7.4"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_042637.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "9A74BA7B167DC8167EF19FC717E26CC7CC65E5521823B0B92F5450DD8E34F40D",
+   "size": 24909334,
+   "version": "1.7.5"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_042844.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "2CC436A37736818A620D29E4A5832667A304E9B11CC35429F1D66DCC5F557D68",
+   "size": 24729057,
+   "version": "1.7.5"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_113553.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "8535CAC80AE048A9FB210A94B3DE6B3EDF8188CD5F8C871DB6C27B2A76FA0714",
+   "size": 24783043,
+   "version": "1.7.5"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_115024.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "9F80DA9A83B1366475ED33C67CE1E051B1A081BD61276637BAE7CA94CECE7DDA",
+   "size": 25003256,
+   "version": "1.7.6"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "WARNING",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_115417.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.0",
+   "sha256": "C4E6E80687CD03F30D842830CBC8A278F174D6D3BAF949817DC8DF8D303F8A17",
+   "size": 24445538,
+   "version": "1.7.6"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "WARNING",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_134524.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "0863AE08E924A184D51F20C04F19B52AF07649FADCADA63156DFFF9501D14A84",
+   "size": 24661228,
+   "version": "1.7.8"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_134853.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "DB1C80B48F550D3CC9293BEB991BBEBD3A3B04FD29B0F79ABE1B4BBD9C02C262",
+   "size": 25066069,
+   "version": "1.7.8"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_144548.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "20B4ADC14BEBD5E101C45B56B79DB54D203B65A5D0FE40D21073638D60C50CA7",
+   "size": 24931325,
+   "version": "1.7.10"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_170157.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "9B20FFE32E3CE53DAC2CE951DD1B73E7B8C4CB1D255FF51B728CDF7E9A02D4CA",
+   "size": 25446800,
+   "version": "1.7.11"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_180353.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "50B518FF3945484863852767745FB8777D3223FD6526D551E112B3624DA62C6E",
+   "size": 25051231,
+   "version": "1.7.11"
+  },
+  {
+   "applicability": "full",
+   "comparisonScope": "normal-benchmark",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "PASS",
+   "crosscheckCode": 0,
+   "file": "battle_411001_20261004_180834.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 411001,
+   "schemaVersion": "1.1",
+   "sha256": "E6624B99CCE59423A7480A78E817121ED538D4E0F597A7C6BEEF60FEC791B563",
+   "size": 21674594,
+   "version": "1.7.11"
+  },
+  {
+   "applicability": "partial",
+   "comparisonScope": "caveat-attribute-affinity",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "WARNING",
+   "crosscheckCode": 0,
+   "file": "battle_700817_20261004_114821.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 59,
+   "quest": 700817,
+   "schemaVersion": "1.0",
+   "sha256": "83A558F61F5093C2520F6093D45E135EE9E15A5B998FA832AAED22F0A76D079A",
+   "size": 867383,
+   "version": "1.7.6"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_9999_20261003_205129.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 2,
+   "quest": 9999,
+   "schemaVersion": null,
+   "sha256": "ACDB30DC4115B923F5734BF2EFF2FC8CA936391B050F60EFA6482A75B5BD88C2",
+   "size": 2986347,
+   "version": "1.5.3"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_9999_20261003_225530.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 5,
+   "quest": 9999,
+   "schemaVersion": null,
+   "sha256": "776CB73144750C22A8F9E192FAA2E31AB0B96B65E4C4F68D7AE2FA4EF03180BF",
+   "size": 496159,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_9999_20261003_225647.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 7,
+   "quest": 9999,
+   "schemaVersion": null,
+   "sha256": "19FDA06C775CB325C3DEA606981E74B7AC0330037B4172A70377BD71EE89EC60",
+   "size": 672530,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_9999_20261003_225905.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 12,
+   "quest": 9999,
+   "schemaVersion": null,
+   "sha256": "DA469A0E32BB5CBBF529437AE4C4039812C561C17C559D5B1C9FEF61CC30F751",
+   "size": 773610,
+   "version": "1.5.4"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": null,
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "NOT_RUN",
+   "crosscheckCode": null,
+   "file": "battle_9999_20261004_012138.json",
+   "hasContributionSection": false,
+   "knownMultWithoutFoldHits": 2,
+   "quest": 9999,
+   "schemaVersion": null,
+   "sha256": "58555A9E2C8887A6325DD2687A6FF773210E340986C876634217B727EBD98FB4",
+   "size": 520778,
+   "version": "1.5.5"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": "1.0",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "LEGACY_NOT_APPLICABLE",
+   "crosscheckCode": 0,
+   "file": "battle_9999_20261004_042458.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 8,
+   "quest": 9999,
+   "schemaVersion": "1.0",
+   "sha256": "364B60F610468E52C27202C92CD0AD85BF18F3C2A731A0DDE43111FBCE73CA56",
+   "size": 2496398,
+   "version": "1.7.5"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "LEGACY_NOT_APPLICABLE",
+   "crosscheckCode": 0,
+   "file": "battle_9999_20261004_135214.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 1,
+   "quest": 9999,
+   "schemaVersion": "1.1",
+   "sha256": "D17A5A5BFD38EC6EEDDC7B32171C91255FEC63220871392AEF7A4E11E894A6BD",
+   "size": 3822792,
+   "version": "1.7.8"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "LEGACY_NOT_APPLICABLE",
+   "crosscheckCode": 0,
+   "file": "battle_9999_20261004_165952.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 0,
+   "quest": 9999,
+   "schemaVersion": "1.1",
+   "sha256": "FAD510DA62B6C8F4EC84A23EA96C69001A5E74D860FF1D3F21877DA856EC8774",
+   "size": 681150,
+   "version": "1.7.11"
+  },
+  {
+   "applicability": "not_comparable",
+   "comparisonScope": "training-ground-only",
+   "contributionSchemaVersion": "1.1",
+   "correctedUnexplainedLeaks": 0,
+   "crosscheck": "LEGACY_NOT_APPLICABLE",
+   "crosscheckCode": 0,
+   "file": "battle_9999_20261004_175957.json",
+   "hasContributionSection": true,
+   "knownMultWithoutFoldHits": 8,
+   "quest": 9999,
+   "schemaVersion": "1.1",
+   "sha256": "51B12F51FC5E6BEFC25B37431D2D650E88438326B3533A2A0CE8A11380529FBE",
+   "size": 866539,
+   "version": "1.7.11"
+  }
+ ],
+ "expected": {
+  "applicability": {
+   "full": 16,
+   "not_comparable": 10,
+   "partial": 9
+  },
+  "batch": {
+   "ERROR": 1,
+   "LEGACY_NOT_APPLICABLE": 17,
+   "PASS": 14,
+   "WARNING": 3
+  },
+  "embedded": {
+   "ERROR": 1,
+   "LEGACY_NOT_APPLICABLE": 4,
+   "NOT_RUN": 13,
+   "PASS": 14,
+   "WARNING": 3
+  },
+  "known_bad": {
+   "battle_411001_20261004_015919.json": "the 1.6.0 sample (58 factor-truncation mismatches): its crosscheck ERROR is EXPECTED (roadmap 2.2)"
+  },
+  "new_files": {
+   "battle_411001_20261004_144548.json": {
+    "applicability": "full",
+    "crosscheck": "PASS",
+    "why": "first 1.7.10 real battle: PASS + full is the N0 sample verdict"
+   },
+   "battle_411001_20261004_170157.json": {
+    "applicability": "full",
+    "crosscheck": "PASS",
+    "why": "1.7.11 normal 411001 with schema 1.1, same DLL as 144548"
+   },
+   "battle_411001_20261004_180353.json": {
+    "applicability": "full",
+    "crosscheck": "PASS",
+    "why": "1.7.11 normal 411001, schema 1.1, same DLL as 170157"
+   },
+   "battle_411001_20261004_180834.json": {
+    "applicability": "full",
+    "crosscheck": "PASS",
+    "why": "1.7.11 normal 411001, schema 1.1, same DLL as 180353"
+   },
+   "battle_9999_20261004_165952.json": {
+    "applicability": "not_comparable",
+    "crosscheck": "LEGACY_NOT_APPLICABLE",
+    "why": "training quest: excluded from crosscheck, not comparable"
+   },
+   "battle_9999_20261004_175957.json": {
+    "applicability": "not_comparable",
+    "crosscheck": "LEGACY_NOT_APPLICABLE",
+    "why": "training quest, same rule as the other three 9999 samples"
+   }
+  },
+  "previous_snapshot": {
+   "applicability": {
+    "full": 12,
+    "not_comparable": 8,
+    "partial": 9
+   },
+   "as_of": "1.7.10 release (SESSION-STATE 7.2.99)",
+   "crosscheck_batch": {
+    "ERROR": 1,
+    "LEGACY_NOT_APPLICABLE": 14,
+    "PASS": 10,
+    "WARNING": 3
+   },
+   "files": 29
+  }
+ },
+ "inputFreeze": {
+  "frozen": [
+   "battle_411001_20261003_205449.json",
+   "battle_411001_20261003_230040.json",
+   "battle_411001_20261003_230311.json",
+   "battle_411001_20261003_230615.json",
+   "battle_411001_20261003_231044.json",
+   "battle_411001_20261003_231340.json",
+   "battle_411001_20261003_235204.json",
+   "battle_411001_20261004_012328.json",
+   "battle_411001_20261004_015919.json",
+   "battle_411001_20261004_021914.json",
+   "battle_411001_20261004_023627.json",
+   "battle_411001_20261004_033231.json",
+   "battle_411001_20261004_035437.json",
+   "battle_411001_20261004_041309.json",
+   "battle_411001_20261004_042637.json",
+   "battle_411001_20261004_042844.json",
+   "battle_411001_20261004_113553.json",
+   "battle_411001_20261004_115024.json",
+   "battle_411001_20261004_115417.json",
+   "battle_411001_20261004_134524.json",
+   "battle_411001_20261004_134853.json",
+   "battle_411001_20261004_144548.json",
+   "battle_411001_20261004_170157.json",
+   "battle_411001_20261004_180353.json",
+   "battle_411001_20261004_180834.json",
+   "battle_700817_20261004_114821.json",
+   "battle_9999_20261003_205129.json",
+   "battle_9999_20261003_225530.json",
+   "battle_9999_20261003_225647.json",
+   "battle_9999_20261003_225905.json",
+   "battle_9999_20261004_012138.json",
+   "battle_9999_20261004_042458.json",
+   "battle_9999_20261004_135214.json",
+   "battle_9999_20261004_165952.json",
+   "battle_9999_20261004_175957.json"
+  ]
+ },
+ "labelingDivergence": {
+  "files": [
+   "battle_411001_20261003_205449.json",
+   "battle_411001_20261003_230040.json",
+   "battle_411001_20261003_230311.json",
+   "battle_411001_20261003_230615.json",
+   "battle_411001_20261003_231044.json",
+   "battle_411001_20261003_231340.json",
+   "battle_411001_20261003_235204.json",
+   "battle_411001_20261004_012328.json",
+   "battle_9999_20261003_205129.json",
+   "battle_9999_20261003_225530.json",
+   "battle_9999_20261003_225647.json",
+   "battle_9999_20261003_225905.json",
+   "battle_9999_20261004_012138.json"
+  ],
+  "note": "a file with no contribution section is LEGACY_NOT_APPLICABLE to `crosscheck --batch` and NOT_RUN to the applicability report: same fact, two words. Tracked by N1 (an absent section must not pass as legacy-ok)."
+ },
+ "meta": {
+  "config": "BepInEx/config/dev.dpsmeter.cfg",
+  "config_sha256": "027EDA53C01A91926018C808D732814B6A8146D0BA7C532A428D62C148F572D5",
+  "config_switches": {
+   "AbilityDump": "true",
+   "AbilityRoster": "true",
+   "AutoSkillProbe": "true",
+   "ChartBothSides": "true",
+   "ChartPerSecond": "false",
+   "Contribution": "true",
+   "DamageComposition": "true",
+   "ExtractOnBattleEnd": "true",
+   "FactStore": "true",
+   "FilterFriendlyFire": "false",
+   "Forensics": "true",
+   "GivenGiverHook": "true",
+   "GivenTalent": "true",
+   "Madness": "true",
+   "MadnessApplier": "true",
+   "MadnessVictim": "true",
+   "MasterDataDump": "true",
+   "ParamOwners": "true",
+   "PowerProbe": "true",
+   "ReconcileCalc": "true",
+   "RosterRouteA": "true",
+   "ShowContribution": "true",
+   "ShowEnemies": "true",
+   "ShowSkills": "false",
+   "SlotProbe": "false",
+   "StateTimeline": "true",
+   "StatusResist": "true",
+   "TalentTriggers": "true",
+   "TimerUsesGameTime": "false",
+   "TraceCandidates": "true",
+   "VerboseEvents": "false",
+   "WheelScrolls": "true"
+  },
+  "deployed_dll": "BepInEx/plugins/DpsMeter/DpsMeter.dll",
+  "deployed_dll_sha256": "FA8E59188E0A2A5D00E07B27ACCD66B0F6535D01BCF3092A4C88216B7D818ABB",
+  "export_count": 35,
+  "exports_dir": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0",
+  "frozen_input": {
+   "count": 35,
+   "source": "_dpsm_work/batch-inputs-rf0.json"
+  },
+  "generated": "2026-10-06T03:53:53",
+  "notes": [
+   "logs are associated only when the log names the export path",
+   "no historical export, DLL, config or evidence file is modified by this script"
+  ],
+  "python": "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+  "schema": "n0-1",
+  "source_version_BuildInfo": "1.7.17",
+  "tool": "n0_acceptance",
+  "tool_sha256": {
+   "_dpsm_work/check_contribution_layout.py": "2B481648CC68C0BE75001558A6F5D186B3FA23B011AF45568F0987606AA54DCC",
+   "_dpsm_work/check_doc_convergence.py": "4EB7556F4334203F56E5E0A80FD8DB7D79F5F160495DA1CF350FB601063474D3",
+   "_dpsm_work/check_docs_123.py": "0BCDCD15CE3B8440114480B4D1C2388628C559E17F83543CADE48297771F8B8B",
+   "_dpsm_work/check_export_schema.py": "87F45C2E9E317DEFC7992D2A2267E3A6A5E92B76431DEF32647E13687F44D063",
+   "_dpsm_work/check_fact_signature.py": "ADE5EEBED199342863159302FDD583B415B0B80A66D5EEDEB465C85DBC9979EE",
+   "_dpsm_work/check_given_fold_coupling.py": "7E5BA04330363C4F664FB60A65B25388518C462A7B650D93BE76A1A13FE6B60C",
+   "_dpsm_work/check_live_log.py": "9C74682C998C08B8AFCE08A5D19E5E95F9F9F63CF9E15E865818A23449568CE0",
+   "_dpsm_work/check_p2a_summary_and_lastbattle.py": "C4D6DC13D6547605DFEAEF4A7319DF76C10B0CE6F38A02B8479160061431DF8B",
+   "_dpsm_work/contrib/compare.py": "14648A1D403FD24EE220C7C95625D6984E063115D4C0211D8BE2B6A603AE12C7",
+   "_dpsm_work/contrib/crosscheck.py": "FC6757AF2157AFAA2ED534225A8A08D4426590F6F8E707705C858F0E5031CD84",
+   "_dpsm_work/contribution_applicability.py": "66BC47DA56AF8E554F380DE6BFC93E955A40906C901A773B13BA10B575AE287E",
+   "_dpsm_work/contribution_gate.py": "267AF3F044F93FBEBC1571768754B6ADA404D6E59DDF7A4399695923AB5E5651",
+   "_dpsm_work/n0_acceptance.py": "600EE12E9EF0CEC029C5F933DAE8BF0CDE996EFBF4B7E3755AB5BFF3181F0DB8",
+   "_dpsm_work/pairtrusted_impact.py": "9A0AC5F10A9F1D0E1512C1372B7AD7E7677E70CAC28BDADBE58F56159FA98669",
+   "_dpsm_work/refactor_final_check.py": "D6FAAE5633AEE52404E25ED8BCBCF71A20CED72CB8EAD74155470A0112CB8CC1",
+   "_dpsm_work/repo_manifest.py": "B4AC9B818EDE6EA5338F6D2E0DE9E53B1F3C17E33B95083EFECF2793151A86F6",
+   "_dpsm_work/tests/BehaviorTests/BehaviorTests.csproj": "7D181248D0AF7CB119952F984B390F13BBB14F3D0EAA671C924D644BEADE400E",
+   "_dpsm_work/tests/BehaviorTests/Cases.Cache.cs": "CA1057A7D35B19B971C3127D1D88291344DCCDDBA5872441A859A703B493453A",
+   "_dpsm_work/tests/BehaviorTests/Cases.Clock.cs": "53B6713744EA9B384ACF3C98AA7E32930455CE8123DC9B3B984A5059A46D1BE1",
+   "_dpsm_work/tests/BehaviorTests/Cases.HitWindow.cs": "70C67F9E5CDF60F0C78F45E1CB349E33CEDDC7194A29C2856738D1CF8F7CA080",
+   "_dpsm_work/tests/BehaviorTests/Cases.Series.cs": "BB0D71042D2CAD6E3BD50A4BFEB1BBF3C85D4D94CC80B9669F30A06CC3F62224",
+   "_dpsm_work/tests/BehaviorTests/Cases.SessionState.cs": "EBE361481C4974BDD506CE336BA1B78F67ECDA575A3BAB64C47C49B31C5DF195",
+   "_dpsm_work/tests/BehaviorTests/Cases.Tiered.cs": "71B184FBF42E88F7C8FDA5D477CA418DEDF7FA6FD865A979EB3C82E21CD36E59",
+   "_dpsm_work/tests/BehaviorTests/Program.cs": "99F2282A8CA0826208EA84B40AD1F3C946C42775CC645CEACE85E0373F5FA7EA",
+   "_dpsm_work/tests/BehaviorTests/Runner.cs": "D5FD3BC0E06D814F9A3F3D5D969C6E3F57B80E620AE3F6C821663077D1F83594",
+   "_dpsm_work/tests/BehaviorTests/Stubs.cs": "F4D7781752EA76D698E71FA287CBF5AED3F60B73213FED868A016128B2EC871F",
+   "_dpsm_work/tests/negative_control.py": "80864F2372E9B1C326CA234B4C907757ACD916DCF3ABDE4BB7D9DF2760FA12CC"
+  }
+ },
+ "observed": {
+  "applicability": {
+   "full": 16,
+   "not_comparable": 10,
+   "partial": 9
+  },
+  "crosscheck_batch": {
+   "ERROR": 1,
+   "LEGACY_NOT_APPLICABLE": 17,
+   "PASS": 14,
+   "WARNING": 3
+  },
+  "crosscheck_embedded": {
+   "ERROR": 1,
+   "LEGACY_NOT_APPLICABLE": 4,
+   "NOT_RUN": 13,
+   "PASS": 14,
+   "WARNING": 3
+  }
+ },
+ "outputIsolation": {
+  "allowed": {
+   "_dpsm_work/export_schema_selftest.txt": "check_export_schema.py --selftest spills its transcript next to the script; the RUN report is redirected via --report",
+   "_dpsm_work/fact_signature_selftest.txt": "check_fact_signature.py --selftest spills its transcript next to the script; the RUN report goes to --outdir",
+   "_dpsm_work/v150_validate.txt": "v150_validate.py writes its report to a fixed path next to the script (this pipeline has no --out for it yet)"
+  },
+  "changed": [
+   "_dpsm_work/export_schema_selftest.txt",
+   "_dpsm_work/v150_validate.txt"
+  ],
+  "watch": [
+   {
+    "depth": 1,
+    "dir": "_dpsm_work"
+   },
+   {
+    "depth": 1,
+    "dir": "."
+   },
+   {
+    "depth": -1,
+    "dir": "_dpsm_work/acceptance_1.7.11"
+   },
+   {
+    "depth": -1,
+    "dir": "_dpsm_work/contrib/reports"
+   }
+  ]
+ }
+}

@@ -3,26 +3,26 @@ using System;
 namespace DpsMeter;
 
 /// <summary>
-/// PROBE (R64): the arithmetic of an auto skill's CHARGE and of the interval between its activations.
+/// PROBE (R64, corrected in R65): the arithmetic of an auto skill's CHARGE and of the interval between its
+/// activations.
 ///
 /// WHY THIS EXISTS
-/// R63 published the auto-skill master table (`AutoSkillMasterData`: `minCoolTime`/`maxCoolTime` in
-/// SECONDS and the same numbers multiplied by 30 as FRAMES) but could not say whether those numbers
-/// drive anything the player sees: the earlier reverse-inferred cadence (about 13.5 s, taken from a
-/// damage channel) does not match a 240-300 s master cooldown, and the `auto_skill` table's id space is
-/// not the damage-calc effect-id space, so the two could not be reconciled from the export alone.
-/// `Diagnostics/AutoSkillProbe.cs` answers it by reading the LIVE `Skill` instance every battle; this
-/// file holds the arithmetic that turns those readings into the published numbers, so the numbers can
-/// be executed by `tests/BehaviorTests` instead of being argued about (the same split as
-/// <see cref="SkillCooldownPolicy"/>).
+/// R63 published the auto-skill master table (`AutoSkillMasterData`) together with a claim that its
+/// `minCoolTime`/`maxCoolTime` are SECONDS and two derived columns multiplying them by 30. R65 FALSIFIED
+/// that claim from a live battle: `Skill.CoolTimeFrame` equals the master value verbatim for 9 of 9 auto
+/// skills (150/210/240/300/420/2970, not one of them x30), so those numbers ARE the game's own charge
+/// unit. The derived columns are gone and so is `SkillCooldownPolicy`, the function that produced them.
+/// `Diagnostics/AutoSkillProbe.cs` now reads the LIVE `Skill` instance every battle; this file holds the
+/// arithmetic that turns those readings into the published numbers, so the numbers can be executed by
+/// `tests/BehaviorTests` instead of being argued about.
 ///
 /// THE THREE QUANTITIES, AND WHY EACH IS A FUNCTION HERE
 ///   * <see cref="UnitsPerSecond"/> -- how fast the charge counter drains. The probe prints this so a
 ///     reader can check the "30 units per game second" rule against the auto skill itself instead of
-///     against an active skill's `CoolTimeFrame / CoolTime`.
-///   * <see cref="SecondsFor"/> -- the whole charge expressed in seconds. This is the number that must
-///     be compared with the master's `minCoolTime`/`maxCoolTime`; printing the raw frame count is how
-///     a 7200 gets compared with a 240.
+///     against an active skill's `CoolTimeFrame / CoolTime`. Measured 2026-10-06: exactly 30.0.
+///   * <see cref="SecondsFor"/> -- the whole charge expressed in seconds. This is the number that has to
+///     be compared with the master's `minCoolTime`/`maxCoolTime`, and it is a DIVISION now, not a
+///     multiplication: 240 units / 30 units-per-second = 8.0 game seconds.
 ///   * <see cref="IntervalSeconds"/> + <see cref="Median"/> -- the measured cadence, from consecutive
 ///     activation moments on ONE clock.
 ///
