@@ -260,10 +260,11 @@ MUTATIONS = [
          find="\tpublic void OnManualReset()\n\t{\n\t\tEventCount = 0;\n\t}",
          repl="\tpublic void OnManualReset()\n\t{\n\t\tEventCount = 0;\n\t\tHitDetailProduced = 0;\n\t}",
          expect="runtime/counters/a-manual-reset-keeps-the-detail-produced"),
-    dict(name="counters-thirteenth-field", file="Runtime/BattleRuntimeCounters.cs",
+    # R62 (A) added HitMatchRejected, so the family is 13 fields and this mutation adds the 14th.
+    dict(name="counters-fourteenth-field", file="Runtime/BattleRuntimeCounters.cs",
          find="\tpublic int GameTimeAtStart;",
          repl="\tpublic int GameTimeAtStart;\n\tpublic int ExtraCounter;",
-         expect="runtime/counters-shape/the-family-has-twelve-counters"),
+         expect="runtime/counters-shape/the-family-has-thirteen-counters"),
     # ---- RF5b: the display formatter ----
     dict(name="format-dispwidth-all-wide", file="Ui/DisplayFormat.cs",
          find="\t\treturn wide ? 2 : 1;",
@@ -608,6 +609,41 @@ MUTATIONS = [
          find="+ \"  自伤 \" + DisplayFormat.Fmt(friendly);",
          repl="+ \"  自伤 \" + DisplayFormat.Fmt(received);",
          expect="fallback/contribution/the-actor-line-is-verbatim"),
+    # ---- R62 (A): a damage-detail figure that belongs to ANOTHER hit must be rejected, not relabelled.
+    # The predicate is the whole decision; each mutation removes one of its four guards and must redden the
+    # case that pins it (measured defect it answers: D7F-009 factId 127 / D7F-010 factId 173).
+    dict(name="pair-reject-accepts-every-type", file="Policy/AttributionPolicy.cs",
+         find="		return recordHitType != compHitType;",
+         repl="		return true;",
+         expect="policy/record-contradiction/the-same-hit-type-does-not"),
+    dict(name="pair-reject-ignores-composition-trust", file="Policy/AttributionPolicy.cs",
+         find="		if (!compValid || !compTrusted) return false;",
+         repl="		if (false) return false;",
+         expect="policy/record-contradiction/an-untrusted-composition-never-rejects"),
+    dict(name="pair-reject-treats-unreadable-as-a-value", file="Policy/AttributionPolicy.cs",
+         find="		if (recordHitType < 0 || compHitType < 0) return false;",
+         repl="		if (recordHitType < -99 || compHitType < -99) return false;",
+         expect="policy/record-contradiction/an-unreadable-record-type-cannot-contradict"),
+    dict(name="pair-reject-reason-code-is-2", file="Policy/AttributionPolicy.cs",
+         find="	public const int HitMatchRejected = 3;",
+         repl="	public const int HitMatchRejected = 2;",
+         expect="policy/record-contradiction/the-rejected-reason-code-is-3"),
+    dict(name="pair-reject-counter-survives-a-new-session", file="Runtime/BattleRuntimeCounters.cs",
+         find="\t\tHitMatchRejected = 0;\n",
+         repl="\t\tHitMatchRejected = 1;\n",
+         expect="runtime/counters/a-new-session-zeroes-the-rejected"),
+    # ---- R63: the auto-skill master row's cooldown unit. The master stores SECONDS, the live Skill counts
+    # game updates, and the dump publishes both. Dropping the unit rate here is the exact mistake the
+    # both-columns design exists to prevent, so it must redden the case that pins the conversion -- and the
+    # rate is a PARAMETER, so the default cannot quietly substitute for a rate the game actually measured.
+    dict(name="skill-cooldown-forgets-the-unit-rate", file="Policy/SkillCooldownPolicy.cs",
+         find="		double f = seconds * unitsPerGameSecond;",
+         repl="		double f = seconds;",
+         expect="policy/skill-cooldown/the-master-seconds-become-frames"),
+    dict(name="skill-cooldown-decouples-the-fallback", file="Policy/SkillCooldownPolicy.cs",
+         find="	public const double FallbackUnitsPerGameSecond = BattleClockPolicy.DefaultUnitsPerGameSecond;",
+         repl="	public const double FallbackUnitsPerGameSecond = 40.0;",
+         expect="policy/skill-cooldown/the-fallback-rate-is-the-clock-policy-default"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

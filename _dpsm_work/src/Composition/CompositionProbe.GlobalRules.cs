@@ -227,8 +227,31 @@ public static partial class CompositionProbe
 	/// </summary>
 	internal static double ApplyGlobalDebuffs(BattleObject atk, BattleObject victim, out string text, FoldContext ctx = null)
 	{
-		double m = 1.0;
-		text = null;
+		double vic;
+		string atkTxt, vicTxt;
+		double atkF = ApplyGlobalDebuffsSplit(atk, victim, out atkTxt, out vicTxt, out vic, ctx);
+		text = Join(atkTxt, vicTxt);
+		return atkF * vic;
+	}
+
+	/// <summary>
+	/// R62 (C): the two sides SEPARATELY.
+	///
+	/// The table holds BOTH kinds: `EnemyTakes` ("毒/火傷状態の敵全ての被ダメージ+15%", a property of the
+	/// VICTIM) and its complement ("味方ヴァイスの魔法攻撃の与ダメージ+15%", a property of the ATTACKER).
+	/// The old single return multiplied both into the attacker-side product, so every consumer that reads
+	/// 与伤害 / 被伤害 separately saw an incoming-damage rule inside the outgoing multiplier. Measured on
+	/// battle_411001_20261003_205449 (t=3.63): folds 毒の短剣(与伤害, atk/text) ×1.15 and
+	/// 母なる変異の飛沫(被伤害, vic/global) ×1.15 were exported as "与伤害×1.322 · 被伤害×1.000". The
+	/// PRODUCT was always right (`KnownMult` never moved), which is why this survived: only the split was
+	/// wrong. The per-step provenance (`FoldContext`, side "vic"/"atk") was right all along.
+	/// </summary>
+	internal static double ApplyGlobalDebuffsSplit(BattleObject atk, BattleObject victim, out string atkText, out string vicText, out double vicFactor, FoldContext ctx = null)
+	{
+		double atkM = 1.0, vicM = 1.0;
+		vicFactor = 1.0;
+		atkText = null;
+		vicText = null;
 		// 1.3.8 / 1.5.0: this hit's 敌方受伤 responsibility set now lives in the per-hit FoldContext. It
 		// used to be a static dictionary that ANY other caller of this method silently overwrote --
 		// including the diagnostics path, which recomputes the whole chain -- so the cancellation decision
@@ -251,7 +274,8 @@ public static partial class CompositionProbe
 			catch { }
 			int ht = -1;
 			try { ht = _curHitType; } catch { }
-			var sb = new StringBuilder(64);
+			var sbA = new StringBuilder(64);
+			var sbV = new StringBuilder(64);
 			bool logThis = false;
 			try
 			{
@@ -342,20 +366,26 @@ public static partial class CompositionProbe
 						int copies = GlobalRuleApplyPolicy.StatusCopies(r.Tokens.Count, matched);
 						if (copies == 0) continue;
 						double f = GlobalRuleApplyPolicy.EffectiveFactor(r.Factor, copies, r.PerStatus);
-						m *= f;
+						// R62 (C): an incoming-damage rule must land in the VICTIM's product, not the
+						// attacker's. The product is unchanged either way; the split is what consumers read.
+						if (r.EnemyTakes) vicM *= f;
+						else atkM *= f;
 						if (ctx != null)
 							ctx.Add(r.EnemyTakes ? "vic" : "atk", "global", "global#" + kv.Key + "/" + i, f,
 								r.Source + r.Text + (r.EnemyTakes ? "(全局:敌方受伤)" : "(全局:我方攻击)"));
 						if (logThis) RuntimeLog.Write("[RULE]   APPLY " + r.Text + " ×" + f.ToString("F3"));
+						var sb = r.EnemyTakes ? sbV : sbA;
 						if (sb.Length > 0) sb.Append('、');
 						sb.Append(r.Source).Append(r.Text).Append(r.EnemyTakes ? "(全局:敌方受伤)" : "(全局:我方攻击)");
 					}
 					catch { }
 				}
 			}
-			if (sb.Length > 0) text = sb.ToString();
+			if (sbA.Length > 0) atkText = sbA.ToString();
+			if (sbV.Length > 0) vicText = sbV.ToString();
 		}
 		catch { }
-		return m;
+		vicFactor = vicM;
+		return atkM;
 	}
 }

@@ -1,0 +1,84 @@
+{
+ "file": "battle_411001_20261004_195307.json",
+ "pluginVersion": "1.7.11",
+ "quest": 411001,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [],
+ "checked": {
+  "totals": 4,
+  "actors": 4,
+  "rules": 2,
+  "links": 1
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.11)"
+  }
+ ],
+ "notes": [],
+ "modelApplicability": "full",
+ "trainingMode": false,
+ "atkAddCensus": {
+  "nonEmptyHits": 27,
+  "rows": 27,
+  "nonEmptyHitsInDomain": 27,
+  "rowsInDomain": 27,
+  "analysedTeam": 1,
+  "root": {
+   "hits": 52,
+   "emitted": 27,
+   "selfValues": 25,
+   "skippedGuard": 0,
+   "skippedCollision": 0,
+   "skippedUnowned": 0,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0,
+   "selfByKey": 25,
+   "selfByNameFallback": 0,
+   "nameCollision": 0,
+   "ownerUnknown": 0
+  }
+ },
+ "giveCensus": {
+  "givenFoldSteps": 0,
+  "hitsWithAGivenFold": 0,
+  "hitsWithANonCancellingGivenProduct": 0,
+  "hitsWithDroppedFoldSteps": 0,
+  "rosterAudit": {
+   "giveApplied": 0,
+   "giveFoldHits": 0,
+   "giveHits": 0
+  }
+ },
+ "giveInvariants": [],
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 47,
+   "resolved": 47,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ },
+ "status": "PASS"
+}

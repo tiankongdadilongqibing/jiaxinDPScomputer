@@ -227,6 +227,18 @@ internal static partial class Cases
 		r.Eq("live-same-kind", (int)AttributionPolicy.LivePairKind(true), (int)PairKind.LiveSame);
 		r.Eq("live-age-kind", (int)AttributionPolicy.LivePairKind(false), (int)PairKind.LiveAge);
 
+		r.Group("policy/record-contradiction");
+		// R62 (A). The measured pair: the consumed figure said 魔法 (2) while the composition that
+		// describes the same hit said 貫通 (3) -- one of the two is about a different hit, and the
+		// composition is the one to believe. Everything else must NOT reject.
+		r.True("a-different-hit-type-contradicts", AttributionPolicy.RecordContradictsComposition(2, 3, true, true));
+		r.True("the-same-hit-type-does-not", !AttributionPolicy.RecordContradictsComposition(3, 3, true, true));
+		r.True("an-unreadable-record-type-cannot-contradict", !AttributionPolicy.RecordContradictsComposition(-1, 3, true, true));
+		r.True("an-unreadable-composition-type-cannot-contradict", !AttributionPolicy.RecordContradictsComposition(2, -1, true, true));
+		r.True("an-untrusted-composition-never-rejects", !AttributionPolicy.RecordContradictsComposition(2, 3, true, false));
+		r.True("an-invalid-composition-never-rejects", !AttributionPolicy.RecordContradictsComposition(2, 3, false, true));
+		r.Eq("the-rejected-reason-code-is-3", AttributionPolicy.HitMatchRejected, 3);
+
 		r.Group("policy/calc-source");
 		r.Eq("attacker-wins", (int)AttributionPolicy.CalcSourcePriority(true, true), (int)CalcSourceKind.Attacker);
 		r.Eq("owner-is-the-fallback", (int)AttributionPolicy.CalcSourcePriority(false, true), (int)CalcSourceKind.Owner);

@@ -26,6 +26,7 @@ internal static partial class Cases
 		c.HitMatchExact = 14;
 		c.HitMatchPair = 15;
 		c.HitMatchNone = 16;
+		c.HitMatchRejected = 17;
 		c.LastSummaryLog = 5.5;
 		c.LastTimeLog = 6.5;
 		c.GameTimeAtStart = 99999;
@@ -40,6 +41,7 @@ internal static partial class Cases
 		r.Eq("a-new-session-zeroes-the-exact-matches", c.HitMatchExact, 0);
 		r.Eq("a-new-session-zeroes-the-pair-matches", c.HitMatchPair, 0);
 		r.Eq("a-new-session-zeroes-the-unmatched", c.HitMatchNone, 0);
+		r.Eq("a-new-session-zeroes-the-rejected", c.HitMatchRejected, 0);
 		r.True("a-new-session-zeroes-the-summary-throttle", c.LastSummaryLog == 0.0);
 		r.True("a-new-session-zeroes-the-time-throttle", c.LastTimeLog == 0.0);
 		// The battle-start stamp comes from a NATIVE read taken at the same point, so the container does not
@@ -67,15 +69,15 @@ internal static partial class Cases
 		r.Eq("a-manual-reset-keeps-the-start-stamp", c.GameTimeAtStart, 111);
 
 		r.Group("runtime/counters-shape");
-		// The family is COMPLETE and pinned by name: adding a thirteenth counter means deciding its
+		// The family is COMPLETE and pinned by name: adding a fourteenth counter means deciding its
 		// lifecycle (which transition clears it) and updating this list on purpose.
 		var names = new List<string>();
 		foreach (FieldInfo f in typeof(BattleRuntimeCounters).GetFields(BindingFlags.Public | BindingFlags.Instance))
 			names.Add(f.Name);
 		names.Sort();
-		r.Eq("the-family-has-twelve-counters", names.Count, 12);
+		r.Eq("the-family-has-thirteen-counters", names.Count, 13);
 		r.Str("the-family-members-are-pinned", string.Join(",", names),
 		      "AbsorbedHits,AbsorbedTotal,EventCount,GameTimeAtStart,HitDetailErrors,HitDetailProduced,"
-		      + "HitDetailTrimmed,HitMatchExact,HitMatchNone,HitMatchPair,LastSummaryLog,LastTimeLog");
+		      + "HitDetailTrimmed,HitMatchExact,HitMatchNone,HitMatchPair,HitMatchRejected,LastSummaryLog,LastTimeLog");
 	}
 }

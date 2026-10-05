@@ -528,6 +528,11 @@ public static class ExportService
 		  .Append(",\"matchExact\":").Append(Aggregator.Rt.HitMatchExact)
 		  .Append(",\"matchPair\":").Append(Aggregator.Rt.HitMatchPair)
 		  .Append(",\"matchNone\":").Append(Aggregator.Rt.HitMatchNone)
+		  // R62 (A): figures that were paired and then REJECTED because the composition contradicted
+		  // their hit type. Its own counter: "nothing was available" (matchNone) and "the available
+		  // figure belonged to another hit" need different fixes, and only the second means the row
+		  // would otherwise have carried another hit's source / hit type / effect id.
+		  .Append(",\"matchRejected\":").Append(Aggregator.Rt.HitMatchRejected)
 		  .Append('}');
 		// 1.5.0 (B4): the full-resolution status/resistance change timeline, with its own legend and
 		// counters. Always emitted, so "nothing changed" cannot be confused with "the channel never ran".

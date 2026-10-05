@@ -23,6 +23,8 @@ Writes _dpsm_work/contrib/reports/rule115_census.txt and prints an ASCII summary
 from __future__ import annotations
 import glob, io, json, math, os, sys
 
+from .model import game_residual
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.path.dirname(HERE)
 ROOT = os.path.dirname(WORK)
@@ -54,7 +56,7 @@ def scan(path):
            "hits_team": 0, "no_calc": 0, "no_residual": 0, "near_zero": 0, "crit_band": 0,
            "unexplained_residual": 0, "k_extra": {}, "k_folded_hist": {}, "residual_top": {},
            "missed_115": 0, "missed_1152": 0, "over_115": 0, "over_1152": 0, "over_1153": 0,
-           "aligned": 0}
+           "aligned": 0, "absorbed_game": 0}
     actors = {a.get("key"): a for a in (d.get("actors") or [])}
     for e in (d.get("events") or []):
         if e.get("type") != "dmg":
@@ -67,11 +69,17 @@ def scan(path):
         if not isinstance(calc, dict):
             out["no_calc"] += 1
             continue
-        resid = calc.get("residual")
-        if not isinstance(resid, (int, float)) or resid <= 0:
+        # R62 (B): the 1.15 ladder is a property of the CHAIN, so it is measured in the GAME caliber
+        # (applied + absorbed over theory) rather than in what reached 耐久. With the exported field an
+        # absorbed hit lands near 0 and is counted as "unexplained", or as an over-counted 1.15.
+        resid = game_residual(calc)
+        if resid is None or resid <= 0:
             out["no_residual"] += 1
             continue
         resid = float(resid)
+        absorbed = calc.get("absorbed")
+        if isinstance(absorbed, (int, float)) and absorbed > 0:
+            out["absorbed_game"] += 1
         kf = k_folded_of(calc.get("fold") or [])
         out["k_folded_hist"][kf] = out["k_folded_hist"].get(kf, 0) + 1
         if resid < 0.02:
@@ -129,6 +137,9 @@ def main():
     L.append(u"合计:可判 %d 击;少折 ×1.15 %d、×1.15² %d;多折 1/1.15 %d、1/1.15² %d、1/1.15³ %d;对齐 %d" %
              (tot["judged"], tot["missed_115"], tot["missed_1152"],
               tot["over_115"], tot["over_1152"], tot["over_1153"], tot["aligned"]))
+    L.append(u"")
+    L.append(u"口径:R62 起残差取游戏口径 (applied + absorbed) / theory,吸收击不再被当成残差;本轮吸收击 %d" %
+             sum(r["absorbed_game"] for r in rows))
     L.append(u"")
     L.append(u"每个导出的 k_extra 分布(0 = 折叠与游戏一致;>0 = 游戏多给了 1.15^k):")
     for r in rows:

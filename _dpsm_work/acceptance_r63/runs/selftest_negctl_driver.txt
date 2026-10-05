@@ -1,0 +1,12 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\tests\negative_control.py --selftest
+negative-control driver selftest (3 case(s)):
+  [FAIL] selftest-bogus-find              find text occurs 0 times (need exactly 1)
+  [PASS] comment-only-control             prose-only mutation stays GREEN (replaced 1 occurrence in Model/BattleSession.cs)
+         cases=987 failed=0 pinned=987
+  [FAIL] selftest-noop-mutation           suite stayed GREEN; window/constants/hit-match-window-is-0.35s did not bite
+         cases=987 failed=0 pinned=987
+  [PASS] a mutation whose find text does not match is a DRIVER failure
+  [PASS] a prose-only mutation stays GREEN
+  [PASS] a mutation that applies but does not bite is COUNTED as a failure
+driver selftest: 3 case(s), 0 failed

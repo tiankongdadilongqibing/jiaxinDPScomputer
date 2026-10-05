@@ -3,7 +3,7 @@
 from __future__ import annotations
 import math
 from .model import (ActorCredit, Analysis, FoldEntry, HitLine, HitResult,
-                    LinkStat, REASON_CODES, RESOLVED_REASONS, RuleStat)
+                    LinkStat, REASON_CODES, RESOLVED_REASONS, RuleStat, game_residual)
 from .attribution import OwnerIndex, NAME_RE, ability_id_of
 
 EPS = 1e-12
@@ -122,7 +122,8 @@ def analyze(export, team=1, training=False, keep_hits=False, include_friendly=No
                       "attacker_unresolved": {"count": 0, "damage": 0.0},
                       "eventSumAll": 0.0, "name_based_lines": 0, "key_based_lines": 0,
                       "attackerNameFallbacks": 0, "byUnit_hits": 0, "fold_hits": 0,
-                      "crits": 0, "residual_buckets": {}, "zero_damage_credited": 0,
+                      "crits": 0, "residual_buckets": {}, "residual_absorbed_hits": 0,
+                      "zero_damage_credited": 0,
                       "atkTeam_mismatch": 0, "per_hit_max_error": 0.0, "per_hit_bad": 0,
                       "calc_missing": 0, "fold_dropped": 0, "fold_dropped_hits": 0,
                       "summon_actors": [a.name for a in export.team_actors(team) if a.summon],
@@ -200,14 +201,23 @@ def analyze(export, team=1, training=False, keep_hits=False, include_friendly=No
             # Latent silent truncation -> surface it (audit Q7).
             diag["fold_dropped"] = diag.get("fold_dropped", 0) + int(fd)
             diag["fold_dropped_hits"] = diag.get("fold_dropped_hits", 0) + 1
+        # R62 (B): the DIAGNOSTIC LADDER is bucketed in the GAME caliber (applied + absorbed over
+        # theory), not in what reached 耐久. The exported residual is applied/theory, so an absorbed hit
+        # lands near 0 and reads as a missing multiplier; residual_mult keeps that exported value verbatim
+        # and residual_game carries the absorption-aware one. See model.game_residual.
         resid = calc.get("residual")
-        if isinstance(resid, (int, float)):
-            bucket = round(float(resid), 4)
+        resid_game = game_residual(calc)
+        if isinstance(resid_game, (int, float)):
+            bucket = round(float(resid_game), 4)
             diag["residual_buckets"][bucket] = diag["residual_buckets"].get(bucket, 0) + 1
+        absorbed = calc.get("absorbed")
+        if isinstance(absorbed, (int, float)) and absorbed > 0:
+            diag["residual_absorbed_hits"] = diag.get("residual_absorbed_hits", 0) + 1
         hr = HitResult(index=i, time=float(e.get("t") or 0.0), attacker_key=attacker.key,
                        victim_key=e.get("vicKey"), damage=damage, multiplier=M, base=base,
                        pool=pool, folds_total=len(folds), crit=bool(e.get("crit")),
-                       residual_mult=float(resid) if isinstance(resid, (int, float)) else None)
+                       residual_mult=float(resid) if isinstance(resid, (int, float)) else None,
+                       residual_game=resid_game)
         ac = an.actors[attacker.key]
         ac.direct += damage
         ac.hits += 1

@@ -280,6 +280,7 @@ def run(log_path):
                 problems, notes, warnings)
     n_ok = 0
     live_partial = []
+    live_in_domain = []
     for f in withrow:
         row = f['unattrRow'] or ''
         if M_NA in row:
@@ -321,6 +322,10 @@ def run(log_path):
             elif not pairs:
                 warnings.append('overlay frame printed %r but the log names no exported battle, so nothing '
                                 'can corroborate it' % row)
+            elif not _battle_finished_by(f, parsed):
+                # R62: the panel is showing a battle that has not ended yet, so this is a LIVE partial of
+                # a growing figure. Sibling of the 未归属 carve-out above (same measured category error).
+                live_in_domain.append(row)
             else:
                 problems.append('overlay frame printed %r but no export carries that in-domain '
                                 'unattributedDamage (known: %s)' % (row, sorted(x for x in known if x is not None)))
@@ -328,6 +333,10 @@ def run(log_path):
         warnings.append('%d overlay frame(s) printed a 未归属 row WITHOUT a hit count (a live partial '
                         'surface, e.g. %r): no export can corroborate those, and they are not claimed to be '
                         'correct' % (len(live_partial), live_partial[0]))
+    if live_in_domain:
+        warnings.append('%d overlay frame(s) printed the in-domain 未归因 row for a battle that had NOT '
+                        'ended yet (a live partial of a growing figure, e.g. %r): a finished export cannot '
+                        'corroborate it, and it is not claimed to be correct' % (len(live_in_domain), live_in_domain[0]))
     if n_ok:
         notes.append('%d overlay frame(s) carried an unattributed row agreeing with an export' % n_ok)
     else:
@@ -336,6 +345,41 @@ def run(log_path):
     if status == gate.PASS and warnings:
         status = gate.WARNING
     return (status, notes, problems, notes, warnings)
+
+def _battle_finished_by(frame, parsed):
+    """Was the battle this frame DISPLAYS already over when the frame was printed?
+
+    R62: the F5 contribution panel re-renders every second and prints the CURRENT, still-growing
+    in-domain unattributed figure. MEASURED 2026-10-05 on the live log of a 17-battle training session:
+    14 frames showed 2,189 / 101 / 285 / 508 / 2,747 / 288 / 462 / 3,302 / 3,598 at 3..43 s, while every
+    export of that session settles at 0.0 -- those frames belong to a battle that had NOT ended yet (its
+    own end line says dur=61 s). Comparing a live partial against a finished export is the same category
+    error the 未归属 branch above already documents, so the same carve-out applies here: 'unverifiable',
+    never 'contradicted'.
+
+    Two signals keep the carve-out from swallowing a real disagreement of a FINISHED battle (the existing
+    self-test case `in_domain_row_beyond_rounding_is_an_error` is the control):
+      * the header's displayed seconds equal the duration of the most recent battle end for the same
+        quest (the panel prints elapsed seconds as an integer), and
+      * those seconds are NOT also the duration of the next battle end -- if they are, the same integer
+        belongs to the battle in progress, so the frame is a live partial of it.
+    """
+    m = re.search(re.escape(M_TASK) + r"\s*(\d+)\s+([0-9]+)", frame.get('firstRow') or '')
+    if not m:
+        return False
+    quest, secs = int(m.group(1)), int(m.group(2))
+    line = frame.get('line', 10 ** 9)
+    before = [b for b in parsed['ends'] if b['line'] < line and b['quest'] == quest]
+    if not before:
+        return False
+    prev = before[-1]
+    if secs not in (int(prev['dur']), int(round(prev['dur']))):
+        return False
+    after = [b for b in parsed['ends'] if b['line'] > line and b['quest'] == quest]
+    if after and secs in (int(after[0]['dur']), int(round(after[0]['dur']))):
+        return False
+    return True
+
 
 def _matches_in_domain(val, known):
     """The panel prints this figure ROUNDED to an integer ("9,326,541") while the export carries a double
@@ -435,6 +479,19 @@ def selftest():
                  '(\u8bbe\u7f6e\u53ef\u5173\u95ed\u654c\u65b9\u680f)')
     enemy_log = base_log.replace("unattrRow='! %s 257056(x73)'" % M_OUT, "unattrRow='%s'" % enemy_row)
     case('live_enemy_line_is_unverifiable_not_wrong', enemy_log, base_doc, gate.WARNING)
+    # R62: the F5 panel re-renders every second, so a frame printed BEFORE its battle's end line shows a
+    # LIVE partial of a still-growing in-domain figure. Measured 2026-10-05: 14 such frames (2,189 / 101 /
+    # 3,598 ... at 3..43 s) were ERRORs against exports of the same session that settle at 0.0.
+    live_in_log = ('[Info   :   BepInEx] Loading [DpsMeter 1.7.9]\n'
+                   '[Info   :  DpsMeter] [DpsMeter] DpsMeter 1.7.9 loaded. F8 show/hide\n'
+                   "[Info   :  DpsMeter] [DpsMeter][UI-DIAG] canvas=True visible=True "
+                   "view=Contribution panel=780x797 rowsTotal=450 rowsActive=53 hist=1 "
+                   "fontNull=False contentH=797 viewH=789 scroll=0 firstRow='%s 411001 3' "
+                   "unattrRow='\u5408\u8ba1 100   \u672a\u5f52\u56e0 2198(2.00%%)'\n" % M_TASK
+                   + '[Info   :  DpsMeter] [DpsMeter] Battle end: result=Lose dur=119.1s idle=0.0s quest=411001 '
+                   'actors=210 unattributed=257056(x73)\n'
+                   '[Info   :  DpsMeter] [DpsMeter] Exported full battle data -> __EXP__ (__BYTES__ bytes)\n')
+    case('live_in_domain_partial_is_unverifiable_not_wrong', live_in_log, base_doc, gate.WARNING)
     placeholder = base_log.replace('%s 411001 119' % M_TASK, '%s 0   0' % M_TASK)
     case('placeholder_header', placeholder, base_doc, gate.ERROR)
     shutil.rmtree(tmp, ignore_errors=True)

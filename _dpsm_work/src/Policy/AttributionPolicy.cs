@@ -73,6 +73,39 @@ internal static class AttributionPolicy
 		return candidateDamage == damage || (nominal > 0 && candidateDamage == nominal);
 	}
 
+	/// <summary>
+	/// R62 (A): a damage-detail record whose hit type DISAGREES with the composition that describes this
+	/// hit did not come from this hit.
+	///
+	/// WHY this is a decision and not a hunch. The record channel pairs on (attacker, target) inside a
+	/// 0.35 s window with no value match (hitMatch = 2), and ONE hit can leave SEVERAL pending figures
+	/// behind it: the DamageAction / ActDamageAction pair plus the 被吸收 accounting call. Measured
+	/// 2026-10-05 on the two exports that exposed it (B-...D7F-009 factId 127, D7F-010 factId 173): a 10%
+	/// 貫通 extra hit consumed the PREVIOUS hit's post-absorption figure, so `source` said Unknown,
+	/// `calcHitType` said 魔法 and `calcEffectId` carried the main skill's id — while the composition for
+	/// the same event reproduced the damage exactly (theory == applied). hitType is the one field both
+	/// channels read from the same game member (DamageCalculater.m_hitType), so when they disagree at least
+	/// one of the two is about a different hit; the composition is the one to believe, because it is
+	/// either the calc executing right now for exactly this victim (pairTrusted) or corroborated by the
+	/// damage value.
+	///
+	/// What is NOT claimed: this is not a value check. The record's damage legitimately differs from the
+	/// applied damage (it is the calc's own figure, pre-mitigation), so a value mismatch is not evidence.
+	/// Only the hit type is comparable, and only when both sides could read it.
+	/// </summary>
+	public static bool RecordContradictsComposition(int recordHitType, int compHitType, bool compValid, bool compTrusted)
+	{
+		if (!compValid || !compTrusted) return false;
+		if (recordHitType < 0 || compHitType < 0) return false;
+		return recordHitType != compHitType;
+	}
+
+	/// <summary>R62 (A): the exported `hitMatch` reason code for a figure that WAS consumed and then
+	/// discarded because the composition contradicted it. Distinct from 0 (nothing was available): here
+	/// the export must be able to say "a figure existed and was rejected", because the two have different
+	/// fixes.</summary>
+	public const int HitMatchRejected = 3;
+
 	/// <summary>Reason code for a stage-0 pairing (the caller knows whether the target matched).</summary>
 	public static PairKind LivePairKind(bool sameTarget)
 	{

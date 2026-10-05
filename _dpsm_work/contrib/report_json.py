@@ -176,8 +176,10 @@ def to_json(an, export, issues, summary):
                 "modelApplicable": an.diagnostics.get("modelApplicable", True),
                 "subUnityFolds": an.diagnostics.get("sub_unity_factor", 0),
                 "negativeLines": an.diagnostics.get("negative_lines", 0),
+                # R62 (B): bucketed in the GAME caliber -- (applied + absorbed) / theory.
                 "residualBuckets": {str(k): v for k, v in sorted(
                     an.diagnostics.get("residual_buckets", {}).items(), key=lambda x: -x[1])},
+                "residualAbsorbedHits": an.diagnostics.get("residual_absorbed_hits", 0),
                 "checks": [{"level": lv, "code": c, "message": m} for lv, c, m in issues],
                 # 1.7.7 rev2: byte-identical to Contribution.cs's list (they used to disagree).
                 "knownLimits": [

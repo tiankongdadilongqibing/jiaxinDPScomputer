@@ -28,6 +28,30 @@ NAME_BASED_REASONS = ("byUnit", "ability_holder_unique", "ability_holder_attacke
                       "attacker_default", "global_name_unique")
 
 
+def game_residual(calc):
+    """R62 (B): the hit's unexplained multiplier in the GAME's caliber.
+
+    `calc["residual"]` is `applied / theory` (CalcBreakdown.cs:81): what reached 耐久 over what the
+    chain predicted. An absorbed / nullified hit therefore drags it toward 0 and can hide a crit behind a
+    1/30th "residual". The game's own figure is `applied + absorbed`, which is exactly what
+    `calc["valueMatches"]` compares against `theory`. Measured 2026-10-05 over the 82 exports: 801
+    damage hits carry `absorbed > 0` and 688 of them have `residual` < 1, so every residual ladder that
+    read the exported field was classifying absorption as a missing multiplier.
+
+    Returns None when the block cannot answer it (0 = "no chain" must never be published as a measured 0).
+    """
+    if not isinstance(calc, dict):
+        return None
+    applied = calc.get("applied")
+    absorbed = calc.get("absorbed")
+    theory = calc.get("theory")
+    if (isinstance(applied, (int, float)) and isinstance(absorbed, (int, float))
+            and isinstance(theory, (int, float)) and theory > 0):
+        return (float(applied) + float(absorbed)) / float(theory)
+    resid = calc.get("residual")
+    return float(resid) if isinstance(resid, (int, float)) else None
+
+
 @dataclass
 class ActorRef:
     key: int
@@ -83,7 +107,11 @@ class HitResult:
     folds_zero: int = 0
     folds_noop: int = 0
     crit: bool = False
+    # What reached 耐久 over the chain's theory, exactly as the plugin exports it (`calc.residual`).
     residual_mult: Optional[float] = None
+    # R62 (B): the same question asked in the GAME's caliber -- (applied + absorbed) / theory. Differs
+    # from residual_mult only on absorbed hits; that difference is the point.
+    residual_game: Optional[float] = None
 
     @property
     def credited(self) -> float:

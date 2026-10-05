@@ -45,6 +45,12 @@ internal sealed class BattleRuntimeCounters
 	public int HitMatchPair;
 	/// <summary>Damage records with no pending figure at all (field stays Unknown).</summary>
 	public int HitMatchNone;
+	/// <summary>R62 (A): records that WERE paired and then discarded, because the composition that
+	/// describes this hit read a different m_hitType. Kept apart from HitMatchNone on purpose -- "nothing
+	/// was available" and "what was available belonged to another hit" have different fixes, and the
+	/// second one used to be invisible (the export carried the wrong hit's source / hit type / effect id
+	/// with no field saying so).</summary>
+	public int HitMatchRejected;
 
 	/// <summary>Battle-clock stamps of the last [SUMMARY] / [TIME] log lines. Per-battle throttles: a new
 	/// battle must be allowed to log immediately.</summary>
@@ -69,6 +75,7 @@ internal sealed class BattleRuntimeCounters
 		HitMatchExact = 0;
 		HitMatchPair = 0;
 		HitMatchNone = 0;
+		HitMatchRejected = 0;
 		LastSummaryLog = 0.0;
 		LastTimeLog = 0.0;
 	}

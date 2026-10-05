@@ -28,6 +28,12 @@ n0_PATH = os.path.join(HERE, "n0_acceptance.py")
 
 # Roots that contain tool scripts, relative to the repository root. "." = the repository root itself.
 ROOTS = ["_dpsm_work", ".", "review_contrib_core"]
+# R62: the repository DECLARES one temp location (AGENTS section 4: scratch files live at
+# `_dpsm_work/tests/_*.tmp` and that rule is ignored by git), so the scanner must honour the same rule --
+# otherwise ANOTHER agent's scratch file reddens the tool registry and the acceptance run with it
+# (measured 2026-10-05: 35 `_as*.tmp.py` left behind by a parallel analysis session failed rule B).
+SKIP_NAMES = ("_",)          # basename prefix for a declared scratch file
+SKIP_SUFFIXES = (".tmp", ".tmp.py")
 SKIP_PARTS = ("/obj/", "/bin/", "/.git/", "/batch_inputs/", "/acceptance_", "/__pycache__/",
               "/node_modules/", "/Tools/")
 
@@ -83,6 +89,9 @@ def script_paths():
             if rel in seen:
                 continue
             if any(part in ("/" + rel) for part in SKIP_PARTS):
+                continue
+            base = os.path.basename(rel)
+            if base.startswith(SKIP_NAMES) and base.endswith(SKIP_SUFFIXES):
                 continue
             seen.add(rel)
             out.append(rel)

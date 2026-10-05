@@ -1,7 +1,7 @@
 # DpsMeter 项目总方向与实施计划
 
 > 用途：作为后续智能体分工、实现、审查和验收的统一依据。
-> 当前基线：**源码/构建 1.7.13**(R61:同队/自我伤害移出归属池,`contribution.schemaVersion` **1.2**;见 `REFACTOR-BATCH-R61.md`)。上一版 **1.7.12**(R60:自伤三件套 —— 根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1 恢复「自伤」列;见 `REFACTOR-BATCH-R60.md`),**线上 DLL 仍是 1.7.11**(R57 的引用绑定 + 战斗编号 + 精确选场);1.7.11 是显示级发布 —— F5 表 1 改为 `自身 | 他人因你 | 被队友分走`,并新增两条逐角色恒等式与「渲染器↔副本」版面守卫,见 `SESSION-STATE.md` §7.2.100)。本计划依据 DpsMeter-文档索引.md、_dpsm_work/HANDOFF.md 和 _dpsm_work/ARCHITECTURE.md 整理。
+> 当前基线：**源码/构建/线上 1.7.15**(R63:新增「自动技能」主表 `auto_skill` 的转储(20 张表 / 输出 21 个文件)+ 冷却单位纯规则 `SkillCooldownPolicy`(主表**秒** ↔ 线上**帧**,30 单位/游戏秒),同一行给 `*CoolTime` 与 `*CoolTimeFrames`;**不动任何既有数值**;见 `REFACTOR-BATCH-R63.md`;当前语料 82 份)。上一版 **1.7.14**(R62 A/B/C 同步:(1) 命中记录错配改「可证伪即拒绝」+ `hitMatch=3`/`hitDetail.matchRejected`;(2) 离线残差改游戏口径 `(applied+absorbed)/theory`;(3) 全局「敌方受伤」因子从 `dealtMult` 移入 `takenMult`,乘积不变;见 `REFACTOR-BATCH-R62.md`)。上一版 **1.7.13**(R61:同队/自我伤害移出归属池,`contribution.schemaVersion` **1.2**;见 `REFACTOR-BATCH-R61.md`)。上一版 **1.7.12**(R60:自伤三件套 —— 根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1 恢复「自伤」列;见 `REFACTOR-BATCH-R60.md`),**线上 DLL 仍是 1.7.11**(R57 的引用绑定 + 战斗编号 + 精确选场);1.7.11 是显示级发布 —— F5 表 1 改为 `自身 | 他人因你 | 被队友分走`,并新增两条逐角色恒等式与「渲染器↔副本」版面守卫,见 `SESSION-STATE.md` §7.2.100)。本计划依据 DpsMeter-文档索引.md、_dpsm_work/HANDOFF.md 和 _dpsm_work/ARCHITECTURE.md 整理。
 > 证据等级：实测、离线重放、推断必须明确区分。
 > **进度(2026-10-03 深夜)**：阶段 **A / B / C / D(雏形)/ E** 已交付。
 > A/B/C:指标字典 `_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md`、离线核心 `_dpsm_work/contrib/`

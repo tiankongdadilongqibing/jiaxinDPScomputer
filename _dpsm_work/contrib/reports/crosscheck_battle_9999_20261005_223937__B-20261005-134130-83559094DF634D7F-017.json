@@ -1,0 +1,108 @@
+{
+ "file": "battle_9999_20261005_223937__B-20261005-134130-83559094DF634D7F-017.json",
+ "pluginVersion": "1.7.13",
+ "quest": 9999,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfByKey=206 exceeds atkAdd.hits=177: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit",
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfValues=206 exceeds atkAdd.hits=177: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+ ],
+ "checked": {
+  "totals": 4,
+  "actors": 8,
+  "rules": 12,
+  "links": 9
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "legacy",
+   "code": "TRAINING_NOT_COMPARABLE",
+   "message": "quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS"
+  },
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfByKey=206 exceeds atkAdd.hits=177: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfValues=206 exceeds atkAdd.hits=177: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.13)"
+  }
+ ],
+ "notes": [
+  {
+   "severity": "note",
+   "code": "ATKADD_FOLDS_OUT_OF_DOMAIN",
+   "message": "the section restates exactly the 44 in-domain kind=atkadd fold(s); 74 of the 118 non-empty calc.atkAdd entrie(s) belong to attackers outside the analysed team and never reach the model (expected, not a shortfall)"
+  }
+ ],
+ "modelApplicability": "not_comparable",
+ "trainingMode": true,
+ "atkAddCensus": {
+  "nonEmptyHits": 100,
+  "rows": 118,
+  "nonEmptyHitsInDomain": 35,
+  "rowsInDomain": 44,
+  "analysedTeam": 1,
+  "root": {
+   "hits": 177,
+   "emitted": 118,
+   "selfValues": 206,
+   "skippedGuard": 0,
+   "skippedCollision": 0,
+   "skippedUnowned": 66,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0,
+   "selfByKey": 206,
+   "selfByNameFallback": 0,
+   "nameCollision": 0,
+   "ownerUnknown": 21
+  }
+ },
+ "giveCensus": {
+  "givenFoldSteps": 96,
+  "hitsWithAGivenFold": 32,
+  "hitsWithANonCancellingGivenProduct": 32,
+  "hitsWithDroppedFoldSteps": 0,
+  "rosterAudit": {
+   "giveApplied": 96,
+   "giveFoldHits": 32,
+   "giveHits": 180
+  }
+ },
+ "giveInvariants": [],
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 213,
+   "resolved": 213,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 116,
+   "unknown_reason": 0
+  }
+ },
+ "status": "LEGACY_NOT_APPLICABLE"
+}

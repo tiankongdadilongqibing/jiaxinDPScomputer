@@ -132,7 +132,10 @@ def render_full(an, export, issues, summary, max_rows=20):
             L.append(u"  %-24s %13.0f  (%d 条折叠)" % (reason, amt, n))
     else:
         L.append(u"  (未归因池为空)")
-    L.append(u"  非折叠倍率(会心/攻击力加算/未识别)按定义留在基础项;calc.residual 分布(前 8):")
+    # R62 (B): the ladder is the GAME caliber -- (applied + absorbed) / theory. The exported
+    # calc.residual is applied/theory, which an absorbed hit drags toward 0.
+    L.append(u"  非折叠倍率(会心/攻击力加算/未识别)按定义留在基础项;residual 游戏口径分布(前 8;吸收击 %s):" %
+             an.diagnostics.get("residual_absorbed_hits", 0))
     rb = an.diagnostics.get("residual_buckets", {})
     for k in sorted(rb, key=lambda x: -rb[x])[:8]:
         L.append(u"    residual=%-8s %d 击" % (k, rb[k]))

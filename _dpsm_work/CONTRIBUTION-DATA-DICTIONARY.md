@@ -793,3 +793,86 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
 
 **未覆盖(与 R60 同类)**:`ExportService`/`Contribution.AppendJson` 的 1.2 新形状没有在 BehaviorTests 里逐字段跑;
 它由 `check_export_schema.py` 的 1.2 用例(5 例)与离线 `crosscheck` 的版本门控覆盖。
+##### R62(插件 1.7.14):三个**读数**问题(A/B/C)
+
+本轮**不动归属口径**(`schemaVersion` 仍 1.2),只修三处会让人读错数的地方。三条都是「另一个智能体拿插件数据做分析时提出、逐条回数据核实」的结果。
+
+**A. 命中记录的配对错位(导出字段层)**
+
+- **现象(实测)**:`B-20261005-134130-83559094DF634D7F-009` 的 `factId=127`(t=22.47,4,220)与 `-010` 的 `factId=173`
+  (t=25.90,3,798):同一击的 `calc` 块是 `hitType=3`(**贯通**)/`ratio=0.10`/`power=攻击力x10%`,而事件层的
+  `source=0`、`calcHitType=2`(魔法)、`calcEffectId` 还带着主伤害的技能 id。
+- **成因**:`source` / `calcHitType` / `calcEffectId` / `hitValue` 来自 `HitRecord` 通道,它按「攻击者+目标」在 0.35 s 内
+  配对且**不要求值相等**(`hitMatch=2`);而一次结算可以留下**多条**记录(DamageAction/ActDamageAction + 被吸收的记账调用),
+  于是下一次同目标的命中会**吃掉上一条命中的记录**。
+- **范围(全语料 82 份 / 204,168 条伤害事件)**:`calcHitType != calc.hitType` 共 **432 条(0.22%)**;10% 贯通命中被记进
+  `sources[0]` 的:训练场 **9999 = 3,240/11,096(29%)**,普通关卡 **411001 = 6/39,467(0.015%)**。
+- **口径(1.7.14 起)**:`hitMatch` 增加 **`3` = 「已配对,但被合成证伪后拒绝」**;这类命中**不再**用那条记录写
+  `source`/`calcHitType`/`calcEffectId`/`crit`/`skills[]`,而是留空(未知),并计入 `hitDetail.matchRejected`。
+  判据 `AttributionPolicy.RecordContradictsComposition(记录命中属性, 合成命中属性, 合成有效, 合成可信)` —— 只有
+  合成是 `live-same`/`value`(可信)**且**两侧都读到了命中属性**且**不相等时才拒绝。
+- **读法**:任何用 `source==1` 或 `calcHitType==3` 认「直接攻击/贯通」的分析,在 9999 里都会漏掉约 29%;
+  **认贯通请用 `calc.hitType==3`**(它来自合成通道,与 `calc.ratio`/`power` 自洽)。
+
+**B. 有吸收时 `residual` 会误导(离线口径层)**
+
+- `calc.residual` 的定义是 `applied / theory`(入耐久 / 理论),被吸收的部分不在分子里:全语料 **801 条** `absorbed>0`,
+  其中 **688 条** `residual<1` —— 一条被屏障吸收的会心看起来就像「缺了 0.03 倍」。
+- **1.7.14 起**:离线核心用 **`model.game_residual(calc) = (applied + absorbed) / theory`**(即插件 `valueMatches` 用的同一个量),
+  `diagnostics.residual_buckets` 按它分桶,另计 `residual_absorbed_hits`;`HitResult.residual_mult` 仍保留导出原值。
+  回答「链算没算对」请用 `calc.valueMatches` / 事件 `nominal`,不要用 `residual`。
+
+**C. 全局「敌方受伤」因子被算进了 `dealtMult`(栏位层)**
+
+- 战域规则表里既有**被伤害**(`EnemyTakes`,如「毒/火傷状態の敵全ての被ダメージ+15%」)也有**与伤害**
+  (「味方ヴァイスの魔法攻撃の与ダメージ+15%」);1.7.13 及更早把两半都乘进了 `dealtMult`。
+  实测 `battle_411001_20261003_205449` t=3.63:`毒の短剣(与伤害 1.15)` + `母なる変異の飛沫(敌方受伤 1.15)` 导出成
+  `与伤害 x1.322 - 被伤害 x1.000`。
+- **乘积从来没错**(`knownMult = attrMult x dealtMult x takenMult` 不变,`theory`/`valueMatches` 与离线贡献模型都不受影响 ——
+  模型只读 `fold[]` 的 `side`/`kind`,`fold[]` 从 1.5.0 起就是对的)。受影响的是**分开读与伤害/被伤害**的表格与文案。
+- **1.7.14 起**:`EnemyTakes` 的因子乘进 `takenMult`。判据:`dealtMult == prod(side==atk 的 fold)` 且
+  `takenMult == prod(side==vic 的 fold)`(**实测/离线重放**:把因子搬回去后,82 份语料里 **197,533/197,533 条**带 fold 的命中都满足)。
+  **`<=1.7.13` 的旧文件仍是旧栏位** —— 它按各自契约读(`check_export_schema.py` 的该检查版本门控在 1.7.14)。
+
+**守卫**:`check_export_schema.py` 新增 1.7.14 起必须存在的 `hitDetail.matchRejected`(3 例自测)与上面的 fold 栏位恒等式(3 例自测);
+`contrib/tests/test_samples.py` 新增 S14(`game_residual` 与吸收分桶);变异负控新增 5 条(`pair-reject-*`,逐条红在具名用例)。
+**未覆盖**:A 的「拒绝」分支在插件侧(`Aggregator.Stats.RecordDamage`),BehaviorTests 编译不到;它由纯策略函数的行为用例 +
+负控钉住判据,端到端效果要等下一场 1.7.14 实机导出的 `hitDetail.matchRejected` 与 `sources[]`。
+
+##### R63(插件 1.7.15):新增「自动技能」主表 + 冷却单位规则
+
+本轮**不动归属口径、不动任何既有数值**(`contribution.schemaVersion` 仍 **1.2**,导出形状未变)。
+新增的是**取证面**:一张主表和一条单位规则。
+
+- **主数据新增一张表**:`auto_skill`(`Rog.MasterData.AutoSkillMasterTable`),即 `awake_potential.auto_skill_id`
+  指向的那张。定位方法(实测):`awake_potential` 里 `unit_id=U / category=3 / acquire_id=403` 的 `auto_skill_id` **就是 U**
+  (unit 84 = `[賢導]トレイラ` -> 84),category 4 是空的第二槽。字段:`id/name/text`(混淆)、
+  `autoActivate/maxLevel/minFirstCoolTime/maxFirstCoolTime/minCoolTime/maxCoolTime/minDurationTime/maxDurationTime/
+  skillRange/stock`(全 **ObscuredInt**,经 `GameRef.Dec`)、`activationType/activationTypeParam/activationPositionSortId`(明文)、
+  `isTargetUnnecessary`、`triggerTimings`(嵌套 `SkillMasterDataBase.TriggerTimingData`)、`talents`。
+  表数 **19 -> 20**,输出文件 **20 -> 21**(含 `_table_registry.json`)。**旧导出不受影响**(这只改 `masterdata/` 的产物)。
+- **单位是两套,所以两套都给**:主表冷却字段的单位是**秒**,而线上 `Skill.m_coolTimeFrame` 数的是**游戏帧**;
+  `[CLOCKP] … units/s=30.0`(由 `Skill.CoolTimeFrame / Skill.CoolTime` 反推)与 `Plugin.cs`:344 的实测
+  (750/25、1500/50、1050/35)给出 **1 游戏秒 = 30 帧**。因此 `auto_skill` 行里
+  `minCoolTime`/`maxCoolTime` 是主表原值,`minCoolTimeFrames`/`maxCoolTimeFrames` 是按**本次进程实测到的** units/s
+  (读不到就用 `BattleClockPolicy.DefaultUnitsPerGameSecond`)**换算**的值。判据是纯函数
+  `src/Policy/SkillCooldownPolicy.cs`(`Frames(seconds[, unitsPerGameSecond])`),**非正输入与不可用速率一律给 0**
+  ——「没有数可发布」不能与「冷却为 0 帧」混为一谈,而主表的秒数无论如何都照原样发布。
+- **为什么值得单独成规则**:只 dump 秒数,消费方迟早会拿它跟帧计数、或跟战斗秒直接比 —— 这正是「dump 出来是为了不再靠猜」要避免的错。
+
+**守卫**:`tests/BehaviorTests/Cases.SkillCooldown.cs` 16 例(用实测的 25/50/30 秒 -> 750/1500/900 帧回环);
+变异负控 2 条(`skill-cooldown-forgets-the-unit-rate`、`skill-cooldown-decouples-the-fallback`,逐条红在具名用例)。
+**未覆盖**:`MasterDataDump.cs` 不在 BehaviorTests 的编译清单里,所以**转储代码本身没有行为测试** ——
+被覆盖的是它调用的规则,而「字段名正确」由**编译器**保证。
+
+**实机结果(已确认)**:部署后用户自行重启,自检行 `表成功=20 表缺失=0 表异常=0 行异常=0`、`auto_skill=120`;
+`masterdata/auto_skill.json` 落盘。她那一行(unit 84 -> `awake_potential` category 3/acquire_id 403 ->
+`auto_skill_id=84`)是 `暗沌への導き`:`minCoolTime/maxCoolTime = 300/240`(**主表单位 = 秒**)、
+`minFirstCoolTime/maxFirstCoolTime = 240/180`、`stock = 0`、talents 里 `6 攻击力%+` param 300 / maxParam **500**
+(即实测到的那层 `攻撃力+500%`)、`1013 连射` = 4 连、`516 暗闇` 末位 300(300 单位 = 10 s,与正文「10秒間」一致)。
+
+> **口径警告(必须一起引用)**:`auto_skill` 表的 id 与伤害计算里的**效果 id**(`DamageCalculater.m_effectId`)
+> **不是同一个 id 空间** —— 该表里也有 id `10024`(「恐怖の特異点」),与战斗日志里那个每 ≈14 s 出现的
+> `效果10024` 不是一件事。用 `auto_skill` 的冷却去解释一条伤害通道的节拍之前,先确认两者指的是同一个技能。
+> 本轮正是撞在这上面:主表给她的冷却 240–300 秒,而从伤害反推的节拍是 ≈13.5 s,**两者对不上**,反推结论存疑
+> (详见 `REFACTOR-BATCH-R63.md` §3c)。

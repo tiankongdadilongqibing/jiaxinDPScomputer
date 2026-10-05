@@ -39,13 +39,15 @@ def fold(kind, side, origin, factor, label="", by_unit=""):
     return f
 
 
-def dmg(amount, folds, atk_key=1, atk_team=1, victim=1, crit=False, t=0.0, residual=None):
+def dmg(amount, folds, atk_key=1, atk_team=1, victim=1, crit=False, t=0.0, residual=None, calc_extra=None):
     e = {"t": t, "type": "dmg", "attacker": "A", "victim": "V", "amount": amount, "atkTeam": atk_team,
          "vicTeam": 2, "atkKey": atk_key, "vicKey": victim, "crit": crit}
     if folds is not None:
         e["calc"] = {"fold": folds}
         if residual is not None:
             e["calc"]["residual"] = residual
+        if calc_extra:
+            e["calc"].update(calc_extra)
     return e
 
 
@@ -181,6 +183,26 @@ close(an.unattributed_credit, 0, label="S13 no unattributed")
 close(an.diagnostics["sub_unity_factor"], 1, label="S13 sub-unity counted")
 close(an.diagnostics.get("negative_lines", 0), 0, label="S13 no negative lines")
 
+# S14 (R62 B): the residual the CORE reports must be the GAME caliber, not what reached 耐久.
+# The measured shape: theory 2417, applied 2102, of which 315 was absorbed by a barrier. The exported
+# residual (applied/theory = 0.870) reads as an unexplained multiplier; the game's own figure is
+# (applied + absorbed)/theory == 1.000, i.e. the chain explains the hit completely.
+from contrib.model import game_residual
+close(game_residual({"applied": 2102, "absorbed": 315, "theory": 2417}), 1.0, eps=1e-9,
+      label="S14 game-caliber residual")
+close(game_residual({"applied": 2102, "absorbed": 315, "theory": 2417, "residual": 0.87}), 1.0, eps=1e-9,
+      label="S14 ignores the applied-only field when the theory is known")
+close(game_residual({"residual": 0.87}), 0.87, eps=1e-9,
+      label="S14 falls back to the exported field when the theory is absent")
+close(game_residual({"applied": 1, "absorbed": 0, "theory": 0, "residual": 0.5}), 0.5, eps=1e-9,
+      label="S14 a zero theory is not a division")
+
+# S14b: the aggregate DIAGNOSTIC ladder uses the same caliber and counts the absorbed hits separately.
+_, an = run_case([A], [dmg(2102, [fold("text", "atk", "text#1/900/c0", 1.0, "noop")],
+                           residual=0.87, calc_extra={"applied": 2102, "absorbed": 315, "theory": 2417})])
+close(an.diagnostics["residual_absorbed_hits"], 1, label="S14b absorbed hits counted")
+close(sorted(an.diagnostics["residual_buckets"])[0], 1.0, label="S14b bucket is the game caliber")
+
 # analytic cross-check of the log-share formula itself
 M = 1.1 * 2.0 * 1.25
 pool = 2750 - 2750 / M
@@ -192,4 +214,4 @@ if FAILS:
     for f in FAILS:
         print("  " + f)
     sys.exit(1)
-print("OK contrib hand samples S1-S13 (S1-S6 math, S7 accounting, S8-S12 actor-key/ambiguity, S13 sub-unity): all passed")
+print("OK contrib hand samples S1-S14 (S1-S6 math, S7 accounting, S8-S12 actor-key/ambiguity, S13 sub-unity, S14 game-caliber residual): all passed")

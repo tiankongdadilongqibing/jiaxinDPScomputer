@@ -57,6 +57,10 @@
     <Compile Include="$(SrcRoot)\Policy\MasterDataLabelPolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\CompositionTolerancePolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\GlobalRuleApplyPolicy.cs" />
+    <!-- R63: the master-data skill cooldown unit conversion (master SECONDS -> the game's update count at
+         the measured 30 units per game second). Game-free by construction, which is what lets the new
+         auto-skill dump's unit be executed here instead of only argued about. -->
+    <Compile Include="$(SrcRoot)\Policy\SkillCooldownPolicy.cs" />
     <!-- R52: the extraction-flow decisions (trigger key, bundle name, retention). Game-free by
          construction, which is what lets the retention rule be executed instead of argued about. -->
     <Compile Include="$(SrcRoot)\Policy\ExtractPolicy.cs" />

@@ -148,12 +148,36 @@ public static partial class Aggregator
 			}
 		}
 
+		// R62 (A): the composition is built BEFORE the damage-detail figure is consumed. The record
+		// channel pairs on (attacker, target) inside 0.35 s with no value match, and ONE hit can leave
+		// several pending figures behind it (the DamageAction/ActDamageAction pair plus the 被吸收
+		// accounting call), so the NEXT hit to the same target can inherit the previous hit's figure.
+		// hitType is the one field both channels read from the same game member
+		// (DamageCalculater.m_hitType), which makes the contradiction detectable; the decision itself is
+		// AttributionPolicy.RecordContradictsComposition. Moving the composition up cannot change its
+		// result: nothing between the two positions touches the live calc or the calc-activity log.
+		string compA = null, compB = null, compC = null, compD = null;
+		CalcBreakdown compCalc = default(CalcBreakdown);
+		try { TryGetCompForVictim(victim, damage, nominal, out compA, out compB, out compC, out compD, out compCalc); }
+		catch { }
+
 		// 1.5.0 (A2): the damage-detail match. `hitHow` says which kind of match was used (0 none,
-		// 1 exact by damage value, 2 by attacker+target only) and is exported per hit, so a best-effort
-		// label can never be mistaken for an authoritative one.
+		// 1 exact by damage value, 2 by attacker+target only, 3 R62: paired and then REJECTED because the
+		// composition read a different hit type) and is exported per hit, so a best-effort label can never
+		// be mistaken for an authoritative one.
 		int hitHow;
 		HitRecord hitRecord = Session.ConsumePending(source, victim, damage, nominal, Session.ActiveSeconds, out hitHow);
-		if (hitRecord != null) { if (hitHow == 1) Rt.HitMatchExact++; else Rt.HitMatchPair++; }
+		if (hitRecord != null && AttributionPolicy.RecordContradictsComposition(
+				(int)hitRecord.HitType, compCalc.HitType, compCalc.Valid, compCalc.PairTrusted))
+		{
+			// The figure belonged to another hit. Drop it instead of relabelling: `source`, `calcHitType`,
+			// `calcEffectId`, `crit` and `skills[]` are ALL read from it, and writing another hit's figure
+			// as if it were this one's is exactly the silent wrong number this branch exists to stop.
+			hitRecord = null;
+			hitHow = AttributionPolicy.HitMatchRejected;
+			Rt.HitMatchRejected++;
+		}
+		else if (hitRecord != null) { if (hitHow == 1) Rt.HitMatchExact++; else Rt.HitMatchPair++; }
 		else Rt.HitMatchNone++;
 		if (hitRecord != null && actorStats != null)
 		{
@@ -214,7 +238,6 @@ public static partial class Aggregator
 		// full event log for offline analysis
 		try
 		{
-			TryGetCompForVictim(victim, damage, nominal, out string compA, out string compB, out string compC, out string compD, out CalcBreakdown compCalc);
 			var ev = new BattleEvent
 			{
 				T = Session.ActiveSeconds,

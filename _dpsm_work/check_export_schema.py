@@ -100,6 +100,13 @@ HITDETAIL_KEYS = [
     ('matchExact', int), ('matchPair', int), ('matchNone', int),
 ]
 
+# R62 (1.7.14, A): the damage-detail channel's new self-report -- figures that WERE paired and then
+# REJECTED because the composition that describes the hit read a different m_hitType (AttributionPolicy.
+# RecordContradictsComposition). Required exactly from 1.7.14 on: every older export never had it, and
+# "nothing was available" (matchNone) must stay distinguishable from "what was available was another
+# hit's figure" (matchRejected).
+HITDETAIL_KEYS_1714 = [('matchRejected', int)]
+
 TIMELINE_KEYS = [
     ('observed', int), ('units', int), ('rowCount', int), ('rowsDropped', int),
     ('statusChanges', int), ('resistChanges', int), ('notCharacter', int),
@@ -258,6 +265,44 @@ CONTRIB_PLUGIN_120 = (1, 7, 13)
 
 def _isnum(x):
     return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+
+def _check_fold_sides(d, ver, problems):
+    """R62 (C): the fold list carries the SIDE of every factor; 1.7.14 made the two summary doubles agree
+    with it (battle-wide EnemyTakes rules used to be multiplied into dealtMult). Verified offline BEFORE
+    shipping by replaying the corpus with the factor moved: dealtMult == prod(atk steps) and
+    takenMult == prod(vic steps) on all 197,533 fold-carrying hits of the live 82 exports, so this is an
+    identity and not a hope. Version-gated (<= 1.7.13 bucketed it the other way on purpose) and skipped
+    when the per-hit fold cap dropped a step."""
+    if ver < (1, 7, 14):
+        return
+    for i, e in enumerate(d.get('events') or []):
+        if not isinstance(e, dict):
+            continue
+        c = e.get('calc')
+        if not isinstance(c, dict):
+            continue
+        folds = c.get('fold')
+        if not isinstance(folds, list) or not folds or c.get('foldDropped'):
+            continue
+        dm, tm = c.get('dealtMult'), c.get('takenMult')
+        if not (_isnum(dm) and _isnum(tm)):
+            continue
+        pa = pv = 1.0
+        for st in folds:
+            if not isinstance(st, dict) or not _isnum(st.get('factor')):
+                continue
+            if st.get('side') == 'atk':
+                pa *= float(st['factor'])
+            elif st.get('side') == 'vic':
+                pv *= float(st['factor'])
+        tol = 6e-4 * (abs(pa) + abs(pv)) + 1e-3
+        if abs(float(dm) - pa) > tol:
+            problems.append('events[%d].calc.dealtMult(%.4f) != prod(atk folds)(%.4f) [since 1.7.14]'
+                            % (i, dm, pa))
+        if abs(float(tm) - pv) > tol:
+            problems.append('events[%d].calc.takenMult(%.4f) != prod(vic folds)(%.4f) [since 1.7.14]'
+                            % (i, tm, pv))
 
 # Absolute floor for the SUM identities. The plugin may emit integer-rounded values, and the three
 # numbers in "attributed + unattributed = total" are rounded independently, so the worst-case gap is
@@ -558,6 +603,14 @@ def check_export(d, name='<mem>'):
                         missing.append('%s.%s' % (key, k))
                     elif not isinstance(d[key][k], t):
                         problems.append('%s.%s type=%s want=%s' % (key, k, type(d[key][k]).__name__, _tname(t)))
+        # R62 (1.7.14): version-gated, so the whole pre-R62 archive keeps validating unchanged.
+        if ver >= (1, 7, 14) and 'hitDetail' in d and isinstance(d['hitDetail'], dict):
+            for k, t in HITDETAIL_KEYS_1714:
+                if k not in d['hitDetail']:
+                    missing.append('hitDetail.%s (since 1.7.14)' % k)
+                elif not isinstance(d['hitDetail'][k], t):
+                    problems.append('hitDetail.%s type=%s want=%s'
+                                    % (k, type(d['hitDetail'][k]).__name__, _tname(t)))
 
     # 1.7.2 (阶段 G) paramOwners: validated whenever it is present, not only when the version requires
     # it, so an export that carries the section is checked even if its version stamp is older.
@@ -714,8 +767,11 @@ def check_export(d, name='<mem>'):
 
     hd = d.get('hitDetail') or {}
     if isinstance(hd, dict):
-        for k in ('produced', 'matchExact', 'matchPair', 'matchNone'):
+        for k in ('produced', 'matchExact', 'matchPair', 'matchNone', 'matchRejected'):
             cov['hitDetail.' + k] = hd.get(k)
+
+    # R62 (C): the fold sides vs the two summary doubles, for exports that claim 1.7.14 or later.
+    _check_fold_sides(d, ver, problems)
 
     # Phase E: optional contribution section (validated whenever present)
     _check_contribution(d, problems, cov)
@@ -882,6 +938,14 @@ def _fixture_113():
     d['version'] = '1.7.13'
     d['config'] = {'filterFriendlyFire': False}
     d['contribution'] = _contrib_fixture_120()
+    return d
+
+
+def _fixture_114():
+    """A 1.7.14 export: 1.7.13 plus the damage-detail channel's REJECTED-figure counter (R62 A)."""
+    d = _fixture_113()
+    d['version'] = '1.7.14'
+    d['hitDetail']['matchRejected'] = 0
     return d
 
 
@@ -1283,6 +1347,37 @@ def selftest():
     c12_actor = _fixture_113()
     c12_actor['contribution']['actors'][0].pop('friendly')
     cases.append(('REJECTS a 1.2 actor without the excluded same-team amount', c12_actor, 1))
+
+    # ---- R62 (1.7.14, A): the damage-detail channel's rejected-figure counter ----
+    # The requirement is version-gated, so the whole pre-R62 archive keeps validating; a 1.7.14 file that
+    # omits the counter is REJECTED rather than read as "nothing was ever rejected".
+    c14 = _fixture_114()
+    cases.append(('accepts a 1.7.14 export carrying hitDetail.matchRejected', c14, 0))
+
+    c14_abs = _fixture_114()
+    del c14_abs['hitDetail']['matchRejected']
+    cases.append(('REJECTS a 1.7.14 export without hitDetail.matchRejected', c14_abs, 1))
+
+    c14_type = _fixture_114()
+    c14_type['hitDetail']['matchRejected'] = 'two'
+    cases.append(('REJECTS a non-integer hitDetail.matchRejected', c14_type, 1))
+
+    # ---- R62 (C): the fold list's SIDES and the two summary multipliers must agree ----
+    c14_fold_ok = _fixture_114()
+    c14_fold_ok['events'][0]['calc']['dealtMult'] = 1.15
+    c14_fold_ok['events'][0]['calc']['takenMult'] = 1.0
+    cases.append(('accepts a 1.7.14 calc whose fold sides match dealtMult/takenMult', c14_fold_ok, 0))
+
+    c14_fold_bad = _fixture_114()
+    c14_fold_bad['events'][0]['calc']['dealtMult'] = 1.0
+    c14_fold_bad['events'][0]['calc']['takenMult'] = 1.15
+    cases.append(('REJECTS a 1.7.14 calc whose fold sides do not match the multipliers', c14_fold_bad, 1))
+
+    # A <= 1.7.13 export keeps validating: the old bucketing is not a defect of those files.
+    old_fold = _fixture_113()
+    old_fold['events'][0]['calc']['dealtMult'] = 1.15
+    old_fold['events'][0]['calc']['takenMult'] = 1.0
+    cases.append(('accepts a 1.7.13 calc with the pre-R62 bucketing', old_fold, 0))
 
     out = []
     fails = 0

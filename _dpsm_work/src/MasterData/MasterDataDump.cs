@@ -207,6 +207,42 @@ public static class MasterDataDump
 				o.N("auto_skill_id", r.auto_skill_id);
 				o.N("cost", r.cost);
 			});
+			// R63: 自动技能 -- the skill a unit fires on its OWN clock, which is what `awake_potential`
+			// points at: measured on the shipped tables, 潜在 category 3 / acquire_id 403 carries
+			// `auto_skill_id` = the UNIT id (unit 84 = [賢導]トレイラ -> 84), and category 4 is the empty
+			// second slot. Until this table was dumped the auto skill's cycle could only be INFERRED from
+			// battle data (effect-channel cadence); these are the game's own numbers.
+			//
+			// UNITS: the cooldown columns are SECONDS in the master, while the live Skill counts game
+			// updates (30/game second). Both are published -- `*CoolTime` verbatim, `*CoolTimeFrames`
+			// converted -- so nobody has to guess which one they are holding (see SkillCooldownPolicy).
+			Table<int, AutoSkillMasterTable, AutoSkillMasterData>("auto_skill", "自动技能", (AutoSkillMasterTable t) => t.m_cache, delegate (AutoSkillMasterData r, RowJson o)
+			{
+				o.OI("id", r.id);
+				o.N("iconId", r.iconId);
+				o.OS("name", r.name);
+				o.OS("text", r.text);
+				o.OI("autoActivate", r.autoActivate);
+				o.OI("maxLevel", r.maxLevel);
+				o.OI("minFirstCoolTime", r.minFirstCoolTime);
+				o.OI("maxFirstCoolTime", r.maxFirstCoolTime);
+				o.OI("minCoolTime", r.minCoolTime);
+				o.OI("maxCoolTime", r.maxCoolTime);
+				o.N("minCoolTimeFrames", SkillCooldownPolicy.Frames(GameRef.Dec(r.minCoolTime), LiveUnitsPerGameSecond()));
+				o.N("maxCoolTimeFrames", SkillCooldownPolicy.Frames(GameRef.Dec(r.maxCoolTime), LiveUnitsPerGameSecond()));
+				o.OI("minDurationTime", r.minDurationTime);
+				o.OI("maxDurationTime", r.maxDurationTime);
+				o.OI("skillRange", r.skillRange);
+				o.OI("stock", r.stock);
+				o.N("activationType", r.activationType);
+				o.N("activationTypeParam", r.activationTypeParam);
+				o.N("activationPositionSortId", r.activationPositionSortId);
+				o.B("isTargetUnnecessary", r.isTargetUnnecessary);
+				o.N("talentCount", CountOf(r.talentList));
+				o.Arr("talents", TalentsJson(r.talentList));
+				o.N("triggerTimingCount", CountOf(r.triggerTimings));
+				o.Arr("triggerTimings", TriggerTimingsJson(r.triggerTimings));
+			});
 			// 战斗定义 -- a BattleDefine.Id -> string table (21 rows, one per enum member).
 			// CORRECTED 2026-10-03 (1.4.0): the earlier "this is where the battle's coefficients live"
 			// note was WRONG and the data falsifies it -- 18 of the 21 values are ids in an id space no
@@ -573,6 +609,51 @@ public static class MasterDataDump
 		return sb.ToString();
 	}
 
+	/// <summary>
+	/// R63: SkillMasterDataBase.TriggerTimingData entries (the timings a skill may fire on, e.g. the
+	/// 自动技能 start/finish triggers). Nested in SkillMasterDataBase, not top-level -- established by the
+	/// compiler, like the AbilityData note below.
+	/// </summary>
+	private static string TriggerTimingsJson(Il2CppSystem.Collections.Generic.List<SkillMasterDataBase.TriggerTimingData> list)
+	{
+		if (list == null) return "";
+		StringBuilder sb = new StringBuilder();
+		int n;
+		try { n = list.Count; } catch { return ""; }
+		for (int i = 0; i < n; i++)
+		{
+			try
+			{
+				SkillMasterDataBase.TriggerTimingData t = list[i];
+				if (t == null) continue;
+				if (sb.Length > 0) sb.Append(',');
+				RowJson o = new RowJson();
+				o.N("index", t.index);
+				o.N("timing", (int)t.timing);
+				sb.Append('{').Append(o.Body).Append('}');
+			}
+			catch { _rowErrors++; }
+		}
+		return sb.ToString();
+	}
+
+	/// <summary>
+	/// R63: the game units per game second as THE LIVE GAME reported them (`Skill.CoolTimeFrame /
+	/// Skill.CoolTime`, read by TimeProbe), falling back to the configured default while the probe has not
+	/// seen a usable ratio yet. The fallback is a documented constant, not a guess: 30.0 was measured for
+	/// every loaded skill (750/25, 1500/50, 1050/35).
+	/// </summary>
+	private static double LiveUnitsPerGameSecond()
+	{
+		try
+		{
+			double u = TimeProbe.UnitsPerGameSecond;
+			if (u > 0.0) return u;
+		}
+		catch { }
+		return SkillCooldownPolicy.FallbackUnitsPerGameSecond;
+	}
+
 	/// <summary>AbilityTalent.Param is just an array of anti-cheat ints; each element is decrypted
 	/// through the game's own accessor, never read raw.</summary>
 	private static string ParamsJson(Il2CppSystem.Collections.Generic.List<AbilityTalent.Param> list)
@@ -601,6 +682,17 @@ public static class MasterDataDump
 			catch { _rowErrors++; }
 		}
 		return sb.ToString();
+	}
+
+	/// <summary>R63: the nested trigger-timing entries of a skill master row.</summary>
+	private static int CountOf(Il2CppSystem.Collections.Generic.List<SkillMasterDataBase.TriggerTimingData> list)
+	{
+		try
+		{
+			if (list == null) return 0;
+			return list.Count;
+		}
+		catch { return -1; }
 	}
 
 	private static int CountOf(Il2CppReferenceArray<AbilityTrigger> arr)

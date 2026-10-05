@@ -1,0 +1,20 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\comparison_eligibility.py --selftest
+  [PASS] same-capability pair: config/identity still restrict     RESTRICTED
+  [PASS] atkadd capability split restricts                        RESTRICTED
+  [PASS] training ground restricts actor_credit                   RESTRICTED
+  [PASS] different quest restricts team_damage pooling            RESTRICTED
+  [PASS] missing section rejects actor_credit                     REJECTED
+  [PASS] pre-1.7.8 ledger absence restricts team_damage           RESTRICTED
+  [PASS] unknown method rejects actor_credit                      REJECTED
+  [PASS] single sample is never ELIGIBLE (no evidence)            RESTRICTED
+  [PASS] gate ERROR rejects actor_credit                          REJECTED
+  [PASS] gate WARNING is not a yes                                RESTRICTED
+  [PASS] an unexplained fold leak restricts the sample            RESTRICTED
+  [PASS] a dropped fold step restricts (the equality becomes a lower bound) RESTRICTED
+  [PASS] no dropped steps is a pass on that check                 pass
+  [PASS] a clean gate record adds no new restriction              pass
+  [PASS] real 1.7.10 export is not REJECTED                       RESTRICTED
+  [PASS] deleted section in a real copy -> REJECTED               REJECTED
+  [PASS] changed nested damageBasis in a real copy is caught      REJECTED
+---- selftest: PASS

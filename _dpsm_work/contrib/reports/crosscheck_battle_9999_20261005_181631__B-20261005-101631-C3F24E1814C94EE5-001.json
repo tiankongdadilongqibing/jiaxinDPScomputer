@@ -1,0 +1,95 @@
+{
+ "file": "battle_9999_20261005_181631__B-20261005-101631-C3F24E1814C94EE5-001.json",
+ "pluginVersion": "1.7.11",
+ "quest": 9999,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [],
+ "checked": {
+  "totals": 4,
+  "actors": 9,
+  "rules": 13,
+  "links": 15
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "legacy",
+   "code": "TRAINING_NOT_COMPARABLE",
+   "message": "quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS"
+  },
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.11)"
+  }
+ ],
+ "notes": [
+  {
+   "severity": "note",
+   "code": "ATKADD_FOLDS_OUT_OF_DOMAIN",
+   "message": "the section restates exactly the 31 in-domain kind=atkadd fold(s); 466 of the 497 non-empty calc.atkAdd entrie(s) belong to attackers outside the analysed team and never reach the model (expected, not a shortfall)"
+  }
+ ],
+ "modelApplicability": "not_comparable",
+ "trainingMode": true,
+ "atkAddCensus": {
+  "nonEmptyHits": 452,
+  "rows": 497,
+  "nonEmptyHitsInDomain": 31,
+  "rowsInDomain": 31,
+  "analysedTeam": 1,
+  "root": {
+   "hits": 1031,
+   "emitted": 497,
+   "selfValues": 829,
+   "skippedGuard": 0,
+   "skippedCollision": 0,
+   "skippedUnowned": 375,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0,
+   "selfByKey": 829,
+   "selfByNameFallback": 0,
+   "nameCollision": 0,
+   "ownerUnknown": 2
+  }
+ },
+ "giveCensus": {
+  "givenFoldSteps": 648,
+  "hitsWithAGivenFold": 216,
+  "hitsWithANonCancellingGivenProduct": 216,
+  "hitsWithDroppedFoldSteps": 0,
+  "rosterAudit": {
+   "giveApplied": 648,
+   "giveFoldHits": 216,
+   "giveHits": 991
+  }
+ },
+ "giveInvariants": [],
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": false,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 1.0,
+  "unattributedShare": 0.0,
+  "foldAccounting": {
+   "total": 1374,
+   "resolved": 1374,
+   "unresolved": 0,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 1194,
+   "unknown_reason": 0
+  }
+ },
+ "status": "LEGACY_NOT_APPLICABLE"
+}

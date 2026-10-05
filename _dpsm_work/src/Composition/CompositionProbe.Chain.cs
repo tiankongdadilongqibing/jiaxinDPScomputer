@@ -146,9 +146,15 @@ public static partial class CompositionProbe
 			{
 				RegisterGlobalDebuffs(atk);
 				RegisterGlobalDebuffs(blocker);
-				string gTxt;
-				double g = ApplyGlobalDebuffs(atk, blocker, out gTxt, fctx);
-				if (g != 1.0) { atkMod *= g; atkModText = Join(atkModText, gTxt); }
+				// R62 (C): the rule table mixes the two sides, so ask for them separately. An `EnemyTakes`
+				// entry ("毒/火傷状態の敵全ての被ダメージ+15%") is an INCOMING modifier and belongs in
+				// vicMod; the old code multiplied it into atkMod, which made 与伤害 / 被伤害 unreadable
+				// separately even though their product was right.
+				double gVic;
+				string gAtkTxt, gVicTxt;
+				double gAtk = ApplyGlobalDebuffsSplit(atk, blocker, out gAtkTxt, out gVicTxt, out gVic, fctx);
+				if (gAtk != 1.0) { atkMod *= gAtk; atkModText = Join(atkModText, gAtkTxt); }
+				if (gVic != 1.0) { vicMod *= gVic; vicModText = Join(vicModText, gVicTxt); }
 			}
 			catch { }
 			// Talents GRANTED to the victim by other units. This is the channel 刻印 id=26

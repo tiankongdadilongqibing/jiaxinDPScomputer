@@ -1,0 +1,97 @@
+{
+ "file": "battle_411001_20261004_181951.json",
+ "pluginVersion": "1.7.11",
+ "quest": 411001,
+ "sectionPresent": true,
+ "mismatches": [],
+ "omissions": [],
+ "validateErrors": [],
+ "atkAddInvariants": [
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfByKey=7199 exceeds atkAdd.hits=5624: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit",
+  "ATKADD_COUNTER_GT_HITS: atkAdd.selfValues=7199 exceeds atkAdd.hits=5624: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+ ],
+ "checked": {
+  "totals": 4,
+  "actors": 11,
+  "rules": 41,
+  "links": 20
+ },
+ "tolerance": {
+  "rel": 1e-06,
+  "abs": 1.0
+ },
+ "statusCode": 0,
+ "reasons": [
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfByKey=7199 exceeds atkAdd.hits=5624: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "warning",
+   "code": "ATKADD_COUNTER_GT_HITS",
+   "message": "atkAdd.selfValues=7199 exceeds atkAdd.hits=5624: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit"
+  },
+  {
+   "severity": "ok",
+   "code": "SECTION_PRESENT",
+   "message": "contribution section present (plugin version 1.7.11)"
+  }
+ ],
+ "notes": [],
+ "modelApplicability": "full",
+ "trainingMode": false,
+ "atkAddCensus": {
+  "nonEmptyHits": 5437,
+  "rows": 5587,
+  "nonEmptyHitsInDomain": 5437,
+  "rowsInDomain": 5587,
+  "analysedTeam": 1,
+  "root": {
+   "hits": 5624,
+   "emitted": 5587,
+   "selfValues": 7199,
+   "skippedGuard": 132,
+   "skippedCollision": 187,
+   "skippedUnowned": 0,
+   "skippedOwnerNull": 0,
+   "skippedNegative": 0,
+   "skippedType": 0,
+   "selfByKey": 7199,
+   "selfByNameFallback": 0,
+   "nameCollision": 0,
+   "ownerUnknown": 18
+  }
+ },
+ "giveCensus": {
+  "givenFoldSteps": 5390,
+  "hitsWithAGivenFold": 2695,
+  "hitsWithANonCancellingGivenProduct": 2695,
+  "hitsWithDroppedFoldSteps": 0,
+  "rosterAudit": {
+   "giveApplied": 5390,
+   "giveFoldHits": 2695,
+   "giveHits": 5679
+  }
+ },
+ "giveInvariants": [],
+ "optionalBlocks": {
+  "totals": false,
+  "unattributed": true,
+  "diagnostics": true
+ },
+ "offline": {
+  "creditedShare": 0.9524773014239032,
+  "unattributedShare": 0.047522698576093966,
+  "foldAccounting": {
+   "total": 31237,
+   "resolved": 25915,
+   "unresolved": 5322,
+   "zero_factor": 0,
+   "noop_factor": 0,
+   "sub_unity": 0,
+   "unknown_reason": 0
+  }
+ },
+ "status": "WARNING"
+}

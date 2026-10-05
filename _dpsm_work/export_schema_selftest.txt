@@ -64,3 +64,9 @@ PASS REJECTS a 1.2 ledger without the selfTeam bucket     caught=1  [contributio
 PASS REJECTS a 1.2 ledger whose buckets do not reach totalsDealt caught=1  [contribution ledger identity broken: analyzable(400)+outsideTeam(400)+selfTeam(10) != totalsDealt(1000)]
 PASS REJECTS a 1.2 ledger whose hit buckets do not reach events caught=1  [contribution ledger hit identity broken: events(10) != analyzable(4)+outsideTeam(3)+unknown(2)+selfTeam(7)]
 PASS REJECTS a 1.2 actor without the excluded same-team amount caught=1  [contribution.actors[] entry missing friendly]
+PASS accepts a 1.7.14 export carrying hitDetail.matchRejected caught=0
+PASS REJECTS a 1.7.14 export without hitDetail.matchRejected caught=1  [hitDetail.matchRejected (since 1.7.14)]
+PASS REJECTS a non-integer hitDetail.matchRejected        caught=1  [hitDetail.matchRejected type=str want=int]
+PASS accepts a 1.7.14 calc whose fold sides match dealtMult/takenMult caught=0
+PASS REJECTS a 1.7.14 calc whose fold sides do not match the multipliers caught=2  [events[0].calc.dealtMult(1.0000) != prod(atk folds)(1.1500) [since 1.7.14]; events[0].calc.takenMult(1.1500) != prod(vic folds)(1.0000) [since 1.7.14]]
+PASS accepts a 1.7.13 calc with the pre-R62 bucketing     caught=0
