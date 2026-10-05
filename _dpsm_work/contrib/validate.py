@@ -43,12 +43,23 @@ def check(an, export):
 
     # I2b (1.7.12): the same-team split must PARTITION the actor direct damage. It is derived from the
     # event flag on both sides, so a break here means the two halves were built from different predicates.
-    bad_split = [a for a in an.actors.values()
-                 if abs((a.friendly + a.hostile) - a.direct) > max(1e-6, 1e-9 * max(1.0, abs(a.direct)))]
-    if bad_split:
-        add("ERROR", "I2b", "%d actor(s) break friendly+hostile == direct: %s"
-            % (len(bad_split), ", ".join("%s(%.0f+%.0f != %.0f)" % (a.name, a.friendly, a.hostile, a.direct)
-                                         for a in bad_split[:3])))
+    # I2b (1.7.12 / 1.7.13): the identity depends on the contract the file was written under.
+    #   <=1.1: same-team hits sit INSIDE direct, so friendly + hostile == direct.
+    #   1.2  : they are excluded, so the pool split is hostile == direct and friendly is the excluded amount.
+    if an.same_team_in_pool:
+        bad_split = [a for a in an.actors.values()
+                     if abs((a.friendly + a.hostile) - a.direct) > max(1e-6, 1e-9 * max(1.0, abs(a.direct)))]
+        if bad_split:
+            add("ERROR", "I2b", "%d actor(s) break friendly+hostile == direct: %s"
+                % (len(bad_split), ", ".join("%s(%.0f+%.0f != %.0f)" % (a.name, a.friendly, a.hostile, a.direct)
+                                             for a in bad_split[:3])))
+    else:
+        bad_split = [a for a in an.actors.values()
+                     if abs(a.hostile - a.direct) > max(1e-6, 1e-9 * max(1.0, abs(a.direct)))]
+        if bad_split:
+            add("ERROR", "I2b", "%d actor(s) break hostile == direct (schema 1.2, same-team excluded): %s"
+                % (len(bad_split), ", ".join("%s(%.0f != %.0f)" % (a.name, a.hostile, a.direct)
+                                             for a in bad_split[:3])))
 
     # I3: share identity
     credited_share = an.actor_total_credit() / an.analyzable if an.analyzable else 0.0

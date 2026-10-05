@@ -59,3 +59,8 @@ PASS REJECTS a non-numeric actor friendly                 caught=1  [contributio
 PASS accepts a 1.7.12 export stating filterFriendlyFire   caught=0
 PASS REJECTS a 1.7.12 export without its config block     caught=1  [root.config (since 1.7.12)]
 PASS REJECTS a non-boolean filterFriendlyFire             caught=1  [config.filterFriendlyFire type=str want=bool]
+PASS accepts a well-formed 1.2 section (selfTeam bucket in the ledger) caught=0
+PASS REJECTS a 1.2 ledger without the selfTeam bucket     caught=1  [contribution.damageLedger.selfTeamDealt missing [schema 1.2]]
+PASS REJECTS a 1.2 ledger whose buckets do not reach totalsDealt caught=1  [contribution ledger identity broken: analyzable(400)+outsideTeam(400)+selfTeam(10) != totalsDealt(1000)]
+PASS REJECTS a 1.2 ledger whose hit buckets do not reach events caught=1  [contribution ledger hit identity broken: events(10) != analyzable(4)+outsideTeam(3)+unknown(2)+selfTeam(7)]
+PASS REJECTS a 1.2 actor without the excluded same-team amount caught=1  [contribution.actors[] entry missing friendly]

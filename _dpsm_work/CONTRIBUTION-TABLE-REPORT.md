@@ -27,6 +27,11 @@
 > 1.7.12 新增:根 `config.filterFriendlyFire`、`contribution.actors[].friendly` / `friendlyHits` / `hostileDamage`、
 > F5 表 1 的「自伤」列(`T1` 行宽 85 → **94**,面板 780 → 880)。字段定义与恒等式见
 > `CONTRIBUTION-DATA-DICTIONARY.md` §1.4 / §12。
+>
+> **现状补充(2026-10-05 R61,用户决定)**:插件 **1.7.13 已部署**(线上 DLL `32BFEC3B…`,435,200 B)、`contribution.schemaVersion` **1.2** —— 同队/自我伤害
+> (敌方 `回復反転` 的效果)**移出归属池**,改由 `damageLedger.selfTeam*` 与逐角色 `friendly`/`friendlyHits` 计数;
+> `analyzableDealt`、`directDamage`、`总贡献`、`命中` 从此只含**对敌命中**(实测同一场:池 6,146,573 → 4,222,552,
+> 一个「对敌输出为 0、自伤 1.88M」的角色从 30.56% 归零)。**1.2 之前写出的文件按各自契约读,不重算。**
 
 ---
 
@@ -152,6 +157,9 @@
 > **1.7.12**:同队部分已恢复为独立的「自伤」列(`friendly`,列宽 9;F5 原样在 1.5.x 有过这个列),`T1` 行宽因此
 > 由 85 变为 **94**;`contribution.actors[]` 同时发布 `friendly` / `friendlyHits` / `hostileDamage`,恒等式
 > `friendly + hostileDamage == directDamage` 由 `check_export_schema.py` 逐角色强制。该列不移动任何 credit。
+>
+> **1.7.13/schema 1.2(R61)**:`直接伤害/直接占比` 现在只含**对敌命中**;`自伤` 列显示的是**被排除**的量
+> (它不进 `directDamage`,也不被任何人计贡献)。`hostileDamage` 在 1.2 中不再写出(已等于 `directDamage`)。
 
 **历史**:1.7.6–1.7.10 的三列为 `基础(11) | 自身规则(11) | 辅助(11)`。拆开显示会让「自身规则」看起来像与「辅助」同级的外部加成,
 而它其实是该角色自己那半边的另一半;同时 `receivedAssist` 从未进表,读者无法解释「直接打出」与「总贡献」为何不同。

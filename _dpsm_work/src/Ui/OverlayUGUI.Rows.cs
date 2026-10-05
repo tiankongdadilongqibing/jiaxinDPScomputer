@@ -542,8 +542,8 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "   他人因你=队友因他多打出来的(记他名下,不是他打出的);被队友分走=自己命中里由他人倍率拿走的部分", Color = DimColor, Height = 15f });
 		// 1.7.12 (user request): the 自伤 column is back, and it needs one plain sentence or the page repeats
 		// the misreading it was added to prevent (a 2.0M self-damage looked like 2.0M of enemy output).
-		rows.Add(new RowDef { Text = "   自伤=他的命中里落在自己人(含自己)身上的部分;已含在「自身/直接打出」里,读「对敌输出」要减掉", Color = DimColor, Height = 15f });
-		rows.Add(new RowDef { Text = "   全队总贡献相加 = 可分析伤害(不是他打出的伤害);直接占比=他实际打出的伤害占比;分池按「倍率对数份额」", Color = DimColor, Height = 15f });
+		rows.Add(new RowDef { Text = "   自伤=敌方治疗反转(回復反転)/自伤落在自己人身上的部分;它已从贡献里排除、不归属任何角色,只在此单列", Color = DimColor, Height = 15f });
+		rows.Add(new RowDef { Text = "   全队总贡献相加 = 可分析伤害(只含对敌命中;自伤已排除);直接占比=他对敌打出的伤害占比;分池按「倍率对数份额」", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef
 		{
 			// RF5c: the header is BUILT from the column spec, so its widths cannot drift from the labels.

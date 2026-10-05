@@ -6,7 +6,7 @@
 
 ## 0. 一句话现状
 
-插件 **1.7.12 已部署**且与源码一致(线上 DLL = `F791F1CF…`,434,688 B;上一版 `C1DBBD8F` 在 `deploy-backup/pre-r60-C1DBBD8F/`);语料 **冻结快照 35 份、22 份带 `contribution` 段**;6 个契约都有可复现入口和会变红的负控;
+插件 **1.7.13 已部署**且与源码一致(线上 DLL = `32BFEC3B…`,435,200 B;上一版 `F791F1CF` 在 `deploy-backup/pre-r61-F791F1CF/`);**R61 把同队/自我伤害移出归属池**,`contribution.schemaVersion` 升 **1.2**;语料 **冻结快照 35 份、22 份带 `contribution` 段**;6 个契约都有可复现入口和会变红的负控;
 路线图 N0–N6 已闭环、N7 目视 9 项里 1 项由实机日志自动核对通过;**当前没有任何“影响伤害”的已知丢失**;
 配队结论仍是**「有倾向但不确定 → 不换人」**(样本增加后等级未变)。
 **重构最大的障碍不是代码耦合,而是没有版本控制、没有 C# 单元测试工程** —— 见 §7。
@@ -15,15 +15,15 @@
 
 | 项 | 值 |
 |---|---|
-| 插件版本 | **1.7.12**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 线上 DLL = 1.7.12(一致) |
-| 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,434,688 B,SHA256 `F791F1CFD0E5A1963EB7669505C3D9CE8D827AD9F35D6F82B8E909A2B0DB7E7`(1.7.12,R60);上一版 = `C1DBBD8F…`(433,664 B,1.7.11,备份于 `_dpsm_work\deploy-backup\pre-r60-C1DBBD8F\`) |
+| 插件版本 | **1.7.13**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 线上 DLL = 1.7.13(一致) |
+| 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,435,200 B,SHA256 `32BFEC3B6A8884C57997A1BBC36FE5456509278B465A6784A810038FD4446007`(1.7.13,R61);上一版 = `F791F1CF…`(434,688 B,1.7.12,备份于 `_dpsm_work\deploy-backup\pre-r61-F791F1CF\`) |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
 | 源码规模 | `_dpsm_work/src`:**94 个 .cs / 25,284 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **129** 个 .cs(src + recon_probe + test + **tests**) |
-| 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `E00E63E0419EA5CA5E8065BF9A78C226E8A0D39DCE9864A662E0BF577DD28398`(R57:游戏启动后 BepInEx 按新默认值重写了 `ExtractOnBattleEnd` 的说明文字与 "Default value: true",开关值仍是 true);贡献相关开关全 true,R54 起 `ExtractOnBattleEnd=true`(每场自动出证据包,保留 `ExtractKeep=5`),R55 起**插件默认值**也是 true(不再依赖用户读配置) |
+| 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `8E5D2C840AC953E5CD62B8E9C0809DE227156568010A44F59E1FD3C0C5D39641`(R61:游戏用 1.7.12 启动后 BepInEx 只重写了首行 `created by plugin DpsMeter v1.7.12`;上一版 `E00E63E0…` 见 R60 记录。开关值未变——`ExtractOnBattleEnd=true`、`FilterFriendlyFire=false`);贡献相关开关全 true,R54 起 `ExtractOnBattleEnd=true`(每场自动出证据包,保留 `ExtractKeep=5`),R55 起**插件默认值**也是 true(不再依赖用户读配置) |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b+R60):**960 个命名用例 / 99 组**,**136 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b+R60+R61):**963 个命名用例 / 99 组**,**137 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
 | 离线守卫 | **44 条命令 / 76 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**100 条登记 / 31 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
@@ -322,11 +322,12 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 56 轮(战斗编号 + 精确选场,按 BATTLE-REFERENCE-IMPLEMENTATION-PLAN)** | 按规划实现**第一版闭环**:新建会话时**只分配一次**编号(`B-{启动命名空间}-{序号≥3位}`,契约 `battle-ref/1`),视图重建**复制**而不重新发号、没有编号就明说 legacy;导出正文新增 `battleRef` 块,默认文件名 `battle_{quest}_{时间}__{编号}.json`(保留历史前缀与 quest 位置),写盘改为**临时文件 + 原子发布**,成功后才计算**实际字节 SHA256**;主窗/上一场/F5/F6/Chart 五处显示短序号 + 完整编号(uGUI 点击该行复制、IMGUI 回退是真按钮),F9 保留编号并计数;**新增离线 `battle_select.py`**(`list`/`resolve`/`compare`)把编号解析成显式文件清单,缺失/歧义/文件名与正文冲突/内容变化/未终局**一律拒绝**,比较仍交给既有 `contrib.compare`。行为用例 866→**947**(新增 `bref/format|registry|lifecycle` 三组 81 例)、变异 121→**130**(新增 9 例;其中 2 例初稿跑不红,已按"跑不到红就不是闸门"改成会咬的判据并记录)、新工具 selftest **16 例**;真机:真实导出目录 50 份 / 0 带编号 / 50 legacy 全部可列。**本轮不移动任何伤害/贡献数字**。部署 **F6948470**(433,664 字节) | [REFACTOR-BATCH-R56.md](<REFACTOR-BATCH-R56.md>) |
 | **第 57 轮(引用绑定持久文件;实机发现)** | 你复制回来的引用里 `file: battle.json` 暴露了 R56 的一个真缺陷:`MarkExported` 原本是"记住最后一次写盘",而 battle-end 的**证据包在普通导出之后写**,于是身份被绑到了 `extract/<bundle>/battle.json` —— 而 `ExtractKeep`=5 的保留策略**已经把那个包删掉**。按方案 §5.1"实际目标路径首次确定后绑定会话"改为:**首次成功写盘绑定路径,之后只有写同一路径才更新哈希**,副本再也不能移动身份。同时用真实数据端到端确认:该编号 `resolve` 命中唯一文件、报告的 SHA256 与复制文本**逐字相同**,`state=provisional` 与正文(11.80 s / result=None / closeReason=end)一致,`compare` 对未终局样本正确拒绝(exit 5);同一次启动的 6 场(9999 训练场)编号 001–006 各自独立、文件不互相覆盖。行为用例 947→**950**、变异 130→**131**。部署 **C1DBBD8F**(433,664 字节) | [REFACTOR-BATCH-R57.md](<REFACTOR-BATCH-R57.md>) |
 | **第 60 轮(自伤判定三件套:配置回显 + 贡献段自伤字段 + F5 自伤列)** | 按你的指令把 R59 查出的三个缺口一次补掉:①导出根新增 `config.filterFriendlyFire` —— 唯一会改变**既有数字含义**的开关(它决定 `totals.dealt` / `perSecDamage` / `命中` 是否含同队伤害),现在由文件自述;②`contribution.actors[]` 新增 `friendly` / `friendlyHits` / `hostileDamage`(逐事件 `friendly` 标志分类,`friendly+hostileDamage==directDamage` 精确成立,且**不受该开关影响**);③F5 表 1 **恢复「自伤」列**(1.5.x 曾有),`T1` 由 8 列 83 / 行 85 变 **9 列 92 / 行 94**,Contribution 面板上限 780 → 880。**不移动任何既有数值与既有 credit**。同时修掉一个既有缺陷:`contrib/crosscheck.py` 的 `totalDamage` 期望值一直是 1.0 公式(`analyzable+unattributed`),对 schema 1.1 段只要未归因非空就把**正确**文件判成 ERROR(实测 `battle_411001_20261005_142931`,未归因 3.885%),现按段内 `schemaVersion` 选公式。行为用例 950→**960**(新增 `extract/friendly-split` 组)、变异 131→**136**(5 条新变异逐条验证会红,并更新一条改名后的期望)、`check_export_schema` 自测 54→**61**;离线核心同步 `friendly/friendly_hits/hostile` + 恒等式 I2b;真机验证:未修改的 1.7.11 导出经离线重算,`actors[6].friendly = 2,006,442` / `hostile = 1,439` 与文件 `friendly` 逐 key 相等,模拟 1.7.12 段落 crosscheck **0 mismatch / 0 omission**。**部署完成**:`F791F1CF`(434,688 B);上一版 `C1DBBD8F` 备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`,两个 crash `.bak` 哈希复核未变 | [REFACTOR-BATCH-R60.md](<REFACTOR-BATCH-R60.md>) |
+| **第 61 轮(同队/自我伤害移出归属池,按用户判断)** | 你指出自伤其实是**敌方治疗反转(回復反転)**、打自己不算贡献,要求从贡献比例里去掉。按此把**归属契约升到 `schemaVersion 1.2`**(插件 **1.7.13**):`analyzableDealt` 只含**对敌命中**;`damageLedger` 新增 `selfTeamHits/selfTeamDealt`,恒等式变为 `totalsDealt == analyzable + outsideTeam + selfTeam` 与 `events == analyzableHits + outsideTeamHits + unknownAttackerHits + selfTeamHits`,`reconciliationGap` 同步;逐角色 `directDamage` 变成对敌,`friendly`/`friendlyHits` 变成「被排除并计数」,R60 的 `hostileDamage` 在 1.2 不再写;F5 分母变小(其余角色占比按比例上升),自伤列保留并改口径文案。**旧档不重算**:离线核心按文件自己的 `schemaVersion` 选模式(<=1.1 同队命中原样在池内),rf0 冻结语料与全部历史导出的 crosscheck 结论不变。实测你那一场:`analyzableDealt` 6,146,573 → **4,222,552**(排除 1,924,021 / 30 击),`attributed == analyzable`(域内 creditedShare 仍 1.0),一个对敌输出为 0 的角色从 **30.56% 归零**。行为用例 950→**963**(重写 `extract/friendly-split` 为 1.2 语义)、变异 136→**137**、schema 自测 61→**66**(新增 5 例 1.2 用例)。**不移动任何 game 口径数字**(`totals.dealt`/`perSecDamage` 照旧含它) | [REFACTOR-BATCH-R61.md](<REFACTOR-BATCH-R61.md>) |
 | **第 50 轮(首次部署)** | 应你要求把运行 DLL 从基线 1.7.11(387,072 / 36EC96D4…)替换为**重构构建**(398,336 / 28B8CCAF…):替换前确认**游戏未运行且文件未占用**,备份全部 105 个文件到 `_dpsm_work/deploy-backup/baseline-1.7.11/`,并复核你要求永不改动的两个 `.bak` **哈希不变**;回退为一条 Copy-Item;跑完后的对照计划(转储逐字节 vs r42 基准、导出跑既有检查、前后哈希留档)写在记录里 | [REFACTOR-BATCH-R50.md](<REFACTOR-BATCH-R50.md>) |、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
 
-1. **部署链(当前)**:基线 1.7.11(387,072 B / `36EC96D4…`)→ 重构构建(398,336 B / `28B8CCAF…`,第 50 轮)→ 证据提取(416,256 B / `AA836C06…`,R52)→ … → R57 的 **`C1DBBD8F`**(433,664 B)是**线上**这一份;R60/1.7.12 = **`F791F1CF…`**(434,688 B)是**当前线上**这一份(按 AGENTS §5:游戏关闭时替换、备份旧 DLL、复核历史 `.bak`)。RF0 已经证明(对基线那一版)"用 `src` 重建得到的产物与部署逐字节相同",此后每次替换都按 AGENTS §5 备份并复核历史 `.bak` 哈希。
+1. **部署链(当前)**:基线 1.7.11(387,072 B / `36EC96D4…`)→ 重构构建(398,336 B / `28B8CCAF…`,第 50 轮)→ 证据提取(416,256 B / `AA836C06…`,R52)→ … → R57 的 **`C1DBBD8F`**(433,664 B)是**线上**这一份;R61/1.7.13 = **`32BFEC3B…`**(435,200 B)是**当前线上**这一份;上一版 R60/1.7.12 = `F791F1CF…`(434,688 B,备份于 `deploy-backup/pre-r61-F791F1CF/`)。RF0 已经证明(对基线那一版)"用 `src` 重建得到的产物与部署逐字节相同",此后每次替换都按 AGENTS §5 备份并复核历史 `.bak` 哈希。
 2. **判据现在可以离线执行**:`tests/BehaviorTests` 的 `<Compile>` 清单包含 `src/Policy/*.cs`,所以任何让策略层依赖 Unity/IL2CPP/配置的改动会**构建失败**,而不是悄悄漂移。
 3. **未覆盖的要写下来**:门面(编排、原生读取、热路径候选扫描)没有任何离线测试覆盖;策略用例证明的是"判据正确",不是"调用点正确" —— 调用点靠差异审查 + 构建 + 真实导出回归。
 

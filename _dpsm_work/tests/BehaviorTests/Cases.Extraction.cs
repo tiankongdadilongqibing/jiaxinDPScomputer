@@ -472,12 +472,18 @@ internal static partial class Cases
 		ContributionActorRow srow = null;
 		for (int si = 0; si < sres.Actors.Count; si++) if (sres.Actors[si].Key == 3) srow = sres.Actors[si];
 		r.True("the-attacker-row-exists", srow != null);
-		r.EqD("direct-is-both-hits", srow.Direct, 140.0);
-		r.EqD("the-friendly-hit-is-the-friendly-part", srow.Friendly, 40.0);
+		// R61 (1.7.13): the same-team hit leaves the pool. Direct/Analyzable are the ENEMY hit only, the
+		// excluded amount is still published per actor and counted in the session ledger, and nobody is
+		// credited for it.
+		r.EqD("direct-is-the-enemy-hit-only", srow.Direct, 100.0);
+		r.EqD("the-friendly-hit-is-published-but-out-of-the-pool", srow.Friendly, 40.0);
 		r.Eq("and-it-is-one-hit", srow.FriendlyHits, 1);
-		r.EqD("the-enemy-hit-is-the-hostile-part", srow.Hostile, 100.0);
-		r.EqD("the-two-parts-partition-the-direct-damage", srow.Friendly + srow.Hostile, srow.Direct);
-		r.EqD("and-the-friendly-hit-still-credits-its-own-attacker (reporting only)", srow.Base, 140.0);
+		r.EqD("the-pool-is-the-enemy-hit-only", sres.Stats.Analyzable, 100.0);
+		r.EqD("the-session-ledger-counts-the-same-team-amount", sres.Stats.SelfTeamDamage, 40.0);
+		r.Eq("and-its-hit-count", sres.Stats.SelfTeamHits, 1);
+		r.EqD("the-excluded-hit-credits-nobody", srow.Base, 100.0);
+		r.EqD("and-the-credited-total-is-the-enemy-hit", srow.Total, 100.0);
+		r.EqD("so-in-domain-attribution-is-still-complete", sres.Stats.CreditedShare, 1.0);
 
 		// back to the family the caption cases below belong to: the group label is part of a case NAME, so
 		// leaving them in extract/friendly-split would rename four cases (and a negative control keys on one).

@@ -298,7 +298,11 @@ def compare(path, tol_rel=1e-6, tol_abs=1.0):
         # section written before 1.7.12 legitimately lacks it, and treating that as an omission would
         # turn the whole archive into a red ERROR (the schema guard is version-gated for the same
         # reason). A 1.7.12+ section that omits it still gets the MANDATORY_MISSING error below.
-        if _at_least(version, (1, 7, 12)):
+        # 1.7.13 (R61, schema 1.2): the same-team amount is still published, but `hostileDamage` is gone
+        # -- directDamage itself is the in-pool (enemy-facing) number now.
+        if _at_least(version, (1, 7, 13)):
+            fields += [("friendly", mine.friendly), ("friendlyHits", mine.friendly_hits)]
+        elif _at_least(version, (1, 7, 12)):
             fields += [("friendly", mine.friendly), ("friendlyHits", mine.friendly_hits),
                        ("hostileDamage", mine.hostile)]
         for field, mine_v in fields:

@@ -396,8 +396,10 @@ public static class Program
 		string js = sb.ToString();
 		CheckBool("P0-B totalDamage is analyzableDealt, not analyzable+unattributed",
 			js.Contains("\"totalDamage\":600.0000") && !js.Contains("\"totalDamage\":700.0000"));
-		CheckBool("P0-B schema identity is 1.1 / producer plugin",
-			js.Contains("\"schemaVersion\":\"1.1\"") && js.Contains("\"producer\":\"plugin\""));
+		// R61: the contract moved to 1.2 when same-team damage left the analysed pool (the ledger gained
+		// selfTeam*). The producer/method keys are unchanged.
+		CheckBool("P0-B schema identity is 1.2 / producer plugin",
+			js.Contains("\"schemaVersion\":\"1.2\"") && js.Contains("\"producer\":\"plugin\""));
 		CheckBool("P0-B ledger block is emitted",
 			js.Contains("\"damageLedger\":{") && js.Contains("\"excludedDamage\":400.0000"));
 		ContributionStats empty = Contribution.Compute(
@@ -576,8 +578,10 @@ public static class Program
 			JsonCheck.Validate(json, out jerr, out jdup));
 		// 1.7.8 (P0-B): the contract version moved to 1.1 when totalDamage changed meaning, and the
 		// producer field was added so a reader can tell the plugin's section from the offline draft.
+		// R61 (1.7.13): it moved again to 1.2 when same-team damage (the enemy 回復反転 channel) left
+		// analyzableDealt and moved into the ledger's selfTeam bucket.
 		CheckBool("section carries its schema identity",
-			json.Contains("\"schemaVersion\":\"1.1\"") && json.Contains("\"producer\":\"plugin\"")
+			json.Contains("\"schemaVersion\":\"1.2\"") && json.Contains("\"producer\":\"plugin\"")
 			&& json.Contains("\"method\":\"log-share/1\"") && json.Contains("\"damageBasis\":\"dealt\""));
 	}
 

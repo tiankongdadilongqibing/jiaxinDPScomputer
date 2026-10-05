@@ -147,6 +147,9 @@ def scan_raw(raw, path="", crosscheck=None, offline=None):
     n_calc = 0
     own_analyzed_hits = 0
     own_analyzed_damage = 0.0
+    # R61: the same-team part of the team-1 hits, i.e. the amount schema 1.2 excludes from the pool.
+    own_hostile_hits = 0
+    own_hostile_damage = 0.0
     enemy_hits = 0
     enemy_damage = 0.0
     own_excluded_hits = 0
@@ -200,6 +203,9 @@ def scan_raw(raw, path="", crosscheck=None, offline=None):
         if ak is not None and team == 1:
             own_analyzed_hits += 1
             own_analyzed_damage += amt
+            if not e.get("friendly"):
+                own_hostile_hits += 1
+                own_hostile_damage += amt
         elif ak is not None and team == 2:
             enemy_hits += 1
             enemy_damage += amt
@@ -316,6 +322,14 @@ def scan_raw(raw, path="", crosscheck=None, offline=None):
         analyzable = sec_analyzable
     if analyzable is None:
         analyzable = own_analyzed_damage   # synthetic/segment-less input: our own filter
+    # R61: which of our two pools the file itself declares -- same-team inside (<=1.1) or excluded (1.2).
+    _own_for_filter = own_analyzed_damage
+    try:
+        _sv = str((sec or {}).get("schemaVersion") or "") if isinstance(sec, dict) else ""
+        if _sv and tuple(int(x) for x in _sv.split(".")[:2]) >= (1, 2):
+            _own_for_filter = own_hostile_damage
+    except (TypeError, ValueError):
+        pass
     deal_minus = (totals_dealt - analyzable) if analyzable is not None else None
     excluded_total = enemy_damage + own_excluded_damage
     gap = None
@@ -468,9 +482,11 @@ def scan_raw(raw, path="", crosscheck=None, offline=None):
             "totalsDealt": totals_dealt,
             "offlineAnalyzableDealt": offline_analyzable,
             "contributionAnalyzableDealt": sec_analyzable,
+            "ownHostileHits": own_hostile_hits,
+            "ownHostileDealt": own_hostile_damage,
             "analyzableFilterMatchesOffline": (
                 None if offline_analyzable is None
-                else abs(own_analyzed_damage - offline_analyzable) < 1.0),
+                else abs(_own_for_filter - offline_analyzable) < 1.0),
         },
         "foldIdentity": {
             "criterion": "prod(calc.fold) vs dealtMult*takenMult (attrMult excluded)",

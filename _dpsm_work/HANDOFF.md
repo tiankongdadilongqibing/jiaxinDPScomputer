@@ -67,6 +67,7 @@
 
 | 版本 | SHA256(前 12) | 大小 | 状态 |
 |---|---|---|---|
+| **1.7.13(已部署,R61)** | `32BFEC3B6A88` | 435,200 | R61(用户判断):同队/自我伤害(敌方 回復反転)移出归属池,`contribution.schemaVersion` **1.2**;`damageLedger` 增 `selfTeam*`;F5 占比按对敌池重算 |
 | **1.7.12(已部署,R60)** | `F791F1CFD0E5` | 434,688 | R60:自伤三件套 —— 导出根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1 恢复「自伤」列(T1 85→94、面板 780→880);另修 `contrib/crosscheck.py` 对 schema 1.1 段 `totalDamage` 的 1.0 旧公式 |
 | 1.7.11(基线构建) | `36EC96D4DBD8` | 387,072 | 1.7.11(§7.2.100):F5 表 1 改为 `自身 \| 他人因你 \| 被队友分走`(自身=基础+自身规则),F6 明细块写成算式,`receivedAssist` 首次进表;两条逐角色恒等式进 `check_export_schema`,版面守卫新增「渲染器↔副本漂移」检查,并修 `check_live_log` 两处误判 |
 | 1.7.10(前一版) | `BF2F174A4059` | 386,560 | 1.7.10(§7.2.99):`give_section_reasons` 曾读错对象而**从未运行**(改读 `rosterAudit` + 真实文件负控);`[COMP]` 重算遵守 GivenTalent/Madness/MadnessVictim |
@@ -369,7 +370,7 @@
    要真正的跨场主键需要在插件里新增身份字段(属于阶段 C 的插件侧延伸,未做)。
 
 #### 盘面快照
-* **线上 1.7.12** = `F791F1CFD0E5…`(434,688B;R60:自伤三件套 + 根 `config.filterFriendlyFire` + crosscheck 的 1.1 `totalDamage` 修正;R57/R60 的记录在 `REFACTOR-BATCH-*.md`,不再新增 `SESSION-STATE.md` §7.2.x)。上一版 **1.7.11** = `C1DBBD8FF43F…`(433,664B;R57:引用绑定持久文件 + 战斗编号 battle-ref/1 + 精确选场 `battle_select.py`;备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`)。更早的**基线 1.7.11** = `36EC96D4DBD8…`(387,072B;F5 输出分组 `自身 \| 他人因你 \| 被队友分走` + 两条逐角色恒等式 + 版面守卫双向化 + `check_live_log` 两处误判修复;§7.2.100)。前一版 **1.7.10** = `BF2F174A4059…`(386,560B;闸门伪运行修复 + `[COMP]` 重算开关对齐;§7.2.99)。1.7.9 = `F3F73C81FF3D…`(GivenTalent 开关下传 + 逐击 `calc.givenFoldOn`、`giveApplied` 双计修复(新增 `rosterAudit.giveFoldHits`)、UI-DIAG `unattrRow`、`check_live_log.py`;§7.2.98),
+* **线上 1.7.13** = `32BFEC3B6A88…`(435,200B;R61/用户判断:同队/自我伤害移出归属池,`contribution.schemaVersion` 1.2;`damageLedger` 增 `selfTeam*`;离线核心按文件的 `schemaVersion` 选模式)。上一版 **1.7.12** = `F791F1CFD0E5…`(434,688B,备份于 `_dpsm_work/deploy-backup/pre-r61-F791F1CF/`;R60:自伤三件套 + 根 `config.filterFriendlyFire` + crosscheck 的 1.1 `totalDamage` 修正;R57/R60 的记录在 `REFACTOR-BATCH-*.md`,不再新增 `SESSION-STATE.md` §7.2.x)。上一版 **1.7.11** = `C1DBBD8FF43F…`(433,664B;R57:引用绑定持久文件 + 战斗编号 battle-ref/1 + 精确选场 `battle_select.py`;备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`)。更早的**基线 1.7.11** = `36EC96D4DBD8…`(387,072B;F5 输出分组 `自身 \| 他人因你 \| 被队友分走` + 两条逐角色恒等式 + 版面守卫双向化 + `check_live_log` 两处误判修复;§7.2.100)。前一版 **1.7.10** = `BF2F174A4059…`(386,560B;闸门伪运行修复 + `[COMP]` 重算开关对齐;§7.2.99)。1.7.9 = `F3F73C81FF3D…`(GivenTalent 开关下传 + 逐击 `calc.givenFoldOn`、`giveApplied` 双计修复(新增 `rosterAudit.giveFoldHits`)、UI-DIAG `unattrRow`、`check_live_log.py`;§7.2.98),
   前一版 **1.7.8** = `0B3398364628…`(386,048B;**贡献契约 + 五任务集成 §7.2.97**:P0-B `totalDamage=analyzableDealt` 与 `damageLedger`/三覆盖率(P0-A 验证闸门状态机、P0-C 配对影响 A≡B、P0-D 任务适用性 full10/partial9/not_comparable7、P1-A `atkadd` self 改 actor key、P2-A 上一场缓存与未归属透传)),
   1.7.7 = `7425139C3652…`(381,952B;表格对齐打包 §7.2.96:`Fit` 按显示列截断 + 合计行同几何 + 取整统一 + `Amt` 余量 + 字体节流 + `knownLimits` 与离线一致),
   1.7.6 = `BB96DA65E9A8…`(379,904B;F5 改等宽字体 + 口径说明 §7.2.95)、1.7.5 = `64EDA364851D…`(378,368B;改正 `knownLimits` 陈旧断言;`atkadd` 已于 1.7.4 实机验收:ルナリス 25.2%,§7.2.94),1.7.4 = `6B6691977BA3…`(378,368B;**含** F5 表格页 §7.2.90 + `paramOwners` §7.2.91 + 扫描完整性 §7.2.92
@@ -484,4 +485,4 @@
    贡献归因(byUnit)= **域内实机 100%**(§7.2.80);残差 2-2.9% = **实测量出、机制未判**;攻击力加算区 = **已拆**(1.7.4 起队友给的按给出者 `kind=atkadd` 归属,自己给自己的仍留 `baseCredit`,§7.2.93)。
 4. 遇到查不出来的东西,**写"没查出来"并说明已排除了什么**,不要编机制(见 P2 的处理方式)。
 
-> **部署状态(R60 起)**:DLL = **F791F1CF**…(434,688 字节,1.7.12;自伤三件套);上一版 **C1DBBD8F**…(433,664 字节,1.7.11)备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`;上一版 **F6948470**…(433,664 字节)备份于 `_dpsm_work/deploy-backup/pre-r57-F6948470/`,更早在 `pre-r56-390C1340/`、`pre-r55-76CEAC00/`、`pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。
+> **部署状态(R61 起)**:DLL = **32BFEC3B**…(**435,200 字节**,1.7.13;同队/自我伤害移出归属池、`schemaVersion` 1.2);上一版 **F791F1CF**…(434,688 字节,1.7.12)备份于 `_dpsm_work/deploy-backup/pre-r61-F791F1CF/`;上一版 **F6948470**…(433,664 字节)备份于 `_dpsm_work/deploy-backup/pre-r57-F6948470/`,更早在 `pre-r56-390C1340/`、`pre-r55-76CEAC00/`、`pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。

@@ -76,14 +76,43 @@ def extract_folds(event, diag):
     return out
 
 
-def analyze(export, team=1, training=False, keep_hits=False):
+def _ver_at_least(v, want):
+    """Dotted version >= want. Unparseable -> False (never guess)."""
+    try:
+        parts = [int(x) for x in str(v or "").split(".")]
+    except (TypeError, ValueError):
+        return False
+    while len(parts) < len(want):
+        parts.append(0)
+    return tuple(parts[:len(want)]) >= tuple(want)
+
+
+def contract_includes_same_team(export):
+    """True when the FILE's own contract counts same-team hits inside analyzableDealt.
+
+    Schema <= 1.1: yes -- that is how those files were published. Schema 1.2 (plugin 1.7.13+, R61): no,
+    same-team damage is the enemy's 回復反転 channel (not contribution) and the ledger's selfTeam bucket
+    carries it instead. A file with no section version falls back to the plugin version.
+    """
+    raw = getattr(export, "raw", None) or {}
+    sec = raw.get("contribution") or {}
+    v = sec.get("schemaVersion")
+    if v:
+        return not _ver_at_least(v, (1, 2))
+    return not _ver_at_least(getattr(export, "version", None), (1, 7, 13))
+
+
+def analyze(export, team=1, training=False, keep_hits=False, include_friendly=None):
     """Run the full contribution analysis on a loaded export.
 
     keep_hits=True also retains every HitResult (per-hit audit trail); default False keeps the
     memory footprint flat for bulk runs.
     """
+    if include_friendly is None:
+        include_friendly = contract_includes_same_team(export)
     idx = OwnerIndex(export, team)
     an = Analysis(source=export.source(), team=team)
+    an.same_team_in_pool = bool(include_friendly)
     an.diagnostics = {"reasonCounts": {}, "channelCensus": {}, "kindSideCensus": {},
                       "zero_factor": 0, "noop_factor": 0, "sub_unity_factor": 0,
                       "negative_lines": 0, "fold_total": 0,
@@ -137,6 +166,19 @@ def analyze(export, team=1, training=False, keep_hits=False):
             diag["outside_team_events"]["damage"] += damage
             continue
         attacker = idx.by_key.get(row.key) or row
+        # R61 (schema 1.2): a same-team hit is the ENEMY's effect and not contribution. It leaves the pool
+        # (no analyzable, no credit, no hit count) but stays visible: the actor keeps friendly/friendlyHits
+        # and the analysis keeps the session-level selfTeam counters.
+        if e.get("friendly") and not include_friendly:
+            ac0 = an.actors.setdefault(attacker.key, ActorCredit(key=attacker.key, name=attacker.name,
+                                                                 team=attacker.team, kind=attacker.kind,
+                                                                 summon=attacker.summon))
+            ac0.friendly += damage
+            ac0.friendly_hits += 1
+            an.self_team_hits += 1
+            an.self_team_damage += damage
+            diag["self_team_events"] = diag.get("self_team_events", 0) + 1
+            continue
         diag["events"]["dmg_team"] += 1
         an.hits += 1
         if e.get("crit"):

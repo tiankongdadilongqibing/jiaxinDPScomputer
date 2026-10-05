@@ -85,6 +85,12 @@ public sealed class ContributionStats
 	public double OutsideTeamDamage;
 	public int UnknownAttackerHits;
 	public double UnknownAttackerDamage;
+	/// <summary>R61 (1.7.13): same-team hits (回復反転 / self-damage). They are OUT of the analysed pool -- the
+	/// effect is the ENEMY's (it converts the team's healing into damage on itself) and damaging yourself is
+	/// not contribution -- but they are COUNTED here, exactly like the other two buckets, so nothing
+	/// silently disappears from the ledger. Credited to nobody.</summary>
+	public int SelfTeamHits;
+	public double SelfTeamDamage;
 	/// <summary>The game's own dealt total (export totals.dealt), or NaN when the caller does not know it.</summary>
 	public double TotalsDealt = double.NaN;
 
@@ -99,7 +105,7 @@ public sealed class ContributionStats
 		get
 		{
 			if (double.IsNaN(TotalsDealt)) return double.NaN;
-			return TotalsDealt - (Analyzable + OutsideTeamDamage);
+			return TotalsDealt - (Analyzable + OutsideTeamDamage + SelfTeamDamage);
 		}
 	}
 	public double AnalysisDamageCoverage { get { return TotalsDealt > 0.0 ? Analyzable / TotalsDealt : double.NaN; } }
@@ -137,12 +143,11 @@ public sealed class ContributionActorRow
 	public string Kind = "";
 	public bool Summon;
 	public double Direct, Base, Self, Assist, Received;
-	/// <summary>1.7.12: the part of <see cref="Direct"/> whose VICTIM was on the attacker's own team
-	/// (self-damage included). It stays inside Direct -- the game's own report counts it -- but is
-	/// published separately so a reader can subtract it; <see cref="Hostile"/> is the other part.</summary>
+	/// <summary>1.7.13 (R61): the actor's same-team hits (self-damage included). They are NOT part of
+	/// <see cref="Direct"/> any more -- the analysed pool only carries enemy-facing damage -- but they are
+	/// published here, counted, so the 自伤 column and the ledger agree with the raw events.</summary>
 	public double Friendly;
 	public int FriendlyHits;
-	public double Hostile;
 	public int Hits;
 	public double Total { get { return Base + Self + Assist; } }
 }
@@ -472,7 +477,7 @@ public static class Contribution
 	{
 		public ContributionActor Actor;
 		public double Direct, Base, Self, Assist, Received;
-		public double Friendly, Hostile;
+		public double Friendly;
 		public int FriendlyHits;
 		public int Hits;
 	}
@@ -546,6 +551,19 @@ public static class Contribution
 				{ st.UnknownAttackerHits++; st.UnknownAttackerDamage += hit.Damage; }
 				continue;
 			}
+			if (hit.Friendly)
+			{
+				// 1.7.13 (R61, user decision): same-team damage is the ENEMY's effect (回復反転 turns the team's
+				// healing into damage on itself) and it is not contribution, so it is OUT of the analysed pool:
+				// it is neither in analyzableDealt nor credited. It is not dropped either -- the session ledger
+				// counts it (selfTeam*) and the attacker's own row publishes it (friendly/friendlyHits).
+				st.SelfTeamHits++;
+				st.SelfTeamDamage += hit.Damage;
+				Credit fc = credits[attacker.Key];
+				fc.Friendly += hit.Damage;
+				fc.FriendlyHits++;
+				continue;
+			}
 			hitIndex++;
 			st.Hits++;
 			st.Analyzable += hit.Damage;
@@ -580,10 +598,6 @@ public static class Contribution
 			ac.Direct += hit.Damage;
 			ac.Hits++;
 			ac.Base += baseCredit;
-			// 1.7.12: the same-team split. It is an EVENT property (the plugin's own Friendly flag), not a
-			// subtraction, so friendly + hostile == direct exactly and the two cannot drift apart.
-			if (hit.Friendly) { ac.Friendly += hit.Damage; ac.FriendlyHits++; }
-			else ac.Hostile += hit.Damage;
 
 			for (int i = 0; i < folds.Count; i++)
 			{
@@ -645,7 +659,7 @@ public static class Contribution
 				Key = c.Actor.Key, Name = c.Actor.Name, Kind = c.Actor.Kind, Summon = c.Actor.Summon,
 				Direct = c.Direct, Base = c.Base, Self = c.Self, Assist = c.Assist,
 				Received = c.Received, Hits = c.Hits,
-				Friendly = c.Friendly, FriendlyHits = c.FriendlyHits, Hostile = c.Hostile,
+				Friendly = c.Friendly, FriendlyHits = c.FriendlyHits,
 			});
 		}
 		foreach (var r in rules.Values.OrderByDescending(x => x.Damage))
@@ -694,7 +708,7 @@ public static class Contribution
 		// be analyzableDealt + unattributed, which double-counted the unattributed pool (attributedCredit
 		// == analyzableDealt - unattributed, so the old identity attributed+unattributed==totalDamage only
 		// held while unattributed was 0 -- true in all 13 exports that carry the section, so invisible).
-		sb.Append("\"schemaVersion\":\"1.1\"");
+		sb.Append("\"schemaVersion\":\"1.2\"");
 		sb.Append(",\"producer\":\"plugin\"");
 		sb.Append(",\"method\":\"log-share/1\"");
 		sb.Append(",\"damageBasis\":\"dealt\"");
@@ -721,6 +735,10 @@ public static class Contribution
 		sb.Append(",\"outsideTeamDealt\":"); Num(sb, st.OutsideTeamDamage);
 		sb.Append(",\"unknownAttackerHits\":").Append(st.UnknownAttackerHits);
 		sb.Append(",\"unknownAttackerDealt\":"); Num(sb, st.UnknownAttackerDamage);
+		// 1.7.13 (R61): the same-team bucket. Schema 1.2 moved it OUT of analyzableDealt, so the ledger
+		// identity totalsDealt == analyzable + outsideTeam + selfTeam is what keeps the exclusion visible.
+		sb.Append(",\"selfTeamHits\":").Append(st.SelfTeamHits);
+		sb.Append(",\"selfTeamDealt\":"); Num(sb, st.SelfTeamDamage);
 		sb.Append(",\"eventSumAll\":"); Num(sb, st.EventSumAll);
 		sb.Append(",\"reconciliationGap\":"); NumOrNull(sb, st.ReconciliationGap);
 		sb.Append('}');
@@ -750,7 +768,6 @@ public static class Contribution
 			// same-team damage from the game-facing dealt totals.
 			sb.Append(",\"friendly\":"); Num(sb, c.Friendly);
 			sb.Append(",\"friendlyHits\":").Append(c.FriendlyHits);
-			sb.Append(",\"hostileDamage\":"); Num(sb, c.Hostile);
 			sb.Append(",\"hits\":").Append(c.Hits);
 			sb.Append('}');
 		}
@@ -828,7 +845,7 @@ public static class Contribution
 		// 1.7.7 rev2: these six strings are now byte-identical to contrib/report_json.py's list. The two
 		// producers used to ship different sentences (and a different item count) for the same contract
 		// field, so a reader comparing the plugin export with the offline report saw two "contracts".
-		sb.Append("},\"knownLimits\":[\"attackPower addends granted by a teammate are attributed as kind=atkadd (1.7.4+); self-granted addends stay in baseCredit\",\"analyzableDealt covers team-1 hits with a resolvable attacker only; compare it with totals.dealt before comparing battles\",\"crit is observed (1.5.0+) but the model does not credit it; crit damage stays in baseCredit\",\"summons stay separate actors (no owner link in the export)\",\"credit components are rounded independently (F4 in the export, N0 on screen), so they may not add up to the total\",\"totals.dealt and the per-event sum differ by ~0.05% (definitional, not an error)\"]}}");
+		sb.Append("},\"knownLimits\":[\"attackPower addends granted by a teammate are attributed as kind=atkadd (1.7.4+); self-granted addends stay in baseCredit\",\"analyzableDealt covers team-1 hits on the OTHER team with a resolvable attacker (same-team/self damage is counted in damageLedger.selfTeam*, never credited); compare it with totals.dealt before comparing battles\",\"crit is observed (1.5.0+) but the model does not credit it; crit damage stays in baseCredit\",\"summons stay separate actors (no owner link in the export)\",\"credit components are rounded independently (F4 in the export, N0 on screen), so they may not add up to the total\",\"totals.dealt and the per-event sum differ by ~0.05% (definitional, not an error)\"]}}");
 	}
 
 	/// <summary>Compute + write in one call (the export path). Returns the stats for logging/tests.</summary>

@@ -248,6 +248,13 @@ LEDGER_KEYS = [
     ('eventSumAll', (int, float)), ('reconciliationGap', (int, float, type(None))),
 ]
 
+# 1.7.13 (R61, schema 1.2): same-team damage (the ENEMY's 回復反転 / self-damage) left the analysed
+# pool, so the ledger carries a THIRD bucket and the two identities gain a term. Required exactly when
+# the section declares 1.2; every 1.0/1.1 section keeps validating under the old pair.
+LEDGER_KEYS_120 = [('selfTeamHits', int), ('selfTeamDealt', (int, float))]
+CONTRIB_SCHEMA_120 = (1, 2)
+CONTRIB_PLUGIN_120 = (1, 7, 13)
+
 
 def _isnum(x):
     return isinstance(x, (int, float)) and not isinstance(x, bool)
@@ -298,6 +305,10 @@ def _check_contribution(d, problems, cov):
     _sec_ver = sec.get('schemaVersion')
     is_110 = (_ver_tuple(_sec_ver) >= CONTRIB_SCHEMA_110) if _sec_ver else \
         (_ver_tuple(d.get('version')) >= CONTRIB_PLUGIN_110)
+    # R61 (1.7.13): schema 1.2 takes the same-team bucket out of analyzableDealt. Keyed on the SECTION
+    # version with the plugin version as fallback, exactly like 1.1 above.
+    is_120 = (_ver_tuple(_sec_ver) >= CONTRIB_SCHEMA_120) if _sec_ver else \
+        (_ver_tuple(d.get('version')) >= CONTRIB_PLUGIN_120)
     tot, att, un = sec.get('totalDamage'), sec.get('attributedDamage'), sec.get('unattributedDamage')
     _cv0 = sec.get('coverage') if isinstance(sec.get('coverage'), dict) else {}
     if is_110:
@@ -331,9 +342,13 @@ def _check_contribution(d, problems, cov):
             problems.append('contribution share identity broken: credited+unattributed = %.9f' % (cs + us))
         cov['contribution.creditedShare'] = cs
         if is_110:
-            _check_coverage_110(d, sec, cv, att, problems, cov)
+            _check_coverage_110(d, sec, cv, att, problems, cov, is_120)
     # per-entry shapes + per-actor value identity (first offender per list only: one bug, one line)
-    for key, spec in (('actors', CONTRIBUTION_ACTOR_KEYS), ('rules', CONTRIBUTION_RULE_KEYS),
+    actor_spec = list(CONTRIBUTION_ACTOR_KEYS)
+    if is_120:
+        # 1.2: the excluded same-team amount is part of the contract, not an optional extra.
+        actor_spec += [('friendly', (int, float)), ('friendlyHits', int)]
+    for key, spec in (('actors', actor_spec), ('rules', CONTRIBUTION_RULE_KEYS),
                       ('links', CONTRIBUTION_LINK_KEYS)):
         rows = sec.get(key)
         if not isinstance(rows, list) or not rows:
@@ -374,28 +389,30 @@ def _check_contribution(d, problems, cov):
                 # disk (the sections written before 1.7.12 do not carry them), so a missing field is not a
                 # problem -- but a present one must be well typed and must CLOSE, or the new 自伤 column
                 # and the JSON reader would be trusted to a number nothing checks.
-                for k, ty in CONTRIBUTION_ACTOR_OPTIONAL:
-                    if k in row and not isinstance(row[k], ty):
-                        problems.append('contribution.actors[].%s type=%s want=%s'
-                                        % (k, type(row[k]).__name__, _tname(ty)))
-                        break
-                else:
-                    fr, ho = row.get('friendly'), row.get('hostileDamage')
-                    if all(isinstance(x, (int, float)) for x in (fr, ho, dv)) and not _close(fr + ho, dv):
-                        problems.append('contribution.actors[key=%s] identity broken: friendly+hostile(%.0f) != direct(%.0f)'
-                                        % (row.get('key'), fr + ho, dv))
-                        break
-                    fh, hh = row.get('friendlyHits'), row.get('hits')
-                    if (isinstance(fh, int) and not isinstance(fh, bool) and isinstance(hh, int)
-                            and not isinstance(hh, bool) and fh > hh):
-                        problems.append('contribution.actors[key=%s] friendlyHits(%d) > hits(%d)'
-                                        % (row.get('key'), fh, hh))
-                        break
+                if not is_120:
+                    for k, ty in CONTRIBUTION_ACTOR_OPTIONAL:
+                        if k in row and not isinstance(row[k], ty):
+                            problems.append('contribution.actors[].%s type=%s want=%s'
+                                            % (k, type(row[k]).__name__, _tname(ty)))
+                            break
+                    else:
+                        fr, ho = row.get('friendly'), row.get('hostileDamage')
+                        if all(isinstance(x, (int, float)) for x in (fr, ho, dv)) and not _close(fr + ho, dv):
+                            problems.append('contribution.actors[key=%s] identity broken: friendly+hostile(%.0f) != direct(%.0f)'
+                                            % (row.get('key'), fr + ho, dv))
+                            break
+                # A friendly-hits count can never exceed the actor's hits, in either contract.
+                fh, hh = row.get('friendlyHits'), row.get('hits')
+                if (isinstance(fh, int) and not isinstance(fh, bool) and isinstance(hh, int)
+                        and not isinstance(hh, bool) and fh > hh):
+                    problems.append('contribution.actors[key=%s] friendlyHits(%d) > hits(%d)'
+                                    % (row.get('key'), fh, hh))
+                    break
 
 
 
 
-def _check_coverage_110(d, sec, cv, attributed, problems, cov):
+def _check_coverage_110(d, sec, cv, attributed, problems, cov, is_120=False):
     """Schema 1.1 (P0-B): the coverage set, the damage ledger and the three ratios they publish.
 
     The ledger is deliberately THREE separate numbers (review NEXT-STEPS 0.3): excludedDamage is the
@@ -419,6 +436,13 @@ def _check_coverage_110(d, sec, cv, attributed, problems, cov):
             problems.append('contribution.damageLedger.%s missing' % k)
         elif not isinstance(led[k], t):
             problems.append('contribution.damageLedger.%s type=%s' % (k, type(led[k]).__name__))
+    if is_120:
+        # R61: the same-team bucket is what keeps the exclusion visible; it is required in 1.2.
+        for k, t in LEDGER_KEYS_120:
+            if k not in led:
+                problems.append('contribution.damageLedger.%s missing [schema 1.2]' % k)
+            elif not isinstance(led[k], t):
+                problems.append('contribution.damageLedger.%s type=%s' % (k, type(led[k]).__name__))
     td = led.get('totalsDealt')
     out_d = led.get('outsideTeamDealt')
     unk_d = led.get('unknownAttackerDealt')
@@ -432,20 +456,25 @@ def _check_coverage_110(d, sec, cv, attributed, problems, cov):
     # export), so the tolerance scales with the battle: measured on 1.7.6 battle_411001_20261004_115417
     # the difference is EXACTLY 0 (190,889,625 + 94,717 == 190,984,342), and 0.001% still catches a
     # dropped or double-counted bucket (which moves ~0.05% of a 200M battle, i.e. ~95,000 units).
-    if _isnum(az) and _isnum(out_d) and _isnum(td):
+    st_d = led.get('selfTeamDealt') if is_120 else 0.0
+    if _isnum(az) and _isnum(out_d) and _isnum(td) and (not is_120 or _isnum(st_d)):
         _ledger_tol = max(CONTRIB_TOL_ABS, 1e-5 * abs(td))
-        if abs((az + out_d) - td) > _ledger_tol:
-            problems.append('contribution ledger identity broken: analyzable(%.0f)+outsideTeam(%.0f) != totalsDealt(%.0f)'
-                            % (az, out_d, td))
-        cov['contribution.ledgerDelta'] = (az + out_d) - td
+        _sum = az + out_d + (st_d if _isnum(st_d) else 0.0)
+        if abs(_sum - td) > _ledger_tol:
+            problems.append('contribution ledger identity broken: analyzable(%.0f)+outsideTeam(%.0f)%s != totalsDealt(%.0f)'
+                            % (az, out_d, ('+selfTeam(%.0f)' % st_d) if is_120 else '', td))
+        cov['contribution.ledgerDelta'] = _sum - td
     root_un = (d.get('totals') or {}).get('unattributedDamage')
     if _isnum(unk_d) and _isnum(root_un) and not _close(unk_d, root_un):
         problems.append('contribution ledger: unknownAttackerDealt(%.0f) != totals.unattributedDamage(%.0f)'
                         % (unk_d, root_un))
     ev, ah, oh, uh = led.get('events'), led.get('analyzableHits'), led.get('outsideTeamHits'), led.get('unknownAttackerHits')
-    if all(isinstance(x, int) and not isinstance(x, bool) for x in (ev, ah, oh, uh)) and ev != ah + oh + uh:
-        problems.append('contribution ledger hit identity broken: events(%d) != analyzable(%d)+outsideTeam(%d)+unknown(%d)'
-                        % (ev, ah, oh, uh))
+    sh = led.get('selfTeamHits') if is_120 else 0
+    _hit_ok = all(isinstance(x, int) and not isinstance(x, bool) for x in (ev, ah, oh, uh)) and \
+        (not is_120 or (isinstance(sh, int) and not isinstance(sh, bool)))
+    if _hit_ok and ev != ah + oh + uh + (sh if is_120 else 0):
+        problems.append('contribution ledger hit identity broken: events(%d) != analyzable(%d)+outsideTeam(%d)+unknown(%d)%s'
+                        % (ev, ah, oh, uh, ('+selfTeam(%d)' % sh) if is_120 else ''))
     # 1.7.9: tie the ledger's whole-event census to a KPI the GAME computes itself. Every other ledger
     # identity here compares numbers this plugin derived from the same event list, so a ledger that
     # quietly stopped covering part of the battle could keep them all self-consistent; totals.taken comes
@@ -815,6 +844,45 @@ def _contrib_fixture_178():
         'rules': [{'ruleName': 'x', 'kind': 'given', 'side': 'vic', 'hits': 1, 'damageEquivalent': 500}],
         'links': [{'fromKey': 1, 'toKey': 1, 'amount': 500, 'hits': 1}],
     }
+
+
+def _contrib_fixture_120():
+    """R61: the same acceptance sample one contract step later. Same-team damage (the enemy 回復反転
+    channel, which schema 1.1 still counted inside analyzableDealt) is now OUT of the pool and carried by
+    the ledger's third bucket:
+        totalsDealt 1000 = analyzable 400 + outsideTeam 400 + selfTeam 200
+        events 10 = analyzableHits 4 + outsideTeamHits 3 + unknownAttackerHits 2 + selfTeamHits 1
+        eventSumAll 1400 = 400 + 400 + 200 + 400
+        attributed 300 + unattributed 100 == analyzable 400
+    """
+    return {
+        'schemaVersion': '1.2', 'producer': 'plugin', 'method': 'log-share/1', 'damageBasis': 'dealt',
+        'totalDamage': 400, 'attributedDamage': 300, 'unattributedDamage': 100,
+        'coverage': {
+            'creditedShare': 0.75, 'unattributedShare': 0.25, 'analyzableDealt': 400,
+            'excludedDamage': 400, 'analysisDamageCoverage': 0.4,
+            'creditCoverageWithinAnalyzed': 0.75, 'overallAttributedCoverage': 0.3, 'hits': 4,
+        },
+        'damageLedger': {
+            'totalsDealt': 1000, 'events': 10, 'analyzableHits': 4, 'outsideTeamHits': 3,
+            'outsideTeamDealt': 400, 'unknownAttackerHits': 2, 'unknownAttackerDealt': 400,
+            'selfTeamHits': 1, 'selfTeamDealt': 200, 'eventSumAll': 1400, 'reconciliationGap': 0,
+        },
+        'actors': [{'key': 1, 'name': 'Alpha', 'directDamage': 400, 'baseCredit': 300,
+                    'selfRuleCredit': 0, 'assistCredit': 0, 'receivedAssist': 100, 'totalCredit': 300,
+                    'friendly': 200, 'friendlyHits': 1, 'hits': 5}],
+        'rules': [{'ruleName': 'x', 'kind': 'given', 'side': 'vic', 'hits': 1, 'damageEquivalent': 300}],
+        'links': [{'fromKey': 1, 'toKey': 1, 'amount': 300, 'hits': 1}],
+    }
+
+
+def _fixture_113():
+    """A 1.7.13 export: every version-gated block, including the 1.2 contract and the config echo."""
+    d = _fixture_178()
+    d['version'] = '1.7.13'
+    d['config'] = {'filterFriendlyFire': False}
+    d['contribution'] = _contrib_fixture_120()
+    return d
 
 
 def _fixture_178():
@@ -1195,6 +1263,26 @@ def selftest():
     cfg_type['version'] = '1.7.12'
     cfg_type['config'] = {'filterFriendlyFire': 'yes'}
     cases.append(('REJECTS a non-boolean filterFriendlyFire', cfg_type, 1))
+
+    # ---- R61 (schema 1.2): same-team damage left the analysed pool ----
+    c12 = _fixture_113()
+    cases.append(('accepts a well-formed 1.2 section (selfTeam bucket in the ledger)', c12, 0))
+
+    c12_noledger = _fixture_113()
+    c12_noledger['contribution']['damageLedger'].pop('selfTeamDealt')
+    cases.append(('REJECTS a 1.2 ledger without the selfTeam bucket', c12_noledger, 1))
+
+    c12_ident = _fixture_113()
+    c12_ident['contribution']['damageLedger']['selfTeamDealt'] = 10
+    cases.append(('REJECTS a 1.2 ledger whose buckets do not reach totalsDealt', c12_ident, 1))
+
+    c12_hits = _fixture_113()
+    c12_hits['contribution']['damageLedger']['selfTeamHits'] = 7
+    cases.append(('REJECTS a 1.2 ledger whose hit buckets do not reach events', c12_hits, 1))
+
+    c12_actor = _fixture_113()
+    c12_actor['contribution']['actors'][0].pop('friendly')
+    cases.append(('REJECTS a 1.2 actor without the excluded same-team amount', c12_actor, 1))
 
     out = []
     fails = 0

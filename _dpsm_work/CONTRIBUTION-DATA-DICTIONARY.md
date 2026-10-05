@@ -34,7 +34,11 @@
 1. `type == "dmg"`;
 2. `atkTeam == 1`(我方出手);
 3. `amount > 0`;
-4. `attacker` 能解析到我方 `actors[].key`。
+4. `attacker` 能解析到我方 `actors[].key`;
+5. **受击方不与攻击者同队**(schema **1.2** 起,1.7.13 / 用户决定:同队伤害是敌方 `回復反転` 的效果,
+   不是贡献)。同队命中**不被丢弃**:它们进 `damageLedger.selfTeamHits/selfTeamDealt`,并逐角色发布为
+   `friendly`/`friendlyHits`;**1.2 之前的文件仍按各自契约读**(`schemaVersion <= 1.1` 时同队命中在池内;
+   离线核心按文件自己的 `schemaVersion` 选模式,所以旧档的比对结果不会变)。
 
 实测:本场 `analyzableDealt = 203865411`(5602 条 dmg 事件中 **5521** 条入池;
 另有 67 条 `attacker="?"` 与 14 条敌方打我方,`atkKey` 非空的总数是 5535,别混)。
@@ -60,6 +64,10 @@ totals.taken              = dealt + unattributedDamage = Σ 全部 dmg 事件
 - 规则提供者在队外或被判歧义 → 其份额进 `unattributedCredit`,**绝不静默塞给攻击者**。
 
 ### 1.4 同队与自我伤害(默认**计入**,单独计数)
+
+> **1.7.13(R61,schema 1.2)起,归属侧已不含同队伤害**:`analyzableDealt`、逐角色 `directDamage`、`总贡献`、
+> `命中` 都只统计**对敌命中**;同队命中进 `damageLedger.selfTeam*` 与逐角色 `friendly`/`friendlyHits`。
+> 下面这一段描述的是**游戏口径**(`dealt` / `perSecDamage`),它**没有变**。
 
 `dealt` / `analyzableDealt` / 逐角色 `directDamage` / `总贡献` / `命中` / 每秒数组 `perSecDamage` **默认都含
 "攻击者与受击者同队"的伤害**(`回復反転`与自伤技能;包括 `attacker == victim` 的自我结算,下称同队伤害)。
@@ -639,7 +647,7 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
 
 | 字段 | 值 |
 |---|---|
-| `contribution.schemaVersion` | `1.1`(核心契约;插件与离线**共用**同一版本号) |
+| `contribution.schemaVersion` | `1.2`(核心契约;插件与离线**共用**同一版本号;1.0/1.1 的旧文件按各自版本读) |
 | `contribution.producer` | `plugin` / `offline` |
 | `contribution.method` | `log-share/1`(归因算法版本,与 schema 分开) |
 | `offlineExtensionVersion` | 仅离线报告:`1`(离线独有字段的版本) |
@@ -760,3 +768,28 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
 2. `contribution.actors[]` 没有 `friendly` 字段,只能 join 根 `actors[]`;
 3. `perSecDamage` 没有可扣的同队时间序列,逐秒口径只能回到 `events[]`。
 
+##### R61(插件 1.7.13):同队/自我伤害**移出归属池**(schemaVersion 1.2)
+
+用户判断(依据一场真实战斗):自伤是**敌方的治疗反转(回復反転)**造成的,「打自己并不造成实际贡献」。
+实测(`B-20261005-115024-D88099F7C45D4078-001`,任务 9999):同队伤害 **1,924,021 / 30 击 = 当时分析池
+6,146,573 的 31.3%**,其中 `T.O.W.E.R.typeR` 的 `directDamage = 1,878,273` 全部是自伤、对敌输出为 **0**,
+却因旧口径占了 **30.56%** 的总贡献。
+
+- **契约 1.2**:`analyzableDealt` 只含**对敌命中**(条件见 §1.2 第 5 条);`damageLedger` 新增
+  `selfTeamHits` / `selfTeamDealt`;恒等式变为
+  `totalsDealt == analyzableDealt + outsideTeamDealt + selfTeamDealt` 与
+  `events == analyzableHits + outsideTeamHits + unknownAttackerHits + selfTeamHits`;`reconciliationGap` 同步减去新桶。
+- **逐角色**:`directDamage` 变成对敌(入池)伤害;`friendly` / `friendlyHits` 仍在,含义是**被排除并计数**的同队量;
+  R60 加的 `hostileDamage` 在 1.2 里**不再写**(它已经等于 `directDamage`)。
+- **F5 表**:分母变小,其余角色占比按比例上升;「自伤」列保留(显示被排除的量);口径文案改为
+  「自伤=敌方治疗反转/自伤…已从贡献里排除、不归属任何角色,只在此单列」。
+- **不改游戏口径**:`totals.dealt` / `actors[].dealt` / `perSecDamage` 照旧含它(游戏自己的战报也算),
+  文件仍自述 `config.filterFriendlyFire`。
+- **旧档不重算**:离线核心按**文件自己的 `schemaVersion`** 选模式(<=1.1 时同队命中原样在池内),
+  所以 rf0 冻结语料与全部历史导出的 crosscheck 结论不变;只有 1.2 的新文件按新口径比对。
+- **实测(同一场,1.2 口径)**:`analyzableDealt` 6,146,573 → **4,222,552**,命中 676 → **646**,
+  被排除 1,924,021 / 30 击,`attributed == analyzable`(域内 `creditedShare` 仍 **1.0**);
+  前四名占比 14.06 / 14.02 / 12.94 / 10.34% → **20.46 / 20.41 / 18.84 / 15.06%**,`T.O.W.E.R.typeR` 退出榜单。
+
+**未覆盖(与 R60 同类)**:`ExportService`/`Contribution.AppendJson` 的 1.2 新形状没有在 BehaviorTests 里逐字段跑;
+它由 `check_export_schema.py` 的 1.2 用例(5 例)与离线 `crosscheck` 的版本门控覆盖。

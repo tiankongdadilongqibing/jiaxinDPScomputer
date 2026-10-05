@@ -77,11 +77,13 @@
 
 报告数字时**必须说明用的是哪一个口径**。
 
-**另有一条同类陷阱:同队/自我伤害默认计入输出数**。`dealt` / `directDamage` / `总贡献` / `命中` /
-`perSecDamage` 都含"攻击者与受击者同队"的伤害(`回復反転`、自伤、`attacker == victim` 的自我结算),
-它们只由根 `actors[].friendly` + `friendlyHits` 单独计数。要「对敌输出」必须自己扣:优先用逐事件 `vicTeam`
-(`FilterFriendlyFire` 开关**不写进导出**,不能只看文件判断)。定义、实测样例与扣法见
-`_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md` §1.4。
+**同队/自我伤害分两套口径,别混**:①**归属侧**(`contribution`,`schemaVersion 1.2` 起)**已排除**同队/自我伤害
+(敌方 `回復反転` 的效果,不是贡献):`analyzableDealt` / `directDamage` / `总贡献` / `命中` 只含对敌命中,
+同队量由 `damageLedger.selfTeam*` 与逐角色 `friendly`/`friendlyHits` 计数(`schemaVersion <= 1.1` 的旧文件里
+它仍在池内,按各自契约读——离线工具按文件的 `schemaVersion` 选模式);②**游戏口径**(`totals.dealt` /
+`actors[].dealt` / `perSecDamage`)**仍含它**(游戏自己的战报也算),`config.filterFriendlyFire` 是这份文件的
+自述,`FilterFriendlyFire=true` 时那三个数不含它。定义与实测样例见
+`_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md` §1.2/§1.4。
 
 ## 8. 分析一场战斗数据的路径(标准四步)
 

@@ -92,8 +92,8 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
 4. **引用**:字段/公式查 `_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md`;链路、字段字典、实测样例与复现命令
    查 `_dpsm_work/CONTRIBUTION-TABLE-REPORT.md`(数据分析从它开始)。
    **两个未归因口径永不相加**——贡献账残差与"攻击者无法识别"的会话口径,必须写明用的是哪一个(见 §6)。
-   **同队/自我伤害默认计入** `dealt`/`directDamage`/`总贡献`/`perSecDamage`,只由 `actors[].friendly` 单独计数;
-   要"对敌输出"必须自己扣(优先用逐事件 `vicTeam`;数据字典 §1.4)。
+   **同队/自我伤害分两套口径**:归属侧(`contribution`,schema 1.2 起)**已排除**它,同队量由 `damageLedger.selfTeam*`
+   与 `actors[].friendly` 计数;游戏口径(`totals.dealt`/`perSecDamage`)**仍含**它(数据字典 §1.2/§1.4)。
 
 ## 8. 现状与后续
 

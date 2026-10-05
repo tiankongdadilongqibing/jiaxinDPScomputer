@@ -1,0 +1,26 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\battle_select.py --selftest
+inputs=1 metrics=4 comparable strata=0
+  team_damage   RESTRICTED  strata=1 comparable=0
+  actor_credit  REJECTED    strata=0 comparable=0
+  rule_coverage REJECTED    strata=0 comparable=0
+  outcome       RESTRICTED  strata=1 comparable=0
+report=C:\Users\24134\AppData\Local\Temp\battle_select_z10p_0ta\cmp.txt
+NOTHING COMPARABLE: no stratum has n>=2 (exit 4)
+  [PASS] list sees 5 identified files + 1 legacy
+  [PASS] two full ids resolve in the USER order
+  [PASS] a repeated id is counted once
+  [PASS] a missing id refuses the whole group
+  [PASS] launch+seq resolves without a full id
+  [PASS] a duplicated sequence is counted once
+  [PASS] a legacy content hash resolves
+  [PASS] an unknown legacy prefix refuses
+  [PASS] a name/body id conflict refuses
+  [PASS] resolve writes a selection
+  [PASS] the selection records path/id/revision/hash/order
+  [PASS] re-checking an untouched selection passes
+  [PASS] re-checking a CHANGED file fails
+  [PASS] an unfinished sample still resolves
+  [PASS] compare refuses an unfinished sample
+  [PASS] the diagnostic flag lets it through to contrib.compare
+battle_select selftest: 16 case(s), 0 failed

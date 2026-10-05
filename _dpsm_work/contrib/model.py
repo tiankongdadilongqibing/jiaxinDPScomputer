@@ -163,6 +163,12 @@ class Analysis:
     pool_total: float = 0.0
     hits: int = 0
     team: int = 1
+    # R61 (schema 1.2): same-team hits (the enemy 回復反転 channel / self-damage) are OUT of the pool.
+    # They are counted here so the exclusion stays visible; `same_team_in_pool` records which contract
+    # this analysis was run under (True for <=1.1 files, False for 1.2+).
+    self_team_hits: int = 0
+    self_team_damage: float = 0.0
+    same_team_in_pool: bool = True
 
     def actor_total_credit(self) -> float:
         return sum(a.total for a in self.actors.values())

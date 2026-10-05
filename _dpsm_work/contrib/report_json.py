@@ -69,15 +69,26 @@ def to_json(an, export, issues, summary):
                 "outsideTeamDealt": _outside_damage,
                 "unknownAttackerHits": _unknown_hits,
                 "unknownAttackerDealt": _excluded_damage,
+                # R61: schema 1.2 moved same-team damage out of analyzableDealt, so the offline ledger
+                # carries the same third bucket as the plugin (and only under that contract).
+                **({} if an.same_team_in_pool else {
+                    "selfTeamHits": an.self_team_hits,
+                    "selfTeamDealt": an.self_team_damage,
+                }),
                 # NOT totalsDealt - eventSumAll: the unresolvable-attacker pool is not part of
                 # totals.dealt (the game reports it separately), so subtracting it again would report
                 # a gap that is exactly that pool. Measured 1.7.6: analyzable + outsideTeam == totals.dealt
                 # exactly, and unknownAttackerDealt == totals.unattributedDamage exactly.
-                "reconciliationGap": _totals_dealt - (an.analyzable + _outside_damage),
+                "reconciliationGap": _totals_dealt - (an.analyzable + _outside_damage
+                                                      + (0.0 if an.same_team_in_pool
+                                                         else an.self_team_damage)),
             },
             "totals": {
                 "dealt": T.get("dealt"),
                 "analyzableDealt": an.analyzable,
+                "selfTeamHits": an.self_team_hits,
+                "selfTeamDealt": an.self_team_damage,
+                "sameTeamInPool": an.same_team_in_pool,
                 "eventSumAll": an.diagnostics.get("eventSumAll"),
                 "analyzeVsTotalsDelta": summary.get("analyzable_vs_totals"),
                 "unattributedDamageEvents": an.diagnostics.get("unattributed_events"),
@@ -171,7 +182,7 @@ def to_json(an, export, issues, summary):
                 # 1.7.7 rev2: byte-identical to Contribution.cs's list (they used to disagree).
                 "knownLimits": [
                     "attackPower addends granted by a teammate are attributed as kind=atkadd (1.7.4+); self-granted addends stay in baseCredit",
-                    "analyzableDealt covers team-1 hits with a resolvable attacker only; compare it with totals.dealt before comparing battles",
+                    "analyzableDealt covers team-1 hits on the OTHER team with a resolvable attacker (same-team/self damage is counted in damageLedger.selfTeam*, never credited); compare it with totals.dealt before comparing battles",
                     "crit is observed (1.5.0+) but the model does not credit it; crit damage stays in baseCredit",
                     "summons stay separate actors (no owner link in the export)",
                     "credit components are rounded independently (F4 in the export, N0 on screen), so they may not add up to the total",
