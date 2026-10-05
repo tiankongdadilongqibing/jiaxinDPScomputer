@@ -20,7 +20,7 @@
 
 | 名称 | 来源字段 | 含义 | 用法 |
 |---|---|---|---|
-| `dealt` | `totals.dealt` | **双方已识别攻击者**的伤害(`atkTeam ∈ {1,2}`,不分敌我;详见 §1.2) | 对账基准;贡献分母用 `analyzableDealt`,两者的差由 §12.3 的 `damageLedger` 精确拆分 |
+| `dealt` | `totals.dealt` | **双方已识别攻击者**的伤害(`atkTeam ∈ {1,2}`,不分敌我;**含同队/自我伤害**,见 §1.4;详见 §1.2) | 对账基准;贡献分母用 `analyzableDealt`,两者的差由 §12.3 的 `damageLedger` 精确拆分 |
 | `dealtWithAbsorbed` | `totals.dealtWithAbsorbed` | dealt + 被护盾吸收 | 仅作对账参考,单独列出 |
 | `absorbed` | `totals.absorbed` | 被吸收量 | 不折算进贡献 |
 
@@ -59,13 +59,37 @@ totals.taken              = dealt + unattributedDamage = Σ 全部 dmg 事件
 - 攻击者在队外 / 攻击者为 `"?"` → 不进可分析池,单列 `outsideTeamDamage` / `unattributedDamage`。
 - 规则提供者在队外或被判歧义 → 其份额进 `unattributedCredit`,**绝不静默塞给攻击者**。
 
+### 1.4 同队与自我伤害(默认**计入**,单独计数)
+
+`dealt` / `analyzableDealt` / 逐角色 `directDamage` / `总贡献` / `命中` / 每秒数组 `perSecDamage` **默认都含
+"攻击者与受击者同队"的伤害**(`回復反転`与自伤技能;包括 `attacker == victim` 的自我结算,下称同队伤害)。
+它由根 `actors[].friendly` + `friendlyHits` 单独计数,但**不从上面任何一个数里减掉**;逐事件上是
+`events[].friendly == true`(只有为真时才写该键)。
+
+- 开关 `Overlay/FilterFriendlyFire`(默认 **false**)。置 true 时它不再进 `dealt`/`命中`/`perSecDamage`,
+  但 `friendly`/`friendlyHits` **仍照计**;该开关**不写进导出**,所以**不能只看文件判断**。
+- **要「对敌输出」必须自己扣**,优先用逐事件(**与开关无关**):
+  `Σ events[].amount where type=="dmg" && atkKey==k && vicTeam != team(k)`。
+  默认配置下 `dealt − friendly` 等价;开关为 true 时这样减会**减错**(那时 `dealt` 已经不含它)。
+- 自伤 = `atkKey == vicKey`;同队友伤 = `atkTeam == 1 && vicTeam == 1 && atkKey != vicKey`
+  (`contribution_applicability.py` 就是按这三条分开计数的)。
+- `命中`(`hit`)**含**这些命中;`maxHit` **不含**(`Aggregator.Stats.cs` 只对非 friendly 更新最大值)。
+- 实测(2026-10-05,`B-20261005-101631-C3F24E1814C94EE5-001`,quest 9999,53.17 s,该场 `not_comparable`):
+  actor `T.O.W.E.R.typeR` `dealt = 2,007,881 = 1,439`(对敌 1 击)`+ 2,006,442`(自伤 23 击);`friendly = 2,006,442`、
+  `friendlyHits = 23`、`hit = 24`、`perSecDamage` 各秒之和 = 2,007,881、
+  `contribution.directDamage = totalCredit = 2,007,881` —— 它的「直接伤害」里 **99.93% 是打自己**。
+  同场 `ソフィー` `dealt = 72,805`、`friendly = 34,311`。根 `actors[].dealt` 与 `contribution.actors[].directDamage`
+  逐 key **精确相等**(本场 9 个 key、另两份样本 0 处不等)。
+- 冻结语料里 411001 / 700817 实测 `friendly = 0`,只有训练场出现(P0-D §4.3 同结论):既有对比不受影响,
+  但**换人/换装时若拿训练场 9999 的样本做对照,必须先扣掉同队部分**(9999 本身一律 `not_comparable`)。
+
 ---
 
 ## 2. 指标定义
 
 ### 2.1 直接输出
 
-- `directDamage(a)` = 角色 a 作为攻击者的入池伤害之和(dmg 事件 amount 求和)。
+- `directDamage(a)` = 角色 a 作为攻击者的入池伤害之和(dmg 事件 amount 求和)。**含同队/自我伤害**(见 §1.4);与根 `actors[].dealt` 逐 key 相等。
 - `directShare(a)` = `directDamage(a) / analyzableDealt`。
 - 口径:分母永远是 `analyzableDealt`,不是 `totals.dealt`。
 
@@ -691,4 +715,21 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
   **文件名以该编号结尾**;身份校验失败时**不会**被标记为"已导出"。
 - 消费者:`battle_select.py`(只读文件头即可列出;解析与比较前复核 SHA256)、悬浮窗(编号与状态)、
   证据包里的 `battle.json`(同一个序列化器,因此同编号同 revision)。
+
+##### R59(文档,2026-10-05):同队/自我伤害的口径补充(**无字段、无数值变化**)
+
+来源:换人对比的独立分析发现「`actors[].dealt` 会把 `attacker == victim` 的自我结算算进去」
+(`B-20261005-101631-C3F24E1814C94EE5-001` 的 `T.O.W.E.R.typeR`:`dealt = 2,007,881` 里有 2,006,442 是自伤)。
+代码行为**是既有设计、不改**:`Aggregator.Stats.cs` 的 `Accumulate` 规定同队伤害「始终单独计数、默认仍计入
+`dealt`」,理由是**游戏自己的战报也算它**(实测 `game_given == 同队 + 正常`;0.9.4 曾反着改过,0.9.5 已纠正),
+`Overlay/FilterFriendlyFire` 可剔除。缺的是**口径文档没有把它写成读者必须知道的一条约束**。
+本次只补文档:§1.1 / §1.4 / §2.1 写清「默认计入 + 单独计数 + 怎么扣」,报告与根级代理手册同步。
+
+**已知缺口(留给将来的代码轮次,不属本次)**
+
+1. `Overlay/FilterFriendlyFire` 的生效值**没有写进导出**:单看一份文件无法判断 `dealt` 含不含同队伤害
+   (逐事件 `vicTeam` 能绕过,但「数据自我描述」这条边界应当补上 —— 与 1.7.5 修掉「导出里一句已经变成谎话的
+   自我描述」同类);
+2. `contribution.actors[]` 没有 `friendly` 字段,只能 join 根 `actors[]`;
+3. `perSecDamage` 没有可扣的同队时间序列,逐秒口径只能回到 `events[]`。
 
