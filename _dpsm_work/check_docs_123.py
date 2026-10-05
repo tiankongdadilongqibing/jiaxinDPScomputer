@@ -106,6 +106,11 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R49.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R50.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R51.md',
+
+	# R52: 未识别规则种类的定位报告 + 证据提取流程 + 本轮批次记录(CJK 必须保持可读)
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-未识别规则种类-R52.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\EXTRACTION-FLOW.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R52.md',
 ]
 
 

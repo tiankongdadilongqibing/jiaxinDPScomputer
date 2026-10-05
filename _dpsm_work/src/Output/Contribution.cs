@@ -29,6 +29,10 @@ public sealed class ContributionHit
 	public bool HasCalc;
 	public int FoldDropped;
 	public List<ContributionFold> Folds = new List<ContributionFold>();
+	/// <summary>R52: the victim of this hit, carried only for the unresolved census (which unit is on the
+	/// receiving end of a rule nobody claimed). Empty on the pre-R52 paths that do not set it.</summary>
+	public string Victim = "";
+	public int VictimKey;
 }
 
 /// <summary>One roster entry handed to the contribution core (a projection of <see cref="ActorStats"/>).</summary>
@@ -41,6 +45,10 @@ public sealed class ContributionActor
 	public bool Summon;
 	public List<int> AbilityIds = new List<int>();
 	public List<string> AbilityNames = new List<string>();
+	/// <summary>R52: "&lt;type&gt;/&lt;param&gt;" of every talent this actor holds whose condition names the
+	/// GRANT channel (GiveTalent...) -- the loadout-side evidence for "who could have handed this
+	/// modifier to the victim". Filled by ContributionSession from the same roster the export writes.</summary>
+	public List<string> Grants = new List<string>();
 }
 
 /// <summary>Numbers the core computed; returned so the caller can log/assert them.</summary>
@@ -158,6 +166,45 @@ public sealed class ContributionUnattributedRow
 }
 
 /// <summary>
+/// R52 (证据提取流程): ONE GROUP of unresolved folds, with everything needed to answer "what is this
+/// residual made of" without writing a one-off script.
+///
+/// WHY IT IS NOT IN THE EXPORT. The section's shape is pinned by contrib/crosscheck.py against an
+/// independent implementation; adding keys there would move a frozen contract for a diagnostic. The
+/// evidence bundle carries it instead (Diagnostics/EvidenceExtractor.cs), computed by THIS same loop so
+/// the bundle and the file can never disagree about which folds were unresolved.
+///
+/// THE CARRIER VERDICT IS AN INFERENCE AND IS LABELLED AS ONE. For the granted channel
+/// (kind="given", origin "given#&lt;i&gt;/&lt;type&gt;/&lt;param&gt;") the runtime giver read has measured
+/// 0 successes, so this records a SECOND, independent route: which team actors HOLD an ability whose
+/// talent list grants exactly that (type,param) through GiveTalent(...). "unique" is a determinate
+/// candidate; "ambiguous" is a real ambiguity and must never be merged; "none" means this route found
+/// nothing and the fold stays unexplained. Nothing here changes any credit.
+/// </summary>
+public sealed class ContributionUnresolvedRow
+{
+	public string Reason = "";
+	public string Kind = "";
+	public string Side = "";
+	public string Origin = "";
+	public string Label = "";
+	public string RuleName = "";
+	public double Factor = 1.0;
+	public int Folds;
+	public double Amount;
+	/// <summary>How many DISTINCT victim actor slots carried this fold (76 ショゴス spawns, not 1 name).</summary>
+	public int VictimInstances;
+	/// <summary>Most frequent victim display name and its fold count (the export keys victims by name).</summary>
+	public string VictimTop = "";
+	public int VictimTopFolds;
+	/// <summary>"unique" | "ambiguous" | "none" | "" (not a granted-channel fold).</summary>
+	public string CarrierVerdict = "";
+	public int CarrierCount;
+	/// <summary>Candidate holder display names, comma separated, capped for size.</summary>
+	public string CarrierNames = "";
+}
+
+/// <summary>
 /// The computed contribution view. ONE implementation feeds both the export's JSON and the overlay
 /// dashboard: a second compute path for the UI would be a second source of truth, which is the exact
 /// failure mode this project keeps paying for.
@@ -168,6 +215,8 @@ public sealed class ContributionResult
 	public readonly List<ContributionRuleRow> Rules = new List<ContributionRuleRow>();
 	public readonly List<ContributionLinkRow> Links = new List<ContributionLinkRow>();
 	public readonly List<ContributionUnattributedRow> Unattributed = new List<ContributionUnattributedRow>();
+	/// <summary>R52: the grouped unresolved folds (a diagnostic; the export does not write it).</summary>
+	public readonly List<ContributionUnresolvedRow> Unresolved = new List<ContributionUnresolvedRow>();
 	public ContributionStats Stats = new ContributionStats();
 
 	/// <summary>False when the inputs cannot support the model at all (e.g. no composition data).
@@ -209,6 +258,17 @@ public static class Contribution
 		return int.TryParse(origin.Substring(j, k - j), NumberStyles.Integer, CultureInfo.InvariantCulture, out id) ? id : 0;
 	}
 
+	/// <summary>R52: "given#4/1006/-10" -&gt; "1006/-10" (the granted modifier's identity, the same key the
+	/// actor's Grants list uses). Null for any other channel, so only the granted channel is probed.</summary>
+	private static string GrantKeyOf(string origin)
+	{
+		if (string.IsNullOrEmpty(origin) || !origin.StartsWith("given#", StringComparison.Ordinal)) return null;
+		int slash = origin.IndexOf('/');
+		if (slash < 0 || slash + 1 >= origin.Length) return null;
+		// Everything after "given#<index>/" is the granted modifier's identity ("1006/-10").
+		return origin.Substring(slash + 1);
+	}
+
 	private sealed class Index
 	{
 		public readonly Dictionary<int, ContributionActor> Team = new Dictionary<int, ContributionActor>();
@@ -220,6 +280,8 @@ public static class Contribution
 		public readonly HashSet<int> OtherTeamKeys = new HashSet<int>();
 		public readonly Dictionary<int, List<ContributionActor>> ByAbilityId = new Dictionary<int, List<ContributionActor>>();
 		public readonly Dictionary<string, List<ContributionActor>> ByAbilityName = new Dictionary<string, List<ContributionActor>>();
+		/// <summary>R52: granted modifier ("1006/-10") -&gt; the team actors that HOLD a rule granting it.</summary>
+		public readonly Dictionary<string, List<ContributionActor>> ByGrant = new Dictionary<string, List<ContributionActor>>();
 	}
 
 	private static void AddHolder<T>(Dictionary<T, List<ContributionActor>> map, T key, ContributionActor actor)
@@ -250,6 +312,7 @@ public static class Contribution
 			l.Add(a);
 			for (int j = 0; j < a.AbilityIds.Count; j++) AddHolder(ix.ByAbilityId, a.AbilityIds[j], a);
 			for (int j = 0; j < a.AbilityNames.Count; j++) AddHolder(ix.ByAbilityName, a.AbilityNames[j], a);
+			for (int j = 0; j < a.Grants.Count; j++) AddHolder(ix.ByGrant, a.Grants[j], a);
 		}
 		foreach (var kv in seen)
 		{
@@ -296,6 +359,68 @@ public static class Contribution
 		reason = "unknown_kind"; return null;
 	}
 
+	/// <summary>R52: fold one unresolved fold into the census group, and (for the granted channel only)
+	/// record the loadout-side carrier verdict. Credit is NOT touched -- see ContributionUnresolvedRow.</summary>
+	private static void NoteUnresolved(Dictionary<string, UnresolvedAcc> map, Index ix, ContributionHit hit,
+		ContributionFold f, string reason, double share)
+	{
+		string key = reason + "|" + f.Kind + "|" + f.Side + "|" + (f.Origin ?? "") + "|" + (f.Label ?? "")
+			+ "|" + f.Factor.ToString("R", CultureInfo.InvariantCulture);
+		UnresolvedAcc a;
+		if (!map.TryGetValue(key, out a))
+		{
+			a = new UnresolvedAcc
+			{
+				Reason = reason, Kind = f.Kind ?? "", Side = f.Side ?? "", Origin = f.Origin ?? "",
+				Label = f.Label ?? "", RuleName = RuleName(f), Factor = f.Factor,
+			};
+			map[key] = a;
+		}
+		a.Amount += share;
+		a.Folds++;
+		if (!string.IsNullOrEmpty(hit.Victim))
+		{
+			int n;
+			a.Victims.TryGetValue(hit.Victim, out n);
+			a.Victims[hit.Victim] = n + 1;
+		}
+		a.VictimKeys.Add(hit.VictimKey);
+		// The carrier verdict answers a DIFFERENT question ("who could have granted it") and only the
+		// granted channel has one. Computed once per group, from the same index the ladder uses.
+		if (a.CarrierVerdict.Length == 0 && reason == "unknown_kind")
+		{
+			string gk = GrantKeyOf(f.Origin);
+			if (gk != null)
+			{
+				List<ContributionActor> cand;
+				if (!ix.ByGrant.TryGetValue(gk, out cand) || cand == null || cand.Count == 0)
+				{
+					a.CarrierVerdict = "none";
+					a.CarrierCount = 0;
+				}
+				else if (cand.Count == 1)
+				{
+					a.CarrierVerdict = "unique";
+					a.CarrierCount = 1;
+					a.CarrierNames = cand[0].Name ?? "";
+				}
+				else
+				{
+					a.CarrierVerdict = "ambiguous";
+					a.CarrierCount = cand.Count;
+					var sb = new StringBuilder(64);
+					for (int i = 0; i < cand.Count && i < 6; i++)
+					{
+						if (i > 0) sb.Append(", ");
+						sb.Append(cand[i].Name ?? "");
+					}
+					if (cand.Count > 6) sb.Append(", ...");
+					a.CarrierNames = sb.ToString();
+				}
+			}
+		}
+	}
+
 	/// <summary>P0-B: a ratio whose denominator is undefined is written as JSON null. "Not applicable"
 	/// is a different statement from a measured 0, and this project has already paid for that confusion.</summary>
 	private static void NumOrNull(StringBuilder sb, double v)
@@ -338,6 +463,20 @@ public static class Contribution
 		public readonly HashSet<int> Events = new HashSet<int>();
 	}
 
+	/// <summary>R52: the mutable accumulator behind one <see cref="ContributionUnresolvedRow"/>.</summary>
+	private sealed class UnresolvedAcc
+	{
+		public string Reason = "", Kind = "", Side = "", Origin = "", Label = "", RuleName = "";
+		public double Factor = 1.0;
+		public int Folds;
+		public double Amount;
+		public readonly Dictionary<string, int> Victims = new Dictionary<string, int>();
+		public readonly HashSet<int> VictimKeys = new HashSet<int>();
+		public string CarrierVerdict = "";
+		public int CarrierCount;
+		public string CarrierNames = "";
+	}
+
 	/// <summary>
 	/// Append the "contribution" object. Folds are only read when the caller passes useFolds, which
 	/// MUST be the same predicate the export used to emit calc.fold (e.Calc.Valid &amp;&amp; CfgReconcileCalc);
@@ -357,6 +496,8 @@ public static class Contribution
 		var rules = new Dictionary<string, RuleOut>();
 		var links = new Dictionary<string, LinkOut>();
 		var unattr = new Dictionary<string, double[]>();
+		// R52: the grouped unresolved folds (diagnostic; never written into the export).
+		var unresolved = new Dictionary<string, UnresolvedAcc>();
 		int hitIndex = -1;
 
 		for (int hi = 0; hi < hits.Count; hi++)
@@ -428,6 +569,7 @@ public static class Contribution
 					double[] slot;
 					if (!unattr.TryGetValue(reason, out slot)) { slot = new double[2]; unattr[reason] = slot; }
 					slot[0] += share; slot[1] += 1.0;
+					NoteUnresolved(unresolved, ix, hit, f, reason, share);
 					continue;
 				}
 				string rk = RuleName(f) + "|" + f.Kind + "|" + f.Side + "|" + owner.Name;
@@ -488,6 +630,22 @@ public static class Contribution
 			{
 				Reason = kv.Key, Amount = kv.Value[0], Folds = (int)kv.Value[1],
 			});
+		// R52: the census, ordered by amount and with the victim top-name chosen DETERMINISTICALLY
+		// (count desc, then ordinal name) so two runs on one file cannot order it differently.
+		foreach (var kv in unresolved.Values.OrderByDescending(x => x.Amount))
+		{
+			var row = new ContributionUnresolvedRow
+			{
+				Reason = kv.Reason, Kind = kv.Kind, Side = kv.Side, Origin = kv.Origin, Label = kv.Label,
+				RuleName = kv.RuleName, Factor = kv.Factor, Folds = kv.Folds, Amount = kv.Amount,
+				VictimInstances = kv.VictimKeys.Count, CarrierVerdict = kv.CarrierVerdict,
+				CarrierCount = kv.CarrierCount, CarrierNames = kv.CarrierNames,
+			};
+			var names = new List<KeyValuePair<string, int>>(kv.Victims);
+			names.Sort((x, y) => x.Value != y.Value ? y.Value - x.Value : string.CompareOrdinal(x.Key, y.Key));
+			if (names.Count > 0) { row.VictimTop = names[0].Key; row.VictimTopFolds = names[0].Value; }
+			res.Unresolved.Add(row);
+		}
 		return res;
 	}
 

@@ -53,15 +53,15 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
 
     Copy-Item _dpsm_work/deploy-backup/baseline-1.7.11/DpsMeter.dll BepInEx/plugins/DpsMeter/DpsMeter.dll -Force
 
-当前部署 = 398,336 字节 / SHA256 28B8CCAF…;基线 = 387,072 字节 / 36EC96D4…(备份在 _dpsm_work/deploy-backup/)。
+当前部署 = 416,256 字节 / SHA256 AA836C06…(含证据提取流程);上一版 = 398,336 字节 / 28B8CCAF…(备份在 _dpsm_work/deploy-backup/pre-r52-28B8CCAF/);基线 = 387,072 字节 / 36EC96D4…(备份在 _dpsm_work/deploy-backup/baseline-1.7.11/)。
 
 ## 5. 验证(改完必须跑的)
 
 | 层 | 命令 | 规模 |
 |---|---|---|
-| 行为测试 | dotnet run --project _dpsm_work/tests/BehaviorTests/BehaviorTests.csproj -c Release -- --quiet | 709 用例 / 28 组 |
-| 变异负控 | python _dpsm_work/tests/negative_control.py | 102 例,每例必须让具名用例变红 |
-| 离线验收 | python _dpsm_work/n0_acceptance.py(--out 指定输出目录) | 37 条命令 / 69 条检查 |
+| 行为测试 | dotnet run --project _dpsm_work/tests/BehaviorTests/BehaviorTests.csproj -c Release -- --quiet | 794 用例 / 91 组 |
+| 变异负控 | python _dpsm_work/tests/negative_control.py | 111 例,每例必须让具名用例变红 |
+| 离线验收 | python _dpsm_work/n0_acceptance.py(--out 指定输出目录) | 40 条命令 / 72 条检查 |
 | 文档收敛 | python _dpsm_work/check_doc_convergence.py(12 条规则 R1–R12) | 数字、版本、部署哈希、"未做"措辞 |
 | 其他守卫 | check_docs_123.py / refactor_final_check.py / check_tool_registry.py / check_contribution_layout.py / repo_manifest.py --verify / archive_index.py | — |
 

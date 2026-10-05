@@ -99,6 +99,9 @@ public static partial class OverlayUGUI
 	private static float _viewH;
 	private static float _panelW = 460f;
 	private static bool _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
+	/// <summary>R52: latch for the on-demand evidence-extraction key (General/ExtractKey, default F4).
+	/// Polled in CheckKeys, which runs BEFORE the Visible gate, so it also works with the panel hidden.</summary>
+	private static bool _prevExtract;
 	private static Sprite _white;
 	private static float _lastChartDraw;
 	private static float _uiDiagLast;
@@ -434,8 +437,29 @@ public static partial class OverlayUGUI
 				_lastRefresh = 0f;
 			}
 		}
+		// R52: the on-demand evidence bundle. The key is configurable (General/ExtractKey) because the
+		// overlay owns F5-F12 and the game owns an unknown set; an unparsable/off value leaves this dark.
+		bool extractDown = false;
+		try
+		{
+			int vk = ExtractPolicy.ParseVirtualKey(Plugin.CfgExtractKey == null ? null : Plugin.CfgExtractKey.Value);
+			extractDown = vk > 0 && (GetAsyncKeyState(vk) & 0x8000) != 0;
+		}
+		catch { }
+		if (extractDown && !_prevExtract)
+		{
+			try
+			{
+				string dir = EvidenceExtractor.Run(Aggregator.Session, "hotkey");
+				RuntimeLog.Write(dir == null
+					? "[DpsMeter] 证据提取:没有可提取的会话"
+					: ("[DpsMeter] 证据提取 -> " + dir));
+			}
+			catch (Exception ex3) { RuntimeLog.Write("[DpsMeter] 证据提取失败: " + ex3.Message); }
+		}
 		_prevF5 = f5; _prevF6 = f6; _prevF8 = f8; _prevF9 = f9; _prevF10 = f10; _prevF11 = f11; _prevF12 = f12;
 		_prevF7 = f7;
+		_prevExtract = extractDown;
 		_prevLeft = left; _prevRight = right;
 	}
 }

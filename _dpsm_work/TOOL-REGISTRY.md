@@ -6,16 +6,17 @@
 
 | 项 | 值 |
 |---|---|
-| 已注册脚本 | 96 |
-| 其中活跃(有 CLI、有预期退出码与输出声明) | 27 |
+| 已注册脚本 | 98 |
+| 其中活跃(有 CLI、有预期退出码与输出声明) | 29 |
 | 尚未判定(只登记,计数只能下降) | 0 / 上限 0 |
-| 验收流水线实际运行的脚本 | 21 |
+| 验收流水线实际运行的脚本 | 23 |
 
 ## 活跃工具
 
 | 脚本 | 类别 | 用途 | 预期退出码 | 输出 | 自测 | 在流水线 |
 |---|---|---|---|---|---|---|
-| `_dpsm_work/archive_index.py` | cli | RF7c: record every historical evidence file (evidence_*/probe_*/review_contrib_core) with size and sha256, and fail when one changes, vanishes or appears unrecorded. | 0 clean / 1 findings | archive-index.json; ARCHIVE-INDEX.md | no | yes |
+| `_dpsm_work/archive_index.py` | cli | RF7c: record every historical evidence file (evidence_*/probe_*/review_contrib_core) with size and sha256, and fail when one changes, vanishes or appears unrecorded. | 0 clean / 1 findings | archive-index.json; ARCHIVE-INDEX.md | yes | yes |
+| `_dpsm_work/attribution_census.py` | cli | R52: recompute an export's unattributed split with the pinned offline core, diff it field by field against the plugin's own contribution section, and report every unresolved fold group (reason/kind/origin/label/factor/victim) with the loadout-side carrier verdict for the granted channel. | 0 pass / 1 mismatch or unusable input / 3 no contribution section | attribution_census_report.txt; --json <path> (reasons, unresolved groups, carrier verdicts) | yes | yes |
 | `_dpsm_work/batch_snapshot.py` | cli | RF0 section 5.5: freeze ONE batch input list as a hard-linked snapshot, independent of a live game session. | 0 ok / 1 error | batch_inputs/<name> (hard-linked snapshot) | no | no |
 | `_dpsm_work/budget_census.py` | census | N6 budget & residual census (read-only over the export corpus). | 0 = 普查/自测通过;1 = 自测红或有预算异常 | BUDGET-CENSUS.md/.json 或 --out | yes | yes |
 | `_dpsm_work/check_contribution_layout.py` | guard | Contribution table LAYOUT guard (added with 1.7.7). | 0 = 布局合规;1 = 有布局回归 | none (read-only over exports) | yes | yes |
@@ -34,6 +35,7 @@
 | `_dpsm_work/contribution_applicability.py` | census | P0-D: task applicability scanner for DpsMeter battle exports. | 0 = 生成;1 = 语料不足 | applicability.json(--out) | yes | yes |
 | `_dpsm_work/contribution_gate.py` | cli | Contribution validation GATE: one status vocabulary and one exit-code contract. | 0 ok / 1 findings | none (read-only) | no | no |
 | `_dpsm_work/decision_report.py` | report | N5 decision report: from the audited comparison layer to a decision (roadmap N5). | 0 = 生成;1 = 数据不足 | --out 报告(MD/JSON) | yes | yes |
+| `_dpsm_work/extract_verify.py` | cli | R52: verify one evidence bundle -- every manifest checksum and size, the manifest's census summary against the census file, the census file against an independent recomputation of the bundle's own battle.json, and the carrier verdicts against the same recomputation; report whether the deployed assembly still matches the one the bundle names. | 0 pass (warnings allowed) / 1 mismatch or corruption / 3 a required file is absent | extract_verify_report.txt | yes | yes |
 | `_dpsm_work/identity_map.py` | cli | N3 / P1 stage-1 offline cross-battle identity mapping (read-only). | 0 ok / 1 findings | none (read-only) | yes | no |
 | `_dpsm_work/n0_acceptance.py` | cli | N0 acceptance closure for the CONTRIBUTION-NEXT-PHASE-ROADMAP.md (section N0). | 0 ok / 1 findings | acceptance archive under --out (RESULTS.md, runs.json, corpus_manifest.json) | yes | no |
 | `_dpsm_work/pairtrusted_impact.py` | report | P0-C: offline quantification of the PairTrusted / PairCorroborated effect on contribution. | 0 = 生成;1 = 数据不足 | pairtrusted_impact_report.json/.txt(已在 .gitignore 声明为派生) | yes | yes |
@@ -115,4 +117,4 @@
 | `_dpsm_work/verify_155.py` | 45 | 1.5.5 acceptance: self-applied madness attribution + give-applier hook. |  |
 | `_dpsm_work/victim_check.py` | 27 | Control: same enemy set / same front-line structure in the two battles? |  |
 | `dpsmeter_analyze.py` | 201 | DpsMeter 离线精细分析器 |  |
-| `dpsmeter_contrib.py` | 164 |  |  |
+| `dpsmeter_contrib.py` | 164 | DpsMeter per-character contribution analyzer (Stage 0, 2026-10-03). |  |

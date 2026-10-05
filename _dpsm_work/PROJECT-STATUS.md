@@ -18,13 +18,13 @@
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
 | 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,387,072 B,SHA256 `36EC96D4DBD8E221ED554476C299BD8DB4C9A1220A2A923DB16BC7BB4888BC42` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**88 个 .cs / 23,026 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **120** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**91 个 .cs / 23,933 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **125** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `247AD5848F1172EAE0D473C6A2F9A56E164814F3013A22E0BD29EFC95DF0DEFD`;贡献相关开关全 true |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**697 个命名用例 / 27 组**,**100 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **37 条命令 / 69 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**96 条登记 / 27 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**794 个命名用例 / 91 组**,**111 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| 离线守卫 | **40 条命令 / 72 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**98 条登记 / 29 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -63,7 +63,7 @@
 ```
 PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
 
-验收(最全,37 条命令 / 69 条检查)   python n0_acceptance.py
+验收(最全,40 条命令 / 72 条检查)   python n0_acceptance.py
 冻结批次输入                      python batch_snapshot.py --name rf0 --verify
 基线清单核对                      python repo_manifest.py --verify --exports batch_inputs\rf0
 C# 行为测试                       dotnet run --project tests\BehaviorTests\BehaviorTests.csproj -c Release -- --quiet
@@ -262,7 +262,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 - 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
 - 每次改动后跑:`python n0_acceptance.py`(33 命令 / 65 检查,全绿);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
 - **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
-- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"37 条命令 / 69 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。
+- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"40 条命令 / 72 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。**§12 各轮行刻意只记结果(如"0 项")、不复述命令/检查数**:那些数字属于各自那一刻,写进本文就会被 R9 当作对最新流水线的声明;它们留在各自的批次记录与 `acceptance_*/RESULTS.md` 里。
 
 ## 12. 重构批次记录(按 REFACTOR-PLAN-POST-1.7.11.md)
 
@@ -292,7 +292,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 24 轮 RF7c(证据哈希索引)** | 归档的第二前置:新增 `archive_index.py`,把 `evidence_*`/`probe_*`/`review_contrib_core` 的 **56 份 / 212,552 字节**连同 SHA256 记入 `archive-index.json` 与 [ARCHIVE-INDEX.md](<ARCHIVE-INDEX.md>);`--verify` 对改动/丢失/未记录新增报红(4 个自测对照);**不移动不删除任何证据**,也未接进验收(留给单独一轮);新脚本一落地即被注册表守卫 B 检查点名并登记为 active | [REFACTOR-BATCH-RF7C.md](<REFACTOR-BATCH-RF7C.md>) |
 | **第 25 轮 RF7d(索引接入)** | 把第 24 轮刻意留在流水线外的 `archive_index.py` 接进来(2 条 run:校验 + 自测),命令/检查数 **35/67 → 37/69** 并同步四处文档说法;自测只改临时副本,故可安全入线;插件源码零变化 | [REFACTOR-BATCH-RF7D.md](<REFACTOR-BATCH-RF7D.md>) |
 | **第 26 轮 RF5h(内联格式收尾)** | `DisplayFormat.Whole`(F0,**不带千分位**,刻意不是 `Num`)接入 3 处"秒伤",行内 `:F0` 剩余 0;697 用例 / 100 例负控。**更正**:此前"除一处外已无直接 `:N0`/`:F2`"的说法不准确——`OverlayUGUI.Chart.cs` 仍有 4 处,统一它们会改变用户所见,需一次**决定**;另记录一次 shell 重写源码导致 167 个错误、已还原并用定点编辑重做 | [REFACTOR-BATCH-RF5H.md](<REFACTOR-BATCH-RF5H.md>) |
-| **第 27 轮(全面复核,无代码改动)** | 对已达成的部分做一次端到端复核:**部署 DLL** 387,072 B / `36EC96D4…8BC42`(15–27 轮未替换);验收 **37 条命令 / 69 条检查 / 0 项**;行为套件 **697 用例 0 失败**;变异负控 **100 例 0 失败**;`refactor_final_check` blocks=0;文档收敛 **0/12**;docs123 62 份 0 损伤;工具注册表 PASS;布局守卫 35 份 0 违规;证据哈希索引 PASS;`repo_manifest --verify` drift=0;git 干净于 `4c92e10` | 本轮无产物;证据见本行与 [HANDOFF.md](<HANDOFF.md>) |
+| **第 27 轮(全面复核,无代码改动)** | 对已达成的部分做一次端到端复核:**部署 DLL** 387,072 B / `36EC96D4…8BC42`(15–27 轮未替换);验收 **0 项**(当轮命令/检查数见该轮的批次记录;本文 §12 各轮行只记结果,不复述口径数字);行为套件 **697 用例 0 失败**;变异负控 **100 例 0 失败**;`refactor_final_check` blocks=0;文档收敛 **0/12**;docs123 62 份 0 损伤;工具注册表 PASS;布局守卫 35 份 0 违规;证据哈希索引 PASS;`repo_manifest --verify` drift=0;git 干净于 `4c92e10` | 本轮无产物;证据见本行与 [HANDOFF.md](<HANDOFF.md>) |
 | **第 28 轮 RF7e(工具判定续)** | 31 条被引用脚本中证据明确的三条:`batch_snapshot.py` → active(它是 `batch_inputs/rf0` 的来源),`compare_comps.py` / `atkadd_sensitivity.py` → indexed(docstring 证明是历史研究);判定证据固定为"导入者/流水线/文档点名 + **脚本自己的 docstring**";未判定上限 31 → **28**;并写明剩下 28 条需要**先扩展守卫 G 到"活跃导入者"**才能判(独立规则改动) | [REFACTOR-BATCH-RF7E.md](<REFACTOR-BATCH-RF7E.md>) |
 | **第 29 轮 RF7f(G 放宽 + J)** | 守卫 G 由"任何导入者都没有"改为**传递性活跃**(种子 = active ∪ 流水线),并配两个对照(被活跃脚本导入⇒红;只被已死脚本导入⇒不报);新增 **J**:被索引者不得出现在 `n0_acceptance.py` 文本里。**一次被自己抓住的错误**:按"仅认 import"批量判定时把 `n0_acceptance.py` 与 `tests/negative_control.py` 判成"没人依赖",已从 git 还原注册表——这证明了**按名字调用**才是本仓库的主要使用方式,`imports_local` 不足以判定存活;未判定数仍为 28 | [REFACTOR-BATCH-RF7F.md](<REFACTOR-BATCH-RF7F.md>) |
 | **第 30 轮 RF7g(证据表)** | 新增 `tool_census.py --invokers`:对 28 条未判定脚本列出"哪些已登记脚本的**源码文本**里出现它的名字",并单独标出其中的 active 者;**刻意不是闸门**(名字可能只是注释,做成硬规则会因一句注释变红,故先做给人看的证据表);首轮即定一条:`contrib/report_json.py` 被两个 active 脚本点名,不应判为"无人依赖";未判定仍 28 | [REFACTOR-BATCH-RF7G.md](<REFACTOR-BATCH-RF7G.md>) |
@@ -303,7 +303,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 35 轮 RF7l(读点名行)** | 逐处读了第 34 轮留下的 5 处点名,**结论:全部是文本(注释/docstring/列表),没有一处是调用**——即"活点名"从来不是"有活调用者"的证据,第 31 轮把它当保留理由过强;判据回到**真依赖**(流水线文本 J + 活闸门输入清单);3 条判死,未判定 5 → **3**;并自查改正一处误判(`dpsmeter_contrib.py` 在仓库根,我的路径前缀没匹配上);剩下 3 条缺的是状态词汇("被引用的输入")而非证据 | [REFACTOR-BATCH-RF7L.md](<REFACTOR-BATCH-RF7L.md>) |
 | **第 36 轮 RF7m(状态词汇)** | 判定的缺口是**词汇**而非证据:新增状态 **`referenced-input`**(有人读、没人跑的输入文件)+ 守卫检查 **K**(必须声明读者、读者须为 active 且其源码文本确实含该文件、且不得在流水线);`contrib/report_text.py` 与 `dpsmeter_contrib.py`(被活闸门 `check_docs_123.py` 读取)归入此类;未判定 3 → **1**;最后 1 条卡在 J 把**注释**也当成"流水线点名",收尾需单独一次 J 判据改动 | [REFACTOR-BATCH-RF7M.md](<REFACTOR-BATCH-RF7M.md>) |
 | **第 37 轮 RF7n(J 只看运行行)** | 把 J 的判据从"整份文本出现"改为"**同时含 `PY` 的运行行**出现",配两个对照(RUN 行⇒红;注释⇒不报);据此 `contrib/validate.py`(唯一提及是注释)判为 indexed —— **未判定 1 → 0**,RF7 工具治理收口:96 = 27 active + 67 indexed + 2 referenced-input + 0 unclassified | [REFACTOR-BATCH-RF7N.md](<REFACTOR-BATCH-RF7N.md>) |
-| **第 38 轮(全量复核,无代码改动)** | 第 37 轮先后留下一次红提交,故本轮把**整条验收重跑**一遍作最终核对:`acceptance_r38` **37 条命令 / 69 条检查 / 0 项**;行为套件 697 用例 0 失败;`check_tool_registry`(G/J/K 全部有牙)PASS;`refactor_final_check` blocks=0;docs123 72 份 0 损伤;文档收敛 0/12;工具治理 **0 条未判定**;部署 DLL 未替换 | 证据即本轮归档 `acceptance_r38` |
+| **第 38 轮(全量复核,无代码改动)** | 第 37 轮先后留下一次红提交,故本轮把**整条验收重跑**一遍作最终核对:`acceptance_r38` **0 项**(当轮命令/检查数见 acceptance_r38/RESULTS.md);行为套件 697 用例 0 失败;`check_tool_registry`(G/J/K 全部有牙)PASS;`refactor_final_check` blocks=0;docs123 72 份 0 损伤;文档收敛 0/12;工具治理 **0 条未判定**;部署 DLL 未替换 | 证据即本轮归档 `acceptance_r38` |
 | **第 39 轮(第 4 族收尾结论)** | 矩阵新增 §9:把第 4 族剩下的**帧循环游标**(`Clock`/`_lastTickClock`/`_lastTickFrame`/`_lastGameSteps`/`_hasLastSteps`/`_lastGsPointer`)明确记为**不迁移**,并写出三条理由(无独立规则可搬 / 语义与原生帧循环绑死且离线不可验证 / 热路径风险不对称、收益被方案标注为低);说明为何同族里 `History` 搬了而它们不搬——按"有无可测规则"划分,不是半途而废 | [STATE-LIFETIME-MATRIX.md](<STATE-LIFETIME-MATRIX.md>) |
 | **第 41 轮(缓存决定落地 + Chart 格式统一)** | 用户对缓存三问与 Chart 格式给出决定后落地:缓存规则明确"1 秒节流(严格 `>`)、时间窗是唯一时间判据、切换/开关/结算绕过";新增 `ContributionSession.Generation`(**F9 必须失效,且不能只靠事件数**——重置前后事件数可能相同),F9 两个渲染入口调用 `Invalidate()`;Chart 的 5 处 `:N0` 收到 `DisplayFormat.Num`(百分比 `:F0%` 按决定保留);709 用例 / 102 例负控 | [REFACTOR-BATCH-R41.md](<REFACTOR-BATCH-R41.md>) |
 | **第 42 轮(R42 快照)** | 把用户这一场冻成批次 **r42**(方案自带 `batch_snapshot.py`,硬链接,`--verify` drift=0):**46 文件 / 628.7 MB**;新那一场的任务号属于**训练场**类、带贡献段、`schemaVersion 1.1`——按 R6 既有判定,该类别**不参与可比基线**;同一时间戳刷新的 **masterdata 转储**才是 `MasterDataAccess`(§11)实机验证缺的那一半;本轮**不含插件改动** | [REFACTOR-BATCH-R42.md](<REFACTOR-BATCH-R42.md>) |
@@ -315,11 +315,12 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 48 轮(机器证明搬移等价)** | 把第 46 轮"人工逐行看过"升级为**机器判定**:从 git 取改动前的主体、与 MasterDataAccess 的主体按语句规范化后逐条比较(显式排除两类有意差异:计数/提示行留在调用方、新增的 `info.Found` 报告行),结果**语句序列完全一致**;并写明边界——只证明扫描部分逐条搬移,不覆盖转储路由,行为等价仍需一次新构建运行的逐字节对照 | [REFACTOR-BATCH-R48.md](<REFACTOR-BATCH-R48.md>) |
 | **第 49 轮(决定 A:收尾)** | 你选择 A:MasterDataAccess 共享层保留(已机器证明搬移等价 20/20),**转储路由保持各自实现**(四处语义差异,合并即违反方案的"必须保持");行为等价**不宣称**(需一次新构建运行的逐字节对照);据此关闭计划最后一项——方案对主数据层的两条要求(消除重复 / 保持行为)以"只共享真正相同的部分"同时满足 | [REFACTOR-BATCH-R49.md](<REFACTOR-BATCH-R49.md>) |
 | **第 51 轮(首次部署实机验证)** | 用重构构建跑的一场(任务 411001)验证:**masterdata 转储与冻结基准逐字节一致(20/20,IDENTICAL)**、导出正常(1.7.11 / log-share-1 / dealt)、`reconciliationGap=0.0`、折叠健康度 0 退化;并应你要求定位本场未归因:**贡献账残差 8,375,105.67(4.33%,唯一原因 `unknown_kind`,5,862 折叠)与会话口径 337,906(75 击,全在ショゴス,攻击者无法识别)是两个口径,不应相加** | [REFACTOR-BATCH-R51.md](<REFACTOR-BATCH-R51.md>) |
+| **第 52 轮(未知种类定位 + 证据提取流程)** | 应你要求深挖"未识别的规则种类":用新增的 `attribution_census.py` 重算并**逐字段复现**导出(五个理由的折叠数全等,合计 35,961),证明 `unknown_kind` 的 5,862 折叠 **100% 是 `kind="given"`**(4 个 origin、单一 label `被伤害+10%(赋予)`、因子恒 1.1),根因是 `GiveApplierProbe` 在 guest 读不出时**什么都不记**(`giverResolved=0 / giverNull=30,269`;钩子 12 次全是 `nullGuest` → 目标表 0 行),而同一现象的 `StatusApplierProbe` 有"自施加"回退;并证明持有者**唯一**(刻印 id=26 只在 `エヴァラス・フラウ` 名下、两份)。同时把"游戏数据提取"固化成流程:`extract/` 证据包(同源序列化的 battle.json + 未归因普查 + 主数据副本 + FNV-1a 64 manifest;按 `General/ExtractOnBattleEnd` 或 `General/ExtractKey`(默认 F4)触发,保留 `ExtractKeep`=5)+ 离线 `extract_verify.py`;部署替换为 **AA836C06**(416,256 字节)。另修好一个**不会失败的闸门**:`negative_control.py` 的计数只统计"变异没贴上",行为失败只打印不计分(现已每支 `return 1`,并加"应用成功但不改变行为"的自检用例),并让一直空转的 `rowmodel-rules-keep-zero-damage` 真的会红。**未改任何归属** | [REFACTOR-BATCH-R52.md](<REFACTOR-BATCH-R52.md>) |
 | **第 50 轮(首次部署)** | 应你要求把运行 DLL 从基线 1.7.11(387,072 / 36EC96D4…)替换为**重构构建**(398,336 / 28B8CCAF…):替换前确认**游戏未运行且文件未占用**,备份全部 105 个文件到 `_dpsm_work/deploy-backup/baseline-1.7.11/`,并复核你要求永不改动的两个 `.bak` **哈希不变**;回退为一条 Copy-Item;跑完后的对照计划(转储逐字节 vs r42 基准、导出跑既有检查、前后哈希留档)写在记录里 | [REFACTOR-BATCH-R50.md](<REFACTOR-BATCH-R50.md>) |、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:
 
-1. **部署始终未变**:DLL 仍 1.7.11 / 387,072 B / `36EC96D4…`;RF0 已经证明"用 `src` 重建得到的产物与部署逐字节相同"。
+1. **部署已两次前进**:基线 1.7.11(387,072 B / `36EC96D4…`)→ 重构构建(398,336 B / `28B8CCAF…`,第 50 轮)→ 本轮(416,256 B / `AA836C06…`,含证据提取流程);RF0 已经证明(对基线那一版)"用 `src` 重建得到的产物与部署逐字节相同",此后每次替换都按 AGENTS §5 备份并复核历史 `.bak` 哈希。原文: `36EC96D4…`;RF0 已经证明"用 `src` 重建得到的产物与部署逐字节相同"。
 2. **判据现在可以离线执行**:`tests/BehaviorTests` 的 `<Compile>` 清单包含 `src/Policy/*.cs`,所以任何让策略层依赖 Unity/IL2CPP/配置的改动会**构建失败**,而不是悄悄漂移。
 3. **未覆盖的要写下来**:门面(编排、原生读取、热路径候选扫描)没有任何离线测试覆盖;策略用例证明的是"判据正确",不是"调用点正确" —— 调用点靠差异审查 + 构建 + 真实导出回归。
 

@@ -54,10 +54,22 @@ namespace DpsMeter
 
 	public enum eDamageCalcType { None = 0, Attack = 1, Heal = 2 }
 
+	/// <summary>R52: the grant-channel fields ContributionSession reads from a talent (Type/P0/Cond).
+	/// The production TalentRef also carries Index/P1/P2/Timing/Live/Last/Delta -- they are NOT declared
+	/// here because no compiled source touches them, and a convenience member would be drift onto a fake
+	/// game surface (see the file header).</summary>
+	public sealed class TalentRef
+	{
+		public int Type;
+		public int P0;
+		public string Cond = "";
+	}
+
 	public sealed class RosterAbility
 	{
 		public int Id;
 		public string Name = "";
+		public readonly List<TalentRef> Talents = new List<TalentRef>();
 	}
 
 	public sealed class TalentUsage

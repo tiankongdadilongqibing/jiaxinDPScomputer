@@ -414,6 +414,17 @@ def main():
             ("factsig", [PY, os.path.join(HERE, "check_fact_signature.py"), "--outdir", args.out]),
             ("selftest/applicability", [PY, os.path.join(HERE, "contribution_applicability.py"), "--selftest"]),
             ("selftest/pairtrusted", [PY, os.path.join(HERE, "pairtrusted_impact.py"), "--selftest"]),
+            # R52: the two offline halves of the evidence-extraction flow. Both are self-contained (temp
+            # fixtures only) and each has a --selftest that must be able to say NO: attribution_census.py
+            # recomputes an export's unattributed split and diffs it against the plugin's own statement;
+            # extract_verify.py checks a bundle's manifest checksums and cross-diffs its census against an
+            # independent recomputation of the bundle's own battle.json.
+            ("selftest/attribution_census", [PY, os.path.join(HERE, "attribution_census.py"), "--selftest"]),
+            ("selftest/extract_verify", [PY, os.path.join(HERE, "extract_verify.py"), "--selftest"]),
+            # R52: the negative-control DRIVER's own selftest. It has to be in the pipeline because the
+            # driver's counter was the defect it now checks: a mutation that applied, compiled and changed
+            # nothing used to be counted as a pass (see negative_control.py one()).
+            ("selftest/negctl_driver", [PY, os.path.join(HERE, "tests", "negative_control.py"), "--selftest"]),
             ("refactor_final_check", [PY, os.path.join(HERE, "refactor_final_check.py")]),
             ("selftest/refactor", [PY, os.path.join(HERE, "refactor_final_check.py"), "--selftest"]),
             # RF7: the tool registry. The verify run is the drift check (a script the pipeline runs but the

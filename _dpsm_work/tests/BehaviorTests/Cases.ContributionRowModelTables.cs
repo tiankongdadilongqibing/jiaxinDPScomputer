@@ -15,10 +15,15 @@ internal static partial class Cases
 		var res = new ContributionResult();
 		res.Actors.Add(new ContributionActorRow { Key = 7, Name = "甲" });
 		res.Actors.Add(new ContributionActorRow { Key = 9, Name = "乙" });
+		// The zero-equivalent rule comes FIRST on purpose. When it was appended after the 13 positive
+		// rows the cap (12) was already full by the time the loop reached it, so removing the filter
+		// changed nothing and the case below stayed GREEN under its own mutation (measured 2026-10-05:
+		// negative_control rowmodel-rules-keep-zero-damage did not bite). The filter is only falsifiable
+		// if an unfiltered zero row would CONSUME a cap slot.
+		res.Rules.Add(new ContributionRuleRow { Name = "zero", Damage = 0.0 });
 		for (int i = 0; i < 13; i++)
 			res.Rules.Add(new ContributionRuleRow { Name = "r" + i, Kind = "k", Side = "自", OwnerName = "甲",
 			                                        Hits = i, Folds = 1, Damage = 10.0 + i });
-		res.Rules.Add(new ContributionRuleRow { Name = "zero", Damage = 0.0 });
 		for (int i = 0; i < 13; i++)
 			res.Links.Add(new ContributionLinkRow { From = 7, To = 9, Hits = i, Amount = 5.0 });
 		res.Links.Add(new ContributionLinkRow { From = 7, To = 404, Hits = 1, Amount = 0.0 });

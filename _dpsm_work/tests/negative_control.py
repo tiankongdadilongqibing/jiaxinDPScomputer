@@ -453,6 +453,45 @@ MUTATIONS = [
          find="\t\t\t|| now - cachedAt > refreshSeconds;",
          repl="\t\t\t|| now - cachedAt >= refreshSeconds;",
          expect="cache/throttle/exactly-at-one-second-is-still-reused (strict >)"),
+    # ---- R52: the evidence-extraction flow (trigger key, retention) and the unresolved-fold census ----
+    # Each one edits ONE clause of the new code and must redden the case that pins it. The census ones are
+    # the important half: they are what stops "the census is only a report" from being a comment.
+    dict(name="extract-key-f13-enabled", file="Policy/ExtractPolicy.cs",
+         find="&& n >= 1 && n <= 12)",
+         repl="&& n >= 1 && n <= 13)",
+         expect="extract/key/f13-is-not-a-key (off)"),
+    dict(name="extract-retention-drops-the-newest", file="Policy/ExtractPolicy.cs",
+         find="for (int i = 0; i < drop; i++) outl.Add(sorted[i]);",
+         repl="for (int i = sorted.Count - drop; i < sorted.Count; i++) outl.Add(sorted[i]);",
+         expect="extract/retention/the-OLDEST-is-dropped-first (never the newest)"),
+    dict(name="extract-retention-keeps-nothing", file="Policy/ExtractPolicy.cs",
+         find="keep < MinKeep ? MinKeep :",
+         repl="keep < 0 ? 0 :",
+         expect="extract/retention/keeping-zero-is-clamped-to-one (never delete everything)"),
+    dict(name="extract-sanitise-drops-unknown-characters", file="Policy/ExtractPolicy.cs",
+         find="if (sb.Length > 0 && sb[sb.Length - 1] != '-') sb.Append('-');",
+         repl="",
+         expect="extract/bundle-name/separators-become-dashes"),
+    dict(name="census-grant-key-cut-at-the-second-slash", file="Output/Contribution.cs",
+         find="return origin.Substring(slash + 1);",
+         repl="int slash2 = origin.IndexOf('/', slash + 1);\n\t\tif (slash2 < 0) return null;\n\t\treturn origin.Substring(slash + 1, slash2 - slash - 1);",
+         expect="extract/census/a-unique-holding-actor-gives-a-unique-verdict"),
+    dict(name="census-picks-the-first-of-many-carriers", file="Output/Contribution.cs",
+         find="else if (cand.Count == 1)",
+         repl="else if (cand.Count >= 1)",
+         expect="extract/census/two-holding-actors-give-an-ambiguous-verdict"),
+    dict(name="census-groups-copies-of-one-rule", file="Output/Contribution.cs",
+         find="(f.Origin ?? \"\") + \"|\" + (f.Label ?? \"\")",
+         repl="(f.Label ?? \"\")",
+         expect="extract/census/two-copies-at-different-list-indexes-are-two-groups"),
+    dict(name="census-victim-top-tie-reversed", file="Output/Contribution.cs",
+         find="string.CompareOrdinal(x.Key, y.Key)",
+         repl="string.CompareOrdinal(y.Key, x.Key)",
+         expect="extract/census/a-victim-name-tie-is-broken-by-ordinal-order"),
+    dict(name="census-credits-the-unattributed-share-too", file="Output/Contribution.cs",
+         find="\t\t\t\t\tst.Unattributed += share;",
+         repl="\t\t\t\t\tst.Unattributed += share;\n\t\t\t\t\tac.Self += share;",
+         expect="extract/census/nor-the-credited-amount"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",
@@ -499,15 +538,23 @@ def one(mut, keep):
         return 1
     ok, code, out = build_and_run(srcroot)
     expect = mut.get("expect")
+    # R52 FIX. Every branch used to print and then fall through to "return 0", so the summary line
+    # ("N failure(s) of M") only ever counted a mutation that failed to APPLY, and the pipeline's exit
+    # code said "clean" while the transcript said "did not bite". A gate whose counter cannot see its own
+    # failures is exactly the defect this project keeps hunting, so each branch now returns 1 and
+    # --selftest proves it with a mutation that applies, compiles and changes nothing.
+    verdict = 0
     if not ok:
         print("  [FAIL] %-32s build FAILED against the mutated copy (a mutant must still compile)" % mut["name"])
         print("         " + " | ".join(out.strip().splitlines()[-3:])[:200])
+        verdict = 1
     elif expect is None:
         if code == 0:
             print("  [PASS] %-32s prose-only mutation stays GREEN (%s)" % (mut["name"], detail))
         else:
             print("  [FAIL] %-32s prose-only mutation turned the suite RED (the suite is not reading behaviour)" % mut["name"])
             print("         " + " | ".join(l for l in out.splitlines() if l.startswith("FAIL"))[:300])
+            verdict = 1
     else:
         reds = [l for l in out.splitlines() if l.startswith("FAIL ")]
         hit = any(("FAIL " + expect) in l for l in reds)
@@ -515,15 +562,17 @@ def one(mut, keep):
             print("  [PASS] %-32s -> %s went red" % (mut["name"], expect))
         elif code == 0:
             print("  [FAIL] %-32s suite stayed GREEN; %s did not bite" % (mut["name"], expect))
+            verdict = 1
         else:
             print("  [FAIL] %-32s went red on the WRONG case (wanted %s)" % (mut["name"], expect))
             print("         reds: " + " | ".join(reds)[:300])
+            verdict = 1
     m = re.search(r"behavior tests: cases=(\d+) failed=(\d+) pinned=(\d+)", out)
     if m:
         print("         cases=%s failed=%s pinned=%s" % (m.group(1), m.group(2), m.group(3)))
     if not keep:
         shutil.rmtree(tmp, ignore_errors=True)
-    return 0
+    return verdict
 
 
 def main():
@@ -546,12 +595,28 @@ def main():
     sel = [m for m in MUTATIONS if m["name"] == "comment-only-control"]
     bogus = dict(name="selftest-bogus-find", file="Model/BattleSession.cs",
                  find="this text does not exist anywhere", repl="x", expect=None)
+    # R52: a mutation that APPLIES and COMPILES but changes no behaviour. Before the counter fix it was
+    # indistinguishable from a passing control; now it must be counted as a failure, which is what proves
+    # the summary line can see "did not bite".
+    noop = dict(name="selftest-noop-mutation", file="Model/BattleSession.cs",
+                find="public const double HitMatchSeconds = 0.35;",
+                repl="public const double HitMatchSeconds = 0.35 ;",
+                expect="window/constants/hit-match-window-is-0.35s")
     if a.selftest:
-        print("negative-control driver selftest (2 case(s)):")
+        print("negative-control driver selftest (3 case(s)):")
+        cases = [
+            ("a mutation whose find text does not match is a DRIVER failure",
+             one(bogus, a.keep) == 1),
+            ("a prose-only mutation stays GREEN", one(sel[0], a.keep) == 0),
+            ("a mutation that applies but does not bite is COUNTED as a failure",
+             one(noop, a.keep) == 1),
+        ]
         bad = 0
-        bad += one(bogus, a.keep)      # a mutation that does not apply must be a DRIVER failure
-        bad += one(sel[0], a.keep)     # prose-only must stay green
-        print("driver selftest: %d failure(s)" % bad)
+        for label, ok in cases:
+            print("  [%s] %s" % ("PASS" if ok else "FAIL", label))
+            if not ok:
+                bad += 1
+        print("driver selftest: %d case(s), %d failed" % (len(cases), bad))
         return 1 if bad else 0
     picks = [m for m in MUTATIONS if not a.only or m["name"] in a.only]
     if not picks:

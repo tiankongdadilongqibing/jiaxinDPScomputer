@@ -155,6 +155,21 @@ public static partial class Aggregator
 		// retries on a later battle if none were found yet.
 		if (Plugin.CfgMasterDataDump != null && Plugin.CfgMasterDataDump.Value) MasterDataDump.RunOnce();
 		ExportService.Export(s); // full-data JSON for offline analysis
+		// R52 (证据提取流程): the self-contained bundle. OFF by default, so a normal battle writes exactly
+		// what it wrote before (the bundle is a ~25 MB copy). It runs AFTER the export and BEFORE the
+		// actors' live references are cleared, so the census sees the same finished session the file does.
+		// EvidenceExtractor.Run never throws -- a failure is counted, not propagated into a finalisation.
+		try
+		{
+			if (Plugin.CfgExtractOnBattleEnd != null && Plugin.CfgExtractOnBattleEnd.Value)
+				EvidenceExtractor.Run(s, "battle-end");
+			else
+				RuntimeLog.Write("[DpsMeter][EXTRACT] 关闭(General/ExtractOnBattleEnd=false) 自检 " + EvidenceExtractor.Diag());
+		}
+		catch (Exception ex)
+		{
+			RuntimeLog.Write("[DpsMeter][EXTRACT] 调度失败(不影响收尾): " + ex.Message);
+		}
 		_calcEvents.Clear();
 		foreach (ActorStats orderedActor4 in s.OrderedActors) orderedActor4.Source = null;
 		RuntimeLog.Flush();

@@ -34,13 +34,33 @@ public static class ExportService
 
 	public static string Export(BattleSession s)
 	{
+		return ExportTo(s, null);
+	}
+
+	/// <summary>R52 (证据提取流程): the SAME writer, to an explicit path. The evidence bundle must not
+	/// grow a second serializer -- a second writer is a second contract, and the two would eventually
+	/// disagree. A null/empty path keeps the historical exports/ location, so every existing caller and
+	/// the export schema itself are unchanged.</summary>
+	public static string ExportTo(BattleSession s, string file)
+	{
 		try
 		{
 			if (s == null) return null;
 			// Computed once, from the events, and used for both the JSON and the self-report line, so the
 			// number the user reads in the log and the number stored in the file cannot drift apart.
 			CalcReconcile.Stats rec = CalcReconcile.Compute(s);
-			string file = Path.Combine(Dir, $"battle_{s.QuestId}_{s.StartWallClock:yyyyMMdd_HHmmss}.json");
+			if (string.IsNullOrEmpty(file))
+				file = Path.Combine(Dir, $"battle_{s.QuestId}_{s.StartWallClock:yyyyMMdd_HHmmss}.json");
+			else
+			{
+				// An explicit path may live in a directory that does not exist yet (the bundle dir).
+				try
+				{
+					string parent = Path.GetDirectoryName(file);
+					if (!string.IsNullOrEmpty(parent)) Directory.CreateDirectory(parent);
+				}
+				catch { }
+			}
 			string json = BuildJson(s, rec);
 			// 1.5.0: structural self-check BEFORE the file is written. A hand-built writer can be broken by
 			// an edit the compiler cannot see (a swallowed statement, a missing bracket, a duplicated key),

@@ -147,6 +147,19 @@ public class Plugin : BasePlugin
 	/// `factId`. See Diagnostics/FactStore.cs.</summary>
 	public static ConfigEntry<bool> CfgFactStore;
 
+	/// <summary>R52 (证据提取流程): write a self-contained evidence bundle when a battle ends.
+	/// OFF by default: a bundle is a ~25 MB copy plus checksums, so it is an explicit request, never a
+	/// silent change to what a normal battle writes. See Diagnostics/EvidenceExtractor.cs.</summary>
+	public static ConfigEntry<bool> CfgExtractOnBattleEnd;
+
+	/// <summary>R52: the key that extracts a bundle on demand (default F4; the overlay owns F5-F12).
+	/// "NONE"/empty disables the key route and leaves the battle-end route alone.</summary>
+	public static ConfigEntry<string> CfgExtractKey;
+
+	/// <summary>R52: how many bundle directories survive (oldest deleted first). Bounded so a long
+	/// session cannot fill the disk with 25 MB bundles.</summary>
+	public static ConfigEntry<int> CfgExtractKeep;
+
 	private Harmony _harmony;
 
 	/// <summary>
@@ -350,6 +363,9 @@ public class Plugin : BasePlugin
 		CfgContribution = Config.Bind<bool>("General", "Contribution", true, "FEATURE (1.6.0 阶段 E): write the `contribution` section of the export (per character: base damage / own-rule credit / assist credit / total credit, per-rule damage equivalents and provider->beneficiary links). Derived from the same per-hit fold list the composition emitted, at export time only -- no battle-time accumulation, no new hooks. It is about 0.04%-0.12% of the file. Off = the export keeps the 1.5.5 structure and offline analysis (which has its own verified core) is unaffected. NOTE: with General/ReconcileCalc=false there are no folds in the file, so the section reports base damage only -- by design, so the file and the section can never disagree.");
 		CfgShowContribution = Config.Bind<bool>("General", "ShowContribution", true, "FEATURE (1.7.0 阶段 F): show the 总贡献 dashboard in the overlay (per character: base / own rules / assist / total credit + share, plus the top rules by damage equivalent). It reuses the exact computation the export writes, cached and refreshed at most once a second, so the panel and the exported contribution section are always the same numbers. Requires ReconcileCalc (no folds = no attribution -> the panel says 不可用 instead of showing zeros). Off = panel hidden, export unchanged.");
 		CfgFactStore = Config.Bind<bool>("General", "FactStore", true, "FEATURE (1.5.0 B1): give EVERY damage hit a reference (`event.factId`) into a deduplicated fact table (`facts.items`), where each class carries the four composition lines plus the VICTIM's LIVE state (resistance slots, 蓄积 counters, active statuses) read at that class's first sight. WHY: live state can only be read while the game objects are alive (`FinalizeLocked` clears `ActorStats.Source` immediately after the export), so anything not captured during the battle is unrecoverable; before 1.5.0 that capture happened for at most 160 hits of 5,501 (3%), which is why every new question cost another battle. MEASURED: those 5,501 hits collapse to 331-463 distinct classes across four exports, and 2,838 distinct composition quadruples out of 5,501 events, so a bounded deduped table covers 100% of hits inside the byte budget that used to buy 3%. The expensive live read runs only for the first `MaxLiveClasses` (420) classes; both overflow counters are exported. Bounded and read-only; self-reported as a [DpsMeter][FACT] line. Set false to skip it entirely.");
+		CfgExtractOnBattleEnd = Config.Bind<bool>("General", "ExtractOnBattleEnd", false, "FEATURE (R52 证据提取流程): at battle end, write a SELF-CONTAINED evidence bundle to BepInEx\\plugins\\DpsMeter\\extract\\<stamp>\\ containing (1) battle.json from the same serializer as the normal export, (2) contrib_census.json -- every UNRESOLVED fold grouped by reason/kind/origin/label/factor with its victim and, for the granted channel, the loadout-side carrier verdict (who HOLDS a rule that grants that modifier), (3) masterdata/ as a copy of the game's own table dump, (4) manifest.json hashing every file plus the deployed assembly. WHY: 'what is unknown_kind made of' and 'why is the giver always null' used to cost a one-off script over a 24 MB file, and the answer was not reproducible. OFF by default because a bundle is a ~25 MB copy: turn it on for a session that must be documented, or press the key below. Bounded by ExtractKeep. Never throws into the finalisation.");
+		CfgExtractKey = Config.Bind<string>("General", "ExtractKey", ExtractPolicy.DefaultKey, "FEATURE (R52): press this key for an evidence bundle on demand (works in and out of a battle). F1-F12, A-Z or 0-9; NONE disables it. F4 by default because the overlay already owns F5-F12 and F8/F9 must keep their meanings. Every press writes a bundle, so ExtractKeep bounds how many stay on disk.");
+		CfgExtractKeep = Config.Bind<int>("General", "ExtractKeep", ExtractPolicy.DefaultKeep, "FEATURE (R52): how many evidence bundles to keep under BepInEx\\plugins\\DpsMeter\\extract (oldest deleted first, decided by a pure string sort of the timestamped directory names). 1..50.");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");

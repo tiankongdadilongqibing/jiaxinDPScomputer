@@ -1,0 +1,51 @@
+export      : battle_411001_20261005_082525.json
+plugin      : version=1.7.11 quest=411001 app=DpsMeter
+contribution: schema=1.1 method=log-share/1
+hits        : analyzable=5490 fold-bearing=5488 (a hit with no surviving fold counts as analyzable but carries no credit line)
+reasons     : plugin / recompute (folds)
+  ability_holder_attacker  plugin=9180     recompute=9180     amount=26936721.0320
+  ability_holder_unique    plugin=6003     recompute=6003     amount=29978086.4158
+  byUnit                   plugin=6177     recompute=6177     amount=55970218.7526
+  global_name_unique       plugin=8739     recompute=8739     amount=45010339.9447
+  unknown_kind             plugin=5862     recompute=5862     amount=8375105.6709
+
+unattributed (plugin statement)
+  unknown_kind             amount=8375105.6709 folds=5862
+
+given-channel health (the reason the giver was never resolved)
+  rosterAudit: giveApplied=5946 giveCancelled=24323 giveFoldHits=2973 giveReads=5584 giveErrors=0
+  giver       : resolved=0 null=30269 errors=0  (resolved+null+errors must equal giveApplied+giveCancelled)
+  giveTypes   : 1006/-10:5946,1006/-15:24323,1006/100:1,409/30:5015,411/90:5015
+  givenApplies: hookCalls={'addTalent': 12} recorded=12 nullOwner=0 nullGuest=12 errors=0 targets=0 lookupHits=0 lookupMisses=34688
+
+unresolved detail (recomputed; 4 rows)
+  reason=unknown_kind     kind=given    side=vic  factor=1.1 folds=1839 amount=2531919.0217
+    origin=given#6/1006/-10 hits=1839
+    label =\u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)
+    victims=1 name(s)/76 instance(s) top=[('\u30b7\u30e7\u30b4\u30b9', 1839)] t=[19.6..118.47]
+    CARRIER VERDICT: unique (1 candidate(s)) [\u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6#9]
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+  reason=unknown_kind     kind=given    side=vic  factor=1.1 folds=1839 amount=2531919.0217
+    origin=given#7/1006/-10 hits=1839
+    label =\u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)
+    victims=1 name(s)/76 instance(s) top=[('\u30b7\u30e7\u30b4\u30b9', 1839)] t=[19.6..118.47]
+    CARRIER VERDICT: unique (1 candidate(s)) [\u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6#9]
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+  reason=unknown_kind     kind=given    side=vic  factor=1.1 folds=1092 amount=1655633.8137
+    origin=given#4/1006/-10 hits=1092
+    label =\u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)
+    victims=1 name(s)/69 instance(s) top=[('\u30b7\u30e7\u30b4\u30b9', 1092)] t=[5.1..91.6]
+    CARRIER VERDICT: unique (1 candidate(s)) [\u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6#9]
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+  reason=unknown_kind     kind=given    side=vic  factor=1.1 folds=1092 amount=1655633.8137
+    origin=given#5/1006/-10 hits=1092
+    label =\u88ab\u4f24\u5bb3+10%(\u8d4b\u4e88)
+    victims=1 name(s)/69 instance(s) top=[('\u30b7\u30e7\u30b4\u30b9', 1092)] t=[5.1..91.6]
+    CARRIER VERDICT: unique (1 candidate(s)) [\u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6#9]
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+      holder evidence: actor=see candidates ability=\u30d6\u30ed\u30c3\u30af\u3057\u3066\u3044\u308b\u6575\u306e\u88ab\u30c0\u30e1\u30fc\u30b8+10%\uff08\u524d\u885b\u306e\u307f\uff09(id=26, slot=\u523b\u5370) type=1006 p=[-10, 0, 0] cond=GiveTalent(1)
+
+VERDICT: MATCH

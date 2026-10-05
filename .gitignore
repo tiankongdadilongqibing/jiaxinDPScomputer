@@ -76,6 +76,7 @@
 !/_dpsm_work/acceptance_rf5h/
 !/_dpsm_work/acceptance_r38/
 !/_dpsm_work/acceptance_r41/
+!/_dpsm_work/acceptance_r52/
 
 # Derived, multi-MB analysis outputs inside a batch archive. They are reproducible from the frozen
 # snapshot by the tracked tools, so the archive keeps its EVIDENCE (RESULTS.md, corpus_manifest.json,

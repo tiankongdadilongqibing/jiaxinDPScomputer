@@ -54,6 +54,9 @@ public static class ContributionSession
 					AttackerKey = e.AttackerKey,
 					// CalcBreakdown is a struct: a hit that never got a chain has Valid == false.
 					HasCalc = e.Calc.Valid,
+					// R52: the victim rides along for the unresolved census only.
+					Victim = e.Victim ?? "",
+					VictimKey = e.VictimKey,
 				};
 				if (h.HasCalc && useFolds && e.Calc.Fold != null)
 				{
@@ -119,6 +122,19 @@ public static class ContributionSession
 						if (r == null) continue;
 						if (r.Id != 0) ca.AbilityIds.Add(r.Id);
 						if (!string.IsNullOrEmpty(r.Name)) ca.AbilityNames.Add(r.Name);
+						// R52: the GRANT channel of this ability's talents, as "<type>/<param>". This is
+						// the loadout-side evidence for "who could have handed the victim that modifier",
+						// read from the same roster the export writes -- no new game read, no new hook.
+						for (int k = 0; k < r.Talents.Count; k++)
+						{
+							TalentRef tr = r.Talents[k];
+							if (tr == null) continue;
+							string cond = tr.Cond ?? "";
+							if (cond.IndexOf("GiveTalent", System.StringComparison.Ordinal) < 0) continue;
+							string g = tr.Type.ToString(System.Globalization.CultureInfo.InvariantCulture)
+								+ "/" + tr.P0.ToString(System.Globalization.CultureInfo.InvariantCulture);
+							if (!ca.Grants.Contains(g)) ca.Grants.Add(g);
+						}
 					}
 				if (a.TalentTable != null)
 					for (int j = 0; j < a.TalentTable.Count; j++)

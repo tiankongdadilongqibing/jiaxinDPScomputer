@@ -4,10 +4,12 @@
   "_dpsm_work/archive_index.py": {
    "evidence": "RF7d: wired into n0_acceptance (run + selftest); selftest tampers TEMP copies only",
    "expected_exit": "0 clean / 1 findings",
+   "has_selftest": true,
    "imports_local": [],
    "in_pipeline": true,
    "input_versions": "none (reads the evidence trees)",
    "kind": "cli",
+   "lines": 163,
    "outputs": [
     "archive-index.json",
     "ARCHIVE-INDEX.md"
@@ -27,6 +29,22 @@
    "outputs": [],
    "purpose": "atkadd sensitivity study (N4/P1), read-only and offline.",
    "status": "indexed"
+  },
+  "_dpsm_work/attribution_census.py": {
+   "evidence": "R52: wired into n0_acceptance (--selftest, temp fixtures only); it is the offline half of the evidence-extraction flow",
+   "expected_exit": "0 pass / 1 mismatch or unusable input / 3 no contribution section",
+   "has_selftest": true,
+   "imports_local": [],
+   "in_pipeline": true,
+   "input_versions": "a battle export with a contribution section (BepInEx/plugins/DpsMeter/exports/battle_*.json)",
+   "kind": "cli",
+   "lines": 491,
+   "outputs": [
+    "attribution_census_report.txt",
+    "--json <path> (reasons, unresolved groups, carrier verdicts)"
+   ],
+   "purpose": "R52: recompute an export's unattributed split with the pinned offline core, diff it field by field against the plugin's own contribution section, and report every unresolved fold group (reason/kind/origin/label/factor/victim) with the loadout-side carrier verdict for the granted channel.",
+   "status": "active"
   },
   "_dpsm_work/batch_snapshot.py": {
    "evidence": "RF7e: named twice in the current docs; it is how batch_inputs/rf0 was made; nobody imports it",
@@ -66,7 +84,7 @@
    "in_pipeline": true,
    "input_versions": "导出语料(冻结快照)",
    "kind": "guard",
-   "lines": 349,
+   "lines": 446,
    "outputs": [
     "none (read-only over exports)"
    ],
@@ -81,7 +99,7 @@
    "in_pipeline": true,
    "input_versions": "当前文档集 + applicability.json + 冻结导出",
    "kind": "guard",
-   "lines": 430,
+   "lines": 457,
    "outputs": [
     "none (read-only)"
    ],
@@ -96,7 +114,7 @@
    "in_pipeline": true,
    "input_versions": "当前 41 份文档",
    "kind": "guard",
-   "lines": 152,
+   "lines": 194,
    "outputs": [
     "none (read-only)"
    ],
@@ -190,7 +208,7 @@
    "in_pipeline": true,
    "input_versions": "tool_registry.json + 验收流水线 + 源码",
    "kind": "guard",
-   "lines": 233,
+   "lines": 376,
    "outputs": [
     "TOOL-REGISTRY.md(--write)"
    ],
@@ -1024,6 +1042,23 @@
    "purpose": "madnessRatio field",
    "status": "indexed"
   },
+  "_dpsm_work/extract_verify.py": {
+   "evidence": "R52: wired into n0_acceptance (--selftest, synthetic bundles in a temp dir); it is the checker of the flow's own output",
+   "expected_exit": "0 pass (warnings allowed) / 1 mismatch or corruption / 3 a required file is absent",
+   "has_selftest": true,
+   "imports_local": [
+    "_dpsm_work/attribution_census.py"
+   ],
+   "in_pipeline": true,
+   "input_versions": "one evidence bundle written by the plugin under BepInEx/plugins/DpsMeter/extract/extract_*/",
+   "kind": "cli",
+   "lines": 394,
+   "outputs": [
+    "extract_verify_report.txt"
+   ],
+   "purpose": "R52: verify one evidence bundle -- every manifest checksum and size, the manifest's census summary against the census file, the census file against an independent recomputation of the bundle's own battle.json, and the carrier verdicts against the same recomputation; report whether the deployed assembly still matches the one the bundle names.",
+   "status": "active"
+  },
   "_dpsm_work/identity_map.py": {
    "evidence": "RF7i: imported by the active _dpsm_work/contrib/compare.py, so it is inside the liveness closure; purpose from its own docstring",
    "expected_exit": "0 ok / 1 findings",
@@ -1060,7 +1095,7 @@
    "in_pipeline": false,
    "input_versions": "",
    "kind": "cli",
-   "lines": 715,
+   "lines": 726,
    "outputs": [
     "acceptance archive under --out (RESULTS.md, runs.json, corpus_manifest.json)"
    ],
@@ -1211,7 +1246,7 @@
    "in_pipeline": false,
    "input_versions": "",
    "kind": "cli",
-   "lines": 359,
+   "lines": 612,
    "outputs": [
     "stdout mutation report (no files written)"
    ],
@@ -1239,7 +1274,7 @@
    "in_pipeline": false,
    "input_versions": "仓库源码(不含 obj/bin/acceptance)",
    "kind": "census",
-   "lines": 194,
+   "lines": 227,
    "outputs": [
     "tool_registry.json(--seed)"
    ],
@@ -1326,7 +1361,7 @@
    "kind": "input",
    "lines": 164,
    "outputs": [],
-   "purpose": "",
+   "purpose": "DpsMeter per-character contribution analyzer (Stage 0, 2026-10-03).",
    "status": "referenced-input"
   }
  },

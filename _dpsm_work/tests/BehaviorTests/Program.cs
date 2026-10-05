@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 709;
+	public const int ExpectedCases = 794;
 
 	private static int Main(string[] args)
 	{
@@ -62,6 +62,9 @@ internal static class Program
 		Cases.DisplayFormatWholeCases(r);
 		// Round 41: the cache decisions (1s throttle, F9 generation).
 		Cases.CacheGenerationCases(r);
+		// R52: the evidence-extraction flow (trigger key, bundle name, retention) and the unresolved-fold
+		// census the bundle carries.
+		Cases.ExtractionCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
