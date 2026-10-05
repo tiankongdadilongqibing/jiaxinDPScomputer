@@ -356,6 +356,19 @@ public static class Contribution
 			if (holders != null && holders.Count == 1) { reason = "global_name_unique"; return holders[0]; }
 			reason = "global_ambiguous"; return null;
 		}
+		if (f.Kind == "given")
+		{
+			// R54 (user request): the granted 「阻挡增伤」 family gets its OWN reason instead of being mixed into
+			// unknown_kind, so the residual can be read as "this much is that one channel, and here is how close
+			// we are to naming its provider". STILL UNATTRIBUTED on purpose -- this is a label, not a credit.
+			// The holder set comes from the same roster index the census uses, so the two cannot disagree.
+			List<ContributionActor> holders = null;
+			string gk = GrantKeyOf(f.Origin);
+			if (gk != null) ix.ByGrant.TryGetValue(gk, out holders);
+			if (holders == null || holders.Count == 0) { reason = "given_carrier_none"; return null; }
+			if (holders.Count == 1) { reason = "given_carrier_one"; return null; }
+			reason = "given_carrier_ambiguous"; return null;
+		}
 		reason = "unknown_kind"; return null;
 	}
 
@@ -387,7 +400,11 @@ public static class Contribution
 		a.VictimKeys.Add(hit.VictimKey);
 		// The carrier verdict answers a DIFFERENT question ("who could have granted it") and only the
 		// granted channel has one. Computed once per group, from the same index the ladder uses.
-		if (a.CarrierVerdict.Length == 0 && reason == "unknown_kind")
+		// R54: the carrier verdict belongs to the GRANTED channel's PROVIDER-UNKNOWN case, whatever code that
+		// case got -- the old condition keyed on the reason (unknown_kind), which the split renamed out from
+		// under it. A fold that DID carry a byUnit (and failed the NAME lookup instead) is out of scope, so the
+		// probe keeps its original meaning: it answers the runtime silent case, not the name-mismatch case.
+		if (a.CarrierVerdict.Length == 0 && string.IsNullOrEmpty(f.ByUnit) && GrantKeyOf(f.Origin) != null)
 		{
 			string gk = GrantKeyOf(f.Origin);
 			if (gk != null)

@@ -36,6 +36,20 @@ internal static class GiveApplierProbe
 	internal static int LookupHits;
 	internal static int LookupMisses;
 
+	// ---- R54: the EXACT (target, modifier) map -----------------------------------------------------------------
+	// WHY IT EXISTS. The legacy map above is keyed by TARGET NAME ONLY, so its answer means "who last gave this
+	// target ANYTHING". MEASURED 2026-10-05 on battle_411001_20261005_135533: the granted rule
+	// 被伤害+10%(赋予) (6,705,889.97) was credited to イグナ, whose only granted modifier is 80/5 (バルザイの
+	// 偃月刀 id=10120), while the roster's holders of 1006/-10 are エヴァラス・フラウ and チェイシィ. The legacy
+	// answer is therefore counted and REJECTED for attribution; only an exact (target,type/param) match credits.
+	internal static int GrantKeyReads;
+	internal static int GrantKeyErrors;
+	internal static int ExactHits;
+	internal static int ExactMisses;
+	/// <summary>Lookups where NO exact key matched but the legacy target-only map WOULD have answered: the
+	/// measured size of the wrong answers the old route produced.</summary>
+	internal static int TargetOnlyRejected;
+
 	internal struct Row
 	{
 		internal double T;
@@ -46,6 +60,9 @@ internal static class GiveApplierProbe
 
 	private static readonly List<Row> _rows = new List<Row>(64);
 	private static readonly Dictionary<string, string> _giver = new Dictionary<string, string>();
+	/// <summary>Key = targetName + "|" + type + "/" + param. The exact identity, which is what a granted
+	/// fold asks about.</summary>
+	private static readonly Dictionary<string, string> _giverMod = new Dictionary<string, string>();
 
 	internal static void Note(string kind, BattleObject owner, BattleObject guest)
 	{
@@ -71,11 +88,18 @@ internal static class GiveApplierProbe
 				_rows.Add(r);
 			}
 			else RowsDropped++;
+			string mod = null;
+			if (g != null)
+			{
+				try { mod = NewestGrantKey(guest); }
+				catch { GrantKeyErrors++; }
+			}
 			if (g != null)
 			{
 				string prev;
 				if (_giver.TryGetValue(g, out prev) && prev != null && o != null && prev != o) MultiGiver++;
 				_giver[g] = o;
+				if (mod != null) _giverMod[g + "|" + mod] = o;
 			}
 			Recorded++;
 		}
@@ -83,7 +107,9 @@ internal static class GiveApplierProbe
 	}
 
 	/// <summary>The unit that most recently granted something to `targetName`; null when never seen.
-	/// The lookup is counted so "the hook never fired" and "the hook fired but the map missed" differ.</summary>
+	/// The lookup is counted so "the hook never fired" and "the hook fired but the map missed" differ.
+	/// R54: this is EVIDENCE ONLY -- it cannot say WHICH modifier was granted, so it must not be used to
+	/// attribute a fold. Use <see cref="LastGiverExact"/> for that.</summary>
 	internal static string LastGiver(string targetName)
 	{
 		if (targetName == null) { LookupMisses++; return null; }
@@ -93,6 +119,60 @@ internal static class GiveApplierProbe
 		return null;
 	}
 
+	/// <summary>
+	/// The unit that granted THIS modifier (type/param) to `targetName`; null when that exact pair was never
+	/// recorded. Only an exact match may credit a granted fold (R54); the legacy target-only answer is counted
+	/// as <see cref="TargetOnlyRejected"/> so the size of the old wrong answers stays measurable.
+	/// </summary>
+	internal static string LastGiverExact(string targetName, int type, int param)
+	{
+		if (targetName == null)
+		{
+			ExactMisses++;
+			return null;
+		}
+		string key = targetName + "|" + type + "/" + param;
+		string v;
+		if (_giverMod.TryGetValue(key, out v) && v != null) { ExactHits++; return v; }
+		ExactMisses++;
+		string legacy;
+		if (_giver.TryGetValue(targetName, out legacy) && legacy != null) TargetOnlyRejected++;
+		return null;
+	}
+
+	/// <summary>The (type/param) of the grant just applied to `guest`, read from the TARGET's own give list.
+	/// The hook is a POSTFIX, so the entry exists by the time this runs -- the same assumption the per-hit
+	/// given fold already relies on. Every read is individually guarded and the failures are counted.</summary>
+	private static string NewestGrantKey(BattleObject guest)
+	{
+		if (GameRef.IsNull(guest)) return null;
+		var list = guest.m_giveTalentData;
+		if (list == null) return null;
+		string best = null;
+		int n = list.Count;
+		if (n > 64) n = 64;
+		for (int i = 0; i < n; i++)
+		{
+			try
+			{
+				var gd = list[i];
+				if (gd == null) continue;
+				if (gd.isDeleted) continue;
+				var t = gd.talent;
+				if (t == null) { try { t = gd.original; } catch { } }
+				if (t == null) continue;
+				var td = t.TalentData;
+				if (td == null) continue;
+				int ty = (int)td.TalentType;
+				int v = td.GetParam(0);
+				best = ty + "/" + v;
+				GrantKeyReads++;
+			}
+			catch { GrantKeyErrors++; }
+		}
+		return best;
+	}
+
 	internal static void Reset()
 	{
 		_rows.Clear();
@@ -100,6 +180,8 @@ internal static class GiveApplierProbe
 		HookCalls.Clear();
 		Recorded = 0; NullOwner = 0; NullGuest = 0; Errors = 0; RowsDropped = 0; MultiGiver = 0;
 		LookupHits = 0; LookupMisses = 0;
+		_giverMod.Clear();
+		GrantKeyReads = 0; GrantKeyErrors = 0; ExactHits = 0; ExactMisses = 0; TargetOnlyRejected = 0;
 	}
 
 	internal static string Summary()
@@ -135,6 +217,12 @@ internal static class GiveApplierProbe
 		  .Append(",\"multiGiver\":").Append(MultiGiver)
 		  .Append(",\"lookupHits\":").Append(LookupHits)
 		  .Append(",\"lookupMisses\":").Append(LookupMisses)
+		  // R54: the exact route and the size of the answer it rejected.
+		  .Append(",\"exactHits\":").Append(ExactHits)
+		  .Append(",\"exactMisses\":").Append(ExactMisses)
+		  .Append(",\"targetOnlyRejected\":").Append(TargetOnlyRejected)
+		  .Append(",\"grantKeyReads\":").Append(GrantKeyReads)
+		  .Append(",\"grantKeyErrors\":").Append(GrantKeyErrors)
 		  .Append(",\"rows\":[");
 		for (int i = 0; i < _rows.Count; i++)
 		{

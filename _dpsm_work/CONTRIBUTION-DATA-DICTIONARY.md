@@ -188,10 +188,20 @@ credited **412%**、unattributed **−312%**,即负贡献)。因此**规则:因�
 | 7 | text/talent:无 abilityId 或无持有者 | `attacker_default` | 攻击者(名称回退) |
 | 8 | global:label 的 `[规则名]` 在我方唯一命中 | `global_name_unique` | 该持有者 |
 | 9 | global:0 名或 ≥2 名持有者 / label 无方括号 | `global_ambiguous` | 未归因 |
+| 9a | **given**:名册里没有能授予该 `type/param` 的持有者 | `given_carrier_none` | 未归因(「阻挡增伤」家族) |
+| 9b | **given**:恰好 1 名持有者 | `given_carrier_one` | 未归因(候选唯一,但仍未确认) |
+| 9c | **given**:≥2 名持有者 | `given_carrier_ambiguous` | 未归因(真歧义) |
 | 10 | 其它 kind | `unknown_kind` | 未归因 |
 | 11 | 因子 ≤ 0(如 ×0.0 的 100% 减伤) | `zero_factor` | 不计入 M,整击归基础(附诊断) |
 | 12 | 因子 = 1 | `noop_factor` | 份额 0 |
 | 13 | 0 < 因子 < 1(减伤 / 试炼场 ×0.03) | `sub_unity_factor` | 不计入 M,整击归基础(附诊断) |
+
+**「阻挡增伤」为什么单独三个码(R54,用户要求)**:given 通道(= 别人**授予**给受击方的被伤害修正,典型是刻印 id=26
+「ブロックしている敵の被ダメージ+10%」)的失败**不是"种类未知"**,而是"这条已知规则的**提供者**没确认"。把它并进
+`unknown_kind` 会让读者把"一条已知规则缺提供者"误读成"一堆没见过的规则"。所以按**名册侧证据的强弱**分成三码
+(none / one / ambiguous),**都仍然不归因**:码只是告诉读者离答案有多近。运行时那条路(授予钩子)只有**精确**
+(target, type/param) 命中才允许给信用——实测 2026-10-05(第三场)旧版只按目标名做键,把 6,705,889.97 记给了
+一个**不可能授予该规则**的单位;那条旧答案现在只计数(`givenApplies.targetOnlyRejected`)、不再用于归属。
 
 **byUnit 的歧义处理(阶段 C)**:byUnit 是**角色名**,必须先映射成我方 key。
 若该名字在我方存在**两个及以上**同名 actor(同队同名召唤物),返回 `byUnit_ambiguous` 并进未归因,

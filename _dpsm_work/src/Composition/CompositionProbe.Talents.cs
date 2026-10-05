@@ -512,7 +512,10 @@ public static partial class CompositionProbe
 					string byUnit = null;
 					try
 					{
-						byUnit = GiveApplierProbe.LastGiver(Aggregator.NameOf(bo));
+						// R54: EXACT (target, modifier) match only. The legacy target-only map answers "who last
+						// gave this target ANYTHING", which is a different question; it is still counted inside
+						// GiveApplierProbe.TargetOnlyRejected as the evidence for refusing it. See LastGiverExact.
+						byUnit = GiveApplierProbe.LastGiverExact(Aggregator.NameOf(bo), wantType, v);
 						if (measure) { if (byUnit != null) GiverResolved++; else GiverNull++; }
 					}
 					catch { if (measure) GiverErrors++; }

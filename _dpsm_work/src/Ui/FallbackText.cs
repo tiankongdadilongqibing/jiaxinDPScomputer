@@ -43,4 +43,38 @@ internal static class FallbackText
 		     + "   未归因 " + DisplayFormat.Fmt(unattributed) + "(" + DisplayFormat.Pct(unattrPct) + ")"
 		     + "   命中 " + DisplayFormat.Fmt(hits);
 	}
+
+	/// <summary>
+	/// R54 (user request): the Chinese label of ONE unattributed reason. ONE table for both renderers, so the
+	/// panel and the fallback can never name the same reason differently.
+	///
+	/// WHY THE GRANTED FAMILY IS SEPARATE. 「阻挡增伤」 (the granted 被伤害 modifiers) is the channel whose
+	/// PROVIDER is unresolved -- it is a named rule with a missing owner, not an unknown kind of rule. Printing
+	/// it inside one anonymous 未归因 total is what made the user misread a 4.2% residual as "something
+	/// unexplained" (2026-10-05). MEASURED the same day: the granted channel produced 0-5,862 unresolved folds
+	/// depending on whether the giver probe happened to answer, so the family has to be visible on its own.
+	/// </summary>
+	public static string UnattributedReasonLabel(string reason)
+	{
+		switch (reason)
+		{
+			case "given_carrier_ambiguous": return "阻挡增伤(多个候选,未确认)";
+			case "given_carrier_one":       return "阻挡增伤(唯一候选,未确认)";
+			case "given_carrier_none":      return "阻挡增伤(无可读候选)";
+			case "byUnit_unknown":          return "提供者名称不可识别";
+			case "byUnit_ambiguous":        return "提供者同名歧义";
+			case "byUnit_outside":          return "提供者在队伍之外";
+			case "ambiguous_multi_holder":  return "技能持有者歧义";
+			case "global_ambiguous":        return "全局规则持有者歧义";
+			case "unknown_kind":            return "种类未识别";
+			default: return reason ?? "";
+		}
+	}
+
+	/// <summary>R54: one line per unresolved reason, so the residual reads as families instead of a total.</summary>
+	public static string UnattributedBreakdownLine(string reason, double amount, int folds)
+	{
+		return "    " + UnattributedReasonLabel(reason) + " " + DisplayFormat.Fmt(amount)
+		     + "  " + DisplayFormat.Num(folds) + " 折";
+	}
 }

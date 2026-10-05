@@ -12,12 +12,17 @@ REASON_CODES = (
     "byUnit", "byUnit_outside", "byUnit_ambiguous", "byUnit_unknown",
     "ability_holder_unique", "ability_holder_attacker", "ambiguous_multi_holder",
     "attacker_default", "global_name_unique", "global_ambiguous",
+    # R54: the GRANTED channel ("阻挡增伤") got its own codes instead of being mixed into unknown_kind. They are
+    # still UNATTRIBUTED -- the difference is what the reader is told: how close we are to naming the provider.
+    "given_carrier_none", "given_carrier_one", "given_carrier_ambiguous",
     "unknown_kind", "zero_factor", "noop_factor",
 )
 RESOLVED_REASONS = ("byUnit", "ability_holder_unique", "ability_holder_attacker",
                     "attacker_default", "global_name_unique")
 UNRESOLVED_REASONS = ("byUnit_outside", "byUnit_ambiguous", "byUnit_unknown",
-                      "ambiguous_multi_holder", "global_ambiguous", "unknown_kind")
+                      "ambiguous_multi_holder", "global_ambiguous",
+                      "given_carrier_none", "given_carrier_one", "given_carrier_ambiguous",
+                      "unknown_kind")
 # Reasons whose owner was decided through a character name (Phase C bookkeeping).
 NAME_BASED_REASONS = ("byUnit", "ability_holder_unique", "ability_holder_attacker",
                       "attacker_default", "global_name_unique")

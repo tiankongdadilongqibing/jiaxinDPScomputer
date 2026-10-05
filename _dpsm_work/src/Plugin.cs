@@ -396,7 +396,9 @@ public class Plugin : BasePlugin
 		{
 			OverlayUGUI.Create();
 		}
-		LogSource.LogInfo("[DpsMeter] DpsMeter " + BuildInfo.Version + " loaded. F8 show/hide, F9 reset, F10 roster/chart, F11 both-side chart.");
+		LogSource.LogInfo("[DpsMeter] DpsMeter " + BuildInfo.Version + " loaded. F8 show/hide, F9 reset, F10 roster/chart, F11 both-side chart, "
+				+ (ExtractPolicy.DescribeKey(ExtractPolicy.ParseVirtualKey(CfgExtractKey == null ? null : CfgExtractKey.Value)))
+				+ " = evidence bundle (ExtractOnBattleEnd=" + (CfgExtractOnBattleEnd != null && CfgExtractOnBattleEnd.Value ? "on" : "off") + ").");
 		RuntimeLog.Write("[DpsMeter] Load complete.");
 		RuntimeLog.Flush();
 		DumpEnums();

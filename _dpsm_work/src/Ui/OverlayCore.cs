@@ -121,7 +121,7 @@ public static class OverlayCore
 		BattleSession session = Aggregator.Session;
 		if (session == null || !session.InBattle)
 		{
-			GUILayout.Label("未在战斗中  F8 显示/隐藏  F9 重置");
+			GUILayout.Label("未在战斗中  F8 显示/隐藏  F9 重置  F4 证据包");
 			_desiredHeight = 64f;
 			if (Aggregator.History.Count > 0) DrawHistoryMini(Aggregator.History[0]);
 			return;

@@ -469,6 +469,17 @@ public static partial class OverlayUGUI
 			Text = "  未归因 " + DisplayFormat.Fmt(res.Stats.Unattributed) + "(" + DisplayFormat.Pct(unattrPct) + ")  未计入任何角色",
 			Color = DimColor, Height = 15f,
 		});
+		// R54 (user request): name the families INSIDE the residual. The granted 「阻挡增伤」 channel is the one
+		// whose provider is unresolved, and reading it as part of one anonymous total is exactly what misled.
+		for (int ui = 0; ui < res.Unattributed.Count; ui++)
+		{
+			ContributionUnattributedRow ua = res.Unattributed[ui];
+			rows.Add(new RowDef
+			{
+				Text = FallbackText.UnattributedBreakdownLine(ua.Reason, ua.Amount, ua.Folds),
+				Color = WarnColor, Height = 15f,
+			});
+		}
 		rows.Add(new RowDef
 		{
 			Text = "  (* = 使魔)  可分析伤害 " + DisplayFormat.Fmt(res.Stats.Analyzable) + "   倍率池 " + DisplayFormat.Fmt(res.Stats.PoolTotal)
@@ -913,7 +924,7 @@ public static partial class OverlayUGUI
 		// ---- roster ----
 		if (!inBattle)
 		{
-			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献", Color = HeaderColor, Height = 20f });
+			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F4 证据包", Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = "下方显示上一场记录;F10 可查看上一场曲线", Color = DimColor, Height = 16f });
 			if (Aggregator.History.Count > 0) AppendSummaryRows(rows, Aggregator.History[0], Plugin.CfgShowEnemies.Value);
 			return rows;
@@ -926,7 +937,7 @@ public static partial class OverlayUGUI
 			else enemyDealt += a.DamageDealt;
 		}
 		double secs = Math.Max(1.0, session.ActiveSeconds);
-		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献", Color = HeaderColor, Height = 20f });
+		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F4证据包", Color = HeaderColor, Height = 20f });
 		rows.Add(new RowDef { Text = $"我方总伤害 {allyDealt:N0}   秒伤 {(long)(allyDealt / secs):N0}   受击 {allyTaken:N0}   受回复 {allyHeal:N0}", Color = NeutralColor, Height = 18f });
 		if (allyFriendly > 0)
 			rows.Add(new RowDef
@@ -1106,6 +1117,16 @@ public static partial class OverlayUGUI
 			Text = "  合计 " + DisplayFormat.Fmt(res.Stats.Attributed) + "   未归因 " + DisplayFormat.Fmt(res.Stats.Unattributed) + "(" + DisplayFormat.Pct(unattrPct) + ")   命中 " + DisplayFormat.Num(res.Stats.Hits) + "   倍率池 " + DisplayFormat.Fmt(res.Stats.PoolTotal),
 			Color = NeutralColor, Height = 16f,
 		});
+		// R54 (user request): the families inside the residual, named -- see FallbackText.UnattributedReasonLabel.
+		for (int ub = 0; ub < res.Unattributed.Count; ub++)
+		{
+			ContributionUnattributedRow ua = res.Unattributed[ub];
+			rows.Add(new RowDef
+			{
+				Text = FallbackText.UnattributedBreakdownLine(ua.Reason, ua.Amount, ua.Folds),
+				Color = WarnColor, Height = 15f,
+			});
+		}
 		if (res.Rules.Count > 0)
 		{
 			var sb = new System.Text.StringBuilder();

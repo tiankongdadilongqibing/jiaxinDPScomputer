@@ -100,7 +100,8 @@ internal static partial class Cases
 		ContributionResult res = Contribution.Compute(hits, team, 1);
 		r.Eq("an-unresolved-given-fold-produces-one-census-row", res.Unresolved.Count, 1);
 		ContributionUnresolvedRow row = res.Unresolved[0];
-		r.Str("the-reason-is-unknown_kind", row.Reason, "unknown_kind");
+		// R54: the granted channel is no longer called unknown_kind -- it has its own code.
+		r.Str("the-reason-is-the-granted-channels-own-code", row.Reason, "given_carrier_none");
 		r.Str("the-kind-is-carried", row.Kind, "given");
 		r.Str("the-origin-is-carried", row.Origin, "given#4/1006/-10");
 		r.Str("the-factor-is-carried-exactly", row.Factor.ToString("R"), 1.1.ToString("R"));
@@ -113,7 +114,7 @@ internal static partial class Cases
 		// THE credit must not move: the census is a report, not a decision.
 		r.EqD("the-census-does-not-change-the-unattributed-amount", res.Stats.Unattributed, 100.0);
 		r.EqD("nor-the-credited-amount", res.Stats.Attributed, 1000.0);
-		r.Str("the-unattributed-reason-is-still-unknown_kind", res.Unattributed[0].Reason, "unknown_kind");
+		r.Str("and-the-exported-reason-is-the-same-code", res.Unattributed[0].Reason, "given_carrier_none");
 
 		// a unique holding actor -> the loadout route is determinate (but still only reported)
 		team = new List<ContributionActor>
@@ -270,6 +271,53 @@ internal static partial class Cases
 		};
 		res = Contribution.Compute(hits, team, 1);
 		r.Str("the-rule-name-uses-the-bracketed-text", res.Unresolved[0].RuleName, "刻印");
+
+		// ---------------------------------------------------------------------------------------------
+		// R54 (user request): the granted 「阻挡增伤」 family must be readable as its own thing instead of
+		// being mixed into one anonymous unattributed total. The three codes still mean UNATTRIBUTED -- what
+		// they add is how close the roster-side evidence is to naming the provider.
+		r.Group("extract/given-reasons");
+		var baseTeam = new List<ContributionActor> { CensusActor(2, "A", 1), CensusActor(1, "BOSS", 2) };
+		var givenHit = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1)),
+		};
+		var noHolder = Contribution.Compute(givenHit, baseTeam, 1);
+		r.Str("no-roster-holder-says-given_carrier_none", noHolder.Unattributed[0].Reason, "given_carrier_none");
+		var oneHolder = Contribution.Compute(givenHit, new List<ContributionActor>
+		{
+			CensusActor(2, "A", 1), CensusActor(9, "GIVER", 1, "1006/-10"), CensusActor(1, "BOSS", 2),
+		}, 1);
+		r.Str("one-roster-holder-says-given_carrier_one", oneHolder.Unattributed[0].Reason, "given_carrier_one");
+		var twoHolders = Contribution.Compute(givenHit, new List<ContributionActor>
+		{
+			CensusActor(2, "A", 1), CensusActor(9, "GIVER", 1, "1006/-10"),
+			CensusActor(3, "GIVER2", 1, "1006/-10"), CensusActor(1, "BOSS", 2),
+		}, 1);
+		r.Str("two-roster-holders-say-given_carrier_ambiguous", twoHolders.Unattributed[0].Reason,
+		      "given_carrier_ambiguous");
+		r.EqD("and-the-split-still-moves-NOTHING (none)", noHolder.Stats.Unattributed, 100.0);
+		r.EqD("and-the-split-still-moves-NOTHING (one)", oneHolder.Stats.Unattributed, 100.0);
+		r.EqD("and-the-split-still-moves-NOTHING (ambiguous)", twoHolders.Stats.Unattributed, 100.0);
+		r.EqD("the-attacker-keeps-only-the-base", twoHolders.Stats.Attributed, 1000.0);
+		var madness = Contribution.Compute(new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("madness", "vicmadness#150", 1.5)),
+		}, baseTeam, 1);
+		r.Str("a-NON-granted-channel-still-says-unknown_kind", madness.Unattributed[0].Reason, "unknown_kind");
+
+		r.Group("extract/reason-labels");
+		r.Str("the-granted-family-is-named-as-blocking-damage-increase",
+		      FallbackText.UnattributedReasonLabel("given_carrier_ambiguous"), "阻挡增伤(多个候选,未确认)");
+		r.Str("the-one-candidate-case-says-so", FallbackText.UnattributedReasonLabel("given_carrier_one"),
+		      "阻挡增伤(唯一候选,未确认)");
+		r.Str("the-generic-residual-keeps-its-own-label", FallbackText.UnattributedReasonLabel("unknown_kind"),
+		      "种类未识别");
+		r.Str("an-unknown-code-is-printed-as-is", FallbackText.UnattributedReasonLabel("some_future_code"),
+		      "some_future_code");
+		r.Str("the-breakdown-line-names-the-family-amount-and-folds",
+		      FallbackText.UnattributedBreakdownLine("given_carrier_one", 1234567.0, 42),
+		      "    阻挡增伤(唯一候选,未确认) 1,234,567  42 折");
 
 		// ---------------------------------------------------------------------------------------------
 		// R52c: which source an extraction run may use. The point of the group is the PRIORITY, not the

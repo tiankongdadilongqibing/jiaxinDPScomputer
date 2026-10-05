@@ -216,8 +216,31 @@ def carrier_verdict(origin, grants):
 # 3. compare, and render
 # ---------------------------------------------------------------------------------------------
 
+# R54: the granted channel's codes. A file written BEFORE that split labels those folds "unknown_kind",
+# so the recomputed side is normalised into the FILE's vocabulary when the file carries none of them --
+# otherwise every older export would look like a mismatch that is really a renamed bucket.
+NEW_GIVEN_CODES = ("given_carrier_one", "given_carrier_ambiguous", "given_carrier_none")
+
+
+def vocabulary_is_legacy(sec):
+    """True when the file's own section predates the granted-channel split."""
+    file_codes = set(sec["reasonCounts"].keys()) | set(sec["unattributed"].keys())
+    return not any(c in file_codes for c in NEW_GIVEN_CODES)
+
+
+def normalise_vocabulary(reasons, sec):
+    if not vocabulary_is_legacy(sec):
+        return reasons
+    out = {}
+    for r, v in reasons.items():
+        out["unknown_kind" if r in NEW_GIVEN_CODES else r] = v
+    return out
+
+
 def compare(cen, sec):
     problems = []
+    cen = dict(cen)
+    cen["reasons"] = normalise_vocabulary(cen["reasons"], sec)
     for reason, (amount, folds) in sorted(sec["unattributed"].items()):
         got = cen["reasons"].get(reason)
         if got is None:
@@ -376,6 +399,19 @@ def selftest():
         if rc != EXIT_MISSING:
             fails.append("missing section did not return DATA_MISSING (exit=%s)" % rc)
         # 6) carrier verdicts: unique / ambiguous / none
+        # R54: a file that already uses the new vocabulary must NOT be normalised away
+        p = os.path.join(tmp, "new_vocab.json")
+        _fixture(p, [fold], {"reason": "given_carrier_none", "amount": round(amt, 4), "folds": 1,
+                             "counts": {"given_carrier_none": 1}})
+        rc, _ = run(p, report=os.path.join(tmp, "new_vocab.txt"))
+        if rc != EXIT_PASS:
+            fails.append("a new-vocabulary fixture did not PASS (exit=%s)" % rc)
+        p = os.path.join(tmp, "new_vocab_bad.json")
+        _fixture(p, [fold], {"reason": "given_carrier_one", "amount": round(amt, 4), "folds": 1,
+                             "counts": {"given_carrier_one": 1}})
+        rc, _ = run(p, report=os.path.join(tmp, "new_vocab_bad.txt"))
+        if rc != EXIT_ERROR:
+            fails.append("a tampered new-vocabulary fixture did not FAIL (exit=%s)" % rc)
         g = {"1006/-10": [loader.ActorRef(key=9, name="X", team=1)]}
         v, c = carrier_verdict("given#4/1006/-10", g)
         if v != "unique" or len(c) != 1:
@@ -401,7 +437,7 @@ def selftest():
         shutil.rmtree(tmp, ignore_errors=True)
     for f in fails:
         print("SELFTEST FAIL: " + A(f))
-    print("SELFTEST %s (%d case(s))" % ("PASS" if not fails else "FAIL", 7))
+    print("SELFTEST %s (%d case(s))" % ("PASS" if not fails else "FAIL", 9))
     return EXIT_PASS if not fails else EXIT_ERROR
 
 
@@ -437,12 +473,18 @@ def run(path, report=DEFAULT_REPORT, json_out=None):
                                         if r in sec["reasonCounts"])))
     for reason, (amount, folds) in sorted(sec["unattributed"].items()):
         print("unattributed: %s amount=%.4f folds=%d" % (reason, amount, folds))
+    if vocabulary_is_legacy(sec):
+        print("note        : file uses the pre-R54 vocabulary; the given_carrier_* codes are compared as unknown_kind")
     ra = export.roster_audit or {}
     if ra:
-        print("given health: giveApplied=%s giverResolved=%s giverNull=%s hookTargets=%s lookupHits=%s"
+        ga = export.raw.get("givenApplies") or {}
+        print("given health: giveApplied=%s giverResolved(exact)=%s giverNull=%s hookTargets=%s lookupHits=%s"
               % (ra.get("giveApplied"), ra.get("giverResolved"), ra.get("giverNull"),
-                 (export.raw.get("givenApplies") or {}).get("targets"),
-                 (export.raw.get("givenApplies") or {}).get("lookupHits")))
+                 ga.get("targets"), ga.get("lookupHits")))
+        if "exactHits" in ga or "targetOnlyRejected" in ga:
+            print("given exact : exactHits=%s exactMisses=%s targetOnlyRejected=%s grantKeyReads=%s grantKeyErrors=%s"
+                  % (ga.get("exactHits"), ga.get("exactMisses"), ga.get("targetOnlyRejected"),
+                     ga.get("grantKeyReads"), ga.get("grantKeyErrors")))
     for row in cen["detail"][:8]:
         verdict, cand = carrier_verdict(row["origin"], grants)
         print("detail      : reason=%s kind=%s origin=%s factor=%s folds=%d amount=%.4f victims=%d verdict=%s(%d)"

@@ -17,6 +17,16 @@ def ability_id_of(origin):
     return int(m.group(1)) if m else None
 
 
+def grant_key_of(origin):
+    """R54: "given#4/1006/-10" -> "1006/-10" (the granted modifier's identity). None for any other channel,
+    so only the granted channel is probed."""
+    s = str(origin or "")
+    if not s.startswith("given#"):
+        return None
+    i = s.find("/")
+    return s[i + 1:] if 0 <= i < len(s) - 1 else None
+
+
 class OwnerIndex:
     """Stable-key-first owner index for one team.
 
@@ -32,6 +42,9 @@ class OwnerIndex:
         self.all_names = export.all_names()
         self.by_ability_id = {}    # ability id -> [ActorRef]
         self.by_ability_name = {}  # ability name -> [ActorRef]
+        # R54: "<type>/<param>" -> [ActorRef] for the team actors that HOLD a rule granting it. This is the
+        # same evidence Contribution.Index.ByGrant carries in C#, so the two cores decide alike.
+        self.by_grant = {}
         # actor rows are plain dicts in the export; keep raw rows for ability data
         self.raw_by_key = {}
         for row in (export.raw.get("actors") or []):
@@ -49,8 +62,16 @@ class OwnerIndex:
                     self.by_ability_id.setdefault(t["abilityId"], []).append(self.by_key[k])
                 if t.get("ability"):
                     self.by_ability_name.setdefault(t["ability"], []).append(self.by_key[k])
+            for ab in (row.get("abilities") or []):
+                for t in (ab.get("talents") or []):
+                    if "GiveTalent" not in str(t.get("cond") or ""):
+                        continue
+                    p = t.get("p") or []
+                    if not p:
+                        continue
+                    self.by_grant.setdefault("%s/%s" % (t.get("type"), p[0]), []).append(self.by_key[k])
         # de-duplicate holder lists (an actor can expose the same ability twice)
-        for d in (self.by_ability_id, self.by_ability_name):
+        for d in (self.by_ability_id, self.by_ability_name, self.by_grant):
             for k, refs in d.items():
                 uniq = {}
                 for r in refs:
@@ -93,6 +114,16 @@ class OwnerIndex:
             if len(holders) == 1:
                 return holders[0], "global_name_unique"
             return None, "global_ambiguous"
+        if kind == "given":
+            # R54: the granted 「阻挡增伤」 family. Still UNATTRIBUTED; the code only says how close the
+            # roster-side evidence is to naming the provider (none / one / several).
+            gk = grant_key_of(fold.origin)
+            holders = self.by_grant.get(gk, []) if gk else []
+            if not holders:
+                return None, "given_carrier_none"
+            if len(holders) == 1:
+                return None, "given_carrier_one"
+            return None, "given_carrier_ambiguous"
         return None, "unknown_kind"
 
     def reason_is_name_based(self, reason):

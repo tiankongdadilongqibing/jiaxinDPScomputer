@@ -1,0 +1,24 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_fact_signature.py --outdir acceptance_r54
+cap check: {"MaxClasses": 2400, "MaxLiveClasses": 900}
+======================================================================================================================
+FACT signature replay
+  file    battle_411001_20261005_135533.json
+  version 1.7.11   quest 411001   damage events 3927   replayable 3926
+  caps    {"MaxClasses": 2400, "MaxLiveClasses": 900}
+----------------------------------------------------------------------------------------------------------------------
+1.5.1 legacy key           distinct=1330   cap=600   kept=600   served=1659   overflow=2267   servedIfRanked=3196   singletons=732   maxHits=38     STARVED
+1.5.2 shipped key          distinct=145    cap=2400  kept=145   served=3926   overflow=0      servedIfRanked=3926   singletons=28    maxHits=742    OK 
+
+coverage: 1.5.1 legacy 1659/3926 (42.3%)   1.5.2 shipped 3926/3926 (100.0%)
+plugin bookkeeping: observed=3926  sum(facts.items[].hits)=3926  classes=145/2400
+  note: replay served (1659) counts only the 3926 exported events; the plugin counted 3926 Observe calls. Not expected to be equal.
+VERDICT: shipped key fits (headroom 2255 classes) and every consistency check holds.
+
+top 5 classes by hits (shipped key):
+   n=742   ('???????', 1, '????', 2, 0, 2, 1.392, 15, 150, 1, 1, None, ('?',))
+   n=386   ('???????', 1, '????', 2, 0, 2, 1.15, 15, 150, 1, 1, None, ('?',))
+   n=286   ('????', 1, '????', 2, 0, 3, 5.009, 20, 160, 1, 1, 250, ('?',))
+   n=263   ('???????', 1, '????', 2, 0, 2, 1.21, 15, 150, 1, 1, None, ())
+   n=200   ('????', 1, '????', 2, 0, 3, 4.14, 20, 160, 1, 1, 250, ('?',))
+report -> acceptance_r54\fact_signature.txt

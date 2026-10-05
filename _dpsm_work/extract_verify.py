@@ -158,6 +158,16 @@ def verify(bundle):
     export = loader.load(os.path.join(bundle, "battle.json"))
     rec = ac.census(export)
     sec = ac.plugin_section(export)
+    # R54: a bundle written before the granted-channel split labels those folds "unknown_kind". Compare in the
+    # bundle's OWN vocabulary when it carries none of the new codes -- otherwise every older bundle would look
+    # corrupt. The same helper the census tool uses, so the two cannot disagree about what "legacy" means.
+    legacy = bool(sec) and ac.vocabulary_is_legacy(sec)
+    if legacy:
+        warnings.append("battle.json uses the pre-R54 vocabulary; the given_carrier_* codes are compared as "
+                        "unknown_kind")
+
+    def norm(reason):
+        return "unknown_kind" if (legacy and reason in ac.NEW_GIVEN_CODES) else reason
     if sec is None:
         warnings.append("battle.json carries no contribution section (General/Contribution off?)")
     else:
@@ -170,18 +180,19 @@ def verify(bundle):
     if int(fa.get("total") or 0) != rec_folds:
         problems.append("foldAccounting.total: census=%s recompute=%d" % (fa.get("total"), rec_folds))
     got_reasons = dict((r.get("reason"), int(r.get("folds") or 0)) for r in (cen_file.get("reasons") or []))
+    rec_reasons = dict((norm(r), v) for r, v in rec["reasons"].items())
     for reason, folds in sorted(got_reasons.items()):
-        mine = int((rec["reasons"].get(reason) or [0, 0])[1])
+        mine = int((rec_reasons.get(reason) or [0, 0])[1])
         if mine != folds:
             problems.append("reason %s: census=%d recompute=%d" % (reason, folds, mine))
-    for reason, v in sorted(rec["reasons"].items()):
+    for reason, v in sorted(rec_reasons.items()):
         if reason not in got_reasons:
             problems.append("reason %s: recompute=%d folds but the census does not list it" % (reason, int(v[1])))
 
     # the census GROUPS, field by field
     mine = {}
     for row in rec["detail"]:
-        mine[(row["reason"], row["kind"], row["side"], row["origin"], row["label"])] = row
+        mine[(norm(row["reason"]), row["kind"], row["side"], row["origin"], row["label"])] = row
     theirs = {}
     for row in (cen_file.get("unresolved") or []):
         theirs[(row.get("reason"), row.get("kind"), row.get("side"), row.get("origin"), row.get("label"))] = row
@@ -262,12 +273,15 @@ def report_and_print(path, bundle, code, problems, warnings, lines):
 # ---------------------------------------------------------------------------------------------
 
 def _bundle(tmp, name, folds, truth_folds, tamper_file=None, drop_file=None, bad_check_name=False,
-            group_folds=None):
+            group_folds=None, legacy=False):
     """Build a synthetic bundle with the shape EvidenceExtractor.cs writes."""
     d = os.path.join(tmp, name)
     os.makedirs(d)
     fold = {"kind": "given", "side": "vic", "origin": "given#4/1006/-10", "factor": 1.1,
             "label": "被伤害+10%(赋予)"}
+    # R54: today's writer labels the granted channel with its own code; the legacy fixture proves the
+    # vocabulary normalisation still verifies a pre-R54 bundle.
+    REASON = "unknown_kind" if legacy else "given_carrier_none"
     amt = 1000.0 - 1000.0 / 1.1
     battle = {
         "app": "DpsMeter", "version": "1.7.11", "quest": 411001,
@@ -276,8 +290,8 @@ def _bundle(tmp, name, folds, truth_folds, tamper_file=None, drop_file=None, bad
         "events": [{"t": 1.0, "type": "dmg", "atkKey": 2, "attacker": "A", "vicKey": 1, "victim": "BOSS",
                     "amount": 1000.0, "calc": {"fold": [fold]}}],
         "contribution": {"schemaVersion": "1.1", "method": "log-share/1",
-                         "unattributed": [{"reason": "unknown_kind", "amount": round(amt, 4), "folds": folds}],
-                         "coverage": {}, "diagnostics": {"reasonCounts": {"unknown_kind": truth_folds}}},
+                         "unattributed": [{"reason": REASON, "amount": round(amt, 4), "folds": folds}],
+                         "coverage": {}, "diagnostics": {"reasonCounts": {REASON: truth_folds}}},
     }
     with io.open(os.path.join(d, "battle.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(battle, fh, ensure_ascii=False)
@@ -286,8 +300,8 @@ def _bundle(tmp, name, folds, truth_folds, tamper_file=None, drop_file=None, bad
         "usable": True,
         "foldAccounting": {"total": truth_folds if group_folds is None else group_folds, "zeroFactor": 0},
         "coverage": {"unattributed": round(amt, 4), "analyzable": 1000.0, "attributed": 1000.0 - amt},
-        "reasons": [{"reason": "unknown_kind", "folds": truth_folds}],
-        "unresolved": [{"reason": "unknown_kind", "kind": "given", "side": "vic",
+        "reasons": [{"reason": REASON, "folds": truth_folds}],
+        "unresolved": [{"reason": REASON, "kind": "given", "side": "vic",
                         "origin": "given#4/1006/-10", "label": "被伤害+10%(赋予)", "ruleName": "被伤害+10%(赋予)",
                         "factor": 1.1, "folds": truth_folds, "amount": round(amt, 4),
                         "victimInstances": 1, "victimTop": "BOSS", "victimTopFolds": truth_folds,
@@ -335,6 +349,9 @@ def selftest():
             ("bad-check", dict(folds=1, truth_folds=1, bad_check_name=True), EXIT_ERROR),
             # the census's fold accounting disagrees with its own reason list
             ("accounting", dict(folds=1, truth_folds=1, group_folds=9), EXIT_ERROR),
+            # R54: a PRE-R54 bundle (old vocabulary: unknown_kind) must still verify -- the normalisation is
+            # the point, and without this case a rename would silently make old bundles look corrupt.
+            ("legacy-vocabulary", dict(folds=1, truth_folds=1, legacy=True), EXIT_PASS),
         ]
         for name, kw, want in cases:
             d = _bundle(tmp, name, **kw)
@@ -363,7 +380,7 @@ def selftest():
         shutil.rmtree(tmp, ignore_errors=True)
     for f in fails:
         print("SELFTEST FAIL: " + A(f))
-    print("SELFTEST %s (%d case(s))" % ("PASS" if not fails else "FAIL", 7))
+    print("SELFTEST %s (%d case(s))" % ("PASS" if not fails else "FAIL", 8))
     return EXIT_PASS if not fails else EXIT_ERROR
 
 
