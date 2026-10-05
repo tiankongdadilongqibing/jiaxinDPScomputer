@@ -52,3 +52,10 @@ PASS REJECTS a null ratio whose denominator is known      caught=1  [contributio
 PASS accepts an empty battle (ratios null, zero denominators) caught=0
 PASS accepts a 1-unit ledger drift on a 500M battle       caught=0
 PASS REJECTS a dropped outside-team bucket on a 1e4 battle caught=1  [contribution ledger identity broken: analyzable(600)+outsideTeam(0) != totalsDealt(1000)]
+PASS accepts an actor with a closing friendly+hostile split caught=0
+PASS REJECTS an actor whose friendly+hostile != direct    caught=1  [contribution.actors[key=1] identity broken: friendly+hostile(1150) != direct(600)]
+PASS REJECTS friendlyHits above the actor hits            caught=1  [contribution.actors[key=1] friendlyHits(9) > hits(5)]
+PASS REJECTS a non-numeric actor friendly                 caught=1  [contribution.actors[].friendly type=str want=int|float]
+PASS accepts a 1.7.12 export stating filterFriendlyFire   caught=0
+PASS REJECTS a 1.7.12 export without its config block     caught=1  [root.config (since 1.7.12)]
+PASS REJECTS a non-boolean filterFriendlyFire             caught=1  [config.filterFriendlyFire type=str want=bool]

@@ -60,6 +60,17 @@ def close(a, b, rel, ab):
     return abs(a - b) <= max(ab, rel * max(abs(a), abs(b)))
 
 
+def _at_least(version, want):
+    """True when a dotted plugin version string is >= want. Unparseable -> False (never guess)."""
+    try:
+        parts = [int(x) for x in str(version or "").split(".")]
+    except (TypeError, ValueError):
+        return False
+    while len(parts) < len(want):
+        parts.append(0)
+    return tuple(parts[:len(want)]) >= tuple(want)
+
+
 def _present(d, key):
     """True when the producer actually emitted the field (distinguishes 0 from 'absent')."""
     return key in d and d.get(key) is not None
@@ -235,8 +246,16 @@ def compare(path, tol_rel=1e-6, tol_abs=1.0):
     # Presence/types are the schema guard's job; this gate compares VALUES -- and refuses to skip a
     # mandatory field silently, which is what the pre-P0-A version did ("theirs is None -> mismatch"
     # made a missing field indistinguishable from a wrong one and never touched exit priority).
+    # 1.7.8 (P0-B): schema 1.1 REDEFINED totalDamage as analyzableDealt and moved the residual into
+    # unattributedDamage, so the 1.0 formula (analyzable + unattributed) is wrong for a 1.1 section
+    # whenever the unattributed pool is non-empty. MEASURED: on battle_411001_20261005_142931 (3.885%
+    # pool) the stale formula reported a correct 1.7.11 section as an ERROR. Keyed on the SECTION schema
+    # (like check_export_schema); a section that does not declare one falls back to the plugin version.
+    _sec_ver = sec.get("schemaVersion")
+    _is_110 = _at_least(_sec_ver, (1, 1)) if _sec_ver else _at_least(version, (1, 7, 8))
+    _expect_total = an.analyzable if _is_110 else (an.analyzable + an.unattributed_credit)
     mm_checks = {
-        "totalDamage": (an.analyzable + an.unattributed_credit, pick("totalDamage", "totalDamage"),
+        "totalDamage": (_expect_total, pick("totalDamage", "totalDamage"),
                         _present(sec, "totalDamage")),
         "attributedDamage": (an.actor_total_credit(), pick("attributedDamage", "attributedDamage"),
                              _present(sec, "attributedDamage")),
@@ -272,9 +291,17 @@ def compare(path, tol_rel=1e-6, tol_abs=1.0):
         if mine is None:
             mm("actors[%s] missing offline" % k, None, theirs.get("name"))
             continue
-        for field, mine_v in (("directDamage", mine.direct), ("baseCredit", mine.base),
-                              ("selfRuleCredit", mine.self_rule), ("assistCredit", mine.assist),
-                              ("totalCredit", mine.total)):
+        fields = [("directDamage", mine.direct), ("baseCredit", mine.base),
+                  ("selfRuleCredit", mine.self_rule), ("assistCredit", mine.assist),
+                  ("totalCredit", mine.total)]
+        # 1.7.12: the same-team split. MANDATORY only for a producer new enough to emit it -- every
+        # section written before 1.7.12 legitimately lacks it, and treating that as an omission would
+        # turn the whole archive into a red ERROR (the schema guard is version-gated for the same
+        # reason). A 1.7.12+ section that omits it still gets the MANDATORY_MISSING error below.
+        if _at_least(version, (1, 7, 12)):
+            fields += [("friendly", mine.friendly), ("friendlyHits", mine.friendly_hits),
+                       ("hostileDamage", mine.hostile)]
+        for field, mine_v in fields:
             if not _present(theirs, field):
                 omit("actors[key=%s].%s" % (k, field))
                 continue

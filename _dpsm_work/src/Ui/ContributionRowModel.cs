@@ -16,6 +16,8 @@ internal struct ContributionActorValues
 	public double Received;
 	/// <summary>percent of directly dealt damage.</summary>
 	public double DirectShare;
+	/// <summary>1.7.12: the same-team part of the actor's own hits (self-damage included).</summary>
+	public double Friendly;
 	public double Hits;
 }
 
@@ -72,6 +74,8 @@ internal sealed class ContributionTableValues
 	public double SumSelf;
 	public double SumAssist;
 	public double SumReceived;
+	/// <summary>1.7.12: the friendly part, summed over ALL actors (same rule as the other sums).</summary>
+	public double SumFriendly;
 	public readonly List<ContributionRuleValues> Rules = new List<ContributionRuleValues>();
 	public int RuleTotal;
 	public readonly List<ContributionLinkValues> Links = new List<ContributionLinkValues>();
@@ -105,6 +109,7 @@ internal static class ContributionRowModel
 			v.SumSelf += a.Self;
 			v.SumAssist += a.Assist;
 			v.SumReceived += a.Received;
+			v.SumFriendly += a.Friendly;
 			if (a.Total <= 0.0 && a.Direct <= 0.0) continue;
 			v.Rows.Add(new ContributionActorValues
 			{
@@ -115,6 +120,7 @@ internal static class ContributionRowModel
 				BaseAndSelf = a.Base + a.Self,
 				Assist = a.Assist,
 				Received = a.Received,
+				Friendly = a.Friendly,
 				DirectShare = total > 0.0 ? 100.0 * a.Direct / total : 0.0,
 				Hits = a.Hits,
 			});

@@ -59,6 +59,14 @@ ROOT_REQUIRED = [
     ('paramOwners', dict, '1.7.2'),
     # 1.7.4 (阶段 G): the counters of the per-hit attack-power attribution -- the audit of the REFUSALS.
     ('atkAdd', dict, '1.7.4'),
+    # 1.7.12: the settings that change the MEANING of numbers already in this file (today: does
+    # totals.dealt include same-team damage?). A file that does not state them cannot be read alone.
+    ('config', dict, '1.7.12'),
+]
+
+# 1.7.12: the config block. Version-gated by ROOT_REQUIRED, so every older export stays valid.
+CONFIG_KEYS = [
+    ('filterFriendlyFire', bool, '1.7.12'),
 ]
 
 ATKADD_KEYS = [
@@ -200,6 +208,10 @@ CONTRIBUTION_REQUIRED = [
 # 1.7.11: receivedAssist is REQUIRED, not optional. The F5 table's new 被队友分走 column prints it, and
 # the identity 直接打出 = 自身 + 被队友分走 (added below) needs it; a serializer that stopped writing it
 # would otherwise make the column read as a measured 0. Every one of the 15 sections on disk has it.
+# 1.7.12: the same-team split. Optional on disk (every section written before 1.7.12 lacks it) but
+# validated whenever present -- see the identity check in _check_contribution.
+CONTRIBUTION_ACTOR_OPTIONAL = [('friendly', (int, float)), ('friendlyHits', int), ('hostileDamage', (int, float))]
+
 CONTRIBUTION_ACTOR_KEYS = [
     ('key', int), ('name', str),
     ('directDamage', (int, float)), ('baseCredit', (int, float)),
@@ -358,6 +370,27 @@ def _check_contribution(d, problems, cov):
                     problems.append('contribution.actors[key=%s] identity broken: base+self+received(%.0f) != direct(%.0f)'
                                     % (row.get('key'), b + s_ + rv, dv))
                     break
+                # 1.7.12: the same-team split of the actor's own hits. The three fields are OPTIONAL on
+                # disk (the sections written before 1.7.12 do not carry them), so a missing field is not a
+                # problem -- but a present one must be well typed and must CLOSE, or the new 自伤 column
+                # and the JSON reader would be trusted to a number nothing checks.
+                for k, ty in CONTRIBUTION_ACTOR_OPTIONAL:
+                    if k in row and not isinstance(row[k], ty):
+                        problems.append('contribution.actors[].%s type=%s want=%s'
+                                        % (k, type(row[k]).__name__, _tname(ty)))
+                        break
+                else:
+                    fr, ho = row.get('friendly'), row.get('hostileDamage')
+                    if all(isinstance(x, (int, float)) for x in (fr, ho, dv)) and not _close(fr + ho, dv):
+                        problems.append('contribution.actors[key=%s] identity broken: friendly+hostile(%.0f) != direct(%.0f)'
+                                        % (row.get('key'), fr + ho, dv))
+                        break
+                    fh, hh = row.get('friendlyHits'), row.get('hits')
+                    if (isinstance(fh, int) and not isinstance(fh, bool) and isinstance(hh, int)
+                            and not isinstance(hh, bool) and fh > hh):
+                        problems.append('contribution.actors[key=%s] friendlyHits(%d) > hits(%d)'
+                                        % (row.get('key'), fh, hh))
+                        break
 
 
 
@@ -484,6 +517,8 @@ def check_export(d, name='<mem>'):
     cov['version'] = d.get('version', '?')
     _check_keys('root', d, ROOT_REQUIRED, ver, problems, missing)
 
+    if 'config' in d and isinstance(d['config'], dict):
+        _check_keys('config', d['config'], CONFIG_KEYS, ver, problems, missing)
     if 'reconcile' in d and isinstance(d['reconcile'], dict):
         _check_keys('reconcile', d['reconcile'], RECON_REQUIRED, ver, problems, missing)
     if ver >= (1, 5, 0):
@@ -1123,6 +1158,43 @@ def selftest():
     pb_drop = _fixture_178()
     pb_drop['contribution']['damageLedger']['outsideTeamDealt'] = 0   # the whole bucket dropped
     cases.append(('REJECTS a dropped outside-team bucket on a 1e4 battle', pb_drop, 1))
+
+    # 1.7.12: the same-team split. Present -> type-checked and its identity asserted; absent -> accepted
+    # (the whole pre-1.7.12 archive must stay green).
+    f_ok = _fixture_178()
+    f_ok['contribution']['actors'][0].update({'friendly': 150.0, 'friendlyHits': 2,
+                                              'hostileDamage': 450.0, 'hits': 5})
+    cases.append(('accepts an actor with a closing friendly+hostile split', f_ok, 0))
+
+    f_bad = _fixture_178()
+    f_bad['contribution']['actors'][0].update({'friendly': 150.0, 'friendlyHits': 2,
+                                               'hostileDamage': 1000.0, 'hits': 5})
+    cases.append(('REJECTS an actor whose friendly+hostile != direct', f_bad, 1))
+
+    f_hits = _fixture_178()
+    f_hits['contribution']['actors'][0].update({'friendly': 150.0, 'friendlyHits': 9,
+                                                'hostileDamage': 450.0, 'hits': 5})
+    cases.append(('REJECTS friendlyHits above the actor hits', f_hits, 1))
+
+    f_type = _fixture_178()
+    f_type['contribution']['actors'][0]['friendly'] = 'many'
+    cases.append(('REJECTS a non-numeric actor friendly', f_type, 1))
+
+    # 1.7.12 root config: the settings that change the meaning of existing numbers must be stated by the
+    # file itself, and the requirement is version-gated so the archive stays valid.
+    cfg_ok = _fixture_178()
+    cfg_ok['version'] = '1.7.12'
+    cfg_ok['config'] = {'filterFriendlyFire': True}
+    cases.append(('accepts a 1.7.12 export stating filterFriendlyFire', cfg_ok, 0))
+
+    cfg_abs = _fixture_178()
+    cfg_abs['version'] = '1.7.12'
+    cases.append(('REJECTS a 1.7.12 export without its config block', cfg_abs, 1))
+
+    cfg_type = _fixture_178()
+    cfg_type['version'] = '1.7.12'
+    cfg_type['config'] = {'filterFriendlyFire': 'yes'}
+    cases.append(('REJECTS a non-boolean filterFriendlyFire', cfg_type, 1))
 
     out = []
     fails = 0

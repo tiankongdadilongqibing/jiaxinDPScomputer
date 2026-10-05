@@ -98,6 +98,12 @@ class ActorCredit:
     kind: str = ""
     summon: bool = False
     direct: float = 0.0
+    # 1.7.12: the same-team split of `direct`. `hostile` is the part aimed at the other team and
+    # `friendly` the part aimed at the attacker OWN team (self-damage included). They come from the
+    # event flag, exactly like the plugin does it, so the two implementations cannot disagree.
+    friendly: float = 0.0
+    friendly_hits: int = 0
+    hostile: float = 0.0
     hits: int = 0
     base: float = 0.0
     self_rule: float = 0.0

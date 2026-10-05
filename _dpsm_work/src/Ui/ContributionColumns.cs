@@ -26,7 +26,7 @@ internal struct ColumnSpec
 ///     columns), and the layout guard now verifies those literals against THIS file, so a mismatch is a
 ///     red build rather than a misaligned table.
 ///
-/// The three table widths are the sums of their columns and are pinned by tests: 85 / 77 / 53.
+/// The three table widths are the sums of their columns and are pinned by tests: 94 / 77 / 53.
 /// Pure: no Unity type, so the behaviour suite compiles and executes the builders.
 /// </summary>
 internal static class ContributionColumns
@@ -34,7 +34,7 @@ internal static class ContributionColumns
 	// The VISIBLE WIDTH OF A LINE, i.e. the columns PLUS the two leading spaces (83 + 2, 75 + 2, 51 + 2).
 	// The layout guard pins the same three numbers as the exported tables' widths, which is how the
 	// definition and the artifact stay comparable.
-	public const int T1LineWidth = 85;
+	public const int T1LineWidth = 94;
 	public const int T2LineWidth = 77;
 	public const int T3LineWidth = 53;
 
@@ -45,6 +45,10 @@ internal static class ContributionColumns
 	public const int T1Self = 11;
 	public const int T1Other = 11;
 	public const int T1Stolen = 11;
+	// 1.7.12 (user request): the same-team/self-damage part of the character's own hits. It was a column
+	// in the 1.5.x table, disappeared when the credit columns were regrouped, and its absence is what made
+	// a 2.0M self-damage read as "this character dealt 2.0M".
+	public const int T1Friendly = 9;
 	public const int T1Direct = 9;
 	public const int T1Hits = 6;
 
@@ -67,7 +71,8 @@ internal static class ContributionColumns
 	public static readonly ColumnSpec[] T1 =
 	{
 		C("角色", T1Name, false), C("总贡献", T1Total, true), C("占比", T1Share, true), C("自身", T1Self, true),
-		C("他人因你", T1Other, true), C("被队友分走", T1Stolen, true), C("直接占比", T1Direct, true), C("命中", T1Hits, true),
+		C("他人因你", T1Other, true), C("被队友分走", T1Stolen, true), C("自伤", T1Friendly, true),
+		C("直接占比", T1Direct, true), C("命中", T1Hits, true),
 	};
 
 	public static readonly ColumnSpec[] T2 =
@@ -112,7 +117,8 @@ internal static class ContributionColumns
 	/// printed in the 总贡献 column, and filling them with a second percentage is what made the pre-1.7.7
 	/// variant ambiguous. The geometry comes from the same constants the header uses.
 	/// </summary>
-	public static string T1TotalsLine(double attributed, double selfAndBase, double assist, double received)
+	public static string T1TotalsLine(double attributed, double selfAndBase, double assist, double received,
+	                                  double friendly)
 	{
 		return "  " + DisplayFormat.PadR("合计", T1Name)
 		     + DisplayFormat.Amt(attributed, T1Total)
@@ -120,6 +126,7 @@ internal static class ContributionColumns
 		     + DisplayFormat.Amt(selfAndBase, T1Self)
 		     + DisplayFormat.Amt(assist, T1Other)
 		     + DisplayFormat.Amt(received, T1Stolen)
+		     + DisplayFormat.Amt(friendly, T1Friendly)
 		     + DisplayFormat.PadL("", T1Direct)
 		     + DisplayFormat.PadL("", T1Hits);
 	}
@@ -129,7 +136,7 @@ internal static class ContributionColumns
 	/// 8-column name + "*" 17 columns wide and pushed the whole row right.
 	/// </summary>
 	public static string T1Row(string name, bool summon, double total, double sharePct, double baseAndSelf,
-	                           double assist, double received, double directPct, double hits)
+	                           double assist, double received, double friendly, double directPct, double hits)
 	{
 		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(name) + (summon ? "*" : ""), T1Name), T1Name)
 		     + DisplayFormat.Amt(total, T1Total)
@@ -137,6 +144,7 @@ internal static class ContributionColumns
 		     + DisplayFormat.Amt(baseAndSelf, T1Self)
 		     + DisplayFormat.Amt(assist, T1Other)
 		     + DisplayFormat.Amt(received, T1Stolen)
+		     + DisplayFormat.Amt(friendly, T1Friendly)
 		     + DisplayFormat.PadL(DisplayFormat.Pct(directPct), T1Direct)
 		     + DisplayFormat.Amt(hits, T1Hits);
 	}
@@ -171,6 +179,7 @@ internal static class ContributionColumns
 		     + PendingDash(T1Self)
 		     + PendingDash(T1Other)
 		     + PendingDash(T1Stolen)
+		     + PendingDash(T1Friendly)
 		     + PendingDash(T1Direct)
 		     + DisplayFormat.Amt(folds, T1Hits);
 	}
@@ -187,6 +196,7 @@ internal static class ContributionColumns
 		     + PendingDash(T1Self)
 		     + PendingDash(T1Other)
 		     + PendingDash(T1Stolen)
+		     + PendingDash(T1Friendly)
 		     + PendingDash(T1Direct)
 		     + DisplayFormat.Amt(folds, T1Hits);
 	}

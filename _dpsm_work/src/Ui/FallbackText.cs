@@ -27,14 +27,16 @@ internal static class FallbackText
 {
 	/// <summary>One actor line of the fallback's contribution dashboard. 1.7.0 (phase F).</summary>
 	public static string ContributionActorLine(string name, bool summon, double total, double sharePct,
-	                                           double baseCredit, double self, double assist, double received)
+	                                           double baseCredit, double self, double assist, double received,
+	                                           double friendly)
 	{
 		return "  " + (name ?? "") + (summon ? "[使魔]" : "")
 		     + "  总贡献 " + DisplayFormat.Fmt(total) + "(" + DisplayFormat.Pct(sharePct) + ")"
 		     + "  自身 " + DisplayFormat.Fmt(baseCredit + self)
 		     + "(基础 " + DisplayFormat.Fmt(baseCredit) + " + 自身规则 " + DisplayFormat.Fmt(self) + ")"
 		     + "  他人因你 " + DisplayFormat.Fmt(assist)
-		     + "  被队友分走 " + DisplayFormat.Fmt(received);
+		     + "  被队友分走 " + DisplayFormat.Fmt(received)
+		     + "  自伤 " + DisplayFormat.Fmt(friendly);
 	}
 
 	/// <summary>The fallback's totals line. The un-attributed share is printed as a percentage of the same

@@ -81,12 +81,13 @@ def amt(v, width):
         if disp(c) <= width: return pad_l(c, width)
     return pad_l('>' + '9' * max(0, width - 1), width)
 
-T1_W, T2_W, T3_W = 85, 77, 53
+T1_W, T2_W, T3_W = 94, 77, 53
 
 def t1_header():
     return ('  ' + pad_r('\u89d2\u8272', 16) + pad_l('\u603b\u8d21\u732e', 11) + pad_l('\u5360\u6bd4', 8)
             + pad_l('\u81ea\u8eab', 11) + pad_l('\u4ed6\u4eba\u56e0\u4f60', 11)
-            + pad_l('\u88ab\u961f\u53cb\u5206\u8d70', 11) + pad_l('\u76f4\u63a5\u5360\u6bd4', 9) + pad_l('\u547d\u4e2d', 6))
+            + pad_l('\u88ab\u961f\u53cb\u5206\u8d70', 11) + pad_l('\u81ea\u4f24', 9)
+            + pad_l('\u76f4\u63a5\u5360\u6bd4', 9) + pad_l('\u547d\u4e2d', 6))
 
 def t1_row(a, total):
     share = 100.0 * a['totalCredit'] / total if total else 0.0
@@ -94,14 +95,16 @@ def t1_row(a, total):
     label = pad_r(fit(cell(a['name']) + ('*' if a.get('summon') else ''), 16), 16)
     return ('  ' + label + amt(a['totalCredit'], 11) + pad_l(pct(share), 8)
             + amt(a['baseCredit'] + a['selfRuleCredit'], 11) + amt(a['assistCredit'], 11)
-            + amt(a['receivedAssist'], 11) + pad_l(pct(dshare), 9) + amt(a['hits'], 6))
+            + amt(a['receivedAssist'], 11) + amt(a.get('friendly', 0.0), 9)
+            + pad_l(pct(dshare), 9) + amt(a['hits'], 6))
 
 def t1_total(cj):
-    sn = sa = sr = 0.0
+    sn = sa = sr = sf = 0.0
     for a in cj['actors']:
         sn += a['baseCredit'] + a['selfRuleCredit']; sa += a['assistCredit']; sr += a['receivedAssist']
+        sf += a.get('friendly', 0.0)
     return ('  ' + pad_r('\u5408\u8ba1', 16) + amt(cj['attributedDamage'], 11) + pad_l('', 8)
-            + amt(sn, 11) + amt(sa, 11) + amt(sr, 11) + pad_l('', 9) + pad_l('', 6))
+            + amt(sn, 11) + amt(sa, 11) + amt(sr, 11) + amt(sf, 9) + pad_l('', 9) + pad_l('', 6))
 
 def t2_header():
     return ('  ' + pad_r('\u89c4\u5219', 22) + pad_r('\u901a\u9053', 8) + pad_r('\u4fa7', 5) + pad_r('\u6301\u6709\u8005', 14)
@@ -198,7 +201,7 @@ def _numeric_selftest():
     # a 1e9-class battle must not push any row: Amt() must fall back to M/G/T
     big = {'key': 1, 'name': '\u30c6\u30b9\u30c8', 'summon': False, 'totalCredit': 9.9e9,
            'directDamage': 9.9e9, 'baseCredit': 9.9e9, 'selfRuleCredit': 9.9e9,
-           'assistCredit': 9.9e9, 'receivedAssist': 9.9e9, 'hits': 1234567}
+           'assistCredit': 9.9e9, 'receivedAssist': 9.9e9, 'friendly': 9.9e9, 'hits': 1234567}
     cj = {'actors': [big], 'attributedDamage': 9.9e9, 'coverage': {'analyzableDealt': 9.9e9}}
     r2 = {'ruleName': 'x', 'kind': 'madness', 'side': 'vic', 'ownerName': 'y',
           'hits': 1, 'folds': 1, 'damageEquivalent': 9.9e9}
@@ -239,7 +242,8 @@ RE_BARE_WIDTH = re.compile(r',\s*\d+\)')
 T1_CELLS = [
     ('\u89d2\u8272', 16), ('\u603b\u8d21\u732e', 11), ('\u5360\u6bd4', 8),
     ('\u81ea\u8eab', 11), ('\u4ed6\u4eba\u56e0\u4f60', 11),
-    ('\u88ab\u961f\u53cb\u5206\u8d70', 11), ('\u76f4\u63a5\u5360\u6bd4', 9), ('\u547d\u4e2d', 6),
+    ('\u88ab\u961f\u53cb\u5206\u8d70', 11), ('\u81ea\u4f24', 9),
+    ('\u76f4\u63a5\u5360\u6bd4', 9), ('\u547d\u4e2d', 6),
 ]
 T2_CELLS = [
     ('\u89c4\u5219', 22), ('\u901a\u9053', 8), ('\u4fa7', 5), ('\u6301\u6709\u8005', 14),

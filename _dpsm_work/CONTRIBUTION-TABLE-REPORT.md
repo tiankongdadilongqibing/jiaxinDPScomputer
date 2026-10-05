@@ -22,6 +22,11 @@
 > 只由根 `actors[].friendly` + `friendlyHits` 单独计数。要「对敌输出」必须自己扣,优先用逐事件 `vicTeam`
 > (`Overlay/FilterFriendlyFire` 开关**不写进导出**,不能只看文件判断)。定义、实测样例与扣法见
 > `CONTRIBUTION-DATA-DICTIONARY.md` §1.4。
+>
+> **现状补充(2026-10-05 R60)**:插件 **1.7.12 已部署**(线上 DLL `F791F1CF…`,434,688 B;上一版 `C1DBBD8F` 备份于 `deploy-backup/pre-r60-C1DBBD8F/`)。
+> 1.7.12 新增:根 `config.filterFriendlyFire`、`contribution.actors[].friendly` / `friendlyHits` / `hostileDamage`、
+> F5 表 1 的「自伤」列(`T1` 行宽 85 → **94**,面板 780 → 880)。字段定义与恒等式见
+> `CONTRIBUTION-DATA-DICTIONARY.md` §1.4 / §12。
 
 ---
 
@@ -143,6 +148,10 @@
 > `T.O.W.E.R.typeR`:`dealt = 2,007,881`,其中**对敌只有 1,439(1 击)**,其余 2,006,442(23 击)是自伤;
 > 它的直接占比 27.6% 里绝大多数是「打自己」。换人/换装的 A-B 对比必须先扣掉同队部分。扣法见
 > `CONTRIBUTION-DATA-DICTIONARY.md` §1.4。
+>
+> **1.7.12**:同队部分已恢复为独立的「自伤」列(`friendly`,列宽 9;F5 原样在 1.5.x 有过这个列),`T1` 行宽因此
+> 由 85 变为 **94**;`contribution.actors[]` 同时发布 `friendly` / `friendlyHits` / `hostileDamage`,恒等式
+> `friendly + hostileDamage == directDamage` 由 `check_export_schema.py` 逐角色强制。该列不移动任何 credit。
 
 **历史**:1.7.6–1.7.10 的三列为 `基础(11) | 自身规则(11) | 辅助(11)`。拆开显示会让「自身规则」看起来像与「辅助」同级的外部加成,
 而它其实是该角色自己那半边的另一半;同时 `receivedAssist` 从未进表,读者无法解释「直接打出」与「总贡献」为何不同。

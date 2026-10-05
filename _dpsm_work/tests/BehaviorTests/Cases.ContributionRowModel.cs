@@ -14,8 +14,8 @@ internal static partial class Cases
 	public static void ContributionRowModelCases(Runner r)
 	{
 		var res = new ContributionResult();
-		res.Actors.Add(Actor("甲", 40.0, 30.0, 10.0, 5.0, 3.0, 7, false));   // total 45
-		res.Actors.Add(Actor("乙", 0.0, 20.0, 20.0, 1.0, 0.0, 4, true));    // total 41, no direct damage
+		res.Actors.Add(Actor("甲", 40.0, 30.0, 10.0, 5.0, 3.0, 7, false, 12.0));   // total 45
+		res.Actors.Add(Actor("乙", 0.0, 20.0, 20.0, 1.0, 0.0, 4, true, 18.0));    // total 41, no direct damage
 		res.Actors.Add(Actor("丙", 0.0, 0.0, 0.0, 0.0, 9.0, 0, false));     // total 0: sums only, not shown
 		ContributionTableValues v = ContributionRowModel.Build(res, 100.0);
 
@@ -38,6 +38,10 @@ internal static partial class Cases
 		r.EqD("the-self-sum-covers-the-unshown-actor", v.SumSelf, 30.0);
 		r.EqD("the-assist-sum-covers-the-unshown-actor", v.SumAssist, 6.0);
 		r.EqD("the-received-sum-covers-the-unshown-actor", v.SumReceived, 12.0);
+		// 1.7.12: the self-damage column gets the same treatment -- a per-row value and a sum over ALL
+		// actors, including the one the table does not show.
+		r.EqD("the-friendly-value-passes-through", v.Rows[0].Friendly, 12.0);
+		r.EqD("the-friendly-sum-covers-the-unshown-actor", v.SumFriendly, 30.0);
 
 		ContributionTableValues z = ContributionRowModel.Build(res, 0.0);
 		r.EqD("a-zero-total-gives-a-zero-share", z.Rows[0].Share, 0.0);
@@ -48,12 +52,13 @@ internal static partial class Cases
 	}
 
 	private static ContributionActorRow Actor(string name, double direct, double baseCredit, double self,
-	                                         double assist, double received, int hits, bool summon)
+	                                         double assist, double received, int hits, bool summon,
+	                                         double friendly = 0.0)
 	{
 		return new ContributionActorRow
 		{
 			Name = name, Direct = direct, Base = baseCredit, Self = self, Assist = assist,
-			Received = received, Hits = hits, Summon = summon,
+			Received = received, Hits = hits, Summon = summon, Friendly = friendly,
 		};
 	}
 }

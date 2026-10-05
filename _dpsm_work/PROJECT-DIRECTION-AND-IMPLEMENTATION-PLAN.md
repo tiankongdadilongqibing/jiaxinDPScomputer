@@ -1,7 +1,7 @@
 # DpsMeter 项目总方向与实施计划
 
 > 用途：作为后续智能体分工、实现、审查和验收的统一依据。
-> 当前基线：插件版本 1.7.11(前一版 1.7.10;1.7.11 是显示级发布 —— F5 表 1 改为 `自身 | 他人因你 | 被队友分走`,并新增两条逐角色恒等式与「渲染器↔副本」版面守卫,见 `SESSION-STATE.md` §7.2.100)。本计划依据 DpsMeter-文档索引.md、_dpsm_work/HANDOFF.md 和 _dpsm_work/ARCHITECTURE.md 整理。
+> 当前基线：**源码/构建 1.7.12**(R60:自伤三件套 —— 根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1 恢复「自伤」列;见 `REFACTOR-BATCH-R60.md`),**线上 DLL 仍是 1.7.11**(R57 的引用绑定 + 战斗编号 + 精确选场);1.7.11 是显示级发布 —— F5 表 1 改为 `自身 | 他人因你 | 被队友分走`,并新增两条逐角色恒等式与「渲染器↔副本」版面守卫,见 `SESSION-STATE.md` §7.2.100)。本计划依据 DpsMeter-文档索引.md、_dpsm_work/HANDOFF.md 和 _dpsm_work/ARCHITECTURE.md 整理。
 > 证据等级：实测、离线重放、推断必须明确区分。
 > **进度(2026-10-03 深夜)**：阶段 **A / B / C / D(雏形)/ E** 已交付。
 > A/B/C:指标字典 `_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md`、离线核心 `_dpsm_work/contrib/`

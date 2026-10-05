@@ -170,6 +170,13 @@ def analyze(export, team=1, training=False, keep_hits=False):
         ac.direct += damage
         ac.hits += 1
         ac.base += base
+        # 1.7.12: the same-team split. An EVENT property, not a subtraction: friendly + hostile is
+        # exactly direct, and the split is reporting only -- it never moves a credit line.
+        if e.get("friendly"):
+            ac.friendly += damage
+            ac.friendly_hits += 1
+        else:
+            ac.hostile += damage
         an.analyzable += damage
         an.pool_total += pool
         # the base part is an explicit, auditable credit line (dictionary section 2.2)

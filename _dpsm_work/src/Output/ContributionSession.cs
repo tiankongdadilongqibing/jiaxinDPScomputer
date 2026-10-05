@@ -57,6 +57,8 @@ public static class ContributionSession
 					// R52: the victim rides along for the unresolved census only.
 					Victim = e.Victim ?? "",
 					VictimKey = e.VictimKey,
+					// 1.7.12: the same-team flag rides along so the credit row can publish the friendly/hostile split.
+					Friendly = e.Friendly,
 				};
 				if (h.HasCalc && useFolds && e.Calc.Fold != null)
 				{

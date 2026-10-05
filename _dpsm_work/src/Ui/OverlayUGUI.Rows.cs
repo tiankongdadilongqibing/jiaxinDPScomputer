@@ -100,7 +100,7 @@ public static partial class OverlayUGUI
 		_panelW = View == ViewMode.Detail
 			? Mathf.Min((float)Screen.width - 40f, 1400f)   // detail lines are long: widen the panel
 			: (View == ViewMode.Contribution
-				? Mathf.Min((float)Screen.width - 40f, 780f)   // the contribution table needs its columns
+				? Mathf.Min((float)Screen.width - 40f, 880f)   // the contribution table needs its columns (94 with 自伤)
 				: Mathf.Min((float)Screen.width - 20f, 560f));
 
 		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a
@@ -540,6 +540,9 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = "  【口径】自身 = 基础 + 自身规则;总贡献 = 自身 + 他人因你;直接打出 = 自身 + 被队友分走", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef { Text = "   自身=自己命中里归自己的份额;基础=自己的攻击力/属性打出来的;自身规则=自己的装备/能力倍率应得的部分", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef { Text = "   他人因你=队友因他多打出来的(记他名下,不是他打出的);被队友分走=自己命中里由他人倍率拿走的部分", Color = DimColor, Height = 15f });
+		// 1.7.12 (user request): the 自伤 column is back, and it needs one plain sentence or the page repeats
+		// the misreading it was added to prevent (a 2.0M self-damage looked like 2.0M of enemy output).
+		rows.Add(new RowDef { Text = "   自伤=他的命中里落在自己人(含自己)身上的部分;已含在「自身/直接打出」里,读「对敌输出」要减掉", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef { Text = "   全队总贡献相加 = 可分析伤害(不是他打出的伤害);直接占比=他实际打出的伤害占比;分池按「倍率对数份额」", Color = DimColor, Height = 15f });
 		rows.Add(new RowDef
 		{
@@ -559,7 +562,7 @@ public static partial class OverlayUGUI
 			{
 				// RF5d: the row is BUILT from the column definition (the widths live there, not here).
 				Text = ContributionColumns.T1Row(a.Name, a.Summon, a.Total, a.Share, a.BaseAndSelf, a.Assist,
-				                                 a.Received, a.DirectShare, a.Hits),
+				                                 a.Received, a.Friendly, a.DirectShare, a.Hits),
 				Color = AllyColor, Height = 16f,
 			});
 		}
@@ -572,7 +575,8 @@ public static partial class OverlayUGUI
 		// they still cover every actor, including the ones the table does not show).
 		rows.Add(new RowDef
 		{
-			Text = ContributionColumns.T1TotalsLine(res.Stats.Attributed, t1.SumBase + t1.SumSelf, t1.SumAssist, t1.SumReceived),
+			Text = ContributionColumns.T1TotalsLine(res.Stats.Attributed, t1.SumBase + t1.SumSelf, t1.SumAssist,
+			                                            t1.SumReceived, t1.SumFriendly),
 			Color = NeutralColor, Height = 16f,
 		});
 		double unattrPct = total > 0.0 ? 100.0 * res.Stats.Unattributed / total : 0.0;

@@ -1,0 +1,25 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\contribution_applicability.py --selftest
+== P0-D applicability scanner selftest ==
+  [PASS] attrMult-explained hits are not leaks                got=0 want=0
+  [PASS] attrMult-explained hits are counted                  got=1 want=1
+  [PASS] attrMult-explained hits attributed to attrMult       got=1 want=1
+  [PASS] retired knownMult criterion still flags the hit      got=1 want=1
+  [PASS] true knownMult-without-fold leak detected            got=1 want=1
+  [PASS] true leak => not_comparable                          got=not_comparable want=not_comparable
+  [PASS] fold identity leak detected                          got=2 want=2
+  [PASS] fold identity leak rejects the task                  got=not_comparable want=not_comparable
+  [PASS] sub-unity hit is strictly over 1e-3                  got=1 want=1
+  [PASS] sub-unity rounding is explained                      got=0 want=0
+  [PASS] training ground is not_comparable                    got=not_comparable want=not_comparable
+  [PASS] training ground x0.03 marker                         got=True want=True
+  [PASS] dealtMinusAnalyzable                                 got=400.0 want=400.0
+  [PASS] enemy damage is evidence                             got=100.0 want=100.0
+  [PASS] reconciliationGap kept separate                      got=300.0 want=300.0
+  [PASS] unknown attacker outside dealt                       got=300.0 want=300.0
+  [PASS] 700817 retired rule flags hits                       got=59 want=59
+  [PASS] 700817 corrected rule flags no leak                  got=0 want=0
+  real 700817: retired=59 corrected=0 (attrMult-explained=59)
+FAILING-BEFORE (retired knownMult criterion): 700817 leaks=59 -> judged a fold leak
+PASSING-AFTER  (corrected prod(fold) criterion): unexplained=0
+selftest OK (18/18)

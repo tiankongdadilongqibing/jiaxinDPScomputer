@@ -237,7 +237,7 @@ public static class OverlayCore
 			// RF5e: the row text comes from the pure builder, so the fallback formats numbers the same way the
 			// panel and the export do (and the suite executes it).
 			GUILayout.Label(FallbackText.ContributionActorLine(a.Name, a.Summon, a.Total, share, a.Base, a.Self,
-			                                                   a.Assist, a.Received));
+			                                                   a.Assist, a.Received, a.Friendly));
 			_desiredHeight += 18f;
 			if (i >= 11) break;
 		}

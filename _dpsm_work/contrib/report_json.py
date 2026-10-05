@@ -101,6 +101,8 @@ def to_json(an, export, issues, summary):
                     "summon": a.summon,
                     "directDamage": a.direct,
                     "directShare": (a.direct / an.analyzable) if an.analyzable else 0.0,
+                    "friendly": a.friendly, "friendlyHits": a.friendly_hits,
+                    "hostileDamage": a.hostile,
                     "baseCredit": a.base, "selfRuleCredit": a.self_rule,
                     "assistCredit": a.assist, "totalCredit": a.total,
                     "totalShare": (a.total / an.analyzable) if an.analyzable else 0.0,

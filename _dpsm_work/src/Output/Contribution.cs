@@ -33,6 +33,10 @@ public sealed class ContributionHit
 	/// receiving end of a rule nobody claimed). Empty on the pre-R52 paths that do not set it.</summary>
 	public string Victim = "";
 	public int VictimKey;
+	/// <summary>1.7.12: this hit's target was on the attacker's OWN team (回復反転 / self-damage / a
+	/// teammate). Carried so the credit row can publish the friendly/hostile split without re-deriving
+	/// the team rule in a second place.</summary>
+	public bool Friendly;
 }
 
 /// <summary>One roster entry handed to the contribution core (a projection of <see cref="ActorStats"/>).</summary>
@@ -133,6 +137,12 @@ public sealed class ContributionActorRow
 	public string Kind = "";
 	public bool Summon;
 	public double Direct, Base, Self, Assist, Received;
+	/// <summary>1.7.12: the part of <see cref="Direct"/> whose VICTIM was on the attacker's own team
+	/// (self-damage included). It stays inside Direct -- the game's own report counts it -- but is
+	/// published separately so a reader can subtract it; <see cref="Hostile"/> is the other part.</summary>
+	public double Friendly;
+	public int FriendlyHits;
+	public double Hostile;
 	public int Hits;
 	public double Total { get { return Base + Self + Assist; } }
 }
@@ -462,6 +472,8 @@ public static class Contribution
 	{
 		public ContributionActor Actor;
 		public double Direct, Base, Self, Assist, Received;
+		public double Friendly, Hostile;
+		public int FriendlyHits;
 		public int Hits;
 	}
 
@@ -568,6 +580,10 @@ public static class Contribution
 			ac.Direct += hit.Damage;
 			ac.Hits++;
 			ac.Base += baseCredit;
+			// 1.7.12: the same-team split. It is an EVENT property (the plugin's own Friendly flag), not a
+			// subtraction, so friendly + hostile == direct exactly and the two cannot drift apart.
+			if (hit.Friendly) { ac.Friendly += hit.Damage; ac.FriendlyHits++; }
+			else ac.Hostile += hit.Damage;
 
 			for (int i = 0; i < folds.Count; i++)
 			{
@@ -629,6 +645,7 @@ public static class Contribution
 				Key = c.Actor.Key, Name = c.Actor.Name, Kind = c.Actor.Kind, Summon = c.Actor.Summon,
 				Direct = c.Direct, Base = c.Base, Self = c.Self, Assist = c.Assist,
 				Received = c.Received, Hits = c.Hits,
+				Friendly = c.Friendly, FriendlyHits = c.FriendlyHits, Hostile = c.Hostile,
 			});
 		}
 		foreach (var r in rules.Values.OrderByDescending(x => x.Damage))
@@ -727,6 +744,13 @@ public static class Contribution
 			sb.Append(",\"assistCredit\":"); Num(sb, c.Assist);
 			sb.Append(",\"totalCredit\":"); Num(sb, c.Base + c.Self + c.Assist);
 			sb.Append(",\"receivedAssist\":"); Num(sb, c.Received);
+			// 1.7.12: the same-team split of directDamage. `friendly` counts the hits whose VICTIM was on
+			// the attacker's own team (self-damage included) and `hostileDamage` is the rest; both are
+			// derived from the EVENT flag, so they do NOT move when Overlay/FilterFriendlyFire excludes the
+			// same-team damage from the game-facing dealt totals.
+			sb.Append(",\"friendly\":"); Num(sb, c.Friendly);
+			sb.Append(",\"friendlyHits\":").Append(c.FriendlyHits);
+			sb.Append(",\"hostileDamage\":"); Num(sb, c.Hostile);
 			sb.Append(",\"hits\":").Append(c.Hits);
 			sb.Append('}');
 		}

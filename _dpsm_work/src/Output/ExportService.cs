@@ -8,7 +8,7 @@ namespace DpsMeter;
 
 /// <summary>
 /// Exports the full data of a finished battle to a JSON file for offline analysis.
-/// Format: { app, version, battleRef, quest, duration, result, started, totals,
+/// Format: { app, version, config, battleRef, quest, duration, result, started, totals,
 ///          actors:[{name,team,kind,summon,dealt,taken,healingGiven,healingTaken,self,
 ///                   hit,maxHit,crit,perSecDamage:[],perSecTaken:[],perSecHeal:[],sources:{},skills:{}}],
 ///          events:[{t,type,victim,attacker,owner,attr,amount,nominal,source,crit,calc:{}}],
@@ -306,6 +306,13 @@ public static class ExportService
 	{
 		var sb = new StringBuilder(4096);
 		sb.Append("{\"app\":\"").Append(BuildInfo.Name).Append("\",\"version\":\"").Append(BuildInfo.Version).Append('"');
+		// 1.7.12: the settings that change the MEANING of numbers already in this file, so a reader can
+		// tell from the file alone which convention it was written under. Today exactly one: does totals.dealt
+		// (and per-second) include same-team damage (回復反転 / self-damage)? The contribution section's
+		// friendly/hostileDamage split is event-derived and does NOT depend on this. Grows additively.
+		sb.Append(",\"config\":{\"filterFriendlyFire\":")
+		  .Append(Plugin.CfgFilterFriendlyFire != null && Plugin.CfgFilterFriendlyFire.Value ? "true" : "false")
+		  .Append('}');
 		// R56 (BID-0, plan §4): the identity block. It is written from the SAME BattleRef the overlay shows
 		// and battle_select.py resolves, so "the number on screen" and "the file I compare" cannot diverge.
 		if (s.Ref != null)

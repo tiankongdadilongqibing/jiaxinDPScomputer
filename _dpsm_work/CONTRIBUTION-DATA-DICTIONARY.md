@@ -82,6 +82,9 @@ totals.taken              = dealt + unattributedDamage = Σ 全部 dmg 事件
   逐 key **精确相等**(本场 9 个 key、另两份样本 0 处不等)。
 - 冻结语料里 411001 / 700817 实测 `friendly = 0`,只有训练场出现(P0-D §4.3 同结论):既有对比不受影响,
   但**换人/换装时若拿训练场 9999 的样本做对照,必须先扣掉同队部分**(9999 本身一律 `not_comparable`)。
+- **导出与界面里能直接读到的形态(1.7.12 起)**:根 `config.filterFriendlyFire`(必写)、
+  `contribution.actors[].friendly` / `friendlyHits` / `hostileDamage`(可选字段;`friendly + hostileDamage == directDamage`
+  由 `check_export_schema.py` 校验),以及 F5 表 1 的「自伤」列(它显示的就是 `friendly`)。
 
 ---
 
@@ -715,6 +718,30 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
   **文件名以该编号结尾**;身份校验失败时**不会**被标记为"已导出"。
 - 消费者:`battle_select.py`(只读文件头即可列出;解析与比较前复核 SHA256)、悬浮窗(编号与状态)、
   证据包里的 `battle.json`(同一个序列化器,因此同编号同 revision)。
+
+##### R60(插件 1.7.12):同队/自我伤害进导出与 F5 表(**可选字段,既有数值一个都没动**)
+
+用户要求「恢复自伤判定」,三处一起做:
+
+1. **根 `config` 块(自 1.7.12 起必需)**:`{"filterFriendlyFire":bool}` —— 这是唯一会改变**既有数字含义**的
+   开关(它决定 `totals.dealt` / `perSecDamage` / `actors[].hit` 是否含同队伤害)。导出不写它时,单看文件无法
+   判断 `dealt` 用的是哪套口径;`check_export_schema.py` 现在按版本要求它存在。
+2. **`contribution.actors[]` 增加三个可选字段**:`friendly` / `friendlyHits` / `hostileDamage`。
+   `friendly` 是「受击方与攻击者同队」的命中金额(含 `attacker == victim` 的自我结算),`hostileDamage` 是其余;
+   两者由**逐事件 `friendly` 标志**分类,因此 **`friendly + hostileDamage == directDamage` 精确成立**,且
+   **不受 `FilterFriendlyFire` 影响**(该开关只动游戏口径的 `dealt`,不动归属账)。
+   字段可选是因为 1.7.12 之前的 15 份带段导出没有它们:`check_export_schema.py` 只在字段存在时校验类型与
+   恒等式;`contrib/crosscheck.py` 只在**插件版本 >= 1.7.12** 时把它们当必比对字段(否则整档会因「旧文件
+   缺字段」变红)。
+3. **F5 表 1 恢复「自伤」列**(1.5.x 曾有;列宽 9):T1 由 8 列 83 / 行 85 变为 **9 列 92 / 行 94**,
+   Contribution 页面板上限 780 → **880**(等宽排版下,面板不跟着变宽就会把列画到背景外)。
+   自伤是**报告列**:它不移动任何 credit,「自身」「直接打出」的口径与数值不变。
+
+**顺带修掉一个既有缺陷(与本轮直接相关)**:`contrib/crosscheck.py` 的 `totalDamage` 期望值一直是 **1.0 的公式**
+(`analyzable + unattributed`),对 schema 1.1 段(1.7.8 起 `totalDamage = analyzableDealt`)只要
+`unattributedCredit > 0` 就会把**正确的**文件判成 MISMATCH。实测 `battle_411001_20261005_142931`
+(未归因 3.885%)在改动前就是 ERROR。现在按**段内 `schemaVersion`** 选公式,与 `check_export_schema.py` 一致。
+冻结语料(rf0)里没有「1.1 段 + 非空未归因」的样本,所以这个缺陷此前没有被验收抓到。
 
 ##### R59(文档,2026-10-05):同队/自我伤害的口径补充(**无字段、无数值变化**)
 

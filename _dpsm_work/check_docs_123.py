@@ -122,6 +122,7 @@ FILES = [
 
 	# R57: 战斗引用绑定持久文件(实机发现)
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R57.md',
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R60.md',
 ]
 
 

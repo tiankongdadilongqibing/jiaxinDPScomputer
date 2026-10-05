@@ -446,11 +446,42 @@ internal static partial class Cases
 		string prow = ContributionColumns.T1PendingRow("X", 1.0, 1.0, 1);
 		int dashes = 0;
 		for (int pi = 0; pi < prow.Length; pi++) if (prow[pi] == '-') dashes++;
-		r.Eq("the-four-inapplicable-credit-columns-print-a-dash (not a zero)", dashes, 4);
+		r.Eq("the-five-inapplicable-credit-columns-print-a-dash (not a zero)", dashes, 5);
 		string pfoot = ContributionColumns.T1PendingTotalsLine(1.0, 1.0, 1);
 		int fdashes = 0;
 		for (int pi = 0; pi < pfoot.Length; pi++) if (pfoot[pi] == '-') fdashes++;
-		r.Eq("the-footer-dashes-the-same-four-columns", fdashes, 4);
+		r.Eq("the-footer-dashes-the-same-five-columns", fdashes, 5);
+
+		// ---------------------------------------------------------------------------------------------
+		// 1.7.12: the same-team split of one attacker own hits. Two hits by the SAME attacker: one on the
+		// enemy, one on his own side (the event Friendly flag). Direct is their sum and the two parts must
+		// PARTITION it -- that partition is what the new self-damage column and the JSON fields publish.
+		// The last assertion is the important one: the split is REPORTING, it does not move a single credit.
+		r.Group("extract/friendly-split");
+		var splitTeam = new List<ContributionActor>
+		{
+			CensusActor(3, "SELF", 1), CensusActor(4, "ALLY", 1), CensusActor(1, "BOSS", 2),
+		};
+		var splitHits = new List<ContributionHit>
+		{
+			CensusHit(100.0, 3, "BOSS", 1),
+			CensusHit(40.0, 3, "ALLY", 4),
+		};
+		splitHits[1].Friendly = true;
+		ContributionResult sres = Contribution.Compute(splitHits, splitTeam, 1);
+		ContributionActorRow srow = null;
+		for (int si = 0; si < sres.Actors.Count; si++) if (sres.Actors[si].Key == 3) srow = sres.Actors[si];
+		r.True("the-attacker-row-exists", srow != null);
+		r.EqD("direct-is-both-hits", srow.Direct, 140.0);
+		r.EqD("the-friendly-hit-is-the-friendly-part", srow.Friendly, 40.0);
+		r.Eq("and-it-is-one-hit", srow.FriendlyHits, 1);
+		r.EqD("the-enemy-hit-is-the-hostile-part", srow.Hostile, 100.0);
+		r.EqD("the-two-parts-partition-the-direct-damage", srow.Friendly + srow.Hostile, srow.Direct);
+		r.EqD("and-the-friendly-hit-still-credits-its-own-attacker (reporting only)", srow.Base, 140.0);
+
+		// back to the family the caption cases below belong to: the group label is part of a case NAME, so
+		// leaving them in extract/friendly-split would rename four cases (and a negative control keys on one).
+		r.Group("extract/pending");
 
 		// the captions: the family's own name, an explicit "not charged" promise, and the candidate list
 		r.Str("the-pending-header-names-the-family-and-the-rule",
