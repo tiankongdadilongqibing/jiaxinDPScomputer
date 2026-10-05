@@ -1,0 +1,68 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe -m contrib.tests.test_gate
+PASS status vocabulary is the frozen five
+PASS exit codes: PASS/WARNING/LEGACY=0 DATA_MISSING=3 ERROR=1
+PASS unknown status raises instead of guessed
+PASS priority ERROR > DATA_MISSING > LEGACY > WARNING > PASS
+PASS crosscheck reuses the gate's exit codes (no second convention)
+PASS the fixed gate conditions carry the documented exit codes
+PASS mandatory field list is non-trivial and every name is emitted by the offline producer
+PASS 1.7.6 without contribution -> DATA_MISSING  [status=DATA_MISSING]
+PASS 1.7.6 without contribution -> exit 3  [exit=3]
+PASS 1.7.6 without contribution -> the reason names the version and the first emitting version
+PASS 1.5.5 without contribution -> LEGACY_NOT_APPLICABLE, exit 0  [status=LEGACY_NOT_APPLICABLE exit=0]
+PASS legacy verdict prints WHY it does not apply (never a silent 0)
+PASS a legacy export can never be reported as the current version's PASS
+PASS quest 9999 -> LEGACY_NOT_APPLICABLE (not the normal PASS)  [status=LEGACY_NOT_APPLICABLE]
+PASS quest 9999 -> modelApplicability=not_comparable
+PASS quest 9999 -> the reason names the special-mode rule
+PASS quest 9999 + current version missing section -> DATA_MISSING wins over LEGACY precedence  [status=DATA_MISSING exit=3]
+PASS faithful 1.7.6 section -> PASS, exit 0  [status=PASS exit=0]
+PASS faithful section -> no validate ERROR, no omission
+PASS tampered contribution values -> ERROR, exit 1  [status=ERROR exit=1 mismatches=2]
+PASS tampered values are reported as real mismatches
+PASS missing mandatory totalDamage -> ERROR, exit 1  [status=ERROR exit=1 omissions=['contribution.totalDamage']]
+PASS the omission names the field it wanted
+PASS missing mandatory actor field -> ERROR, exit 1  [status=ERROR]
+PASS validate.check ERROR is consumed -> ERROR, exit 1  [status=ERROR exit=1 verrs=['I3']]
+PASS the reason records the validate ERROR codes
+PASS gate.validate_result turns a validate ERROR into exit 1  [code=1 status=ERROR errors=['I3']]
+PASS atkAdd.emitted != non-empty calc.atkAdd rows -> ERROR, exit 1  [status=ERROR]
+PASS the reason is the atkAdd identity
+PASS a negative atkAdd counter -> ERROR
+PASS atkAdd.emitted=0 with a non-empty body -> ERROR
+PASS no root atkAdd block but hits carry calc.atkAdd -> ERROR
+PASS atkAdd.emitted with an unchanged section -> ERROR (the section under-restates)  [status=ERROR codes=['ATKADD_COUNTER_GT_HITS', 'ATKADD_FOLDS_VS_BODY', 'SECTION_PRESENT', 'MISMATCH']]
+PASS a section without any atkadd rule -> NOTE, not ERROR  [codes=[('note', 'ATKADD_FOLDS_ABSENT')]]
+PASS a section that authors atkadd rows but under-restates them -> ERROR  [codes=[('error', 'ATKADD_FOLDS_VS_BODY')]]
+PASS a counter added after this file was written is accepted (and range-checked)  [reasons=[]]
+PASS a new counter with a negative value is still caught
+PASS a producer that stops writing a refusal counter -> ERROR
+PASS version parsing handles real strings and junk
+PASS CASE1 training-ground export (9999) is not an atkAdd-domain ERROR  [status=LEGACY_NOT_APPLICABLE exit=0 codes=['TRAINING_NOT_COMPARABLE', 'SECTION_PRESENT']]
+PASS CASE1 out-of-domain atkAdd rows are reported as an explicit NOTE  [notes=['ATKADD_FOLDS_OUT_OF_DOMAIN', 'GIVE_APPLIED_LEGACY_MIXED']]
+PASS CASE1 the in-domain census is strictly smaller than the full body (34 < 509)  [census={"nonEmptyHits": 472, "rows": 509, "nonEmptyHitsInDomain": 34, "rowsInDomain": 34, "analysedTeam": 1}]
+PASS CASE1 the section really does restate only the in-domain rows  [folds=34 rowsInDomain=34]
+PASS CASE2 tampered folds on the real 9999 export -> ERROR, exit 1  [atkaddRules=1 status=ERROR exit=1 codes=['TRAINING_NOT_COMPARABLE', 'ATKADD_FOLDS_VS_BODY', 'SECTION_PRESENT']]
+PASS CASE2 same tamper on 411001 (6006 in-domain folds) -> ERROR, exit 1  [status=ERROR exit=1]
+PASS CASE2 control: the untampered 411001 export is not an ERROR  [status=WARNING]
+PASS CASE3 the untampered real export raises no GIVE error  [file=battle_700817_20261004_114821.json steps=0 appliedHits=0 giveApplied=0 status=WARNING]
+PASS CASE3 a tampered rosterAudit.giveApplied -> ERROR (the gate really runs)  [status=ERROR codes=['ATKADD_COUNTER_GT_HITS', 'GIVE_APPLIED_VS_BODY', 'SECTION_PRESENT']]
+PASS CASE3 a 1.7.9 export without giveFoldHits -> DATA_MISSING exit 3  [status=DATA_MISSING exit=3 codes=['ATKADD_COUNTER_GT_HITS', 'GIVE_FOLDHITS_MISSING', 'SECTION_PRESENT']]
+PASS CASE3 a 1.7.9 export with a wrong giveFoldHits -> ERROR  [status=ERROR codes=['ATKADD_COUNTER_GT_HITS', 'GIVE_FOLDHITS_VS_BODY', 'SECTION_PRESENT']]
+PASS CASE3 control: the correct 1.7.9 counters raise no GIVE error  [status=WARNING codes=['ATKADD_COUNTER_GT_HITS', 'SECTION_PRESENT']]
+PASS gate: folds == in-domain rows passes even when out-of-domain rows exist  [codes=[('note', 'ATKADD_FOLDS_OUT_OF_DOMAIN')]]
+PASS gate: folds short of the IN-DOMAIN rows still fails  [codes=[('error', 'ATKADD_FOLDS_VS_BODY')]]
+PASS gate: without a domain the check degrades to a NOTE, never an ERROR over a mixed body  [codes=[('note', 'ATKADD_FOLDS_DOMAIN_UNKNOWN')]]
+PASS gate: a 1.7.9 file with giveApplied == body steps is clean  [codes=[]]
+PASS gate: the pre-1.7.9 entries+hits counter is a NOTE, never an ERROR  [codes=[('note', 'GIVE_APPLIED_LEGACY_MIXED')]]
+PASS gate: giveApplied disagreeing with the body is an ERROR  [codes=[('error', 'GIVE_APPLIED_VS_BODY')]]
+PASS gate: a 1.7.9 file without giveFoldHits is DATA_MISSING  [codes=[('missing', 'GIVE_FOLDHITS_MISSING')]]
+PASS gate: giveFoldHits disagreeing with the body is an ERROR  [codes=[('error', 'GIVE_FOLDHITS_VS_BODY')]]
+PASS gate: no give counters at all is a single NOTE  [codes=[('note', 'GIVE_COUNTERS_ABSENT')]]
+PASS classify_section(1.5.5, absent) == LEGACY_NOT_APPLICABLE
+PASS classify_section(1.6.0, absent) == DATA_MISSING
+PASS classify_section(1.7.7, absent) == DATA_MISSING
+PASS classify_section(1.7.7, present) == PASS
+
+gate regression: 64 passed, 0 failed (fixtures in C:\Users\24134\AppData\Local\Temp\p0a_gate_ohm0kv_m)

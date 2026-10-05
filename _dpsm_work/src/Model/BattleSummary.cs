@@ -24,6 +24,10 @@ public sealed class BattleSummary
 	/// soft (idle) close can withdraw its own stale summary (see Aggregator.TryResumeClosedSession).</summary>
 	public BattleSession Session;
 
+	/// <summary>R56 (BID-1): the SAME identity object the session carries (plan §3: a summary is a view
+	/// of one session, so it must never be handed a fresh number). Null for a battle that predates it.</summary>
+	public BattleRef Ref;
+
 	/// <summary>Per-hit event log kept for the in-game detail view of the finished battle.</summary>
 	public readonly List<BattleEvent> Events = new List<BattleEvent>();
 }

@@ -28,6 +28,7 @@
     BepInEx/plugins/DpsMeter/extract/
       extract_<yyyyMMdd_HHmmss>_q<quest>_<reason>/
         battle.json          与正常导出同一个序列化器(ExportService.ExportTo),不是第二份实现
+                             → 因此它携带**同一份 `battleRef`**(编号/修订/状态),证据包与普通导出同源同号
         contrib_census.json  未归因折叠普查(见 §3)
         masterdata/*.json    游戏自身主数据转储的**副本**(没有转储过就不生成,并在 manifest 里如实写 0)
         manifest.json        文件清单 + 校验 + 部署程序集 + 普查摘要(见 §4)

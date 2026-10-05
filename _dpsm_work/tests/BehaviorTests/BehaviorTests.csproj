@@ -35,6 +35,8 @@
     <Compile Include="$(SrcRoot)\Model\BattleEvent.cs" />
     <Compile Include="$(SrcRoot)\Model\ActorStats.cs" />
     <Compile Include="$(SrcRoot)\Model\BattleSummary.cs" />
+    <!-- R56: the battle identity (pure: no Unity, no file system). -->
+    <Compile Include="$(SrcRoot)\Model\BattleRef.cs" />
     <Compile Include="$(SrcRoot)\Model\CalcBreakdown.cs" />
     <Compile Include="$(SrcRoot)\Model\FoldStep.cs" />
     <Compile Include="$(SrcRoot)\Model\StatusKey.cs" />
@@ -58,6 +60,8 @@
     <!-- R52: the extraction-flow decisions (trigger key, bundle name, retention). Game-free by
          construction, which is what lets the retention rule be executed instead of argued about. -->
     <Compile Include="$(SrcRoot)\Policy\ExtractPolicy.cs" />
+    <!-- R56 (BID-0): the frozen battle-reference contract (format, lifecycle, file name, copy text). -->
+    <Compile Include="$(SrcRoot)\Policy\BattleRefPolicy.cs" />
     <!-- RF4: the first state family. Game-free by construction (BattleSession only), which is what makes
          the Start/End/resume sequences executable here instead of only in a battle. -->
     <Compile Include="$(SrcRoot)\Runtime\SessionContinuity.cs" />
@@ -66,6 +70,8 @@
     <Compile Include="$(SrcRoot)\Runtime\CalcActivityLog.cs" />
     <Compile Include="$(SrcRoot)\Runtime\AttackSnapshot.cs" />
     <Compile Include="$(SrcRoot)\Runtime\BattleHistoryRing.cs" />
+    <!-- R56 (BID-1): the launch namespace + session sequence allocator (time/random injected). -->
+    <Compile Include="$(SrcRoot)\Runtime\BattleRefRegistry.cs" />
     <!-- RF5b: the overlay text layout. No Unity type is involved, which is why it can be compiled here
          and executed as production code instead of being mirrored by a Python replica. -->
     <Compile Include="$(SrcRoot)\Ui\DisplayFormat.cs" />

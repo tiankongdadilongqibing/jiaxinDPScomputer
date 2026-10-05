@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BepInEx;
@@ -7,12 +8,17 @@ namespace DpsMeter;
 
 /// <summary>
 /// Exports the full data of a finished battle to a JSON file for offline analysis.
-/// Format: { app, version, quest, duration, result, started, totals,
+/// Format: { app, version, battleRef, quest, duration, result, started, totals,
 ///          actors:[{name,team,kind,summon,dealt,taken,healingGiven,healingTaken,self,
 ///                   hit,maxHit,crit,perSecDamage:[],perSecTaken:[],perSecHeal:[],sources:{},skills:{}}],
 ///          events:[{t,type,victim,attacker,owner,attr,amount,nominal,source,crit,calc:{}}],
 ///          reconcile:{exact,approx,unexplained,theoryExceeds,byPair,byTenth*,topResidual[]},
 ///          unattributedByVictim:{} }
+///
+/// R56: `battleRef` (contract battle-ref/1) is this session's stable identity -- id/launchId/sequence are
+/// fixed when the session is created, resetCount/revision/state move only at the documented events, and
+/// the default file name ENDS with the id so two battles cannot share a target. Older exports have no
+/// such block and stay valid; the offline selection tool addresses those by content hash.
 /// </summary>
 public static class ExportService
 {
@@ -32,6 +38,38 @@ public static class ExportService
 		}
 	}
 
+	private static HashSet<string> _knownIds;
+
+	/// <summary>
+	/// R56 (BID-2, plan §1/§5.1): is this battle id already published under the exports directory? The
+	/// registry asks this before handing out a reference, so a colliding launch namespace is REGENERATED
+	/// instead of reusing a number that already points at a file.
+	///
+	/// Built once per process from the directory listing (the ids are part of the file name). An
+	/// unreadable directory yields "nothing known": the collision check then degrades, which is why the
+	/// write path independently refuses a target name that does not end with this session's id.
+	/// </summary>
+	public static bool IdExists(string id)
+	{
+		if (string.IsNullOrEmpty(id)) return false;
+		try
+		{
+			if (_knownIds == null)
+			{
+				var set = new HashSet<string>(StringComparer.Ordinal);
+				foreach (string f in Directory.GetFiles(Dir, "battle_*.json"))
+				{
+					string name = Path.GetFileNameWithoutExtension(f);
+					int at = name.IndexOf("__", StringComparison.Ordinal);
+					if (at >= 0 && at + 2 < name.Length) set.Add(name.Substring(at + 2));
+				}
+				_knownIds = set;
+			}
+			return _knownIds.Contains(id);
+		}
+		catch { return false; }
+	}
+
 	public static string Export(BattleSession s)
 	{
 		return ExportTo(s, null);
@@ -49,8 +87,12 @@ public static class ExportService
 			// Computed once, from the events, and used for both the JSON and the self-report line, so the
 			// number the user reads in the log and the number stored in the file cannot drift apart.
 			CalcReconcile.Stats rec = CalcReconcile.Compute(s);
-			if (string.IsNullOrEmpty(file))
-				file = Path.Combine(Dir, $"battle_{s.QuestId}_{s.StartWallClock:yyyyMMdd_HHmmss}.json");
+			// R56 (plan §5.1): a caller-supplied path (the evidence bundle) is a COPY of the same
+			// session, not a second identity; only the default exports/ path is name-checked below.
+			bool explicitTarget = !string.IsNullOrEmpty(file);
+			if (!explicitTarget)
+				file = Path.Combine(Dir, BattleRefPolicy.FileName(s.QuestId, s.StartWallClock,
+					s.Ref == null ? null : s.Ref.Id));
 			else
 			{
 				// An explicit path may live in a directory that does not exist yet (the bundle dir).
@@ -68,7 +110,39 @@ public static class ExportService
 			string jcErr;
 			int jcDup;
 			bool jsonOk = JsonCheck.Validate(json, out jcErr, out jcDup);
-			File.WriteAllText(file, json, new UTF8Encoding(false));
+			// R56 (BID-2, plan §5.2): validate the identity, write through a temp file, and only then
+			// report success. A write that did not happen must NOT look like one: before this the return
+			// value was the path even when the write threw, so callers treated a lost export as saved.
+			string idErr = (s.Ref == null) ? "" : BattleRefPolicy.ValidateBlock(
+				s.Ref.Id, s.Ref.LaunchId, s.Ref.Sequence, s.Ref.Revision, s.Ref.State);
+			if (idErr.Length == 0 && s.Ref != null && !explicitTarget && !BattleRefPolicy.FileNameMatchesId(file, s.Ref.Id))
+				idErr = "目标文件名与该会话的编号不符";
+			if (idErr.Length > 0)
+			{
+				string emsg = "[DpsMeter][BREF] 身份校验失败:" + idErr + " (仍写出文件,但不标记为已导出)";
+				Plugin.LogSource.LogWarning(emsg);
+				RuntimeLog.Write(emsg);
+			}
+			if (!WriteAtomic(file, json))
+			{
+				string fmsg = $"[DpsMeter] Export FAILED (临时写入或发布失败,旧文件保持不变) -> {file}";
+				Plugin.LogSource.LogWarning(fmsg);
+				RuntimeLog.Write(fmsg);
+				return null;
+			}
+			string sha = FileSha256(file);
+			// The identity now knows where its bytes are. Only a successful write may say so.
+			if (s.Ref != null && idErr.Length == 0) BattleRefRegistry.MarkExported(s.Ref, file, sha);
+			if (s.Ref != null)
+			{
+				string bline = "[DpsMeter][BREF] id=" + s.Ref.Id + " rev=" + s.Ref.Revision
+					+ " state=" + s.Ref.State + " reset=" + s.Ref.ResetCount
+					+ " close=" + (string.IsNullOrEmpty(s.Ref.CloseReason) ? "-" : s.Ref.CloseReason)
+					+ " sha256=" + (sha.Length > 0 ? sha : "?") + " file=" + Path.GetFileName(file);
+				Plugin.LogSource.LogInfo(bline);
+				RuntimeLog.Write(bline);
+				RuntimeLog.Flush();
+			}
 			string msg = $"[DpsMeter] Exported full battle data -> {file} ({json.Length} bytes)";
 			Plugin.LogSource.LogInfo(msg);
 			RuntimeLog.Write(msg);
@@ -168,10 +242,74 @@ public static class ExportService
 		}
 	}
 
+	/// <summary>R56 (plan §5.2 step 2): temp file in the SAME directory, then publish by replace/move, so
+	/// an interrupted export can never truncate the previous complete file. A destination that blocks the
+	/// atomic primitive falls back to an overwrite COPY -- the data is what matters, and the caller is
+	/// told truthfully whether the bytes landed.</summary>
+	private static bool WriteAtomic(string file, string json)
+	{
+		string tmp = file + ".tmp";
+		try { File.WriteAllText(tmp, json, new UTF8Encoding(false)); }
+		catch
+		{
+			try { if (File.Exists(tmp)) File.Delete(tmp); } catch { }
+			return false;
+		}
+		try
+		{
+			if (File.Exists(file)) File.Replace(tmp, file, null);
+			else File.Move(tmp, file);
+			return true;
+		}
+		catch
+		{
+			try
+			{
+				File.Copy(tmp, file, true);
+				try { File.Delete(tmp); } catch { }
+				return true;
+			}
+			catch
+			{
+				try { if (File.Exists(tmp)) File.Delete(tmp); } catch { }
+				return false;
+			}
+		}
+	}
+
+	/// <summary>SHA256 of the bytes actually on disk. "" when it cannot be read -- the copy text then says
+	/// "no analysable file" rather than printing a hash nobody can verify.</summary>
+	private static string FileSha256(string file)
+	{
+		try
+		{
+			using (var sha = System.Security.Cryptography.SHA256.Create())
+			using (var fs = File.OpenRead(file))
+			{
+				byte[] h = sha.ComputeHash(fs);
+				var sb = new StringBuilder(h.Length * 2);
+				for (int i = 0; i < h.Length; i++) sb.Append(h[i].ToString("x2"));
+				return sb.ToString();
+			}
+		}
+		catch { return ""; }
+	}
+
 	private static string BuildJson(BattleSession s, CalcReconcile.Stats rec)
 	{
 		var sb = new StringBuilder(4096);
 		sb.Append("{\"app\":\"").Append(BuildInfo.Name).Append("\",\"version\":\"").Append(BuildInfo.Version).Append('"');
+		// R56 (BID-0, plan §4): the identity block. It is written from the SAME BattleRef the overlay shows
+		// and battle_select.py resolves, so "the number on screen" and "the file I compare" cannot diverge.
+		if (s.Ref != null)
+			sb.Append(",\"battleRef\":{\"schemaVersion\":\"").Append(BattleRefPolicy.SchemaVersion)
+			  .Append("\",\"id\":\"").Append(Escape(s.Ref.Id))
+			  .Append("\",\"launchId\":\"").Append(Escape(s.Ref.LaunchId))
+			  .Append("\",\"sequence\":").Append(s.Ref.Sequence)
+			  .Append(",\"resetCount\":").Append(s.Ref.ResetCount)
+			  .Append(",\"revision\":").Append(s.Ref.Revision)
+			  .Append(",\"state\":\"").Append(Escape(s.Ref.State))
+			  .Append("\",\"closeReason\":\"").Append(Escape(s.Ref.CloseReason)).Append("\"}");
 
 		long dealt = 0, taken = 0, heal = 0, healGiven = 0;
 		foreach (var a in s.OrderedActors)

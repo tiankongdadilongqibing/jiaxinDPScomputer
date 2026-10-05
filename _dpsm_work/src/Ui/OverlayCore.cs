@@ -123,6 +123,12 @@ public static class OverlayCore
 		{
 			GUILayout.Label("未在战斗中  F8 显示/隐藏  F9 重置  F4 证据包");
 			_desiredHeight = 64f;
+			if (Aggregator.History.Count > 0)
+			{
+				int lastQuest;
+				int.TryParse(Aggregator.History[0].QuestId, out lastQuest);
+				DrawBattleRef(Aggregator.History[0].Ref, lastQuest, "上一场 ");
+			}
 			if (Aggregator.History.Count > 0) DrawHistoryMini(Aggregator.History[0]);
 			return;
 		}
@@ -135,6 +141,7 @@ public static class OverlayCore
 			else enemyDealt += a.DamageDealt;
 		}
 		GUILayout.Label($"任务 {session.QuestId}  {BattleTime.Hit(secs)}  我方伤害 {DisplayFormat.Num(allyDealt)}  秒伤 {DisplayFormat.Num((long)(allyDealt / secs))}  受击 {DisplayFormat.Num(allyTaken)}  敌伤害 {DisplayFormat.Num(enemyDealt)}");
+		DrawBattleRef(session.Ref, session.QuestId, "本场 ");
 
 		var allies = new List<ActorStats>();
 		foreach (var a in session.OrderedActors)
@@ -172,6 +179,35 @@ public static class OverlayCore
 	/// <summary>1.7.0 (阶段 F): total-contribution dashboard for the IMGUI fallback renderer.
 	/// It reads the SAME cached view the uGUI renderer uses, so both show one set of numbers, and an
 	/// unavailable computation prints the reason instead of zeros.</summary>
+	/// <summary>
+	/// R56 (BID-3, plan §6): the IMGUI fallback's identity line. It prints the FULL id as text (so the
+	/// number can always be transcribed by hand) and offers the same copy action as the uGUI row through
+	/// the same function, so the two renderers cannot produce different payloads.
+	/// </summary>
+	private static void DrawBattleRef(BattleRef r, int quest, string label)
+	{
+		if (r == null)
+		{
+			GUILayout.Label("  " + label + "无编号(legacy):该场按文件内容哈希引用");
+			_desiredHeight += 18f;
+			return;
+		}
+		string state = r.State == BattleRefPolicy.StateFinal ? "终局"
+			: (r.State == BattleRefPolicy.StateProvisional ? "暂存(未终局)" : "战斗中");
+		if (r.ResetCount > 0) state += " 已重置×" + r.ResetCount;
+		string write = string.IsNullOrEmpty(r.ExportSha256) ? "尚未导出" : "已导出";
+		GUILayout.Label("  " + label + r.ShortTag + "  " + state + " · " + write);
+		_desiredHeight += 18f;
+		GUILayout.Label("  战斗编号 " + r.Id);
+		_desiredHeight += 18f;
+		if (GUILayout.Button("复制引用", GUILayout.Width(80f)))
+		{
+			OverlayUGUI.CopyToClipboard(BattleRefPolicy.CopyText(r.Id, r.Revision, quest, r.State, r.ResetCount,
+				string.IsNullOrEmpty(r.ExportPath) ? "" : System.IO.Path.GetFileName(r.ExportPath), r.ExportSha256));
+		}
+		_desiredHeight += 22f;
+	}
+
 	private static void DrawContributionDashboard()
 	{
 		bool useFolds = Plugin.CfgReconcileCalc != null && Plugin.CfgReconcileCalc.Value;
@@ -180,6 +216,10 @@ public static class OverlayCore
 		ContributionView view = OverlayUGUI.ResolveContributionView(useFolds);
 		GUILayout.Label("───── 总贡献(可加和:自身 + 他人因你)─────");
 		_desiredHeight += 18f;
+		// R56 (plan §6): the title and the identity come from the SAME resolved view, so the fallback
+		// cannot label the previous battle's table with the live battle's number.
+		DrawBattleRef(OverlayUGUI.DisplayedRef(view != null && view.Live), view == null ? 0 : view.QuestId,
+			view != null && view.Live ? "本场 " : "上一场 ");
 		if (view == null || !view.Usable || view.Result == null)
 		{
 			GUILayout.Label("  不可用 —— " + ((view == null) ? "无数据" : (view.Unavailable ?? "无数据")));
@@ -210,6 +250,11 @@ public static class OverlayCore
 	{
 		GUILayout.Label($"上一场 结果 {bs.Result} 任务 {bs.QuestId} {BattleTime.Seconds(bs.DurationSeconds)} 我方{DisplayFormat.Num(SumDealt(bs, true))} 敌{DisplayFormat.Num(SumDealt(bs, false))}");
 		_desiredHeight += 24f;
+		if (bs.Ref != null)
+		{
+			GUILayout.Label("  " + bs.Ref.ShortTag + "  战斗编号 " + bs.Ref.Id);
+			_desiredHeight += 18f;
+		}
 	}
 
 	private static long SumDealt(BattleSummary bs, bool ally)

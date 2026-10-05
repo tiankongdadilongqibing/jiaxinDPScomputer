@@ -13,6 +13,10 @@ public static partial class Aggregator
 	private static void FinalizeLocked(BattleSession s, GameResult result, string why)
 	{
 		s.InBattle = false;
+		// R56 (BID-1, plan §3/§4): stamp the close BEFORE anything reads the identity, so the export,
+		// the evidence bundle, the summary and the overlay all describe the same state/reason pair. A
+		// close without a result stays provisional -- it must not masquerade as a completed battle.
+		BattleRefRegistry.MarkClosed(s.Ref, why, (int)result);
 		// Remember how this one ended so the NEXT session can decide whether it is a continuation of the
 		// same stretch of play (grouping marker only -- see BattleSession.RunId). RF4: the state is the
 		// container's; this stays the FIRST thing a finalisation does.
@@ -28,7 +32,8 @@ public static partial class Aggregator
 			QuestId = s.QuestId.ToString(),
 			Result = result.ToString(),
 			DurationSeconds = s.ActiveSeconds,
-			Session = s
+			Session = s,
+			Ref = s.Ref
 		};
 		foreach (ActorStats orderedActor in s.OrderedActors)
 		{

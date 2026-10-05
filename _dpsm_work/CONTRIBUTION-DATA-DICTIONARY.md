@@ -662,3 +662,33 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
    副本与 `OverlayUGUI.Rows.cs` 漂移时它仍会全绿。现在它**解析 C# 源里的列标签与宽度**并与副本逐项比对,
    自测里用「把一列从 11 改成 12」的真实篡改证明该检查会红(见该脚本 `check_source_replica`)。
 
+##### R56:根对象新增 `battleRef` 块(战斗编号;不改贡献口径)
+
+编号是**元数据**,不是新的伤害口径:`contribution` 的方法、`schemaVersion`(仍 1.1)与任何数值都没有改动。
+
+```json
+"battleRef": {
+  "schemaVersion": "1",
+  "id": "B-20261005-143012-7A2C91EF-003",
+  "launchId": "20261005-143012-7A2C91EF",
+  "sequence": 3, "resetCount": 0, "revision": 1,
+  "state": "final", "closeReason": "end"
+}
+```
+
+| 字段 | 语义 | 何时变 |
+|---|---|---|
+| `id` | 完整编号 `B-{launchId}-{sequence}`;序号**至少 3 位且不截断**(1000 就是 4 位) | 创建后不变 |
+| `launchId` | **本次插件启动**的命名空间 `{UTC:yyyyMMdd-HHmmss}-{16 hex}`;短序号只在这个命名空间内唯一 | 每次启动 |
+| `sequence` | 启动内第几场会话 | 创建后不变 |
+| `resetCount` | 本场被 F9/重置 的次数 | 每次重置 |
+| `revision` | **内容快照**修订号 | 软恢复 / 重置 / 新快照导出;UI 渲染不动它 |
+| `state` | `live` / `provisional` / `final`;`final` 要求收尾原因为 `end` **且**有胜负 | 收尾 |
+| `closeReason` | 实际收尾原因 `end`/`idle`/`teardown`/`restart` | 收尾 |
+
+- **旧导出没有这个块,且永远合法**:它们按 `legacy:<SHA256>` 引用(离线工具 `battle_select.py`),不回填、不改写。
+- 校验入口:写盘前 `BattleRefPolicy.ValidateBlock`(id/launchId/sequence/revision/state 自洽),默认导出路径还要求
+  **文件名以该编号结尾**;身份校验失败时**不会**被标记为"已导出"。
+- 消费者:`battle_select.py`(只读文件头即可列出;解析与比较前复核 SHA256)、悬浮窗(编号与状态)、
+  证据包里的 `battle.json`(同一个序列化器,因此同编号同 revision)。
+

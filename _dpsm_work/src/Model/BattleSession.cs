@@ -28,6 +28,13 @@ public sealed class BattleSession
 	/// </summary>
 	public long RunId;
 
+	/// <summary>
+	/// R56 (BID-1): this session's STABLE, COPYABLE identity (plan §3/§4). Created exactly once, in
+	/// <see cref="Aggregator.StartSession"/>; views copy it. Null only for a session that never went
+	/// through that path, which the UI must render as "无编号(legacy)" rather than invent a number.
+	/// </summary>
+	public BattleRef Ref;
+
 	/// <summary>0-based position of this session inside its run.</summary>
 	public int RunSeq;
 
@@ -113,6 +120,9 @@ public sealed class BattleSession
 			ActiveSeconds = b.DurationSeconds,   // the same clock the header showed while it was live
 			Result = (GameResult)0
 		};
+		// R56 (plan §3): a view rebuild COPIES the identity. It must not allocate, and when the summary
+		// has none the view keeps none -- a fabricated id would point at a file that does not exist.
+		v.Ref = (b.Ref == null) ? null : b.Ref.Clone();
 		v.OrderedActors.AddRange(b.Actors);
 		try { v.Events.AddRange(b.Events); } catch { }
 		// 1.7.7 (P2-A #6): a finished-battle view must carry the unattributed pool.
@@ -334,6 +344,9 @@ public sealed class BattleSession
 
 	public void ResetActors()
 	{
+		// R56 (plan §3): F9 / the 重置 button does NOT start a new battle. The id stays, the reset is
+		// counted, and the revision moves because the next export no longer describes the same content.
+		BattleRefRegistry.MarkReset(Ref);
 		Actors.Clear();
 		OrderedActors.Clear();
 		// 1.5.0 (A4): keys restart with the actor table. Safe because ResetActors also clears Events, so

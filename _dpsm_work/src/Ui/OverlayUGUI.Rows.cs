@@ -28,6 +28,11 @@ public static partial class OverlayUGUI
 		/// <summary>1.7.6: null = the default UI font. Set to the monospaced font by the 总贡献 table,
 		/// whose column padding is only exact on a 1:2 grid (see OverlayUGUI.Pool.GetMonoFont).</summary>
 		public Font Font;
+		/// <summary>R56: this row is the battle-reference line; a click on it copies <see cref="CopyText"/>.
+		/// The payload is built by the producer, which is the only place that knows WHICH battle this page
+		/// is describing.</summary>
+		public bool Copyable;
+		public string CopyText;
 	}
 
 	private static void Refresh()
@@ -98,6 +103,14 @@ public static partial class OverlayUGUI
 				? Mathf.Min((float)Screen.width - 40f, 780f)   // the contribution table needs its columns
 				: Mathf.Min((float)Screen.width - 20f, 560f));
 
+		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a
+		// click pointing at the previous page's id.
+		_copyRefRt = null;
+		_copyRefPayload = null;
+		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a
+		// click pointing at the previous page's id.
+		_copyRefRt = null;
+		_copyRefPayload = null;
 		float totalContent = 0f;
 		for (int i = 0; i < rows.Count; i++) totalContent += rows[i].Height;
 		_contentH = totalContent;
@@ -138,6 +151,7 @@ public static partial class OverlayUGUI
 			else if (textIdx < _rowTexts.Count)
 			{
 				RectTransform rt = _rowRts[textIdx];
+				if (r.Copyable) { _copyRefRt = rt; _copyRefPayload = r.CopyText; }
 				rt.anchorMin = new Vector2(0f, 1f);
 				rt.anchorMax = new Vector2(0f, 1f);
 				rt.pivot = new Vector2(0f, 1f);
@@ -419,6 +433,66 @@ public static partial class OverlayUGUI
 		rows.Add(new RowDef { Text = FallbackText.PendingNoteLine(pend), Color = DimColor, Height = 15f });
 	}
 
+	/// <summary>
+	/// R56 (BID-3, plan §6): the identity line of whatever the page is DISPLAYING. Two rows on purpose --
+	/// the short tag is for scanning, the full id is the copyable unambiguous reference -- and the line
+	/// states the WRITE result separately from the session state, because "final" is a fact about the
+	/// battle while "已导出" is a fact about the disk.
+	/// </summary>
+	private static void AppendBattleRefRow(List<RowDef> rows, BattleRef r, int quest, string label)
+	{
+		if (r == null)
+		{
+			rows.Add(new RowDef
+			{
+				Text = "  " + label + "无编号(legacy):该场按文件内容哈希引用,见 battle_select.py",
+				Color = DimColor, Height = 15f,
+			});
+			return;
+		}
+		string state = r.State == BattleRefPolicy.StateFinal ? "终局"
+			: (r.State == BattleRefPolicy.StateProvisional ? "暂存(未终局)" : "战斗中");
+		if (r.ResetCount > 0) state += " 已重置×" + r.ResetCount;
+		string write = string.IsNullOrEmpty(r.ExportSha256) ? "尚未导出" : "已导出";
+		rows.Add(new RowDef
+		{
+			Text = "  " + label + r.ShortTag + "   " + state + " · " + write
+				+ (CopyFlashActive ? "   ✓已复制到剪贴板" : "   [点击此行复制引用]"),
+			Color = HeaderColor, Height = 16f,
+		});
+		rows.Add(new RowDef
+		{
+			Text = "  战斗编号 " + r.Id,
+			Color = NeutralColor, Height = 16f,
+			Copyable = true,
+			CopyText = BattleRefPolicy.CopyText(r.Id, r.Revision, quest, r.State, r.ResetCount,
+				string.IsNullOrEmpty(r.ExportPath) ? "" : System.IO.Path.GetFileName(r.ExportPath),
+				r.ExportSha256),
+		});
+	}
+
+	/// <summary>The identity of the battle the panel is currently describing: the live session while one
+	/// is running, else the newest finished battle. Views ask THIS instead of re-deriving an id.</summary>
+	internal static BattleRef DisplayedRef(bool live)
+	{
+		try
+		{
+			if (live)
+			{
+				BattleSession s = Aggregator.Session;
+				return s == null ? null : s.Ref;
+			}
+			if (Aggregator.History.Count > 0)
+			{
+				BattleSummary b = Aggregator.History[0];
+				if (b == null) return null;
+				return b.Ref != null ? b.Ref : (b.Session == null ? null : b.Session.Ref);
+			}
+		}
+		catch { }
+		return null;
+	}
+
 	private static void AppendContributionTable(List<RowDef> rows)
 	{
 		int firstRow = rows.Count;
@@ -437,6 +511,9 @@ public static partial class OverlayUGUI
 		double hSeconds;
 		ResolveHeaderBattle(view, out hQuest, out hSeconds);
 		rows.Add(new RowDef { Text = "总贡献  F5返回  任务 " + hQuest + "   " + BattleTime.Seconds(hSeconds), Color = HeaderColor, Height = 20f });
+		// R56 (plan §6): the title is bound to the battle this table describes, and it is shown even when
+		// the data is unavailable -- an "unavailable" page must still say WHICH battle it is about.
+		AppendBattleRefRow(rows, DisplayedRef(view != null && view.Live), hQuest, view != null && view.Live ? "本场 " : "上一场 ");
 		if (!panelOn)
 		{
 			rows.Add(new RowDef { Text = "  总贡献看板已被 General/ShowContribution 关闭", Color = WarnColor, Height = 16f });
@@ -607,6 +684,9 @@ public static partial class OverlayUGUI
 				rows.Add(new RowDef { Text = "伤害明细  暂无战斗数据", Color = HeaderColor, Height = 20f });
 				return rows;
 			}
+			// R56 (plan §6): the detail timeline and the identity come from the SAME BattleSession (ds), so
+			// the number above the records is by construction the number of the file this battle writes.
+			AppendBattleRefRow(rows, ds.Ref, ds.QuestId, "本场 ");
 			// Party damage, keyed by (name, team).
 			// This content can field the SAME character name on BOTH sides (mirror match), and
 			// keying by name alone merged our unit with the enemy copy -- which is also how the
@@ -864,6 +944,7 @@ public static partial class OverlayUGUI
 			// everything numeric lives in the pinned bar only (see LayoutPinBar), so the heading above
 			// stays a plain delimiter instead of repeating the counts.
 			_pinLine = $"伤害明细 {_detailIdx + 1}/{names.Count} {who} · 总伤害 {totals[whoKey]:N0} / {counts[whoKey]} 条"
+				+ (ds.Ref == null ? " · 无编号(legacy)" : " · " + ds.Ref.ShortTag)
 				+ (filtered ? $" · 筛选→{filtName} {vTotals[_victimFilter]:N0}/{vCounts[_victimFilter]} 条" : "")
 				+ $" · 第 {_detailPage + 1}/{pages} 页({pageLo:F0}~{pageHi:F0} 秒)本页 {pageN} 条 / 列表 {listTotal} 条"
 				+ " · ←/→ 翻页(20秒/页) F7 筛选目标 F11/F12 换角色 F6返回";
@@ -925,6 +1006,7 @@ public static partial class OverlayUGUI
 			string modeTag = OverlayChart.UsePerSecond ? "每秒DPS" : "累计";
 			rows.Add(new RowDef { Text = $"{modeTag}  上:我方伤害 中:耐久% 下:敌方  F10列表 F12累计/每秒", Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = ChartCaption(viewSession), Color = DimColor, Height = 16f });
+			AppendBattleRefRow(rows, DisplayedRef(inBattle), viewSession == null ? 0 : viewSession.QuestId, "本图 ");
 
 			// 1) party DPS (cumulative damage dealt)
 			rows.Add(new RowDef { Text = "── 我方 · 累计伤害(各角色DPS) ──", Color = HeaderColor, Height = 14f });
@@ -963,6 +1045,12 @@ public static partial class OverlayUGUI
 		{
 			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F4 证据包", Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = "下方显示上一场记录;F10 可查看上一场曲线", Color = DimColor, Height = 16f });
+			if (Aggregator.History.Count > 0)
+			{
+				int lastQuest;
+				int.TryParse(Aggregator.History[0].QuestId, out lastQuest);
+				AppendBattleRefRow(rows, DisplayedRef(false), lastQuest, "上一场 ");
+			}
 			if (Aggregator.History.Count > 0) AppendSummaryRows(rows, Aggregator.History[0], Plugin.CfgShowEnemies.Value);
 			return rows;
 		}
@@ -975,6 +1063,7 @@ public static partial class OverlayUGUI
 		}
 		double secs = Math.Max(1.0, session.ActiveSeconds);
 		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F4证据包", Color = HeaderColor, Height = 20f });
+		AppendBattleRefRow(rows, session.Ref, session.QuestId, "本场 ");
 		rows.Add(new RowDef { Text = $"我方总伤害 {allyDealt:N0}   秒伤 {(long)(allyDealt / secs):N0}   受击 {allyTaken:N0}   受回复 {allyHeal:N0}", Color = NeutralColor, Height = 18f });
 		if (allyFriendly > 0)
 			rows.Add(new RowDef

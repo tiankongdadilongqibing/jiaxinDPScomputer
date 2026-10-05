@@ -46,6 +46,22 @@
    "purpose": "R52: recompute an export's unattributed split with the pinned offline core, diff it field by field against the plugin's own contribution section, and report every unresolved fold group (reason/kind/origin/label/factor/victim) with the loadout-side carrier verdict for the granted channel.",
    "status": "active"
   },
+  "_dpsm_work/battle_select.py": {
+   "evidence": "R56: wired into n0_acceptance (--selftest, synthetic exports in a temp dir); it is the offline half of the battle-reference feature",
+   "expected_exit": "0 resolved / 2 missing / 3 ambiguous-or-conflict / 4 content changed / 5 unfinished sample / 6 usage",
+   "has_selftest": true,
+   "imports_local": [],
+   "in_pipeline": true,
+   "input_versions": "battle exports under BepInEx/plugins/DpsMeter/exports (battle_*.json); a selection file written by this tool",
+   "kind": "cli",
+   "lines": 596,
+   "outputs": [
+    "selection.json (--out; id/revision/hash/path/quest/state/order)",
+    "compare reports via contrib.compare"
+   ],
+   "purpose": "R56 (plan section 7): turn a copied battle reference (full id, launch+sequence, or legacy:<sha256>) into an EXPLICIT list of files, refuse missing/ambiguous/conflicting inputs instead of comparing a partial set, and re-check every content hash before handing the absolute paths to contrib.compare.",
+   "status": "active"
+  },
   "_dpsm_work/batch_snapshot.py": {
    "evidence": "RF7e: named twice in the current docs; it is how batch_inputs/rf0 was made; nobody imports it",
    "expected_exit": "0 ok / 1 error",

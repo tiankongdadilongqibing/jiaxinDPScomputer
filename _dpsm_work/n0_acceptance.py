@@ -430,6 +430,12 @@ def main():
             # Without this the pair could drift silently until somebody produces a real bundle (needs the game).
             ("extract_contract", [PY, os.path.join(HERE, "check_extract_contract.py")]),
             ("selftest/extract_contract", [PY, os.path.join(HERE, "check_extract_contract.py"), "--selftest"]),
+            # R56: the battle-reference SELECTION layer. The list run executes it against the frozen batch
+            # (proving it reads real exports and stays ASCII/exit-0), the selftest exercises every refusal
+            # path on synthetic files in a temp dir: missing, ambiguous, name/body conflict, changed hash,
+            # unfinished sample.
+            ("battle_select", [PY, os.path.join(HERE, "battle_select.py"), "list", "--exports", exports_dir]),
+            ("selftest/battle_select", [PY, os.path.join(HERE, "battle_select.py"), "--selftest"]),
             ("refactor_final_check", [PY, os.path.join(HERE, "refactor_final_check.py")]),
             ("selftest/refactor", [PY, os.path.join(HERE, "refactor_final_check.py"), "--selftest"]),
             # RF7: the tool registry. The verify run is the drift check (a script the pipeline runs but the

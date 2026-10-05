@@ -63,6 +63,26 @@ public static partial class OverlayUGUI
 
 	private static bool _prevLeft, _prevRight;
 
+	/// <summary>
+	/// R56 (BID-3, plan §6): the 复制引用 target. The LAYOUT pass records the rect and the payload of the
+	/// row that carries the currently displayed battle's identity, so a click can only ever copy the
+	/// battle the panel is showing -- never "whatever Aggregator.Session happens to be at that moment".
+	/// </summary>
+	private static RectTransform _copyRefRt;
+	private static string _copyRefPayload;
+	private static bool _lmbWasDown;
+	private static float _copyFlashUntil;
+
+	/// <summary>True for a couple of seconds after a successful copy, so the row can say so.</summary>
+	internal static bool CopyFlashActive
+	{
+		get
+		{
+			try { return _copyFlashUntil > 0f && Time.unscaledTime < _copyFlashUntil; }
+			catch { return false; }
+		}
+	}
+
 	private static Canvas _canvas;
 	private static RectTransform _panelRt;
 	private static Image _bg;
@@ -240,6 +260,7 @@ public static partial class OverlayUGUI
 			}
 			_canvas.enabled = true;
 			HandleScroll();
+			CheckCopyClick();
 			if (Time.unscaledTime - _lastRefresh >= 0.25f)
 			{
 				_lastRefresh = Time.unscaledTime;
@@ -332,6 +353,51 @@ public static partial class OverlayUGUI
 			if (_scrollOffset < 0f) _scrollOffset = 0f;
 		}
 		try { _contentRt.anchoredPosition = new Vector2(0f, _scrollOffset); } catch { }
+	}
+
+	/// <summary>
+	/// R56 (BID-3): the 复制引用 click. A real uGUI Button needs an EventSystem in the game's scene, and
+	/// this overlay deliberately owns nothing in that scene; the click is therefore detected exactly like
+	/// the mouse wheel already is (GetAsyncKeyState + a rectangle test), which adds no component and
+	/// cannot fight the game for input.
+	/// </summary>
+	private static void CheckCopyClick()
+	{
+		try
+		{
+			bool down = (GetAsyncKeyState(1) & 0x8000) != 0;   // VK_LBUTTON
+			bool pressed = down && !_lmbWasDown;
+			_lmbWasDown = down;
+			if (!pressed) return;
+			if (GameRef.IsNull(_copyRefRt) || string.IsNullOrEmpty(_copyRefPayload)) return;
+			if (!RectTransformUtility.RectangleContainsScreenPoint(_copyRefRt, Input.mousePosition, null)) return;
+			CopyToClipboard(_copyRefPayload);
+		}
+		catch { }
+	}
+
+	/// <summary>The one place text reaches the clipboard. A failure is LOGGED and the row keeps printing
+	/// the full id, which is the documented manual fallback (plan §6) -- a click must never look like it
+	/// worked when nothing was copied.</summary>
+	internal static bool CopyToClipboard(string text)
+	{
+		if (string.IsNullOrEmpty(text)) return false;
+		try
+		{
+			GUIUtility.systemCopyBuffer = text;
+			try { _copyFlashUntil = Time.unscaledTime + 2.5f; } catch { }
+			string ok = "[DpsMeter][BREF] 已复制战斗引用(" + text.Length + " 字符)";
+			Plugin.LogSource.LogInfo(ok);
+			RuntimeLog.Write(ok);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			string bad = "[DpsMeter][BREF] 复制失败,可手动抄写完整编号: " + ex.Message;
+			Plugin.LogSource.LogWarning(bad);
+			RuntimeLog.Write(bad);
+			return false;
+		}
 	}
 
 	private static void CheckKeys()

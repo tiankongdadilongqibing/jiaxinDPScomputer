@@ -1,0 +1,51 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\attribution_census.py --selftest
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\clean.txt
+export      : clean.json
+reasons     : 
+unattributed: unknown_kind amount=90.9091 folds=1
+note        : file uses the pre-R54 vocabulary; the given_carrier_* codes are compared as unknown_kind
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MATCH
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\bad_folds.txt
+export      : bad_folds.json
+reasons     : 
+unattributed: unknown_kind amount=90.9091 folds=2
+note        : file uses the pre-R54 vocabulary; the given_carrier_* codes are compared as unknown_kind
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MISMATCH
+  PROBLEM   : reason unknown_kind: folds plugin=2 recompute=1
+  PROBLEM   : reasonCounts unknown_kind: plugin=2 recompute=1
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\bad_amount.txt
+export      : bad_amount.json
+reasons     : 
+unattributed: unknown_kind amount=1.0000 folds=1
+note        : file uses the pre-R54 vocabulary; the given_carrier_* codes are compared as unknown_kind
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MISMATCH
+  PROBLEM   : reason unknown_kind: amount plugin=1.0000 recompute=90.9091
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\bad_reason.txt
+export      : bad_reason.json
+reasons     : 
+unattributed: not_a_real_reason amount=90.9091 folds=1
+note        : file uses the pre-R54 vocabulary; the given_carrier_* codes are compared as unknown_kind
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MISMATCH
+  PROBLEM   : reason not_a_real_reason: plugin says 1 folds; recompute never produced it
+DATA_MISSING: missing.json has no contribution section (version=1.5.0)
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\new_vocab.txt
+export      : new_vocab.json
+reasons     : given_carrier_none=1
+unattributed: given_carrier_none amount=90.9091 folds=1
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MATCH
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_ma0up52s\new_vocab_bad.txt
+export      : new_vocab_bad.json
+reasons     : 
+unattributed: given_carrier_one amount=90.9091 folds=1
+detail      : reason=given_carrier_none kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
+VERDICT     : MISMATCH
+  PROBLEM   : reason given_carrier_one: plugin says 1 folds; recompute never produced it
+  PROBLEM   : reasonCounts given_carrier_one: plugin=1 recompute=0
+  PROBLEM   : reasonCounts given_carrier_none: recompute=1 folds but the plugin recorded none
+SELFTEST PASS (9 case(s))

@@ -26,7 +26,7 @@
 | 开关 | `BepInEx\config\dev.dpsmeter.cfg`(DamageComposition/Forensics/ReconcileCalc/GivenTalent/StatusResist/Madness/StateTimeline/FactStore/MadnessApplier/GivenGiverHook/**Contribution/ShowContribution** 全 true) |
 | 导出 | **冻结快照 35 份**(`_dpsm_work\batch-inputs-rf0.json`;`exports\` 本身是活的):411001×25 / 试炼场 9999×9 / 700817×1;版本 1.5.3→1.7.11;其中 **22 份含 `contribution` 段**(schema 1.1 ×9 = 1.7.8×3 + 1.7.10×1 + 1.7.11×5;schema 1.0 ×13),13 份无段 = 1.5.3–1.5.5,1 份 1.6.0 不可复算 |
 | 运行时日志 | `BepInEx\config\dpsmeter_runtime.log`(每次启动被删,只留最新一场) |
-| 验收 | `python n0_acceptance.py` → **42 条命令 / 74 条检查**(默认读冻结快照、写 `--out`);RF2 起的各轮终轮均 **0 项**;RF0–RF2 基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
+| 验收 | `python n0_acceptance.py` → **44 条命令 / 76 条检查**(默认读冻结快照、写 `--out`);RF2 起的各轮终轮均 **0 项**;RF0–RF2 基线轮 59 ok / 4 项(3 项已修 + 1 项是本轮工具自身产物,见 PROJECT-STATUS §12);白名单允许 `crosscheck --batch`(=1,1.6.0 已知坏样本) |
 | 契约 | `log-share/1` / `ComparisonEligibility/1` / `compare/2` / `decision/1` / `budget-census/1` / 身份映射;入口与退出码见 PROJECT-STATUS §3 |
 
 ## 3. 已验证的能力(全部实机)
@@ -38,7 +38,7 @@
   ルゥ=ルルサ 给敌方 ×1.5)、赋予(マッドシーカー 的刻印授予 +10%)、全局规则(母なる変異の飛沫、海魔の残滓)。
 * **队伍贡献表**:每角色 自伤 / 自身规则 / 受队友赋能 / 为团队赋能(对数份额口径),**域内 creditedShare 100%(未归因池 0.0%)**;**整场覆盖率是 `overallAttributedCoverage`,并非 100%**。
 * **时间线**:受击方 18 抗性槽 + 10 状态位,只在变化时出行。
-* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **42 条命令 / 74 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **811 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数/活动环/文字排版与数字格式/列定义/数据行构造/回退渲染器文本/主数据选名/composition 容差)与 **87 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
+* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **44 条命令 / 76 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **947 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数/活动环/文字排版与数字格式/列定义/数据行构造/回退渲染器文本/主数据选名/composition 容差)与 **130 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
 * **阶段 E(1.6.0 起,1.6.1 实机验收通过)**:导出新增 `contribution` 段 —— 每角色 基础/自身规则/辅助/总贡献、
   规则当量、提供者→受益者关系,全部由逐击折叠导出现算。**验收 = 与独立 Python 核心逐字段一致**
   (`contrib.crosscheck` status=OK / mismatches=0,11 角色/21 规则/20 关系);schema 与 v150 problems=0。
@@ -100,9 +100,9 @@
        python -m contrib.legacy_diff(回归证据:新核心 ↔ 旧 Stage-0 表逐列对照,裁决 MATCHES-LEGACY)
        python -m contrib.tests.test_golden_155(把已公布的 1.5.5 数字钉成回归测试;导出缺失时 SKIP)
        python -m contrib.rule115_census(8 场 1.15 生效次数普查:98.3% 对齐,多折 481 vs 少折 220)
-验收   python n0_acceptance.py(全量:42 条命令 / 74 条检查;默认读冻结快照、写 `--out`)/ python n0_acceptance.py --selftest(负控用例见工具注册表)
+验收   python n0_acceptance.py(全量:44 条命令 / 76 条检查;默认读冻结快照、写 `--out`)/ python n0_acceptance.py --selftest(负控用例见工具注册表)
 批次   python batch_snapshot.py --name rf0 --verify(冻结输入)/ python repo_manifest.py --verify --exports batch_inputs\rf0(基线清单)
-测试   python tests\negative_control.py(114 例变异负控)/ python tests\il_equiv.py <pre> <post> <report>(IL 等价)/ python tests\rf2_split.py(RF2 拆分器)
+测试   python tests\negative_control.py(130 例变异负控)/ python tests\il_equiv.py <pre> <post> <report>(IL 等价)/ python tests\rf2_split.py(RF2 拆分器)
        python check_doc_convergence.py(--selftest)/ python check_docs_123.py(--selftest)/ python check_live_log.py --log ..\BepInEx\LogOutput.log
        python check_export_schema.py / python check_contribution_layout.py / python refactor_final_check.py / python v150_validate.py
 契约   python comparison_eligibility.py --applicability acceptance_1.7.11\applicability.json --json acceptance_1.7.11\eligibility.json
@@ -138,7 +138,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 
 1. **不要为了验证一个假设就让用户再打一场** —— 能离线判的必须离线判完;探针一次上齐。
 2. 每个数字都要能在磁盘上复算;文档标注**实测 / 离线重放 / 推断**。
-3. 改完立刻跑验收:`python n0_acceptance.py`(42 条命令 / 74 条检查,且工具哈希零漂移);只改文档至少跑
+3. 改完立刻跑验收:`python n0_acceptance.py`(44 条命令 / 76 条检查,且工具哈希零漂移);只改文档至少跑
    `check_doc_convergence.py` + `check_docs_123.py`;改插件还要构建 + `recon_probe`。
 4. 文件交换用编辑/写文件工具,**不要用 PowerShell 整文件读写含中文的文件**(控制台是 GBK)。
 5. **两个 crash.bak 绝不回滚/删除**;`.bak` 是回滚档案不是文档。可再生的 artifact(反编译 dumps、`__pycache__`)用完即删。
@@ -187,7 +187,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 | `_dpsm_work\evidence_*` | 复算脚本与输出(1.15² / 1.5.2 实机 / 1.5.3 实机 / 贡献联结 / 1.5.5 验收) |
 | `_dpsm_work\export_archive_20261003.zip` | 3 份证据战场(旧导出清空时留存) |
 | `_dpsm_work\doc_archive_20261003.zip` | 8 份逐版说明(1.4.0–1.5.5)归档 |
-| `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(811 用例 / 94 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
+| `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(947 用例 / 98 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
 | `_dpsm_work\tests\`(IlDump / il_equiv.py / negative_control.py / rf2_split.py) | RF2 等价证据与拆分器、RF1 变异负控 |
 | [`REPO-BOUNDARY.md`](<REPO-BOUNDARY.md>) · [`_dpsm_work\baseline-manifest.json`](<_dpsm_work/baseline-manifest.json>) · [`_dpsm_work\batch-inputs-rf0.json`](<_dpsm_work/batch-inputs-rf0.json>) | 仓库边界 / 基线清单(源码·工具·配置·语料·外部程序集)/ 本批冻结输入清单 |
 | [`_dpsm_work\REFACTOR-BATCH-RF0-RF2.md`](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>) | **重构第 1 轮记录**:RF0–RF2 的文件清单 / 证据 / 未覆盖项 / 回滚 |
@@ -209,4 +209,4 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 * **2026-10-03 深夜(阶段 A/B/C)**:新增贡献指标字典 + `contrib/` 离线核心(纯新增,未删任何文件;
   只删了自己刚生成的旧命名 `compare_all.*`);`check_docs_123.py` 的 FILES 追加 4 个新增 CJK 文件;
   记录见 §7.2.82。
-> **部署状态(R55 起)**:DLL = **390C1340**…(423,424 字节;证据提取流程**默认开启** + 「阻挡增伤」待确认表按角色贡献同款列宽显示);上一版 **76CEAC00**…(420,352 字节)备份于 `_dpsm_work/deploy-backup/pre-r55-76CEAC00/`,更早三版在 `pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。
+> **部署状态(R56 起)**:DLL = **F6948470**…(433,664 字节;战斗编号 battle-ref/1 + 主窗/各页身份一致 + 点击复制引用 + 离线 `battle_select.py` 精确选场);上一版 **390C1340**…(423,424 字节)备份于 `_dpsm_work/deploy-backup/pre-r56-390C1340/`,更早在 `pre-r55-76CEAC00/`、`pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。

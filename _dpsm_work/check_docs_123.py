@@ -115,6 +115,10 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R54.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R55.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\BATTLE-REFERENCE-IMPLEMENTATION-PLAN.md',
+
+	# R56: 战斗编号 / 精确选场(面向用户的报告 + 逐轮记录)
+	'D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\REPORT-精确选场-R56.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R56.md',
 ]
 
 

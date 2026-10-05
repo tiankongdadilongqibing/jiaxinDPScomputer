@@ -47,7 +47,11 @@ public static partial class Aggregator
 		// the silent merge that a relaxed resume rule would cause.
 		// RF3 + RF4: the grouping RULE is the policy, the marker STATE is the container; the wall-clock read
 		// stays here (every clock read belongs to the facade).
-		double runGap = Continuity.HasEnded ? (DateTime.Now - Continuity.LastEndWall).TotalSeconds : -1.0;
+		DateTime startWall = DateTime.Now;
+		// R56 (BID-1): THE one allocation point of a battle identity (plan §3). The collision probe reads
+		// the ids already on disk, so a regenerated launch namespace cannot reuse a published reference.
+		BattleRef battleRef = BattleRefRegistry.Default.NewBattle(startWall, ExportService.IdExists);
+		double runGap = Continuity.HasEnded ? (startWall - Continuity.LastEndWall).TotalSeconds : -1.0;
 		RunMarker marker = Continuity.BeginSession(runGap, questId, SessionTransitionPolicy.RunJoinSeconds);
 		int runSeq = marker.RunSeq;
 		long runIdNow = marker.RunId;
@@ -56,8 +60,9 @@ public static partial class Aggregator
 			InBattle = true,
 			Result = (GameResult)0,
 			QuestId = questId,
-			StartWallClock = DateTime.Now,
-			LastEventWall = DateTime.Now,
+			StartWallClock = startWall,
+			LastEventWall = startWall,
+			Ref = battleRef,
 			RunId = runIdNow,
 			RunSeq = runSeq,
 			RunGap = marker.RunGap,
@@ -89,6 +94,7 @@ public static partial class Aggregator
 		TalentRuntime.ResetSession();
 		OverlayUGUI.LogSessionStart(battleSession.QuestId);
 		string text = $"[DpsMeter] Battle session started (quest={battleSession.QuestId})"
+			+ $" battleId={battleRef.Id} {battleRef.ShortTag}"
 			+ $" gameTimeAtStart={Rt.GameTimeAtStart} run=#{runIdNow}.{runSeq}"
 			+ (runSeq > 0
 				? $" gap={marker.RunGap:F2}s prev={marker.PrevWhy}/{marker.PrevResult}"
@@ -143,6 +149,9 @@ public static partial class Aggregator
 			// StartWallClock, so it is overwritten instead of duplicated.
 			History.RemoveAll(h => ReferenceEquals(h.Session, s));
 			s.InBattle = true;
+			// R56 (plan §3): resuming the SAME session keeps its id and re-marks it live; the revision
+			// moves because the resumed battle's content is no longer the provisional snapshot.
+			BattleRefRegistry.MarkResumed(s.Ref);
 			s.NoteEvent();
 			// FinalizeLocked drops the BattleObject references to release the native objects; restore
 			// them so 耐久 sampling and the [CROSS] check keep working for the resumed tail.

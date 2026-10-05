@@ -16,15 +16,15 @@
 | 项 | 值 |
 |---|---|
 | 插件版本 | **1.7.11**;`src/BuildInfo.cs` = `DpsMeter.csproj` = 1.7.11(一致) |
-| 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,423,424 B,SHA256 `390C1340665F925CC9B9BFC997928D707BEA617E882F2ED1CF111BD605C1218E` |
+| 部署 DLL | `BepInEx\plugins\DpsMeter\DpsMeter.dll`,433,664 B,SHA256 `F6948470E0F51680E44983327746A010F5F62BB0F5E415A0DE0518956077F1C0` |
 | 回退锚点 | `.1.7.10.bak` = `BF2F174A…`(另有 .1.7.9/.1.7.8/.1.7.7/.1.7.6/.1.7.5/.1.7.4/.1.7.3/.1.7.2/.1.7.0/.1.6.1/.1.6.0/.1.5.5-verified);**`1.0.48/1.0.49-crash.bak` 绝不回滚** |
-| 源码规模 | `_dpsm_work/src`:**91 个 .cs / 23,933 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **125** 个 .cs(src + recon_probe + test + **tests**) |
+| 源码规模 | `_dpsm_work/src`:**94 个 .cs / 25,204 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 3 个纯策略文件,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **129** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `47BC333E2B99EF7B78F2F35EED3CD41FB624CE7AEED6D5C60C4328D9D9DD4F85`;贡献相关开关全 true,R54 起 `ExtractOnBattleEnd=true`(每场自动出证据包,保留 `ExtractKeep=5`),R55 起**插件默认值**也是 true(不再依赖用户读配置) |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
 | 导出段 schema | `contribution.schemaVersion` = **1.1**(**22 份带段**:1.0 ×13 / 1.1 ×9);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
-| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**866 个命名用例 / 95 组**,**121 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
-| 离线守卫 | **42 条命令 / 74 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**99 条登记 / 30 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
+| C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b):**947 个命名用例 / 98 组**,**130 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
+| 离线守卫 | **44 条命令 / 76 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**100 条登记 / 31 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |
 
 ## 2. 语料现状(35 份,冻结快照)
 
@@ -63,7 +63,7 @@
 ```
 PY = C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe
 
-验收(最全,42 条命令 / 74 条检查)   python n0_acceptance.py
+验收(最全,44 条命令 / 76 条检查)   python n0_acceptance.py
 冻结批次输入                      python batch_snapshot.py --name rf0 --verify
 基线清单核对                      python repo_manifest.py --verify --exports batch_inputs\rf0
 C# 行为测试                       dotnet run --project tests\BehaviorTests\BehaviorTests.csproj -c Release -- --quiet
@@ -262,7 +262,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 - 新增"当前状态句"的数字必须能被 §4 的命令复算,否则不写。
 - 每次改动后跑:`python n0_acceptance.py`(33 命令 / 65 检查,全绿);只改文档时至少跑 `check_doc_convergence.py` + `check_docs_123.py`。
 - **输入会变**:`exports\` 是游戏写的活目录。每次新开一批先 `python batch_snapshot.py --name <批名>` 并提交清单,再让 `n0` 读快照;批中新增的战斗属于**下一批**。
-- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"42 条命令 / 74 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。**§12 各轮行刻意只记结果(如"0 项")、不复述命令/检查数**:那些数字属于各自那一刻,写进本文就会被 R9 当作对最新流水线的声明;它们留在各自的批次记录与 `acceptance_*/RESULTS.md` 里。
+- **数字与守卫同步**:改了流水线的命令/检查数,必须同步本文与索引中"44 条命令 / 76 条检查"的说法,否则 R9 会红(这是设计,不是麻烦)。注意**检查总数会随数据移动**:桶集合与"本次真正被重写的固定路径数"都会改变行数,所以数字要复算而不是抄。**§12 各轮行刻意只记结果(如"0 项")、不复述命令/检查数**:那些数字属于各自那一刻,写进本文就会被 R9 当作对最新流水线的声明;它们留在各自的批次记录与 `acceptance_*/RESULTS.md` 里。
 
 ## 12. 重构批次记录(按 REFACTOR-PLAN-POST-1.7.11.md)
 
@@ -319,6 +319,7 @@ C# 离线断言                       dotnet run --project recon_probe\ReconProb
 | **第 53 轮(第二场的独立复现 + 提取键的收尾回退)** | 你的第二场(任务 411001,导出 `battle_411001_20261005_132514.json` 24,876,310 字节)把 R52 的结论**独立复现**:贡献账残差 8,425,649.60 / 5,774 折叠(4.199%),仍然 **100% 是 `kind="given"`**、`1006/-10`、因子 1.1;提供者解析 `giverResolved=0 / giverNull=31,021`、钩子 11 次全 `nullGuest`、候选判定仍是**唯一 = エヴァラス・フラウ**;重算与自述 MATCH。同时**实机抓到流程的一个真缺陷**:你 13:26:50 按了提取键,运行日志留下 `[EXTRACT] 跳过:没有战斗会话` —— 收尾后 `Aggregator.Session` 已置空、5 s 软恢复窗口也过期,而导出文件与收尾时算好的贡献结果都还在。修法:收尾时 `EvidenceExtractor.Remember()` 存下最后一场的快照(导出路径 + 同一份 ContributionResult),按键按 `ExtractPolicy.SelectSource` **实时→快照→明确跳过**选择,普查与 manifest 增加 `inputSource`;行为用例 794→**798**、变异 111→**112**,部署替换为 **3A89D30A**(417,792 字节) | [REFACTOR-BATCH-R53.md](<REFACTOR-BATCH-R53.md>) |
 | **第 54 轮(阻挡增伤单独归类 + 授予者精确匹配 + 提取可见化)** | 按你的两点要求:①**「阻挡增伤」不再混进一个笼统的未归因** —— given 通道按名册侧证据强弱分成 `given_carrier_none/one/ambiguous` 三码(**都仍未归因**,码只说明离答案多近),贡献面板在每个未归因理由下**单独列出金额与折叠数**;②授予钩子改为按 **(目标, type/param) 精确匹配**才给信用,旧的「只按目标名」答案只计数(`givenApplies.targetOnlyRejected`)—— 实测第三场它把 6,705,889.97 记给了**不能授予该规则**的单位,这条修改的方向是**撤销无证据的归属**;③**提取键 F4 现在显示在面板底栏**(未战斗中/战斗中两处)+ IMGUI 回退 + 启动日志,并把你的 `ExtractOnBattleEnd` 打开(每场自动出包,保留 5 份)。行为用例 798→**811**,变异 112→**114**;Python 离线核心同步实现三码;`attribution_census.py` 对旧词汇文件做**词汇归一**并在输出注明。部署 **76CEAC00**(420,352 字节) | [REFACTOR-BATCH-R54.md](<REFACTOR-BATCH-R54.md>) |
 | **第 55 轮(提取默认开启 + 「阻挡增伤」待确认表)** | 按你的两点要求:①`General/ExtractOnBattleEnd` 的**插件默认值**从 false 改成 **true**(R54 只改了你的 cfg)—— 提取不再依赖用户知道有个键,F4 仍是随时补一包的手动入口,磁盘由 `ExtractKeep`=5 兜住;②「阻挡增伤」改成**和角色贡献表同款**的小表:`【阻挡增伤·待确认】` 用 T1 的**同一套列宽**(调用时从 T1 复制,只把「角色」→「候选角色」、「命中」→「折叠」),逐**候选持有者**一行给待确认金额/占比/折叠 + 一行 `待确认合计`,不适用的信用列打印 `-` 而不是 `0`;它属于**未归因**,放在未归因理由行之后、**不进角色表合计**。本轮**不移动任何信用**。行为用例 811→**866**、变异 114→**121**,没有新增 `.py` 工具。同时补上 R54 遗留的最后一环:2026-10-05 14:30:55 的 `battle-end` 包(任务 411001 / 119.07 s)是提取流程**第一次实机跑通**,`extract_verify.py` **PASS**(manifest 2/2、masterdata 20/20、普查 4 组 / 35,271 折叠与独立重算逐字段一致);那一场未归因**全部**是 given 通道(5,368 折叠 / 7,373,676.891,候选**唯一** = エヴァラス・フラウ)。部署 **390C1340**(423,424 字节) | [REFACTOR-BATCH-R55.md](<REFACTOR-BATCH-R55.md>) |
+| **第 56 轮(战斗编号 + 精确选场,按 BATTLE-REFERENCE-IMPLEMENTATION-PLAN)** | 按规划实现**第一版闭环**:新建会话时**只分配一次**编号(`B-{启动命名空间}-{序号≥3位}`,契约 `battle-ref/1`),视图重建**复制**而不重新发号、没有编号就明说 legacy;导出正文新增 `battleRef` 块,默认文件名 `battle_{quest}_{时间}__{编号}.json`(保留历史前缀与 quest 位置),写盘改为**临时文件 + 原子发布**,成功后才计算**实际字节 SHA256**;主窗/上一场/F5/F6/Chart 五处显示短序号 + 完整编号(uGUI 点击该行复制、IMGUI 回退是真按钮),F9 保留编号并计数;**新增离线 `battle_select.py`**(`list`/`resolve`/`compare`)把编号解析成显式文件清单,缺失/歧义/文件名与正文冲突/内容变化/未终局**一律拒绝**,比较仍交给既有 `contrib.compare`。行为用例 866→**947**(新增 `bref/format|registry|lifecycle` 三组 81 例)、变异 121→**130**(新增 9 例;其中 2 例初稿跑不红,已按"跑不到红就不是闸门"改成会咬的判据并记录)、新工具 selftest **16 例**;真机:真实导出目录 50 份 / 0 带编号 / 50 legacy 全部可列。**本轮不移动任何伤害/贡献数字**。部署 **F6948470**(433,664 字节) | [REFACTOR-BATCH-R56.md](<REFACTOR-BATCH-R56.md>) |
 | **第 50 轮(首次部署)** | 应你要求把运行 DLL 从基线 1.7.11(387,072 / 36EC96D4…)替换为**重构构建**(398,336 / 28B8CCAF…):替换前确认**游戏未运行且文件未占用**,备份全部 105 个文件到 `_dpsm_work/deploy-backup/baseline-1.7.11/`,并复核你要求永不改动的两个 `.bak` **哈希不变**;回退为一条 Copy-Item;跑完后的对照计划(转储逐字节 vs r42 基准、导出跑既有检查、前后哈希留档)写在记录里 | [REFACTOR-BATCH-R50.md](<REFACTOR-BATCH-R50.md>) |、RF4 其余族(单场运行态 / 攻击快照 / 进程级 / 展示级)与 `ApplyGlobalDebuffs`、RF5 展示层与缓存、RF6 主数据适配器、RF7 工具归档 | — |
 
 三条要点:

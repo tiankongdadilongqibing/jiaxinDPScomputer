@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 866;
+	public const int ExpectedCases = 947;
 
 	private static int Main(string[] args)
 	{
@@ -65,6 +65,8 @@ internal static class Program
 		// R52: the evidence-extraction flow (trigger key, bundle name, retention) and the unresolved-fold
 		// census the bundle carries.
 		Cases.ExtractionCases(r);
+		// R56: the battle reference -- format, lifecycle, launch namespace, collision handling.
+		Cases.BattleRefCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)
