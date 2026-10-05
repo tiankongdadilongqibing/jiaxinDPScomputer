@@ -79,8 +79,9 @@
 |---|---|---|---|
 | `attribution_census.py` | `python _dpsm_work/attribution_census.py [--export PATH] [--json OUT] [--selftest]` | 0 一致 / 1 不一致或输入不可用 / 3 没有 contribution 段 | 用被核对的离线核心重算未归因拆分,与插件自述**逐字段**对比;打印未归因分组与候选判定 |
 | `extract_verify.py` | `python _dpsm_work/extract_verify.py [--bundle DIR] [--selftest]` | 0 通过(可有 WARNING)/ 1 不一致或损坏 / 3 缺必需文件 | 校验 manifest 的每个大小/校验值;把普查文件与"重算同一份 battle.json"逐组对比;报告部署程序集是否仍是包里那一个 |
+| `check_extract_contract.py` | `python _dpsm_work/check_extract_contract.py [--selftest]` | 0 契约一致 / 1 键、文件名或 schema 常量不一致 | **守卫**:证据包的**写方**(`EvidenceExtractor.cs`)与**验方**(`extract_verify.py`)必须仍然说的是同一套字段 —— schema 常量与校验算法名两边比对,验方读的每个键必须仍是写方发出的字面量,三个必需文件名必须仍然产出;自检在临时副本上任一侧篡改,必须报出具名差异 |
 
-两者都只输出 ASCII 到控制台(控制台是 GBK),人读的报告写成 UTF-8。`extract_verify.py` 对 24 MB 的
+三个工具都只输出 ASCII 到控制台(控制台是 GBK),人读的报告写成 UTF-8;三者的 `--selftest` 都在验收流水线里(n0 的 `selftest/attribution_census` / `selftest/extract_verify` / `extract_contract` / `selftest/extract_contract`)。`extract_verify.py` 对 24 MB 的
 `battle.json` 做逐字节 FNV,所以一次调用大约十几秒 —— 这是"真的校验了"的价格。
 
 WARNING 与 ERROR 的区别是刻意的:包里的程序集哈希与当前部署的 `DpsMeter.dll` 不一致时,包**仍然有效**

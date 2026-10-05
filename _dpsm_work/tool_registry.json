@@ -114,7 +114,7 @@
    "in_pipeline": true,
    "input_versions": "当前 41 份文档",
    "kind": "guard",
-   "lines": 194,
+   "lines": 199,
    "outputs": [
     "none (read-only)"
    ],
@@ -134,6 +134,21 @@
     "none (read-only)"
    ],
    "purpose": "DpsMeter export schema checker + coverage reporter  (1.5.2)",
+   "status": "active"
+  },
+  "_dpsm_work/check_extract_contract.py": {
+   "evidence": "R52: wired into n0_acceptance (verify + --selftest, temp copies only); it exists because the bundle's writer and verifier could otherwise drift until somebody produces a real bundle, which needs the game",
+   "expected_exit": "0 contract holds / 1 a key, file name or schema constant disagrees",
+   "has_selftest": true,
+   "imports_local": [],
+   "in_pipeline": true,
+   "input_versions": "src/Diagnostics/EvidenceExtractor.cs + extract_verify.py (the two halves of the bundle contract)",
+   "kind": "cli",
+   "lines": 224,
+   "outputs": [
+    "none (read-only)"
+   ],
+   "purpose": "R52: check that the evidence bundle's WRITER (C#) and its CHECKER (Python) still agree -- the manifest/census schema constants and the checksum algorithm name on both sides, every JSON key the verifier reads exists as an emitted literal, and the three file names the verifier requires are produced; the selftest tampers temp copies on either side.",
    "status": "active"
   },
   "_dpsm_work/check_fact_signature.py": {
@@ -1095,7 +1110,7 @@
    "in_pipeline": false,
    "input_versions": "",
    "kind": "cli",
-   "lines": 726,
+   "lines": 735,
    "outputs": [
     "acceptance archive under --out (RESULTS.md, runs.json, corpus_manifest.json)"
    ],
@@ -1246,7 +1261,7 @@
    "in_pipeline": false,
    "input_versions": "",
    "kind": "cli",
-   "lines": 612,
+   "lines": 638,
    "outputs": [
     "stdout mutation report (no files written)"
    ],

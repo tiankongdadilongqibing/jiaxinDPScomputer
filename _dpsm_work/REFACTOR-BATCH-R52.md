@@ -56,6 +56,7 @@
 | `tests/BehaviorTests/{Cases.Extraction.cs(新), Stubs.cs, BehaviorTests.csproj, Program.cs}` | 85 例新用例(键/包名/保留/普查/候选) | 见 §4;`TalentRef` 进 stub 是"编译即边界"的体现 |
 | `tests/negative_control.py` | 9 例 R52 变异 + **修好计数缺陷** + 第三个自检用例 | 见 §4.4 |
 | `attribution_census.py` / `extract_verify.py`(新) | 见 §2 | 流程的另一半:证明包没被改过、且普查可被独立重算 |
+| `check_extract_contract.py`(新) | 写方(C#)与验方(Python)的**契约守卫**:schema 常量、校验算法名、验方读的每个键、三个必需文件名 | 这两半是同一份契约的两个实现;没有它,一次改名只能等到「真的产出一个包」才暴露,而那需要游戏。它的自检在临时副本上**两侧**都篡改得起(§4.3) |
 | `n0_acceptance.py` / `tool_registry.json` / `TOOL-REGISTRY.md` / `check_docs_123.py` | 三个新 selftest 进流水线;两个新工具登记为 active;三份新文档进文档集 | 新增 .py/.md 不上名单就是红 |
 
 ## 4. 验证阶梯
@@ -81,6 +82,7 @@
 |---|---|
 | `python _dpsm_work/attribution_census.py --selftest` | **7 例通过**(改折叠数/改金额/编造理由/删段 → 各自具名变红) |
 | `python _dpsm_work/extract_verify.py --selftest` | **7 例通过**(追加一个字节 → 大小+校验双红;删文件 → DATA_MISSING;普查不符/算法名不符/账不平/候选判定被翻 → 各自具名变红) |
+| `python _dpsm_work/check_extract_contract.py`(+ `--selftest`) | 契约一致(read=34 / extra=27 / schemas=2 / files=3);**7 例自检通过**:改一个普查键名、改写方的 schema 常量、改写方的哈希算法名、改一个输出文件名 → 必须报出具名差异;改**验方**的 schema 常量与哈希名同样必须报出 |
 
 ### 4.4 本轮**发现并修好的一个"不会失败的闸门"**(重要)
 
@@ -107,8 +109,12 @@
 
 | 命令 | 结果 |
 |---|---|
-| `python n0_acceptance.py --out acceptance_r52`(cwd 必须是 `_dpsm_work`) | **40 条命令 / 72 条检查 / 0 项**(`acceptance_r52`);新增的三条 `selftest/attribution_census`、`selftest/extract_verify`、`selftest/negctl_driver` 全部 exit 0 |
+| `python n0_acceptance.py --out acceptance_r52`(cwd 必须是 `_dpsm_work`) | **42 条命令 / 74 条检查 / 0 项**(`acceptance_r52`);新增的三条 `selftest/attribution_census`、`selftest/extract_verify`、`selftest/negctl_driver` 全部 exit 0 |
 | `python repo_manifest.py --write --exports <冻结快照>` | 部署换了 DLL ⇒ `--verify` 报 `DRIFT: deployed_dll`(这是设计);按工具文档重新基线后 `drift=0`、`corpus=35` 与验收输入一致 |
+
+> 收尾补充:`acceptance_r52` **跑过两次** —— 第一次是 40 条命令 / 72 条检查(提交 `2ef5710` 里留档),
+> 加上 §3 的契约守卫(`extract_contract` + `selftest/extract_contract` 两条)后**重跑**,得 42 条命令 / 74 条检查 / 0 项;
+> 文档里的口径数字按**最新**档案(即重跑后的 `acceptance_r52`)同步,这正是 R9 的用法。
 
 ## 5. 部署与回退
 

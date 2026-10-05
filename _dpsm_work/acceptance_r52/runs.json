@@ -45,7 +45,7 @@
    "count": 35,
    "source": "_dpsm_work/batch-inputs-rf0.json"
   },
-  "generated": "2026-10-05T09:15:35",
+  "generated": "2026-10-05T09:26:16",
   "notes": [
    "logs are associated only when the log names the export path",
    "no historical export, DLL, config or evidence file is modified by this script"
@@ -67,7 +67,7 @@
    "_dpsm_work/contrib/crosscheck.py": "EE749E0BEBA2F2C72FCDBC984ADFD6D1B9EAF78D3B43479252015040AF66BDFD",
    "_dpsm_work/contribution_applicability.py": "EAAEDB3ADA5535723D454D7D7DAA190DAE38DD6B920E01821228B89A1BB7D467",
    "_dpsm_work/contribution_gate.py": "267AF3F044F93FBEBC1571768754B6ADA404D6E59DDF7A4399695923AB5E5651",
-   "_dpsm_work/n0_acceptance.py": "53A54B332D087DF4E5772A6CC38C72E8AF7EA80F59391B4AF447C6DFFB9BB5DB",
+   "_dpsm_work/n0_acceptance.py": "A6C8179A2A9AFB377247B9FD66545528FDB330E3B6C7D6BD466B29AF6220A803",
    "_dpsm_work/pairtrusted_impact.py": "9A0AC5F10A9F1D0E1512C1372B7AD7E7677E70CAC28BDADBE58F56159FA98669",
    "_dpsm_work/refactor_final_check.py": "D6FAAE5633AEE52404E25ED8BCBCF71A20CED72CB8EAD74155470A0112CB8CC1",
    "_dpsm_work/repo_manifest.py": "B4AC9B818EDE6EA5338F6D2E0DE9E53B1F3C17E33B95083EFECF2793151A86F6",
@@ -98,7 +98,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/applicability_all_.txt",
    "name": "applicability(all)",
-   "seconds": 34.72,
+   "seconds": 34.28,
    "tail": "verdicts by quest:\n  quest 411001  exports=25 versions=1.5.3,1.5.4,1.5.5,1.6.0,1.6.1,1.7.0,1.7.10,1.7.11,1.7.2,1.7.3,1.7.4,1.7.5,1.7.6,1.7.8 app=full,not_comparable,partial scope=invalid-plugin-value-trust,normal-benchmark,offline-recompute-only knf=0/0 unexp=0\n  quest 700817  exports=1  versions=1.7.6 app=partial scope=caveat-attribute-affinity knf=59/59 unexp=0\n  quest 9999    exports=9  versions=1.5.3,1.5.4,1.5.5,1.7.11,1.7.5,1.7.8 app=not_comparable scope=training-ground-only knf=45/45 unexp=0\n\nwrote acceptance_r52\\applicability.json (35 exports)"
   },
   {
@@ -115,7 +115,7 @@
    "exit": 1,
    "log": "_dpsm_work/acceptance_r52/runs/crosscheck_batch_.txt",
    "name": "crosscheck(batch)",
-   "seconds": 17.11,
+   "seconds": 17.63,
    "tail": "    [warning] atkAdd.emitted=137 exceeds atkAdd.hits=108: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit\n    [ok] contribution section present (plugin version 1.7.11)\nbattle_9999_20261004_175957.json           version=1.7.11 status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0\n    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS\n    [ok] contribution section present (plugin version 1.7.11)\nbatch: 35 file(s) {\"ERROR\": 1, \"LEGACY_NOT_APPLICABLE\": 17, \"PASS\": 14, \"WARNING\": 3} -> worst=ERROR exit=1"
   },
   {
@@ -167,7 +167,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/pairtrusted_all_.txt",
    "name": "pairtrusted(all)",
-   "seconds": 45.77,
+   "seconds": 42.79,
    "tail": "  diff Cstar_vs_A   poolDelta=     -534871.83 (-99.9760% of A pool) attributedDelta=    -2280628.00\n       denominatorChanged=True maxAbsActorCreditDelta=1019679.18 maxAbsActorShareDelta=64.2056pp top1Changed=True top3SetChanged=True rulesRemoved=6 rulesAppeared=0\n       component deltas: maxBase=630301.10 maxSelf=388146.23 maxAssist=87046.75 anyAssistMoved=True\n\nwrote acceptance_r52\\pairtrusted_impact_report.json\nwrote acceptance_r52\\pairtrusted_impact_report.txt"
   },
   {
@@ -216,7 +216,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/export_schema_all_.txt",
    "name": "export_schema(all)",
-   "seconds": 11.68,
+   "seconds": 11.26,
    "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_export_schema.py --report acceptance_r52\\export_schema_report.txt D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_205449.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230040.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230311.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_230615.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231044.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_231340.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261003_235204.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_012328.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_015919.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_021914.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_023627.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_033231.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_035437.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_041309.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042637.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_042844.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_113553.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115024.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_115417.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134524.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_134853.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_144548.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_170157.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180353.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_411001_20261004_180834.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_700817_20261004_114821.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_205129.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225530.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225647.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261003_225905.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_012138.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_042458.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_135214.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_165952.json D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\\battle_9999_20261004_175957.json\nchecked 35 file(s), problems=0, report=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\acceptance_r52\\export_schema_report.txt"
   },
   {
@@ -230,7 +230,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/layout_all_.txt",
    "name": "layout(all)",
-   "seconds": 2.64,
+   "seconds": 2.61,
    "tail": "OK   battle_700817_20261004_114821.json  rows=25\nOK   battle_9999_20261004_042458.json  rows=21\nOK   battle_9999_20261004_135214.json  rows=25\nOK   battle_9999_20261004_165952.json  rows=25\nOK   battle_9999_20261004_175957.json  rows=24\n---- layout: files=35 with-section=22 absent=13 bad=0 rows-checked=730"
   },
   {
@@ -244,7 +244,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/live_log.txt",
    "name": "live_log",
-   "seconds": 11.49,
+   "seconds": 10.88,
    "tail": "  note: no DpsMeter [Error] line in the log\n  note: 1 exported battle(s) paired with the machine log; version 1.7.11\n  note: history counter non-decreasing across 66 frame(s) (max 1)\n  note: 26 overlay frame(s) carried an unattributed row agreeing with an export\n  warn: 16 overlay frame(s) printed a ??? row WITHOUT a hit count (a live partial surface, e.g. '????? 390   ???(??????) 1,507   (????????)'): no export can corroborate those, and they are not claimed to be correct\n---- exit 0"
   },
   {
@@ -257,7 +257,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_layout.txt",
    "name": "selftest/layout",
-   "seconds": 5.54,
+   "seconds": 5.31,
    "tail": "OK   battle_9999_20261004_175957.json  rows=24\nOK   battle_9999_20261004_194948.json  rows=25\nOK   battle_9999_20261005_064910.json  rows=27\n---- layout: files=47 with-section=34 absent=13 bad=0 rows-checked=905\nselftest: old(1.7.6 Fit) bad=34 rows=905 violations=334 | new(1.7.7 Fit) bad=0 rows=905 violations=0\nselftest: PASS"
   },
   {
@@ -270,7 +270,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_schema.txt",
    "name": "selftest/schema",
-   "seconds": 0.09,
+   "seconds": 0.1,
    "tail": "PASS REJECTS unknownAttackerDealt that disagrees with totals.unattributedDamage caught=2  [contribution ledger: unknownAttackerDealt(400) != totals.unattributedDamage(999); totals identity broken: taken(1400) != dealt(1000)+unattributedDamage(999)]\nPASS REJECTS a broken ledger hit identity                 caught=1  [contribution ledger hit identity broken: events(11) != analyzable(5)+outsideTeam(3)+unknown(2)]\nPASS REJECTS a null ratio whose denominator is known      caught=1  [contribution.coverage.analysisDamageCoverage is null but its denominator is known]\nPASS accepts an empty battle (ratios null, zero denominators) caught=0\nPASS accepts a 1-unit ledger drift on a 500M battle       caught=0\nPASS REJECTS a dropped outside-team bucket on a 1e4 battle caught=1  [contribution ledger identity broken: analyzable(600)+outsideTeam(0) != totalsDealt(1000)]"
   },
   {
@@ -299,8 +299,8 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/doc_convergence.txt",
    "name": "doc_convergence",
-   "seconds": 0.27,
-   "tail": "  [PASS] R8 plugin and offline knownLimits are the same 6 strings\n  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_r41)\n  [PASS] R10 a version called section-less really has none (and the count is exact)\n  [PASS] R11 a largest-N-files list contains exactly N entries\n  [PASS] R12 no live document calls a finished item undone\n---- P1-B doc convergence: PASS (0/12 failing)"
+   "seconds": 0.25,
+   "tail": "  [PASS] R8 plugin and offline knownLimits are the same 6 strings\n  [PASS] R9 the stated acceptance counts match the newest archive (acceptance_r52)\n  [PASS] R10 a version called section-less really has none (and the count is exact)\n  [PASS] R11 a largest-N-files list contains exactly N entries\n  [PASS] R12 no live document calls a finished item undone\n---- P1-B doc convergence: PASS (0/12 failing)"
   },
   {
    "argv": [
@@ -316,7 +316,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_doc_convergence.txt",
    "name": "selftest/doc_convergence",
-   "seconds": 1.56,
+   "seconds": 1.55,
    "tail": "  [PASS] M9 a stated acceptance command count drifts -- R9; failing=['R9']\n  [PASS] M10 a version that has a section is called section-less -- R10; failing=['R10']\n  [PASS] M12 a live document calls a finished item undone -- R12; failing=['R12']\n  [PASS] M11 a largest-N list lists a different number -- R11; failing=['R11']\n  [PASS] M8 the offline knownLimits list diverges -- R8 fails\n---- selftest: PASS"
   },
   {
@@ -328,8 +328,8 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/docs123.txt",
    "name": "docs123",
-   "seconds": 0.15,
-   "tail": "REFACTOR-BATCH-R51.md                          bytes=3376     cjk=517    U+FFFD=0   mojibake=0   OK\nREPORT-δʶ���������-R52.md                          bytes=7998     cjk=1397   U+FFFD=0   mojibake=0   OK\nEXTRACTION-FLOW.md                             bytes=7209     cjk=1482   U+FFFD=0   mojibake=0   OK\nREFACTOR-BATCH-R52.md                          bytes=11389    cjk=1995   U+FFFD=0   mojibake=0   OK\nfiles=86\nTOTAL DAMAGE MARKERS: 0"
+   "seconds": 0.21,
+   "tail": "REFACTOR-BATCH-R51.md                          bytes=3376     cjk=517    U+FFFD=0   mojibake=0   OK\nREPORT-δʶ���������-R52.md                          bytes=7998     cjk=1397   U+FFFD=0   mojibake=0   OK\nEXTRACTION-FLOW.md                             bytes=7880     cjk=1598   U+FFFD=0   mojibake=0   OK\nREFACTOR-BATCH-R52.md                          bytes=12484    cjk=2195   U+FFFD=0   mojibake=0   OK\nfiles=86\nTOTAL DAMAGE MARKERS: 0"
   },
   {
    "argv": [
@@ -341,7 +341,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_docs123.txt",
    "name": "selftest/docs123",
-   "seconds": 0.15,
+   "seconds": 0.14,
    "tail": "U+FFFD                             want_red=True  got_red=True  ok\nmojibake                           want_red=True  got_red=True  ok\nnon-utf8                           want_red=True  got_red=True  ok\nmissing-file                       want_red=True  got_red=True  ok\nall 86 listed docs exist           want_red=False got_red=False ok\nselftest: 6 case(s), 0 failed"
   },
   {
@@ -354,8 +354,8 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/test_gate.txt",
    "name": "test_gate",
-   "seconds": 4.5,
-   "tail": "PASS classify_section(1.5.5, absent) == LEGACY_NOT_APPLICABLE\nPASS classify_section(1.6.0, absent) == DATA_MISSING\nPASS classify_section(1.7.7, absent) == DATA_MISSING\nPASS classify_section(1.7.7, present) == PASS\n\ngate regression: 64 passed, 0 failed (fixtures in C:\\Users\\24134\\AppData\\Local\\Temp\\p0a_gate_hpmfjjwq)"
+   "seconds": 4.13,
+   "tail": "PASS classify_section(1.5.5, absent) == LEGACY_NOT_APPLICABLE\nPASS classify_section(1.6.0, absent) == DATA_MISSING\nPASS classify_section(1.7.7, absent) == DATA_MISSING\nPASS classify_section(1.7.7, present) == PASS\n\ngate regression: 64 passed, 0 failed (fixtures in C:\\Users\\24134\\AppData\\Local\\Temp\\p0a_gate_he_s_uku)"
   },
   {
    "argv": [
@@ -391,7 +391,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/p2a.txt",
    "name": "p2a",
-   "seconds": 21.3,
+   "seconds": 20.53,
    "tail": "  [PASS] model: new prints the real battle id -- new -> 411001\nD. the value the caption must show exists in the export corpus (export fact)\n     newest 1.7.6 export: battle_411001_20261004_115417.json  totals.unattributedDamage=273702  totals.unattributedHits=71\n  [PASS] unattributedDamage is a real non-zero measurement -- value=273702\n  [PASS] the pre-fix caption would print 0 instead -- FromSummary leaves the field at 0 until task 6 is fixed\n---- P2-A guard: PASS (0 failing contract(s))"
   },
   {
@@ -405,7 +405,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/factsig.txt",
    "name": "factsig",
-   "seconds": 0.57,
+   "seconds": 0.51,
    "tail": "   n=380   ('???????', 1, '????', 2, 0, 2, 2.799, None, 150, 1, 1, None, ('?', '??'))\n   n=361   ('???????', 1, '????', 2, 0, 2, 3.219, None, 150, 1, 1, None, ('??', '?', '??'))\n   n=339   ('???', 1, '????', 2, 0, 2, 2.434, None, 150, 1, 1, None, ('?', '??'))\n   n=334   ('???????', 1, '????', 2, 0, 2, 2.66, None, 150, 1, 1, None, ('??', '?', '??'))\n   n=291   ('???', 1, '????', 2, 0, 2, 2.799, None, 150, 1, 1, None, ('??', '?', '??'))\nreport -> acceptance_r52\\fact_signature.txt"
   },
   {
@@ -418,7 +418,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_applicability.txt",
    "name": "selftest/applicability",
-   "seconds": 0.12,
+   "seconds": 0.11,
    "tail": "  [PASS] 700817 retired rule flags hits                       got=59 want=59\n  [PASS] 700817 corrected rule flags no leak                  got=0 want=0\n  real 700817: retired=59 corrected=0 (attrMult-explained=59)\nFAILING-BEFORE (retired knownMult criterion): 700817 leaks=59 -> judged a fold leak\nPASSING-AFTER  (corrected prod(fold) criterion): unexplained=0\nselftest OK (18/18)"
   },
   {
@@ -431,7 +431,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_pairtrusted.txt",
    "name": "selftest/pairtrusted",
-   "seconds": 14.15,
+   "seconds": 13.58,
    "tail": "[PASS] T3c in-domain untrusted hits occur only in pre-1.7 exports or the training ground :: all=[('battle_9999_20261003_205129.json', '1.5.3', 9999, 19), ('battle_9999_20261003_225530.json', '1.5.4', 9999, 9), ('battle_9999_20261003_225647.json', '1.5.4', 9999, 5), ('battle_9999_20261004_012138.json', '1.5.5', 9999, 6), ('battle_9999_20261004_135214.json', '1.7.8', 9999, 12), ('battle_9999_20261004_175957.json', '1.7.11', 9999, 7), ('battle_9999_20261004_194948.json', '1.7.11', 9999, 17), ('battle_9999_20261005_064910.json', '1.7.11', 9999, 14)] outliers=[]\n[PASS] T4 training untrusted hits exist but are all OUT of domain (B no-op there too) :: out-of-domain=104 (with folds=104, would-be pool=1958.98) in-domain=0\n[PASS] T4c 1.7.8 training export: in-domain untrusted hits are measured and bounded :: in-domain=12 (with folds=7) B moves=62.7391 of poolA=842871.87 (0.007443%); quest=9999\n[PASS] T4b B moves exactly zero pool on 411001_115417 :: poolA=162689426.881162 poolB=162689426.881162\n[PASS] T5 criterion C retains <1%% of A's pool on 411001_115417 :: C pool=20986.30 A pool=162689426.88 retained=0.012900%\nselftest: 11/11 passed"
   },
   {
@@ -444,7 +444,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_attribution_census.txt",
    "name": "selftest/attribution_census",
-   "seconds": 0.15,
+   "seconds": 0.13,
    "tail": "unattributed: not_a_real_reason amount=90.9091 folds=1\ndetail      : reason=unknown_kind kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)\nVERDICT     : MISMATCH\n  PROBLEM   : reason not_a_real_reason: plugin says 1 folds; recompute never produced it\nDATA_MISSING: missing.json has no contribution section (version=1.5.0)\nSELFTEST PASS (7 case(s))"
   },
   {
@@ -457,7 +457,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_extract_verify.txt",
    "name": "selftest/extract_verify",
-   "seconds": 0.18,
+   "seconds": 0.15,
    "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\extract_verify.py --selftest\nSELFTEST PASS (7 case(s))"
   },
   {
@@ -470,8 +470,33 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_negctl_driver.txt",
    "name": "selftest/negctl_driver",
-   "seconds": 6.25,
+   "seconds": 5.75,
    "tail": "  [FAIL] selftest-noop-mutation           suite stayed GREEN; window/constants/hit-match-window-is-0.35s did not bite\n         cases=794 failed=0 pinned=794\n  [PASS] a mutation whose find text does not match is a DRIVER failure\n  [PASS] a prose-only mutation stays GREEN\n  [PASS] a mutation that applies but does not bite is COUNTED as a failure\ndriver selftest: 3 case(s), 0 failed"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_extract_contract.py"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_r52/runs/extract_contract.txt",
+   "name": "extract_contract",
+   "seconds": 0.08,
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_extract_contract.py\nextract contract: read=34 extra=27 schemas=2 files=3\n---- extract contract: PASS"
+  },
+  {
+   "argv": [
+    "C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe",
+    "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_extract_contract.py",
+    "--selftest"
+   ],
+   "cwd": "D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work",
+   "exit": 0,
+   "log": "_dpsm_work/acceptance_r52/runs/selftest_extract_contract.txt",
+   "name": "selftest/extract_contract",
+   "seconds": 0.12,
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_extract_contract.py --selftest\nSELFTEST PASS (7 case(s))"
   },
   {
    "argv": [
@@ -482,7 +507,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/refactor_final_check.txt",
    "name": "refactor_final_check",
-   "seconds": 0.3,
+   "seconds": 0.27,
    "tail": "version truth       : BuildInfo=1.7.11 csproj=1.7.11 agree=True\nCompositionProbe         10 partial files, all declare partial: True\nOverlayUGUI              4 partial files, all declare partial: True\nAggregator               6 partial files, all declare partial: True\nCharacterNames rows : 105\nrefactor check: blocks=0 warns=0"
   },
   {
@@ -495,7 +520,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_refactor.txt",
    "name": "selftest/refactor",
-   "seconds": 4.56,
+   "seconds": 4.09,
    "tail": "  [PASS] an Aggregator partial that forgot `partial` blocks       rc=1\n  [PASS] dead symbol in CODE blocks                               rc=1\n  [PASS] dead symbol in a COMMENT only warns (exit 0)             rc=0\n  [PASS] mojibake suspect warns but does not block                rc=0\n  [PASS] an empty root blocks on the required inputs              rc=1\n---- selftest: PASS"
   },
   {
@@ -508,7 +533,7 @@
    "log": "_dpsm_work/acceptance_r52/runs/tool_registry.txt",
    "name": "tool_registry",
    "seconds": 0.17,
-   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_tool_registry.py\ntool registry: registered=98 active=29 unclassified=0 (pin 0) pipeline=23\n---- tool registry: PASS"
+   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\check_tool_registry.py\ntool registry: registered=99 active=30 unclassified=0 (pin 0) pipeline=24\n---- tool registry: PASS"
   },
   {
    "argv": [
@@ -520,7 +545,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_tool_registry.txt",
    "name": "selftest/tool_registry",
-   "seconds": 0.21,
+   "seconds": 0.24,
    "tail": "  [PASS] an indexed script named on a RUN line of the pipeline is caught (J)\n  [PASS] an indexed script named only in a COMMENT is NOT reported (J)\n  [PASS] a referenced-input with no declared reader is caught (K)\n  [PASS] a referenced-input whose reader is not active (or does not read it) is caught (K)\n  [PASS] the unclassified pin is enforced (F)\n---- selftest: PASS"
   },
   {
@@ -545,7 +570,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_archive_index.txt",
    "name": "selftest/archive_index",
-   "seconds": 0.09,
+   "seconds": 0.11,
    "tail": "archive index: recorded=1 bytes=12\n  [PASS] a fresh index does not verify\n  [PASS] an edited evidence file is not caught\n  [PASS] an unrecorded new file is not caught\n  [PASS] a deleted evidence file is not caught\n---- selftest: PASS"
   },
   {
@@ -559,7 +584,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/v150_validate.txt",
    "name": "v150_validate",
-   "seconds": 9.68,
+   "seconds": 9.1,
    "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.py --exports D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\nreport -> D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\v150_validate.txt\nversion=1.7.11 quest=411001 problems=0"
   },
   {
@@ -572,7 +597,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_v150.txt",
    "name": "selftest/v150",
-   "seconds": 13.56,
+   "seconds": 12.98,
    "tail": "  [PASS] an empty baseline -> ������, no claim                       rc=0\n  [PASS] a hash-drifted entry is reported and NOT used            rc=0\n  [PASS] an entry whose declared version disagrees with its file is not used rc=0\n  [PASS] a baseline entry that is not OLDER than the target is not used rc=0\n  [PASS] the real baseline EXCLUDES the 1.6.0 damaged sample      excluded=1 approved=29\n---- selftest: PASS"
   },
   {
@@ -585,7 +610,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_eligibility.txt",
    "name": "selftest/eligibility",
-   "seconds": 1.03,
+   "seconds": 0.96,
    "tail": "  [PASS] no dropped steps is a pass on that check                 pass\n  [PASS] a clean gate record adds no new restriction              pass\n  [PASS] real 1.7.10 export is not REJECTED                       RESTRICTED\n  [PASS] deleted section in a real copy -> REJECTED               REJECTED\n  [PASS] changed nested damageBasis in a real copy is caught      REJECTED\n---- selftest: PASS"
   },
   {
@@ -612,7 +637,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_compare.txt",
    "name": "selftest/compare",
-   "seconds": 41.38,
+   "seconds": 39.55,
    "tail": "  [PASS] a different observed config flag is a different stratum    caps=[[False], [True]]\n  [PASS] training ground is its own stratum and is not pooled with a normal quest strata=3\n  [PASS] the gate-ERROR sample is listed as rejected, not silently averaged rejected=2\n  [PASS] a single sample is not a comparison (exit 4)               rc=4\n  [PASS] strata with different sizes keep their own n (no pooled average) n=[1, 2]\n---- selftest: PASS"
   },
   {
@@ -625,7 +650,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_decision.txt",
    "name": "selftest/decision",
-   "seconds": 80.25,
+   "seconds": 68.03,
    "tail": "  [PASS] the pre-registration and the interval are printed          \n  [PASS] the report states whether the interval covers 0            \n  [PASS] the cross-check against compare/2 ran                      \n  [PASS] a pre-registration that does not match the corpus publishes NOTHING (exit 4) rc=4\n  [PASS] a tampered compare/2 share is caught by the cross-check (exit 4) rc=4\n---- selftest: PASS"
   },
   {
@@ -640,7 +665,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/selftest_budget.txt",
    "name": "selftest/budget",
-   "seconds": 0.56,
+   "seconds": 0.53,
    "tail": "  [PASS] read errors, overflow and unknown identity are kept separate {'triggerErrors': 3} | {'timeline.rowsDropped': 5} | {'paramOwners.ownerUnknown': 7, 'ledger.unknownAttackerHits': 2, 'ledger.unknownAttackerDealt': 123.0}\n  [PASS] the per-battle table is ranked by affected DAMAGE, not by hit count big.json first\n  [PASS] every issue carries the four required fields               5 issues\n  [PASS] the dropped share is a share of dealt                      0.057197\n  [PASS] a real export censuses and the residual detector sees residuals battle_411001_20261003_205449.json dealt=198588964 buckets=12\n---- selftest: PASS"
   },
   {
@@ -655,8 +680,8 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/repo_manifest_verify.txt",
    "name": "repo_manifest_verify",
-   "seconds": 6.54,
-   "tail": "# cwd=D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\n# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\repo_manifest.py --verify --exports D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\batch_inputs\\rf0\nverify: tracked=1675 hashed_excluded=342 corpus=35\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/baseline-manifest.json\nmanifest verify: drift=0 changed=1 grew=0 notes=0"
+   "seconds": 5.64,
+   "tail": "CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/PROJECT-STATUS.md\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/TOOL-REGISTRY.md\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/baseline-manifest.json\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/n0_acceptance.py\nCHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/tool_registry.json\nmanifest verify: drift=0 changed=7 grew=56 notes=0"
   },
   {
    "argv": [
@@ -675,7 +700,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/recon_probe.txt",
    "name": "recon_probe",
-   "seconds": 2.06,
+   "seconds": 1.9,
    "tail": "PASS atkadd keyless teammate is counted as owner-unknown: got=1 want=1\nPASS atkadd keyless teammate is not a self fallback: got=0 want=0\nPASS atkadd missing attacker key falls back to name: got=1 want=1\nPASS atkadd missing attacker key is counted: got=1 want=1\nwrote acceptance_r52\\recon_probe_out.json\nALL CHECKS PASSED"
   },
   {
@@ -695,7 +720,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/csharp_behavior.txt",
    "name": "csharp_behavior",
-   "seconds": 2.72,
+   "seconds": 2.63,
    "tail": "== extract/key\n== extract/bundle-name\n== extract/retention\n== extract/census\nbehavior tests: cases=794 failed=0 pinned=794\n== ALL PASS =="
   },
   {
@@ -711,7 +736,7 @@
    "exit": 0,
    "log": "_dpsm_work/acceptance_r52/runs/csharp_behavior_negctl.txt",
    "name": "csharp_behavior_negctl",
-   "seconds": 19.83,
+   "seconds": 19.68,
    "tail": "# argv=C:\\Users\\24134\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\python\\python.exe D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\tests\\negative_control.py --only window-constant-0.45 --only comment-only-control\nnegative control: 2 mutation(s), temp copies of src (the real sources are never modified)\n  [PASS] window-constant-0.45             -> window/constants/hit-match-window-is-0.35s went red\n  [PASS] comment-only-control             prose-only mutation stays GREEN (replaced 1 occurrence in Model/BattleSession.cs)\n         cases=794 failed=0 pinned=794\nnegative control: 0 failure(s) of 2"
   }
  ]

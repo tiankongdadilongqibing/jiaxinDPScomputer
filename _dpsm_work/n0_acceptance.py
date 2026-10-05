@@ -425,6 +425,11 @@ def main():
             # driver's counter was the defect it now checks: a mutation that applied, compiled and changed
             # nothing used to be counted as a pass (see negative_control.py one()).
             ("selftest/negctl_driver", [PY, os.path.join(HERE, "tests", "negative_control.py"), "--selftest"]),
+            # R52 follow-up: the bundle's WRITER (EvidenceExtractor.cs) and its CHECKER (extract_verify.py)
+            # must still agree on the schema constants, the file names and every key the verifier reads.
+            # Without this the pair could drift silently until somebody produces a real bundle (needs the game).
+            ("extract_contract", [PY, os.path.join(HERE, "check_extract_contract.py")]),
+            ("selftest/extract_contract", [PY, os.path.join(HERE, "check_extract_contract.py"), "--selftest"]),
             ("refactor_final_check", [PY, os.path.join(HERE, "refactor_final_check.py")]),
             ("selftest/refactor", [PY, os.path.join(HERE, "refactor_final_check.py"), "--selftest"]),
             # RF7: the tool registry. The verify run is the drift check (a script the pipeline runs but the

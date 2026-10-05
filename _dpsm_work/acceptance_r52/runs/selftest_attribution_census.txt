@@ -1,12 +1,12 @@
 # cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
 # argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\attribution_census.py --selftest
-report      : C:\Users\24134\AppData\Local\Temp\uk_census_opwppblb\clean.txt
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_6bevndro\clean.txt
 export      : clean.json
 reasons     : unknown_kind=1
 unattributed: unknown_kind amount=90.9091 folds=1
 detail      : reason=unknown_kind kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
 VERDICT     : MATCH
-report      : C:\Users\24134\AppData\Local\Temp\uk_census_opwppblb\bad_folds.txt
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_6bevndro\bad_folds.txt
 export      : bad_folds.json
 reasons     : unknown_kind=1
 unattributed: unknown_kind amount=90.9091 folds=2
@@ -14,14 +14,14 @@ detail      : reason=unknown_kind kind=given origin=given#4/1006/-10 factor=1.1 
 VERDICT     : MISMATCH
   PROBLEM   : reason unknown_kind: folds plugin=2 recompute=1
   PROBLEM   : reasonCounts unknown_kind: plugin=2 recompute=1
-report      : C:\Users\24134\AppData\Local\Temp\uk_census_opwppblb\bad_amount.txt
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_6bevndro\bad_amount.txt
 export      : bad_amount.json
 reasons     : unknown_kind=1
 unattributed: unknown_kind amount=1.0000 folds=1
 detail      : reason=unknown_kind kind=given origin=given#4/1006/-10 factor=1.1 folds=1 amount=90.9091 victims=1 verdict=none(0)
 VERDICT     : MISMATCH
   PROBLEM   : reason unknown_kind: amount plugin=1.0000 recompute=90.9091
-report      : C:\Users\24134\AppData\Local\Temp\uk_census_opwppblb\bad_reason.txt
+report      : C:\Users\24134\AppData\Local\Temp\uk_census_6bevndro\bad_reason.txt
 export      : bad_reason.json
 reasons     : unknown_kind=1
 unattributed: not_a_real_reason amount=90.9091 folds=1

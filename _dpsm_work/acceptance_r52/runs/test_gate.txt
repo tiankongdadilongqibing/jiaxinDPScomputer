@@ -65,4 +65,4 @@ PASS classify_section(1.6.0, absent) == DATA_MISSING
 PASS classify_section(1.7.7, absent) == DATA_MISSING
 PASS classify_section(1.7.7, present) == PASS
 
-gate regression: 64 passed, 0 failed (fixtures in C:\Users\24134\AppData\Local\Temp\p0a_gate_hpmfjjwq)
+gate regression: 64 passed, 0 failed (fixtures in C:\Users\24134\AppData\Local\Temp\p0a_gate_he_s_uku)

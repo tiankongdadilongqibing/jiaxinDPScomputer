@@ -1,6 +1,6 @@
 # N0 acceptance run (corpus manifest + guard runs)
 
-- generated: 2026-10-05T09:15:35
+- generated: 2026-10-05T09:26:16
 - exports: 35 files in `D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0`
 - source BuildInfo version: 1.7.11 ; deployed DLL sha256: AA836C0688A3BAFEF080C755A08C40318845CE1131337CB54FC03E86A92A238A
 - config sha256: 97A1037D843637A910B558F06D455575C69280DCB01E81D1DEF0C1D0712AF568 (contrib switches: Contribution=true, GivenGiverHook=true, GivenTalent=true, Madness=true, MadnessApplier=true, MadnessVictim=true, ShowContribution=true)
@@ -48,6 +48,8 @@ Expectation = the verified 32-file snapshot + the verdict pinned per file added 
 | run_exit | selftest/attribution_census | 0 | 0 | yes |
 | run_exit | selftest/extract_verify | 0 | 0 | yes |
 | run_exit | selftest/negctl_driver | 0 | 0 | yes |
+| run_exit | extract_contract | 0 | 0 | yes |
+| run_exit | selftest/extract_contract | 0 | 0 | yes |
 | run_exit | refactor_final_check | 0 | 0 | yes |
 | run_exit | selftest/refactor | 0 | 0 | yes |
 | run_exit | tool_registry | 0 | 0 | yes |
@@ -112,46 +114,48 @@ Files the applicability report labels NOT_RUN (13): battle_411001_20261003_20544
 
 | run | exit | seconds | log |
 |---|---|---|---|
-| applicability(all) | 0 | 34.72 | `_dpsm_work/acceptance_r52/runs/applicability_all_.txt` |
-| crosscheck(batch) | 1 | 17.11 | `_dpsm_work/acceptance_r52/runs/crosscheck_batch_.txt` |
-| pairtrusted(all) | 0 | 45.77 | `_dpsm_work/acceptance_r52/runs/pairtrusted_all_.txt` |
-| export_schema(all) | 0 | 11.68 | `_dpsm_work/acceptance_r52/runs/export_schema_all_.txt` |
-| layout(all) | 0 | 2.64 | `_dpsm_work/acceptance_r52/runs/layout_all_.txt` |
-| live_log | 0 | 11.49 | `_dpsm_work/acceptance_r52/runs/live_log.txt` |
-| selftest/layout | 0 | 5.54 | `_dpsm_work/acceptance_r52/runs/selftest_layout.txt` |
-| selftest/schema | 0 | 0.09 | `_dpsm_work/acceptance_r52/runs/selftest_schema.txt` |
+| applicability(all) | 0 | 34.28 | `_dpsm_work/acceptance_r52/runs/applicability_all_.txt` |
+| crosscheck(batch) | 1 | 17.63 | `_dpsm_work/acceptance_r52/runs/crosscheck_batch_.txt` |
+| pairtrusted(all) | 0 | 42.79 | `_dpsm_work/acceptance_r52/runs/pairtrusted_all_.txt` |
+| export_schema(all) | 0 | 11.26 | `_dpsm_work/acceptance_r52/runs/export_schema_all_.txt` |
+| layout(all) | 0 | 2.61 | `_dpsm_work/acceptance_r52/runs/layout_all_.txt` |
+| live_log | 0 | 10.88 | `_dpsm_work/acceptance_r52/runs/live_log.txt` |
+| selftest/layout | 0 | 5.31 | `_dpsm_work/acceptance_r52/runs/selftest_layout.txt` |
+| selftest/schema | 0 | 0.1 | `_dpsm_work/acceptance_r52/runs/selftest_schema.txt` |
 | selftest/live_log | 0 | 0.14 | `_dpsm_work/acceptance_r52/runs/selftest_live_log.txt` |
-| doc_convergence | 0 | 0.27 | `_dpsm_work/acceptance_r52/runs/doc_convergence.txt` |
-| selftest/doc_convergence | 0 | 1.56 | `_dpsm_work/acceptance_r52/runs/selftest_doc_convergence.txt` |
-| docs123 | 0 | 0.15 | `_dpsm_work/acceptance_r52/runs/docs123.txt` |
-| selftest/docs123 | 0 | 0.15 | `_dpsm_work/acceptance_r52/runs/selftest_docs123.txt` |
-| test_gate | 0 | 4.5 | `_dpsm_work/acceptance_r52/runs/test_gate.txt` |
+| doc_convergence | 0 | 0.25 | `_dpsm_work/acceptance_r52/runs/doc_convergence.txt` |
+| selftest/doc_convergence | 0 | 1.55 | `_dpsm_work/acceptance_r52/runs/selftest_doc_convergence.txt` |
+| docs123 | 0 | 0.21 | `_dpsm_work/acceptance_r52/runs/docs123.txt` |
+| selftest/docs123 | 0 | 0.14 | `_dpsm_work/acceptance_r52/runs/selftest_docs123.txt` |
+| test_gate | 0 | 4.13 | `_dpsm_work/acceptance_r52/runs/test_gate.txt` |
 | given_coupling | 0 | 0.08 | `_dpsm_work/acceptance_r52/runs/given_coupling.txt` |
 | selftest/given_coupling | 0 | 0.08 | `_dpsm_work/acceptance_r52/runs/selftest_given_coupling.txt` |
-| p2a | 0 | 21.3 | `_dpsm_work/acceptance_r52/runs/p2a.txt` |
-| factsig | 0 | 0.57 | `_dpsm_work/acceptance_r52/runs/factsig.txt` |
-| selftest/applicability | 0 | 0.12 | `_dpsm_work/acceptance_r52/runs/selftest_applicability.txt` |
-| selftest/pairtrusted | 0 | 14.15 | `_dpsm_work/acceptance_r52/runs/selftest_pairtrusted.txt` |
-| selftest/attribution_census | 0 | 0.15 | `_dpsm_work/acceptance_r52/runs/selftest_attribution_census.txt` |
-| selftest/extract_verify | 0 | 0.18 | `_dpsm_work/acceptance_r52/runs/selftest_extract_verify.txt` |
-| selftest/negctl_driver | 0 | 6.25 | `_dpsm_work/acceptance_r52/runs/selftest_negctl_driver.txt` |
-| refactor_final_check | 0 | 0.3 | `_dpsm_work/acceptance_r52/runs/refactor_final_check.txt` |
-| selftest/refactor | 0 | 4.56 | `_dpsm_work/acceptance_r52/runs/selftest_refactor.txt` |
+| p2a | 0 | 20.53 | `_dpsm_work/acceptance_r52/runs/p2a.txt` |
+| factsig | 0 | 0.51 | `_dpsm_work/acceptance_r52/runs/factsig.txt` |
+| selftest/applicability | 0 | 0.11 | `_dpsm_work/acceptance_r52/runs/selftest_applicability.txt` |
+| selftest/pairtrusted | 0 | 13.58 | `_dpsm_work/acceptance_r52/runs/selftest_pairtrusted.txt` |
+| selftest/attribution_census | 0 | 0.13 | `_dpsm_work/acceptance_r52/runs/selftest_attribution_census.txt` |
+| selftest/extract_verify | 0 | 0.15 | `_dpsm_work/acceptance_r52/runs/selftest_extract_verify.txt` |
+| selftest/negctl_driver | 0 | 5.75 | `_dpsm_work/acceptance_r52/runs/selftest_negctl_driver.txt` |
+| extract_contract | 0 | 0.08 | `_dpsm_work/acceptance_r52/runs/extract_contract.txt` |
+| selftest/extract_contract | 0 | 0.12 | `_dpsm_work/acceptance_r52/runs/selftest_extract_contract.txt` |
+| refactor_final_check | 0 | 0.27 | `_dpsm_work/acceptance_r52/runs/refactor_final_check.txt` |
+| selftest/refactor | 0 | 4.09 | `_dpsm_work/acceptance_r52/runs/selftest_refactor.txt` |
 | tool_registry | 0 | 0.17 | `_dpsm_work/acceptance_r52/runs/tool_registry.txt` |
-| selftest/tool_registry | 0 | 0.21 | `_dpsm_work/acceptance_r52/runs/selftest_tool_registry.txt` |
+| selftest/tool_registry | 0 | 0.24 | `_dpsm_work/acceptance_r52/runs/selftest_tool_registry.txt` |
 | archive_index | 0 | 0.09 | `_dpsm_work/acceptance_r52/runs/archive_index.txt` |
-| selftest/archive_index | 0 | 0.09 | `_dpsm_work/acceptance_r52/runs/selftest_archive_index.txt` |
-| v150_validate | 0 | 9.68 | `_dpsm_work/acceptance_r52/runs/v150_validate.txt` |
-| selftest/v150 | 0 | 13.56 | `_dpsm_work/acceptance_r52/runs/selftest_v150.txt` |
-| selftest/eligibility | 0 | 1.03 | `_dpsm_work/acceptance_r52/runs/selftest_eligibility.txt` |
+| selftest/archive_index | 0 | 0.11 | `_dpsm_work/acceptance_r52/runs/selftest_archive_index.txt` |
+| v150_validate | 0 | 9.1 | `_dpsm_work/acceptance_r52/runs/v150_validate.txt` |
+| selftest/v150 | 0 | 12.98 | `_dpsm_work/acceptance_r52/runs/selftest_v150.txt` |
+| selftest/eligibility | 0 | 0.96 | `_dpsm_work/acceptance_r52/runs/selftest_eligibility.txt` |
 | selftest/eligibility_e2e | 0 | 2.43 | `_dpsm_work/acceptance_r52/runs/selftest_eligibility_e2e.txt` |
-| selftest/compare | 0 | 41.38 | `_dpsm_work/acceptance_r52/runs/selftest_compare.txt` |
-| selftest/decision | 0 | 80.25 | `_dpsm_work/acceptance_r52/runs/selftest_decision.txt` |
-| selftest/budget | 0 | 0.56 | `_dpsm_work/acceptance_r52/runs/selftest_budget.txt` |
-| repo_manifest_verify | 0 | 6.54 | `_dpsm_work/acceptance_r52/runs/repo_manifest_verify.txt` |
-| recon_probe | 0 | 2.06 | `_dpsm_work/acceptance_r52/runs/recon_probe.txt` |
-| csharp_behavior | 0 | 2.72 | `_dpsm_work/acceptance_r52/runs/csharp_behavior.txt` |
-| csharp_behavior_negctl | 0 | 19.83 | `_dpsm_work/acceptance_r52/runs/csharp_behavior_negctl.txt` |
+| selftest/compare | 0 | 39.55 | `_dpsm_work/acceptance_r52/runs/selftest_compare.txt` |
+| selftest/decision | 0 | 68.03 | `_dpsm_work/acceptance_r52/runs/selftest_decision.txt` |
+| selftest/budget | 0 | 0.53 | `_dpsm_work/acceptance_r52/runs/selftest_budget.txt` |
+| repo_manifest_verify | 0 | 5.64 | `_dpsm_work/acceptance_r52/runs/repo_manifest_verify.txt` |
+| recon_probe | 0 | 1.9 | `_dpsm_work/acceptance_r52/runs/recon_probe.txt` |
+| csharp_behavior | 0 | 2.63 | `_dpsm_work/acceptance_r52/runs/csharp_behavior.txt` |
+| csharp_behavior_negctl | 0 | 19.68 | `_dpsm_work/acceptance_r52/runs/csharp_behavior_negctl.txt` |
 
 ## per-file verdicts
 

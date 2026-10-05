@@ -6,10 +6,10 @@
 
 | 项 | 值 |
 |---|---|
-| 已注册脚本 | 98 |
-| 其中活跃(有 CLI、有预期退出码与输出声明) | 29 |
+| 已注册脚本 | 99 |
+| 其中活跃(有 CLI、有预期退出码与输出声明) | 30 |
 | 尚未判定(只登记,计数只能下降) | 0 / 上限 0 |
-| 验收流水线实际运行的脚本 | 23 |
+| 验收流水线实际运行的脚本 | 24 |
 
 ## 活跃工具
 
@@ -23,6 +23,7 @@
 | `_dpsm_work/check_doc_convergence.py` | guard | P1-B acceptance guard: the five main documents must not contradict the repository. | 0 = 无矛盾(0/11);1 = 有 R1–R11 违规 | none (read-only) | yes | yes |
 | `_dpsm_work/check_docs_123.py` | guard | Encoding guard for the CURRENT doc set (2026-10-03 cleanup; extended 2026-10-04 round 6). | 0 = 文档集干净;1 = 混入损坏标记或缺文件 | none (read-only) | yes | yes |
 | `_dpsm_work/check_export_schema.py` | guard | DpsMeter export schema checker + coverage reporter  (1.5.2) | 0 = schema 合规;1 = schema 违规 | none (read-only) | yes | yes |
+| `_dpsm_work/check_extract_contract.py` | cli | R52: check that the evidence bundle's WRITER (C#) and its CHECKER (Python) still agree -- the manifest/census schema constants and the checksum algorithm name on both sides, every JSON key the verifier reads exists as an emitted literal, and the three file names the verifier requires are produced; the selftest tampers temp copies on either side. | 0 contract holds / 1 a key, file name or schema constant disagrees | none (read-only) | yes | yes |
 | `_dpsm_work/check_fact_signature.py` | guard | FACT signature replay -- offline, BEFORE the next battle. | 0 = 无异常;1 = 有事实签名异常 | --outdir 下的报告 | yes | yes |
 | `_dpsm_work/check_given_fold_coupling.py` | guard | Guard (1.7.9): the General/GivenTalent switch must drive BOTH halves of the granted-talent rule. | 0 = 取消语义自洽;1 = 有耦合回归 | none (read-only) | yes | yes |
 | `_dpsm_work/check_live_log.py` | guard | Live-log acceptance gate (1.7.9): the MACHINE's own log against the exports it wrote. | 0 = 无矛盾;1 = 面板/live 帧与导出不一致 | none (read-only) | yes | yes |

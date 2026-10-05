@@ -307,6 +307,24 @@
   },
   {
    "allowListed": false,
+   "bucket": "extract_contract",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
+   "bucket": "selftest/extract_contract",
+   "expected": 0,
+   "kind": "run_exit",
+   "observed": 0,
+   "ok": true,
+   "why": "a guard run must exit 0"
+  },
+  {
+   "allowListed": false,
    "bucket": "refactor_final_check",
    "expected": 0,
    "kind": "run_exit",
@@ -1319,7 +1337,7 @@
    "count": 35,
    "source": "_dpsm_work/batch-inputs-rf0.json"
   },
-  "generated": "2026-10-05T09:15:35",
+  "generated": "2026-10-05T09:26:16",
   "notes": [
    "logs are associated only when the log names the export path",
    "no historical export, DLL, config or evidence file is modified by this script"
@@ -1341,7 +1359,7 @@
    "_dpsm_work/contrib/crosscheck.py": "EE749E0BEBA2F2C72FCDBC984ADFD6D1B9EAF78D3B43479252015040AF66BDFD",
    "_dpsm_work/contribution_applicability.py": "EAAEDB3ADA5535723D454D7D7DAA190DAE38DD6B920E01821228B89A1BB7D467",
    "_dpsm_work/contribution_gate.py": "267AF3F044F93FBEBC1571768754B6ADA404D6E59DDF7A4399695923AB5E5651",
-   "_dpsm_work/n0_acceptance.py": "53A54B332D087DF4E5772A6CC38C72E8AF7EA80F59391B4AF447C6DFFB9BB5DB",
+   "_dpsm_work/n0_acceptance.py": "A6C8179A2A9AFB377247B9FD66545528FDB330E3B6C7D6BD466B29AF6220A803",
    "_dpsm_work/pairtrusted_impact.py": "9A0AC5F10A9F1D0E1512C1372B7AD7E7677E70CAC28BDADBE58F56159FA98669",
    "_dpsm_work/refactor_final_check.py": "D6FAAE5633AEE52404E25ED8BCBCF71A20CED72CB8EAD74155470A0112CB8CC1",
    "_dpsm_work/repo_manifest.py": "B4AC9B818EDE6EA5338F6D2E0DE9E53B1F3C17E33B95083EFECF2793151A86F6",

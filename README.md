@@ -61,7 +61,7 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
 |---|---|---|
 | 行为测试 | dotnet run --project _dpsm_work/tests/BehaviorTests/BehaviorTests.csproj -c Release -- --quiet | 794 用例 / 91 组 |
 | 变异负控 | python _dpsm_work/tests/negative_control.py | 111 例,每例必须让具名用例变红 |
-| 离线验收 | python _dpsm_work/n0_acceptance.py(--out 指定输出目录) | 40 条命令 / 72 条检查 |
+| 离线验收 | python _dpsm_work/n0_acceptance.py(--out 指定输出目录) | 42 条命令 / 74 条检查 |
 | 文档收敛 | python _dpsm_work/check_doc_convergence.py(12 条规则 R1–R12) | 数字、版本、部署哈希、"未做"措辞 |
 | 其他守卫 | check_docs_123.py / refactor_final_check.py / check_tool_registry.py / check_contribution_layout.py / repo_manifest.py --verify / archive_index.py | — |
 

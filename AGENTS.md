@@ -35,7 +35,7 @@
 
 | 改了 | 必须同步 | 守卫 |
 |---|---|---|
-| 验收的命令数/检查数 | PROJECT-STATUS.md 与文档索引里的"40 条命令 / 72 条检查" | R9 |
+| 验收的命令数/检查数 | PROJECT-STATUS.md 与文档索引里的"42 条命令 / 74 条检查" | R9 |
 | 部署的 DLL | 索引 / HANDOFF / 报告 / PROJECT-STATUS 里的部署哈希前缀(当前 AA836C06) | R3 |
 | 用例数与变异数 | PROJECT-STATUS.md 的计数行 | 人工+自测 |
 | 新增守卫脚本(.py) | 必须在 _dpsm_work/tool_registry.json 登记(含 status/outputs/expected_exit),否则 B 检查红 | 工具注册表 |
