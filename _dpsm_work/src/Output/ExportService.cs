@@ -143,7 +143,14 @@ public static class ExportService
 				RuntimeLog.Write(bline);
 				RuntimeLog.Flush();
 			}
-			string msg = $"[DpsMeter] Exported full battle data -> {file} ({json.Length} bytes)";
+			// R57 (real machine): the battle-end evidence bundle writes the SAME data to an explicit target,
+			// and the retention policy (ExtractKeep) deletes old bundles BY DESIGN. Logging both as "Exported
+			// full battle data" made the live-log gate report "exported but the file is gone (truncated
+			// corpus?)" for a bundle that had simply rotated. The durable export keeps its historical line;
+			// a copy says it is a copy, so a reader -- and the gate -- can tell the two apart.
+			string msg = explicitTarget
+				? $"[DpsMeter] Exported COPY (explicit target, same serializer) -> {file} ({json.Length} bytes)"
+				: $"[DpsMeter] Exported full battle data -> {file} ({json.Length} bytes)";
 			Plugin.LogSource.LogInfo(msg);
 			RuntimeLog.Write(msg);
 			// The self-check result, always stated. `dupRootKeys` is reported even when the JSON parses,

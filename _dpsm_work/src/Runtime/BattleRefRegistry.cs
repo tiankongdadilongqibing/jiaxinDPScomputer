@@ -119,12 +119,25 @@ public sealed class BattleRefRegistry
 		r.Revision++;
 	}
 
-	/// <summary>Called once per successful export. A re-export of an UNCHANGED snapshot keeps the
-	/// revision; only a new snapshot (already bumped by the events above) produces a new one.</summary>
+	/// <summary>
+	/// Called once per successful write. The PATH is bound by the FIRST successful write and can then only
+	/// be updated by another write to the SAME path (plan §5.1: 实际目标路径首次确定后绑定会话).
+	///
+	/// WHY THIS IS NOT "remember the last write". MEASURED 2026-10-05 on the user's own machine: the
+	/// battle-end evidence bundle is written AFTER the normal export, so binding the last path made the
+	/// 复制引用 text name `battle.json` inside `extract/&lt;bundle&gt;/` -- a directory the retention policy
+	/// ROTATES AWAY (the user's -001 bundle was already gone when the reference was checked) -- while the
+	/// canonical export was still on disk. The identity must point at the durable file.
+	///
+	/// The hash follows the bound path, so a soft-resume re-export of the same session (same path) does
+	/// update it, and a copy to another directory cannot borrow the identity's hash.</summary>
 	public static void MarkExported(BattleRef r, string path, string sha256)
 	{
 		if (r == null) return;
-		r.ExportPath = path ?? "";
-		r.ExportSha256 = sha256 ?? "";
+		if (string.IsNullOrEmpty(r.ExportPath) || string.Equals(r.ExportPath, path, StringComparison.Ordinal))
+		{
+			r.ExportPath = path ?? "";
+			r.ExportSha256 = sha256 ?? "";
+		}
 	}
 }

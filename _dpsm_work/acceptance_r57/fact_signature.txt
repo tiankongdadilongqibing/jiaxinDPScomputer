@@ -1,0 +1,20 @@
+======================================================================================================================
+FACT signature replay
+  file    battle_9999_20261005_164941__B-20261005-084431-C090E1C550B84C10-006.json
+  version 1.7.11   quest 9999   damage events 408   replayable 407
+  caps    {"MaxClasses": 2400, "MaxLiveClasses": 900}
+----------------------------------------------------------------------------------------------------------------------
+1.5.1 legacy key           distinct=225    cap=600   kept=225   served=407    overflow=0      servedIfRanked=407    singletons=152   maxHits=20     OK 
+1.5.2 shipped key          distinct=222    cap=2400  kept=222   served=407    overflow=0      servedIfRanked=407    singletons=149   maxHits=20     OK 
+
+coverage: 1.5.1 legacy 407/407 (100.0%)   1.5.2 shipped 407/407 (100.0%)
+plugin bookkeeping: observed=407  sum(facts.items[].hits)=407  classes=222/2400
+  note: replay served (407) counts only the 407 exported events; the plugin counted 407 Observe calls. Not expected to be equal.
+VERDICT: shipped key fits (headroom 2178 classes) and every consistency check holds.
+
+top 5 classes by hits (shipped key):
+   n=20    ('メルティエル', 1, '城塞', 2, 0, 3, 0.028, None, 150, 0, 0, None, ())
+   n=12    ('メルティエル', 1, 'T.O.W.E.R.typeR', 2, 0, 3, 1.521, None, 150, 1, 0, None, ('毒',))
+   n=12    ('[賢導]トレイラ', 1, '城塞', 2, 0, 2, 0.034, 50, 150, 0, 0, None, ())
+   n=10    ('メルティエル', 1, '城塞', 2, 0, 2, 0.034, None, 150, 0, 0, None, ())
+   n=9     ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 2, 1.322, 40, 190, 1, 0, None, ('毒',))

@@ -176,9 +176,17 @@ def run(log_path):
                             'could not run on this log' % len(parsed['frames']))
     session_unattr = {}
     checked = 0
+    rotated_copies = 0
     for e, b in pairs:
         path = e['path']
         name = os.path.basename(path)
+        # R57: the evidence bundle writes the same data to extract/<bundle>/battle.json, and ExtractKeep
+        # deletes old bundles BY DESIGN. That is a COPY, not the durable corpus, so a missing one is a
+        # note rather than "truncated corpus". (The writer now also logs copies on a different line; this
+        # branch keeps the HISTORICAL logs -- already written before that change -- honest.)
+        if os.sep + 'extract' + os.sep in path or name == 'battle.json':
+            rotated_copies += 1
+            continue
         if not os.path.isfile(path):
             problems.append('the log says %s was exported but the file is gone (truncated corpus?)' % name)
             continue
@@ -237,6 +245,9 @@ def run(log_path):
             warnings.append('%s: could not re-read for the length check: %s' % (name, ex))
     if checked:
         notes.append('%d exported battle(s) paired with the machine log; version %s' % (checked, version))
+    if rotated_copies:
+        notes.append('%d evidence-bundle copy path(s) skipped: ExtractKeep rotates those by design'
+                     % rotated_copies)
     # C. overlay frames
     frames = parsed['frames']
     if not frames:

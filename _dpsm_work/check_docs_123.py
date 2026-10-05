@@ -119,6 +119,9 @@ FILES = [
 	# R56: 战斗编号 / 精确选场(面向用户的报告 + 逐轮记录)
 	'D:\\dmmplayer\\rlyehshoujotaix_cl\\_dpsm_work\\REPORT-精确选场-R56.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R56.md',
+
+	# R57: 战斗引用绑定持久文件(实机发现)
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R57.md',
 ]
 
 

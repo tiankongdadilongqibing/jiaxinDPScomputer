@@ -1,0 +1,14 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\refactor_final_check.py --selftest
+  [PASS] clean copy is green                                      rc=0
+  [PASS] invalid UTF-8 blocks                                     rc=1
+  [PASS] U+FFFD in a source file blocks                           rc=1
+  [PASS] required source file missing blocks                      rc=1
+  [PASS] BuildInfo/csproj version mismatch blocks                 rc=1
+  [PASS] a partial part that forgot `partial` blocks              rc=1
+  [PASS] an Aggregator partial that forgot `partial` blocks       rc=1
+  [PASS] dead symbol in CODE blocks                               rc=1
+  [PASS] dead symbol in a COMMENT only warns (exit 0)             rc=0
+  [PASS] mojibake suspect warns but does not block                rc=0
+  [PASS] an empty root blocks on the required inputs              rc=1
+---- selftest: PASS

@@ -147,6 +147,14 @@ internal static partial class Cases
 		BattleRefRegistry.MarkExported(live, "/x/f.json", "deadbeef");
 		r.Str("a-successful-write-binds-the-path", live.ExportPath, "/x/f.json");
 		r.Str("and-the-hash", live.ExportSha256, "deadbeef");
+		// R57 (real machine, 2026-10-05): the evidence bundle is written AFTER the export, and binding the
+		// LAST path made the copied reference name extract/<bundle>/battle.json -- a directory the retention
+		// policy deletes. The identity must keep pointing at the durable export.
+		BattleRefRegistry.MarkExported(live, "/x/f.json", "cafebabe");
+		r.Str("a-rewrite-of-the-SAME-path-updates-the-hash", live.ExportSha256, "cafebabe");
+		BattleRefRegistry.MarkExported(live, "/extract/extract_x/battle.json", "00112233");
+		r.Str("a-later-COPY-can-not-move-the-identity (the bundle is rotated away)", live.ExportPath, "/x/f.json");
+		r.Str("and-can-not-borrow-the-hash-either", live.ExportSha256, "cafebabe");
 
 		// ---------------------------------------------------------------------------------------------
 		r.Group("bref/lifecycle");
