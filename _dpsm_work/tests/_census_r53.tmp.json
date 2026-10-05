@@ -1,0 +1,243 @@
+{
+ "export": {
+  "file": "battle_411001_20261005_132514.json",
+  "pluginVersion": "1.7.11",
+  "quest": 411001,
+  "duration": 119.07,
+  "result": "Lose",
+  "run": {
+   "id": 1,
+   "seq": 0
+  },
+  "started": "2026-10-05T13:25:14",
+  "app": "DpsMeter"
+ },
+ "plugin": {
+  "unattributed": {
+   "unknown_kind": [
+    8425649.6039,
+    5774
+   ]
+  },
+  "reasonCounts": {
+   "ability_holder_attacker": 9726,
+   "global_name_unique": 8765,
+   "byUnit": 6212,
+   "ability_holder_unique": 6194,
+   "unknown_kind": 5774
+  },
+  "coverage": {
+   "creditedShare": 0.958009,
+   "unattributedShare": 0.041991,
+   "analyzableDealt": 200655280.0,
+   "excludedDamage": 363554.0,
+   "analysisDamageCoverage": 0.9994,
+   "creditCoverageWithinAnalyzed": 0.958,
+   "overallAttributedCoverage": 0.9575,
+   "hits": 5515
+  },
+  "schemaVersion": "1.1",
+  "method": "log-share/1"
+ },
+ "census": {
+  "reasons": {
+   "ability_holder_attacker": [
+    28464963.52631089,
+    9726
+   ],
+   "byUnit": [
+    62425281.93231162,
+    6212
+   ],
+   "ability_holder_unique": [
+    29637555.797705755,
+    6194
+   ],
+   "global_name_unique": [
+    46145021.98851213,
+    8765
+   ],
+   "unknown_kind": [
+    8425649.603925956,
+    5774
+   ]
+  },
+  "detail": [
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#6/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 3106851.7871192507,
+    "folds": 2251,
+    "victims": {
+     "ショゴス": 2251
+    },
+    "hits": 2251,
+    "t_min": 5.1,
+    "t_max": 119.03,
+    "victim_instances": 109,
+    "victims_top": [
+     [
+      "ショゴス",
+      2251
+     ]
+    ],
+    "victim_count": 1
+   },
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#7/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 3106851.7871192507,
+    "folds": 2251,
+    "victims": {
+     "ショゴス": 2251
+    },
+    "hits": 2251,
+    "t_min": 5.1,
+    "t_max": 119.03,
+    "victim_instances": 109,
+    "victims_top": [
+     [
+      "ショゴス",
+      2251
+     ]
+    ],
+    "victim_count": 1
+   },
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#2/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 1022099.8237230073,
+    "folds": 571,
+    "victims": {
+     "ショゴス": 571
+    },
+    "hits": 571,
+    "t_min": 99.33,
+    "t_max": 111.13,
+    "victim_instances": 24,
+    "victims_top": [
+     [
+      "ショゴス",
+      571
+     ]
+    ],
+    "victim_count": 1
+   },
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#3/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 1022099.8237230073,
+    "folds": 571,
+    "victims": {
+     "ショゴス": 571
+    },
+    "hits": 571,
+    "t_min": 99.33,
+    "t_max": 111.13,
+    "victim_instances": 24,
+    "victims_top": [
+     [
+      "ショゴス",
+      571
+     ]
+    ],
+    "victim_count": 1
+   },
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#4/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 83873.19112067722,
+    "folds": 65,
+    "victims": {
+     "ショゴス": 65
+    },
+    "hits": 65,
+    "t_min": 97.7,
+    "t_max": 99.07,
+    "victim_instances": 3,
+    "victims_top": [
+     [
+      "ショゴス",
+      65
+     ]
+    ],
+    "victim_count": 1
+   },
+   {
+    "reason": "unknown_kind",
+    "kind": "given",
+    "side": "vic",
+    "origin": "given#5/1006/-10",
+    "label": "被伤害+10%(赋予)",
+    "factor": 1.1,
+    "rule_name": "被伤害+10%(赋予)",
+    "amount": 83873.19112067722,
+    "folds": 65,
+    "victims": {
+     "ショゴス": 65
+    },
+    "hits": 65,
+    "t_min": 97.7,
+    "t_max": 99.07,
+    "victim_instances": 3,
+    "victims_top": [
+     [
+      "ショゴス",
+      65
+     ]
+    ],
+    "victim_count": 1
+   }
+  ],
+  "analyzable_hits": 5515,
+  "fold_bearing_hits": 5513,
+  "unresolved_folds": 5774
+ },
+ "carriers": {
+  "1006/-15": [
+   "メルティエル",
+   "マッドシーカー"
+  ],
+  "1038/50": [
+   "ルナリス"
+  ],
+  "1006/100": [
+   "メアリー"
+  ],
+  "409/30": [
+   "エヴァラス・フラウ"
+  ],
+  "411/90": [
+   "エヴァラス・フラウ"
+  ],
+  "1006/-10": [
+   "エヴァラス・フラウ"
+  ]
+ },
+ "problems": []
+}

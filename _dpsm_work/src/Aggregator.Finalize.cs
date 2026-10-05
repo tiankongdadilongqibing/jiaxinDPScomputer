@@ -154,7 +154,12 @@ public static partial class Aggregator
 		// Done here because the tables are guaranteed loaded by the time a battle has ended; RunOnce
 		// retries on a later battle if none were found yet.
 		if (Plugin.CfgMasterDataDump != null && Plugin.CfgMasterDataDump.Value) MasterDataDump.RunOnce();
-		ExportService.Export(s); // full-data JSON for offline analysis
+		string exportPath = ExportService.Export(s); // full-data JSON for offline analysis
+		// R52c: keep the last finalised battle so the extraction KEY still works after it is over. MEASURED
+		// 2026-10-05 13:26: a key press 12 s after a battle logged "跳过:没有战斗会话" because Aggregator nulls
+		// Session at teardown and the 5 s resume window had expired. Runs here, while the session model is
+		// still alive; EvidenceExtractor.Remember never throws.
+		EvidenceExtractor.Remember(s, exportPath);
 		// R52 (证据提取流程): the self-contained bundle. OFF by default, so a normal battle writes exactly
 		// what it wrote before (the bundle is a ~25 MB copy). It runs AFTER the export and BEFORE the
 		// actors' live references are cleared, so the census sees the same finished session the file does.

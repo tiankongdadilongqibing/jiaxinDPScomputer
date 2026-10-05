@@ -54,11 +54,11 @@ CENSUS_READ = [
 # does not read them. Kept in a separate list so "the verifier stopped reading this" and "the writer
 # stopped emitting this" cannot be confused, which is what the first version of this tool got wrong.
 MANIFEST_EXTRA = ["seconds", "bundle", "missing", "source", "carrierUnique", "carrierAmbiguous",
-                  "carrierNone", "notes"]
+                  "carrierNone", "notes", "inputSource"]
 CENSUS_EXTRA = ["foldsEnabled", "usable", "zeroFactor", "noopFactor", "subUnity", "negative",
                 "analysisHits", "events", "analyzable", "attributed", "creditedShare",
                 "reconciliationGap", "unknownAttackerHits", "outsideTeamHits", "ruleName", "victimTop",
-                "victimTopFolds", "carrierCount", "carrierNames"]
+                "victimTopFolds", "carrierCount", "carrierNames", "inputSource"]
 REQUIRED_FILES = ["manifest.json", "battle.json", "contrib_census.json"]
 SCHEMAS = [("MANIFEST_SCHEMA", "extract-manifest/1"), ("CENSUS_SCHEMA", "contrib-census/1")]
 HASH_NAME = "fnv1a64"

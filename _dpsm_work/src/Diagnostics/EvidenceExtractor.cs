@@ -45,9 +45,31 @@ internal static class EvidenceExtractor
 	private static string _dir;
 	private static string _lastDir;
 
+	/// <summary>
+	/// The last FINALISED battle, kept so the extraction key still works after it is over.
+	///
+	/// WHY IT EXISTS. MEASURED 2026-10-05 13:26: a key press 12 s after the battle logged
+	/// "跳过:没有战斗会话" -- Aggregator sets Session = null at teardown and the 5 s resume window had
+	/// expired, so the ONE thing the key needs was gone while the export file and the contribution result
+	/// were both still available. This keeps exactly those two, and nothing is recomputed from the file
+	/// (a second implementation of the attribution ladder is the failure mode this project refuses).
+	/// </summary>
+	private sealed class Snapshot
+	{
+		public string ExportPath;
+		public ContributionResult Result;
+		public int QuestId;
+		public double Seconds;
+		public bool UseFolds;
+	}
+
+	private static Snapshot _snapshot;
+
 	// ---- self-report (the same discipline as every other probe: a counter, never a swallowed catch) ----
 	internal static int Runs;
 	internal static int Failures;
+	/// <summary>Finalisations that stored a snapshot for the key route.</summary>
+	internal static int Remembered;
 	internal static int LastCensusGroups;
 	internal static int LastCensusFolds;
 	internal static double LastCensusAmount;
@@ -77,6 +99,8 @@ internal static class EvidenceExtractor
 	internal static string LastDir { get { return _lastDir; } }
 
 	/// <summary>Write one bundle. Returns its directory (null when nothing could be written).
+	/// <paramref name="s"/> may be null: the run then falls back to the snapshot of the last FINALISED
+	/// battle (see Remember), which is what makes the key work AFTER a battle as well as during one.
 	/// Never throws: see the failure policy in the class comment.</summary>
 	internal static string Run(BattleSession s, string reason)
 	{
@@ -84,10 +108,13 @@ internal static class EvidenceExtractor
 		try
 		{
 			Runs++;
-			if (s == null)
+			Snapshot snap = _snapshot;
+			ExtractPolicy.BundleSource src = ExtractPolicy.SelectSource(s != null, snap != null);
+			if (src == ExtractPolicy.BundleSource.None)
 			{
-				LastError = "no session";
-				RuntimeLog.Write("[DpsMeter][EXTRACT] 跳过:没有战斗会话");
+				LastError = "no session and no finalised snapshot";
+				RuntimeLog.Write("[DpsMeter][EXTRACT] 跳过:没有战斗会话,也没有已结束战斗的快照"
+					+ "(战斗中按一次,或打开 General/ExtractOnBattleEnd 让收尾自动出包)");
 				return null;
 			}
 			string baseDir = Dir;
@@ -98,20 +125,44 @@ internal static class EvidenceExtractor
 				RuntimeLog.Write("[DpsMeter][EXTRACT] 失败:无法建立提取目录");
 				return null;
 			}
+			int quest = src == ExtractPolicy.BundleSource.Live ? s.QuestId : snap.QuestId;
+			double seconds = src == ExtractPolicy.BundleSource.Live ? s.ActiveSeconds : snap.Seconds;
+			string input = src == ExtractPolicy.BundleSource.Live ? "live" : "last-finalised";
 			DateTime stamp = DateTime.Now;
-			dir = Path.Combine(baseDir, ExtractPolicy.BundleName(stamp, s.QuestId, reason));
+			dir = Path.Combine(baseDir, ExtractPolicy.BundleName(stamp, quest, reason));
 			Directory.CreateDirectory(dir);
 
 			var names = new List<string>();
-			// 1) the battle, through the serializer the normal export uses
+			ContributionResult res;
+			bool useFolds;
 			string battle = Path.Combine(dir, "battle.json");
-			ExportService.ExportTo(s, battle);
-			if (File.Exists(battle)) names.Add("battle.json");
-			// 2) the census, through the core that writes the export's contribution section
-			bool useFolds = Plugin.CfgReconcileCalc != null && Plugin.CfgReconcileCalc.Value;
-			ContributionResult res = ContributionSession.Compute(s, useFolds);
+			if (src == ExtractPolicy.BundleSource.Live)
+			{
+				// 1) the battle, through the serializer the normal export uses
+				ExportService.ExportTo(s, battle);
+				// 2) the census, through the core that writes the export's contribution section
+				useFolds = Plugin.CfgReconcileCalc != null && Plugin.CfgReconcileCalc.Value;
+				res = ContributionSession.Compute(s, useFolds);
+			}
+			else
+			{
+				// The battle is over: the export file and the result computed at finalisation are the only
+				// two things left. Copy the file (so the bundle stays self-contained) and re-emit the
+				// REMEMBERED result -- never recompute it, which would need a second ladder implementation.
+				try
+				{
+					if (!string.IsNullOrEmpty(snap.ExportPath) && File.Exists(snap.ExportPath))
+						File.Copy(snap.ExportPath, battle, true);
+				}
+				catch { }
+				useFolds = snap.UseFolds;
+				res = snap.Result;
+			}
+			// Listed even when the copy failed, so the manifest marks it missing: an unlisted file and a
+			// broken file must never look the same to the verifier.
+			names.Add("battle.json");
 			Summarise(res);
-			string census = BuildCensus(s, res, reason, stamp, useFolds);
+			string census = BuildCensus(quest, seconds, res, reason, stamp, useFolds, input);
 			names.Add("contrib_census.json");
 			WriteChecked(Path.Combine(dir, "contrib_census.json"), census, "contrib_census");
 			// 3) the game's own tables, copied (they are dumped once per process, at battle end)
@@ -119,14 +170,14 @@ internal static class EvidenceExtractor
 			long mdBytes = 0;
 			CopyMasterData(dir, out mdFiles, out mdBytes);
 			// 4) the manifest LAST, so it lists and hashes everything above it
-			string manifest = BuildManifest(s, reason, stamp, dir, names, mdFiles, mdBytes);
+			string manifest = BuildManifest(quest, seconds, reason, stamp, dir, names, mdFiles, mdBytes, input);
 			names.Add("manifest.json");
 			WriteChecked(Path.Combine(dir, "manifest.json"), manifest, "manifest");
 			// 5) retention
 			DeleteStale(baseDir);
 
 			_lastDir = dir;
-			string line = "[DpsMeter][EXTRACT] " + reason + " -> " + dir
+			string line = "[DpsMeter][EXTRACT] " + reason + "(" + input + ") -> " + dir
 				+ " 文件=" + names.Count.ToString(CultureInfo.InvariantCulture)
 				+ " 主数据=" + mdFiles.ToString(CultureInfo.InvariantCulture)
 				+ " 未归因组=" + LastCensusGroups.ToString(CultureInfo.InvariantCulture)
@@ -156,6 +207,11 @@ internal static class EvidenceExtractor
 			+ " 折叠=" + LastCensusFolds.ToString(CultureInfo.InvariantCulture)
 			+ " 候选(唯一/歧义/无)=" + LastCarrierUnique + "/" + LastCarrierAmbiguous + "/" + LastCarrierNone
 			+ " 保留删除=" + RetentionDeleted.ToString(CultureInfo.InvariantCulture)
+			+ " 快照=" + (_snapshot == null
+				? "无"
+				: (_snapshot.QuestId.ToString(CultureInfo.InvariantCulture) + "/"
+					+ _snapshot.Seconds.ToString("F0", CultureInfo.InvariantCulture)))
+			+ " 已存快照=" + Remembered.ToString(CultureInfo.InvariantCulture)
 			+ (LastError == null ? "" : (" 最近错误=" + LastError));
 	}
 
@@ -194,16 +250,20 @@ internal static class EvidenceExtractor
 
 	/// <summary>The unresolved-fold census. Field names mirror ContributionUnresolvedRow 1:1 on purpose,
 	/// so a reader of the bundle and a reader of the C# class cannot disagree about what a field means.</summary>
-	private static string BuildCensus(BattleSession s, ContributionResult res, string reason, DateTime stamp, bool useFolds)
+	private static string BuildCensus(int quest, double seconds, ContributionResult res, string reason,
+		DateTime stamp, bool useFolds, string input)
 	{
 		var sb = new StringBuilder(4096);
 		sb.Append('{');
 		sb.Append("\"schema\":\"").Append(CensusSchema).Append('"');
 		sb.Append(",\"reason\":\"").Append(JsonText.Str(reason)).Append('"');
+		// WHICH battle this describes is not decoration: after a battle the key writes from a snapshot, and
+		// a reader must be able to tell a live extraction from a re-emission of the finalised one.
+		sb.Append(",\"inputSource\":\"").Append(JsonText.Str(input)).Append('"');
 		sb.Append(",\"createdAt\":\"").Append(stamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)).Append('"');
 		sb.Append(",\"pluginVersion\":\"").Append(JsonText.Str(BuildInfo.Version)).Append('"');
-		sb.Append(",\"quest\":").Append(s.QuestId.ToString(CultureInfo.InvariantCulture));
-		sb.Append(",\"seconds\":").Append(s.ActiveSeconds.ToString("F2", CultureInfo.InvariantCulture));
+		sb.Append(",\"quest\":").Append(quest.ToString(CultureInfo.InvariantCulture));
+		sb.Append(",\"seconds\":").Append(seconds.ToString("F2", CultureInfo.InvariantCulture));
 		sb.Append(",\"foldsEnabled\":").Append(useFolds ? "true" : "false");
 		ContributionStats st = res == null ? null : res.Stats;
 		if (st == null)
@@ -263,18 +323,19 @@ internal static class EvidenceExtractor
 		return sb.ToString();
 	}
 
-	private static string BuildManifest(BattleSession s, string reason, DateTime stamp, string dir,
-		List<string> names, int mdFiles, long mdBytes)
+	private static string BuildManifest(int quest, double seconds, string reason, DateTime stamp, string dir,
+		List<string> names, int mdFiles, long mdBytes, string input)
 	{
 		var sb = new StringBuilder(2048);
 		sb.Append('{');
 		sb.Append("\"schema\":\"").Append(ManifestSchema).Append('"');
 		sb.Append(",\"check\":\"").Append(HashName).Append('"');
 		sb.Append(",\"reason\":\"").Append(JsonText.Str(reason)).Append('"');
+		sb.Append(",\"inputSource\":\"").Append(JsonText.Str(input)).Append('"');
 		sb.Append(",\"createdAt\":\"").Append(stamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)).Append('"');
 		sb.Append(",\"pluginVersion\":\"").Append(JsonText.Str(BuildInfo.Version)).Append('"');
-		sb.Append(",\"quest\":").Append(s.QuestId.ToString(CultureInfo.InvariantCulture));
-		sb.Append(",\"seconds\":").Append(s.ActiveSeconds.ToString("F2", CultureInfo.InvariantCulture));
+		sb.Append(",\"quest\":").Append(quest.ToString(CultureInfo.InvariantCulture));
+		sb.Append(",\"seconds\":").Append(seconds.ToString("F2", CultureInfo.InvariantCulture));
 		sb.Append(",\"bundle\":\"").Append(JsonText.Str(Path.GetFileName(dir))).Append('"');
 		// the deployed assembly: without this a bundle cannot be tied to the build that produced it
 		string asm = null;
@@ -318,8 +379,37 @@ internal static class EvidenceExtractor
 		sb.Append(",\"contrib_census.json is computed by the same core that writes the export contribution section\"");
 		sb.Append(",\"masterdata is a COPY of the dump made at battle end; absent means it was never produced\"");
 		sb.Append(",\"carrierVerdict is an inference from the roster loadout, not a measured runtime read\"");
+		sb.Append(",\"inputSource says whether this was written from the live session or from the snapshot of the last finalised battle\"");
 		sb.Append("]}");
 		return sb.ToString();
+	}
+
+	/// <summary>
+	/// Keep the last finalised battle so the extraction KEY still works after it. Called from
+	/// Aggregator.Finalize right after the export was written and while the session model is alive; the
+	/// contribution result is computed HERE (once per battle, ~30k operations) so a later key press can
+	/// re-emit it without a second implementation of the ladder. Never throws.
+	/// </summary>
+	internal static void Remember(BattleSession s, string exportPath)
+	{
+		try
+		{
+			if (s == null) return;
+			bool useFolds = Plugin.CfgReconcileCalc != null && Plugin.CfgReconcileCalc.Value;
+			var snap = new Snapshot();
+			snap.ExportPath = exportPath;
+			snap.Result = ContributionSession.Compute(s, useFolds);
+			snap.QuestId = s.QuestId;
+			snap.Seconds = s.ActiveSeconds;
+			snap.UseFolds = useFolds;
+			_snapshot = snap;
+			Remembered++;
+		}
+		catch (Exception ex)
+		{
+			LastError = "remember: " + ex.Message;
+			try { RuntimeLog.Write("[DpsMeter][EXTRACT] 快照失败: " + ex.Message); } catch { }
+		}
 	}
 
 	private static void WriteChecked(string path, string json, string label)

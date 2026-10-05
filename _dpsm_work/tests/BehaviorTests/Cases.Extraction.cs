@@ -270,5 +270,19 @@ internal static partial class Cases
 		};
 		res = Contribution.Compute(hits, team, 1);
 		r.Str("the-rule-name-uses-the-bracketed-text", res.Unresolved[0].RuleName, "刻印");
+
+		// ---------------------------------------------------------------------------------------------
+		// R52c: which source an extraction run may use. The point of the group is the PRIORITY, not the
+		// enumeration: after a battle the live session is gone (Aggregator nulls it) while the snapshot of
+		// the finalised battle remains, and the key must still produce the battle the user just fought.
+		r.Group("extract/source");
+		r.Eq("a-live-session-is-used-when-there-is-one",
+		     (int)ExtractPolicy.SelectSource(true, true), (int)ExtractPolicy.BundleSource.Live);
+		r.Eq("live-beats-the-snapshot (the live session is the more recent truth)",
+		     (int)ExtractPolicy.SelectSource(true, false), (int)ExtractPolicy.BundleSource.Live);
+		r.Eq("with-no-live-session-the-last-finalised-battle-is-used",
+		     (int)ExtractPolicy.SelectSource(false, true), (int)ExtractPolicy.BundleSource.LastFinalised);
+		r.Eq("with-neither-an-empty-bundle-is-NOT-written",
+		     (int)ExtractPolicy.SelectSource(false, false), (int)ExtractPolicy.BundleSource.None);
 	}
 }

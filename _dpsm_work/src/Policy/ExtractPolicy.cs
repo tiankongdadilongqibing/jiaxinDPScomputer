@@ -107,4 +107,30 @@ internal static class ExtractPolicy
 		for (int i = 0; i < drop; i++) outl.Add(sorted[i]);
 		return outl;
 	}
+
+	/// <summary>Where an on-demand bundle can take its data from.</summary>
+	public enum BundleSource
+	{
+		/// <summary>Nothing to extract: report it, never write an empty bundle.</summary>
+		None = 0,
+		/// <summary>A live session (mid-battle, or the battle-end call inside the finalisation).</summary>
+		Live = 1,
+		/// <summary>The snapshot of the last FINALISED battle (see EvidenceExtractor.Remember).</summary>
+		LastFinalised = 2,
+	}
+
+	/// <summary>
+	/// Which source an extraction run may use. WHY THIS IS A DECISION AND NOT AN if:
+	/// MEASURED 2026-10-05 13:26 -- the user pressed the extraction key ~12 s after a battle and the log
+	/// said "跳过:没有战斗会话". Aggregator nulls Session at teardown / idle close, and the resume window
+	/// (5 s) had already expired, but the export file and the contribution result computed at finalisation
+	/// were both still there. A key that cannot read the battle the user just fought is useless exactly
+	/// when it is wanted, so the fallback order is fixed here and exercised offline.
+	/// </summary>
+	public static BundleSource SelectSource(bool liveAvailable, bool rememberedAvailable)
+	{
+		if (liveAvailable) return BundleSource.Live;
+		if (rememberedAvailable) return BundleSource.LastFinalised;
+		return BundleSource.None;
+	}
 }
