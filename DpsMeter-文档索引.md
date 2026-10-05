@@ -209,3 +209,4 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 * **2026-10-03 深夜(阶段 A/B/C)**:新增贡献指标字典 + `contrib/` 离线核心(纯新增,未删任何文件;
   只删了自己刚生成的旧命名 `compare_all.*`);`check_docs_123.py` 的 FILES 追加 4 个新增 CJK 文件;
   记录见 §7.2.82。
+> **部署状态(第 50 轮起)**:DLL = **28B8CCAF**…(398,336 字节,重构构建);基线 **36EC96D4**…(387,072 字节)已备份于 `_dpsm_work/deploy-backup/baseline-1.7.11/`,回退为一条 Copy-Item。

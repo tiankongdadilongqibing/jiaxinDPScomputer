@@ -685,3 +685,5 @@ damageLedger.eventSumAll == totals.taken                       ← 3/3 份带台
 8. ~~`GivenTalent=false` 的真实导出形态~~ → **已由代码契约 + 数据结案(1.7.9,§9.8.3)**:开关关闭时不再登记 fold、不再计 applied,`prod(calc.fold)` 与 `dealtMult·takenMult` 因此在两种设置下都一致;逐击 `givenFoldOn` 让人能从**任何**一份将来的导出判断当时用的是哪套理论。**不再需要改配置专门打一场**;若将来真有 flag-off 导出,`contribution_applicability.py` 的漏折检测与 `give_section_reasons` 会同时给出红灯。
 9. **非 CJK Windows 的等宽字体回退**:需另一台机器确认日志与列对齐(缓存节流在失败路径失效,见 §9.3)。
 10. **敌方视角(team 2)贡献**:需改代码,当前不可算。
+
+> **部署状态(第 50 轮起)**:DLL = **28B8CCAF**…(398,336 字节,重构构建);基线 **36EC96D4**…(387,072 字节)已备份于 `_dpsm_work/deploy-backup/baseline-1.7.11/`,回退为一条 Copy-Item。
