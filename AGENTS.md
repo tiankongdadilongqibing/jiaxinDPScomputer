@@ -63,7 +63,7 @@
 
 - 源码:_dpsm_work/src/**;行为测试:_dpsm_work/tests/BehaviorTests/**;
   守卫与工具:_dpsm_work/*.py;**工程文档:_dpsm_work/*.md**。
-- 文档入口:_dpsm_work/DpsMeter-文档索引.md(导航)、PROJECT-STATUS.md(现状)、HANDOFF.md(交接)、
+- 文档入口:DpsMeter-文档索引.md(**仓库根**,导航)、PROJECT-STATUS.md(现状)、HANDOFF.md(交接)、
   REFACTOR-PLAN-POST-1.7.11.md(方案)、REFACTOR-BATCH-*.md(逐轮记录)、CACHE-SEMANTICS-ADR.md(缓存决策)。
 
 ## 7. 已知的两个数据口径(别把它们相加)
@@ -76,3 +76,25 @@
    以及队伍之外的命中,它们被**整体排除**在归属之外。
 
 报告数字时**必须说明用的是哪一个口径**。
+
+## 8. 分析一场战斗数据的路径(标准四步)
+
+分析数据**不是**"从 `exports\` 里挑一个最新文件就开始算"。按下面四步走;每步都有权威文档,不要自己造流程。
+
+1. **选场(精确到文件)**:`python _dpsm_work/battle_select.py list|resolve|compare`。编号形如
+   `B-{启动命名空间}-{序号}`,旧档按 `legacy:<sha256>` 引用;`resolve` 把编号变成**显式文件清单**,
+   `compare` 只比清单里的文件。**`compare` 只接受终局**(`state=final`):训练场 9999 与未终局一律拒绝
+   (退出码区分,别当工具坏了)。→ `_dpsm_work/REPORT-精确选场-R56.md` §7
+2. **取证(让结论可复算)**:战斗结束时插件**默认**写一个自包含证据包
+   (`BepInEx/plugins/DpsMeter/extract/extract_<时间>_q<任务>_<原因>/`:`battle.json` + `contrib_census.json`
+   + `manifest.json`),用 `python _dpsm_work/extract_verify.py` 证明它没被改过、普查与独立重算一致。
+   → `_dpsm_work/EXTRACTION-FLOW.md`
+3. **复算(一手证据永远是导出文件)**:在 `_dpsm_work` 下跑
+   `python -m contrib.crosscheck <导出>`(文件里的 `contribution` 段 ↔ 离线核心**逐字段**)与
+   `python -m contrib.validate`(恒等式 I1–I10);要文本/JSON 报告用 `python -m contrib.run`。
+   → `_dpsm_work/CONTRIBUTION-TABLE-REPORT.md`(§2 链路 / §3 字段字典 / §7 实测样例 / §8 复现命令)
+4. **引用(写结论时)**:每个数字都要能回答"哪份文件、哪个字段";口径按
+   `_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md` §1/§12 写明,**两个未归因口径永不相加**(§7)。
+
+**文档当前性**:分析口径的权威是 `CONTRIBUTION-TABLE-REPORT.md` 与 `CONTRIBUTION-DATA-DICTIONARY.md`;
+`PROJECT-STATUS.md` §10 的文档年龄表说明哪些只是历史快照——先看它,别把快照当现状。

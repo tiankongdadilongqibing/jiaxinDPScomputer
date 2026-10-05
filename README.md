@@ -31,7 +31,7 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
     _dpsm_work/batch_inputs/   冻结输入快照(rf0 = 35 份既有语料;r42 = 新一轮语料与 masterdata 基准)
     BepInEx/plugins/DpsMeter/  部署位置(运行中的插件)+ masterdata 转储 + 历史 .bak
 
-文档入口:**_dpsm_work/DpsMeter-文档索引.md**(全量导航)、**_dpsm_work/PROJECT-STATUS.md**(现状事实)、
+文档入口:**DpsMeter-文档索引.md**(仓库根,全量导航)、**_dpsm_work/PROJECT-STATUS.md**(现状事实)、
 **_dpsm_work/HANDOFF.md**(交接)、**REFACTOR-PLAN-POST-1.7.11.md**(本次重构方案)与 REFACTOR-BATCH-*.md(逐轮记录)。
 
 ## 3. 构建
@@ -53,14 +53,14 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
 
     Copy-Item _dpsm_work/deploy-backup/baseline-1.7.11/DpsMeter.dll BepInEx/plugins/DpsMeter/DpsMeter.dll -Force
 
-当前部署 = 416,256 字节 / SHA256 AA836C06…(含证据提取流程);上一版 = 398,336 字节 / 28B8CCAF…(备份在 _dpsm_work/deploy-backup/pre-r52-28B8CCAF/);基线 = 387,072 字节 / 36EC96D4…(备份在 _dpsm_work/deploy-backup/baseline-1.7.11/)。
+当前部署 = 433,664 字节 / SHA256 C1DBBD8F…(含战斗编号 battle-ref/1 与精确选场);上一版 = 433,664 字节 / F6948470…(备份在 _dpsm_work/deploy-backup/pre-r57-F6948470/);基线 = 387,072 字节 / 36EC96D4…(备份在 _dpsm_work/deploy-backup/baseline-1.7.11/)。
 
 ## 5. 验证(改完必须跑的)
 
 | 层 | 命令 | 规模 |
 |---|---|---|
-| 行为测试 | dotnet run --project _dpsm_work/tests/BehaviorTests/BehaviorTests.csproj -c Release -- --quiet | 947 用例 / 98 组 |
-| 变异负控 | python _dpsm_work/tests/negative_control.py | 130 例,每例必须让具名用例变红 |
+| 行为测试 | dotnet run --project _dpsm_work/tests/BehaviorTests/BehaviorTests.csproj -c Release -- --quiet | 950 用例 / 98 组 |
+| 变异负控 | python _dpsm_work/tests/negative_control.py | 131 例,每例必须让具名用例变红 |
 | 离线验收 | python _dpsm_work/n0_acceptance.py(--out 指定输出目录) | 44 条命令 / 76 条检查 |
 | 文档收敛 | python _dpsm_work/check_doc_convergence.py(12 条规则 R1–R12) | 数字、版本、部署哈希、"未做"措辞 |
 | 其他守卫 | check_docs_123.py / refactor_final_check.py / check_tool_registry.py / check_contribution_layout.py / repo_manifest.py --verify / archive_index.py | — |
@@ -76,9 +76,26 @@ BepInEx IL2CPP 插件,游戏内叠加层实时显示总伤害 / 秒伤 / 承伤 
   (例:2026-10-05 那一场为 8,375,105.67（4.33%，unknown_kind）与 337,906（75 击,全在ショゴス）)。
 - 插件的 masterdata 转储每次运行都会重写,可用于**逐字节回归对照**(见 _dpsm_work/batch_inputs/r42-masterdata)。
 
-## 7. 现状与后续
+## 7. 分析战斗数据的路径
 
-本次(1.7.11 之后)的重构已收口:纯判据层、状态容器、界面格式化与三张表的行值模型、工具治理(96 条全部判定、
+给代理/新协作者的最短路径(每步都有权威文档,**不要从"挑最新那个文件"开始**):
+
+1. **选场**:`python _dpsm_work/battle_select.py list|resolve|compare` —— 按战斗编号
+   (`B-{启动命名空间}-{序号}`)把编号精确解析成文件清单;旧档按 `legacy:<sha256>` 引用。
+   训练场 9999 与未终局会被 `compare` 拒绝(这是设计)。详见 `_dpsm_work/REPORT-精确选场-R56.md` §7。
+2. **取证**:战斗结束默认写出自包含证据包(`BepInEx/plugins/DpsMeter/extract/`,由 `ExtractOnBattleEnd`
+   控制,默认开),用 `python _dpsm_work/extract_verify.py` 校验 manifest 与未归因普查。
+   详见 `_dpsm_work/EXTRACTION-FLOW.md`。
+3. **复算**(一手证据永远是导出文件):在 `_dpsm_work` 下跑
+   `python -m contrib.crosscheck <导出>`(文件里的 `contribution` 段 ↔ 离线核心逐字段)与
+   `python -m contrib.validate`(恒等式 I1–I10)。
+4. **引用**:字段/公式查 `_dpsm_work/CONTRIBUTION-DATA-DICTIONARY.md`;链路、字段字典、实测样例与复现命令
+   查 `_dpsm_work/CONTRIBUTION-TABLE-REPORT.md`(数据分析从它开始)。
+   **两个未归因口径永不相加**——贡献账残差与"攻击者无法识别"的会话口径,必须写明用的是哪一个(见 §6)。
+
+## 8. 现状与后续
+
+本次(1.7.11 之后)的重构已收口:纯判据层、状态容器、界面格式化与三张表的行值模型、工具治理(100 条全部判定、
 0 条未判定)、文档收敛守卫(R1–R12)、缓存语义三问与 Chart 格式按产品决定落地。
 主数据层的共享部分已抽取(MasterDataAccess)并**机器证明**搬移等价;转储路由经证据判定**不合并**。
 首次部署的实机验证已通过:**masterdata 转储与冻结基准逐字节一致**。
