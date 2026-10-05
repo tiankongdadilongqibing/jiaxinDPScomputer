@@ -40,6 +40,30 @@ internal struct ContributionLinkValues
 	public double Amount;
 }
 
+/// <summary>R55 (user request): one row of the PENDING granted-channel table -- a CANDIDATE carrier, not
+/// a provider. Nothing in this struct is credited anywhere; it exists so the 「阻挡增伤」 pool can be read
+/// with the same eye as the character table it is printed under.</summary>
+internal struct ContributionPendingValues
+{
+	public string Name;
+	public double Amount;
+	public double Share;
+	public double Folds;
+}
+
+/// <summary>The pending granted-channel table plus its totals and the captions the header needs.</summary>
+internal sealed class ContributionPendingTable
+{
+	public readonly List<ContributionPendingValues> Rows = new List<ContributionPendingValues>();
+	/// <summary>The distinct rule labels of the pooled groups, in first-seen order.</summary>
+	public readonly List<string> Labels = new List<string>();
+	/// <summary>Each ambiguous group's candidate list, verbatim -- the row caption can only carry a COUNT.</summary>
+	public readonly List<string> Ambiguous = new List<string>();
+	public double Total;
+	public double Share;
+	public double Folds;
+}
+
 /// <summary>The contribution table's row values plus the four sums its footer prints.</summary>
 internal sealed class ContributionTableValues
 {
@@ -148,5 +172,80 @@ internal static class ContributionRowModel
 			for (int i = 0; i < res.Actors.Count; i++)
 				if (res.Actors[i] != null && res.Actors[i].Key == key) return res.Actors[i].Name;
 		return "#" + key;
+	}
+
+	/// <summary>R55: the caption of a row whose candidates are NOT unique. It carries the COUNT, never a
+	/// name picked out of the set -- picking one is the wrong answer R54 removed. Public so a test can pin
+	/// the exact wording the panel shows.</summary>
+	public const string AmbiguousNamePrefix = "候选";
+
+	/// <summary>
+	/// R55 (user request): turn the census' granted-channel groups into the rows of the PENDING table.
+	///
+	/// Input rule: ONLY a group WITH a carrier verdict is a pending row. The verdict is recorded for the
+	/// granted channel alone (Contribution.NoteUnresolved), so this filter is what keeps a byUnit_unknown
+	/// or a madness fold out of a table whose whole promise is "this is the blocked-damage family".
+	///
+	/// Aggregation: by (verdict, name), so the several copies of one rule that share a unique holder
+	/// collapse into ONE row for that holder -- which is what makes the table read as "who would get it".
+	/// An ambiguous group is one row labelled with its candidate COUNT, and its names travel in
+	/// <see cref="ContributionPendingTable.Ambiguous"/> for the note line.
+	///
+	/// Pure: it reads the result and returns a table; it cannot move a single credit, and a test pins that.
+	/// </summary>
+	public static ContributionPendingTable BuildPending(ContributionResult res, double total)
+	{
+		var t = new ContributionPendingTable();
+		if (res == null || res.Unresolved == null) return t;
+		var slot = new Dictionary<string, int>();
+		for (int i = 0; i < res.Unresolved.Count; i++)
+		{
+			ContributionUnresolvedRow u = res.Unresolved[i];
+			if (u == null || string.IsNullOrEmpty(u.CarrierVerdict)) continue;
+			string id, name;
+			if (u.CarrierVerdict == "unique")
+			{
+				name = string.IsNullOrEmpty(u.CarrierNames) ? "(候选名不可读)" : u.CarrierNames;
+				id = "u|" + name;
+			}
+			else if (u.CarrierVerdict == "ambiguous")
+			{
+				name = AmbiguousNamePrefix + u.CarrierCount + "人";
+				id = "a|" + name;
+				if (!string.IsNullOrEmpty(u.CarrierNames) && !t.Ambiguous.Contains(u.CarrierNames))
+					t.Ambiguous.Add(u.CarrierNames);
+			}
+			else
+			{
+				name = "(无可读候选)";
+				id = "n|" + name;
+			}
+			if (!string.IsNullOrEmpty(u.Label) && !t.Labels.Contains(u.Label)) t.Labels.Add(u.Label);
+			int at;
+			if (!slot.TryGetValue(id, out at))
+			{
+				at = t.Rows.Count;
+				slot[id] = at;
+				t.Rows.Add(new ContributionPendingValues { Name = name });
+			}
+			ContributionPendingValues row = t.Rows[at];
+			row.Amount += u.Amount;
+			row.Folds += u.Folds;
+			t.Rows[at] = row;
+		}
+		// Deterministic order (amount desc, then the name): two runs over one battle cannot reorder the page.
+		t.Rows.Sort((x, y) => x.Amount != y.Amount
+			? (x.Amount < y.Amount ? 1 : -1)
+			: string.CompareOrdinal(x.Name, y.Name));
+		for (int i = 0; i < t.Rows.Count; i++)
+		{
+			ContributionPendingValues row = t.Rows[i];
+			row.Share = total > 0.0 ? 100.0 * row.Amount / total : 0.0;
+			t.Rows[i] = row;
+			t.Total += row.Amount;
+			t.Folds += row.Folds;
+		}
+		t.Share = total > 0.0 ? 100.0 * t.Total / total : 0.0;
+		return t;
 	}
 }

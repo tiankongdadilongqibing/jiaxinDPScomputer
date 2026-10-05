@@ -1,0 +1,23 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_given_fold_coupling.py
+  [PASS] 1. GivenTalentDamage takes applyToChain with default true -- signature: d, out string text, FoldContext ctx = null, bool measure = true, bool applyToChain = true)
+  [PASS] 2a. found the applyToChain gate and the ctx.Add side effect -- gate=yes ctxAdd=1 occurrence(s)
+  [PASS] 2b. ctx.Add("vic","given",...) occurs exactly once in the callee -- occurrences=1
+  [PASS] 2c. mult *= f is inside the gate -- idx=24424
+  [PASS] 2d. applied++ is inside the gate -- idx=24441
+  [PASS] 2e. the global GivenApplied++ is inside the gate -- idx=24458
+  [PASS] 2f. the fold registration is inside the gate -- idx=24517
+  [PASS] 2g. the measurement/text path stays OUTSIDE the gate (switch-off is still a read) -- sb index=24662
+  [PASS] 3a. the production call site passes one identifier down -- passed=givenFold
+  [PASS] 3b. the multiply branch evaluates the SAME identifier -- call passes givenFold, decision uses givenFold
+  [PASS] 3c. exactly one production call site -- call sites=1
+  [PASS] 4. pure decision helper GivenFoldApplies exists -- looked for the one-line predicate
+  [PASS] 5a. Madness (outgoing) registration inside the same if as the multiply -- idx=12297
+  [PASS] 5b. MadnessVictim (incoming) registration inside the same if as the multiply -- idx=10842
+  [PASS] 6a. CalcBreakdown carries GivenFoldOn -- field
+  [PASS] 6b. CalcReconcile writes "givenFoldOn" -- per-hit writer
+  [PASS] 6c. Forensics writes "givenFoldOn" -- per-hit writer
+  [PASS] 7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage -- looked for the call ending in ", false, <switch>)
+  [PASS] 7b. the diagnostics madness multiply is gated on Plugin.CfgMadness -- looked for the CfgMadness switch next to the madness multiply
+  [PASS] 7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim -- looked for the CfgMadnessVictim gate on the incoming ¡Á1.5 fold
+---- given-talent fold coupling guard: PASS (0/20 failing)

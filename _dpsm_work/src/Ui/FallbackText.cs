@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Text;
+
 namespace DpsMeter;
 
 /// <summary>
@@ -76,5 +79,42 @@ internal static class FallbackText
 	{
 		return "    " + UnattributedReasonLabel(reason) + " " + DisplayFormat.Fmt(amount)
 		     + "  " + DisplayFormat.Num(folds) + " 折";
+	}
+
+	/// <summary>
+	/// R55 (user request): the caption of the pending 「阻挡增伤」 table. It reuses the family's own name
+	/// (阻挡增伤) instead of inventing a second vocabulary, names the rules that produced the pool, and says
+	/// IN WORDS that nothing below is charged to anybody -- the table is drawn with the character table's
+	/// geometry on purpose, and that resemblance must not be read as an attribution.
+	/// </summary>
+	public static string PendingHeaderLine(List<string> labels)
+	{
+		string lab = "";
+		int shown = 0;
+		if (labels != null)
+		{
+			for (int i = 0; i < labels.Count && shown < 2; i++, shown++)
+			{
+				if (shown > 0) lab += " / ";
+				lab += labels[i];
+			}
+			if (labels.Count > 2) lab += " 等" + labels.Count + "种";
+		}
+		return "【阻挡增伤·待确认】" + lab + "   提供者未确认,下列份额未计入任何角色";
+	}
+
+	/// <summary>The honesty line under the pending table: where a candidate comes from, and -- when the
+	/// roster route was ambiguous -- WHICH candidates, because the row caption can only carry a count.</summary>
+	public static string PendingNoteLine(ContributionPendingTable t)
+	{
+		string note = "  (* 候选来自名册持有者的推断,不是实测;确认归属前不计入任何角色)";
+		if (t == null || t.Ambiguous == null || t.Ambiguous.Count == 0) return note;
+		var sb = new StringBuilder(note);
+		for (int i = 0; i < t.Ambiguous.Count; i++)
+		{
+			sb.Append(i == 0 ? "   多个候选: " : " / ");
+			sb.Append(t.Ambiguous[i]);
+		}
+		return sb.ToString();
 	}
 }

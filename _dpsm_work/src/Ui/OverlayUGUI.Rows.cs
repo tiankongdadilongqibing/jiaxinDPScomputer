@@ -384,6 +384,41 @@ public static partial class OverlayUGUI
 		seconds = view != null ? view.Seconds : 0.0;
 	}
 
+	/// <summary>
+	/// R55 (user request): draw the granted 「阻挡增伤」 residual with the CHARACTER table's own column
+	/// geometry, so it reads as a contribution table instead of as one loose warning line. Two things are
+	/// deliberate:
+	///   * it is a SEPARATE block, placed after the 未归因 lines, because the character table's 合计 row must
+	///     still equal the sum of the rows above it -- merging a not-yet-charged pool into table 1 would
+	///     silently move credit, which is the exact mistake R54 removed;
+	///   * every credit column that does not apply prints "-", not 0. A measured zero and "not charged" are
+	///     different statements, and this page has already paid for confusing them.
+	/// The rows come from ContributionRowModel.BuildPending, so the panel and the tests read ONE model.
+	/// </summary>
+	private static void AppendPendingRows(List<RowDef> rows, ContributionResult res, double total)
+	{
+		ContributionPendingTable pend = ContributionRowModel.BuildPending(res, total);
+		if (pend.Rows.Count == 0) return;
+		rows.Add(new RowDef { Text = "", Color = DimColor, Height = 6f });
+		rows.Add(new RowDef { Text = FallbackText.PendingHeaderLine(pend.Labels), Color = WarnColor, Height = 16f });
+		rows.Add(new RowDef { Text = ContributionColumns.HeaderLine(ContributionColumns.T1PendingSpec()), Color = DimColor, Height = 15f });
+		for (int i = 0; i < pend.Rows.Count; i++)
+		{
+			ContributionPendingValues p = pend.Rows[i];
+			rows.Add(new RowDef
+			{
+				Text = ContributionColumns.T1PendingRow(p.Name, p.Amount, p.Share, p.Folds),
+				Color = WarnColor, Height = 16f,
+			});
+		}
+		rows.Add(new RowDef
+		{
+			Text = ContributionColumns.T1PendingTotalsLine(pend.Total, pend.Share, pend.Folds),
+			Color = NeutralColor, Height = 16f,
+		});
+		rows.Add(new RowDef { Text = FallbackText.PendingNoteLine(pend), Color = DimColor, Height = 15f });
+	}
+
 	private static void AppendContributionTable(List<RowDef> rows)
 	{
 		int firstRow = rows.Count;
@@ -480,6 +515,8 @@ public static partial class OverlayUGUI
 				Color = WarnColor, Height = 15f,
 			});
 		}
+		// R55: the granted family's pending pool, on the character table's geometry.
+		AppendPendingRows(rows, res, total);
 		rows.Add(new RowDef
 		{
 			Text = "  (* = 使魔)  可分析伤害 " + DisplayFormat.Fmt(res.Stats.Analyzable) + "   倍率池 " + DisplayFormat.Fmt(res.Stats.PoolTotal)
@@ -1127,6 +1164,8 @@ public static partial class OverlayUGUI
 				Color = WarnColor, Height = 15f,
 			});
 		}
+		// R55: same pending table on the live 总贡献 rows (one model, two render sites).
+		AppendPendingRows(rows, res, total);
 		if (res.Rules.Count > 0)
 		{
 			var sb = new System.Text.StringBuilder();

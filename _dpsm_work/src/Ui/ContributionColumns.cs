@@ -141,6 +141,61 @@ internal static class ContributionColumns
 		     + DisplayFormat.Amt(hits, T1Hits);
 	}
 
+	/// <summary>
+	/// R55 (user request): the PENDING table's columns. They are T1's columns COPIED at call time -- same
+	/// widths, so the two tables line up column for column -- with the two labels whose meaning differs
+	/// changed: 角色 becomes 候选角色 (nothing here is attributed) and 命中 becomes 折叠 (these shares are
+	/// counted per fold, not per hit). Copying instead of re-declaring is what stops the pair drifting.
+	/// </summary>
+	public static ColumnSpec[] T1PendingSpec()
+	{
+		var cols = new ColumnSpec[T1.Length];
+		for (int i = 0; i < T1.Length; i++) cols[i] = T1[i];
+		cols[0].Label = "候选角色";
+		cols[cols.Length - 1].Label = "折叠";
+		return cols;
+	}
+
+	/// <summary>A pending row: the name/amount/share/folds are real, and the credit columns that do not
+	/// apply print a dash. A 0 there would read as a measurement of zero, which is a different statement
+	/// from "this pool is not charged to anyone yet".</summary>
+	public static string T1PendingRow(string name, double amount, double sharePct, double folds)
+	{
+		// the share text is materialised first on purpose: writing the same PadL(Pct(sharePct), T1Share)
+		// expression here as in T1Row would make the negative-control mutation that targets that ONE line
+		// match twice, i.e. turn a working gate into a driver failure.
+		string share = DisplayFormat.Pct(sharePct);
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(name), T1Name), T1Name)
+		     + DisplayFormat.Amt(amount, T1Total)
+		     + DisplayFormat.PadL(share, T1Share)
+		     + PendingDash(T1Self)
+		     + PendingDash(T1Other)
+		     + PendingDash(T1Stolen)
+		     + PendingDash(T1Direct)
+		     + DisplayFormat.Amt(folds, T1Hits);
+	}
+
+	/// <summary>The pending table's footer, on the character table's own geometry so the two totals sit in
+	/// the same column. It says 待确认 rather than 合计 because this pool is exactly the part that is NOT in
+	/// the 合计 above it.</summary>
+	public static string T1PendingTotalsLine(double amount, double sharePct, double folds)
+	{
+		string share = DisplayFormat.Pct(sharePct);
+		return "  " + DisplayFormat.PadR("待确认合计", T1Name)
+		     + DisplayFormat.Amt(amount, T1Total)
+		     + DisplayFormat.PadL(share, T1Share)
+		     + PendingDash(T1Self)
+		     + PendingDash(T1Other)
+		     + PendingDash(T1Stolen)
+		     + PendingDash(T1Direct)
+		     + DisplayFormat.Amt(folds, T1Hits);
+	}
+
+	private static string PendingDash(int width)
+	{
+		return DisplayFormat.PadL("-", width);
+	}
+
 	/// <summary>A T2 data row: four fitted/padded text cells, then three amounts.</summary>
 	public static string T2Row(string rule, string kind, string side, string owner, double hits, double folds,
 	                           double amount)

@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 811;
+	public const int ExpectedCases = 866;
 
 	private static int Main(string[] args)
 	{

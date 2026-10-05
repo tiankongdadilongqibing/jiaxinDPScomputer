@@ -1,0 +1,9 @@
+extract_verify -- D:\dmmplayer\rlyehshoujotaix_cl\BepInEx\plugins\DpsMeter\extract\extract_20261005_143055_q411001_battle-end
+bundle      : extract_20261005_143055_q411001_battle-end
+manifest    : schema=extract-manifest/1 check=fnv1a64 reason=battle-end plugin=1.7.11 quest=411001 at=2026-10-05 14:30:55
+files       : 2 listed, 2 hashed
+masterdata  : claimed=20 on disk=20 failures=0
+census      : groups census=4 recompute=4 folds census=35271 recompute=35271
+unattributed: census coverage=7373676.891 recompute reasons=ability_holder_attacker=9282, ability_holder_unique=5927, byUnit=6134, given_carrier_one=5368, global_name_unique=8560
+assembly    : DpsMeter.dll check=12d09d637fbc872e bytes=420352
+VERDICT: PASS

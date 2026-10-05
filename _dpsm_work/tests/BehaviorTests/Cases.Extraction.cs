@@ -320,6 +320,157 @@ internal static partial class Cases
 		      "    阻挡增伤(唯一候选,未确认) 1,234,567  42 折");
 
 		// ---------------------------------------------------------------------------------------------
+		// R55 (user request): the pending 「阻挡增伤」 table -- the granted pool drawn with the CHARACTER
+		// table's own geometry. What is pinned here is the two things that could go wrong silently: the
+		// table must contain ONLY the granted family, and building it must not move one unit of credit.
+		r.Group("extract/pending");
+		var pendTeam = new List<ContributionActor> { CensusActor(2, "A", 1), CensusActor(1, "BOSS", 2) };
+		var giverTeam = new List<ContributionActor>
+		{
+			CensusActor(2, "A", 1), CensusActor(9, "GIVER", 1, "1006/-10"), CensusActor(1, "BOSS", 2),
+		};
+		var oneGiven = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1, null, "被伤害+10%(赋予)")),
+		};
+		ContributionResult pres = Contribution.Compute(oneGiven, giverTeam, 1);
+		ContributionPendingTable pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("one-unique-candidate-is-one-row", pt.Rows.Count, 1);
+		r.Str("the-row-names-the-candidate-holder", pt.Rows[0].Name, "GIVER");
+		r.EqD("with-the-pending-amount", pt.Rows[0].Amount, 100.0);
+		r.EqD("and-the-pending-fold-count", pt.Rows[0].Folds, 1.0);
+		r.EqD("and-its-share-of-the-analyzable-total", pt.Rows[0].Share, 100.0 * 100.0 / 1100.0);
+		r.EqD("the-footer-totals-the-pool", pt.Total, 100.0);
+		r.EqD("the-footer-share-is-the-same-share", pt.Share, 100.0 * 100.0 / 1100.0);
+		r.Eq("the-rule-label-travels-with-the-table", pt.Labels.Count, 1);
+		r.Str("and-it-is-the-rules-own-label", pt.Labels[0], "被伤害+10%(赋予)");
+		r.EqD("building-the-table-does-NOT-move-the-credit", pres.Stats.Unattributed, 100.0);
+		r.EqD("nor-the-attributed-side", pres.Stats.Attributed, 1000.0);
+		r.Eq("a-null-result-produces-no-pending-rows",
+		     ContributionRowModel.BuildPending(null, 100.0).Rows.Count, 0);
+
+		// several copies of ONE rule that share ONE holder are ONE row for that holder (that is what makes
+		// the table answer "who would get it" instead of listing the same name four times)
+		var twoCopies = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1, null, "被伤害+10%(赋予)")),
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#7/1006/-10", 1.1, null, "被伤害+10%(赋予)")),
+		};
+		pres = Contribution.Compute(twoCopies, giverTeam, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("two-copies-sharing-one-holder-are-ONE-row", pt.Rows.Count, 1);
+		r.EqD("with-the-two-shares-added-up", pt.Rows[0].Amount, 200.0);
+		r.EqD("and-two-folds", pt.Rows[0].Folds, 2.0);
+
+		// an ambiguous roster route keeps its candidates apart: one row carrying the COUNT, never a picked name
+		var twoGivers = new List<ContributionActor>
+		{
+			CensusActor(2, "A", 1), CensusActor(9, "GIVER", 1, "1006/-10"),
+			CensusActor(3, "GIVER2", 1, "1006/-10"), CensusActor(1, "BOSS", 2),
+		};
+		pres = Contribution.Compute(oneGiven, twoGivers, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("an-ambiguous-group-is-still-one-row", pt.Rows.Count, 1);
+		r.Str("and-it-carries-the-count-not-a-picked-name", pt.Rows[0].Name, "候选2人");
+		r.Eq("the-candidate-names-are-kept-for-the-note-line", pt.Ambiguous.Count, 1);
+		r.Str("with-both-candidates-in-it", pt.Ambiguous[0], "GIVER, GIVER2");
+		r.EqD("and-no-credit-moves-here-either", pres.Stats.Unattributed, 100.0);
+
+		// no readable candidate is a row too -- it is a statement about the roster read, not an absence
+		pres = Contribution.Compute(oneGiven, pendTeam, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("no-readable-candidate-is-still-a-row", pt.Rows.Count, 1);
+		r.Str("labelled-as-such", pt.Rows[0].Name, "(无可读候选)");
+		r.Eq("with-no-ambiguous-note", pt.Ambiguous.Count, 0);
+
+		// ONLY the granted-channnel groups have a carrier verdict, so only they may reach this table
+		var mixed = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1)),
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("madness", "vicmadness#150", 1.5)),
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1, "NOBODY")),
+		};
+		pres = Contribution.Compute(mixed, giverTeam, 1);
+		r.Eq("three-unrelated-unresolved-groups-are-censused", pres.Unresolved.Count, 3);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("but-only-the-granted-carriers-pool-reaches-the-pending-table", pt.Rows.Count, 1);
+		r.Str("and-it-is-the-granted-group", pt.Rows[0].Name, "GIVER");
+
+		// order: the heavier pool first, and a tie broken by the name (ordinal, so it cannot shuffle per run)
+		var orderTeam = new List<ContributionActor>
+		{
+			CensusActor(2, "A", 1), CensusActor(9, "ZZZ", 1, "1006/-10"),
+			CensusActor(3, "AAA", 1, "2006/-10"), CensusActor(1, "BOSS", 2),
+		};
+		var tie = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 1.1, null, "R1")),
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#5/2006/-10", 1.1, null, "R2")),
+		};
+		pres = Contribution.Compute(tie, orderTeam, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Eq("two-holders-are-two-rows", pt.Rows.Count, 2);
+		r.EqD("their-shares-tie", pt.Rows[0].Amount, pt.Rows[1].Amount);
+		r.Str("so-the-name-breaks-it (ordinal)", pt.Rows[0].Name, "AAA");
+		r.Str("and-the-other-follows", pt.Rows[1].Name, "ZZZ");
+		r.Eq("two-distinct-labels-are-both-listed", pt.Labels.Count, 2);
+		// the heavier pool is ZZZ's (x2.0 on the 1006/-10 grant), so the amount -- not the alphabet -- decides
+		var heavy = new List<ContributionHit>
+		{
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#4/1006/-10", 2.0, null, "R1")),
+			CensusHit(1100.0, 2, "BOSS", 1, CensusFold("given", "given#5/2006/-10", 1.1, null, "R2")),
+		};
+		pres = Contribution.Compute(heavy, orderTeam, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.Str("the-heavier-pool-is-printed-first-even-against-the-alphabet", pt.Rows[0].Name, "ZZZ");
+		r.EqD("with-the-whole-share", pt.Rows[0].Amount, 550.0);
+
+		// the geometry IS the character table's -- same column count, same widths, same nominal line width
+		ColumnSpec[] pspec = ContributionColumns.T1PendingSpec();
+		r.Eq("the-pending-table-has-the-same-column-count", pspec.Length, ContributionColumns.T1.Length);
+		r.Str("the-first-column-is-relabelled-candidates", pspec[0].Label, "候选角色");
+		r.Str("the-last-column-is-relabelled-folds", pspec[pspec.Length - 1].Label, "折叠");
+		for (int pi = 0; pi < pspec.Length; pi++)
+			r.Eq("pending-column-" + pi + "-keeps-the-T1-width", pspec[pi].Width, ContributionColumns.T1[pi].Width);
+		r.Eq("the-pending-header-is-as-wide-as-the-character-header",
+		     DisplayFormat.DispWidth(ContributionColumns.HeaderLine(pspec)), ContributionColumns.T1LineWidth);
+		r.Eq("and-so-is-a-pending-data-row",
+		     DisplayFormat.DispWidth(ContributionColumns.T1PendingRow("エヴァラス・フラウ", 7373676.891, 3.885, 5368)),
+		     ContributionColumns.T1LineWidth);
+		r.Eq("and-the-pending-footer",
+		     DisplayFormat.DispWidth(ContributionColumns.T1PendingTotalsLine(7373676.891, 3.885, 5368)),
+		     ContributionColumns.T1LineWidth);
+		r.Eq("a-1e9-class-pool-must-not-push-the-row-either",
+		     DisplayFormat.DispWidth(ContributionColumns.T1PendingRow("X", 9.9e9, 100.0, 1234567)),
+		     ContributionColumns.T1LineWidth);
+		string prow = ContributionColumns.T1PendingRow("X", 1.0, 1.0, 1);
+		int dashes = 0;
+		for (int pi = 0; pi < prow.Length; pi++) if (prow[pi] == '-') dashes++;
+		r.Eq("the-four-inapplicable-credit-columns-print-a-dash (not a zero)", dashes, 4);
+		string pfoot = ContributionColumns.T1PendingTotalsLine(1.0, 1.0, 1);
+		int fdashes = 0;
+		for (int pi = 0; pi < pfoot.Length; pi++) if (pfoot[pi] == '-') fdashes++;
+		r.Eq("the-footer-dashes-the-same-four-columns", fdashes, 4);
+
+		// the captions: the family's own name, an explicit "not charged" promise, and the candidate list
+		r.Str("the-pending-header-names-the-family-and-the-rule",
+		      FallbackText.PendingHeaderLine(new List<string> { "被伤害+10%(赋予)" }),
+		      "【阻挡增伤·待确认】被伤害+10%(赋予)   提供者未确认,下列份额未计入任何角色");
+		r.Str("a-third-label-becomes-a-count-not-a-third-name",
+		      FallbackText.PendingHeaderLine(new List<string> { "a", "b", "c" }),
+		      "【阻挡增伤·待确认】a / b 等3种   提供者未确认,下列份额未计入任何角色");
+		r.Str("no-label-still-produces-a-caption",
+		      FallbackText.PendingHeaderLine(null),
+		      "【阻挡增伤·待确认】   提供者未确认,下列份额未计入任何角色");
+		r.Str("the-note-says-the-candidate-is-an-inference",
+		      FallbackText.PendingNoteLine(new ContributionPendingTable()),
+		      "  (* 候选来自名册持有者的推断,不是实测;确认归属前不计入任何角色)");
+		pres = Contribution.Compute(oneGiven, twoGivers, 1);
+		pt = ContributionRowModel.BuildPending(pres, pres.Stats.Analyzable);
+		r.True("the-note-lists-the-ambiguous-candidates",
+		       FallbackText.PendingNoteLine(pt).EndsWith("多个候选: GIVER, GIVER2"));
+
+		// ---------------------------------------------------------------------------------------------
 		// R52c: which source an extraction run may use. The point of the group is the PRIORITY, not the
 		// enumeration: after a battle the live session is gone (Aggregator nulls it) while the snapshot of
 		// the finalised battle remains, and the key must still produce the battle the user just fought.

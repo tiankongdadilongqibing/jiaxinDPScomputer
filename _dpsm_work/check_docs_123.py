@@ -113,6 +113,8 @@ FILES = [
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R52.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R53.md',
 	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R54.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R55.md',
+	r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\BATTLE-REFERENCE-IMPLEMENTATION-PLAN.md',
 ]
 
 
