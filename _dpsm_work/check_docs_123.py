@@ -127,6 +127,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R62.md',
     # R63: 自动技能主表转储 + 冷却单位规则
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R63.md',
+    # R64: 自动技能的 Skill 侧实例 + 充能 + 发动时刻
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R64.md',
 ]
 
 

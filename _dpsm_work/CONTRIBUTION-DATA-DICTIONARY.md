@@ -868,6 +868,39 @@ damageLedger.eventSumAll == totals.taken                        ← 3/3 份带�
 **未覆盖**:`MasterDataDump.cs` 不在 BehaviorTests 的编译清单里,所以**转储代码本身没有行为测试** ——
 被覆盖的是它调用的规则,而「字段名正确」由**编译器**保证。
 
+##### R64(插件 1.7.16):自动技能的**运行时**读法 + 两个 id 空间不是一回事
+
+本轮**不动归属口径、不动任何既有数值**、不改导出形状、**不新增导出根段**
+(`contribution.schemaVersion` 仍 **1.2**)。新增的是**取证面**:一条**只读**探针,以及一条必须写下来的**口径**。
+
+- **口径:`auto_skill` 表的 id 空间 ≠ 伤害计算里的效果 id 空间。** R63 的表里存在 id `10024`
+  「恐怖の特異点」,而战斗日志里每 ≈14 s 出现一次的「效果 `10024`」只是 `DamageCalculater.m_effectId` ——
+  **两者不是同一个编号体系**,不能互相引用。这条是 R63 §7 留下的待办,现在写进来:凡是要把
+  「日志里的效果 N」与「`auto_skill` 的第 N 行」对上,都必须先证明那个 N 是从哪来的,**默认假定它们无关**。
+- **自动技能在运行时是普通 `Skill`,而且不在 `[CLOCKP]` 走的那个列表里。** `AutoSkillMasterData :
+  SkillMasterDataBase`(ilspycmd),所以它最终就是 `SkillData` -> `Skill`。判别靠游戏自己的
+  `Skill.m_type : Skill.Type { Skill, SpecialSkill, OverSkill, AutoSkill1ForPassiveSkill,
+  AutoSkill2ForPassiveSkill }`,状态靠 `Skill.GetStatus() : Skill.Status { NotHave, Charge, Usable, Using }`。
+  实测佐证(2026-10-06):`PlayerSkillStandbyData` 列表渲染出的 3 个技能名
+  (地下からの完全顕現 / 電脳掌都 / 狂気の眼球)在**全部 21 个** `masterdata/*.json` 里**一个都不出现**,
+  而 4 个候选名字里只有 暗沌への導き 命中,且只在 `auto_skill.json` 里 —— 即 **`TimeProbe` 那条路线永远读不到自动技能**。
+- **读什么、写在哪**:`Player.AutoSkill1/2` -> `Skill.WaitCountFrame`(充能)/ `CoolTimeFrame`(满格),
+  写成运行日志的 `[AUTOSK] act`(发动时刻:墙钟 + 战斗钟 + 单位/槽位/技能名/类型/状态/充能/时长/库存/游戏返回值)、
+  `[AUTOSK] chg`(每槽每 2 s 一行充能轨迹;`upsGame`/`upsWall`/`chargeSec` 只由**相邻两次打印**算出,所以能用手算复核)、
+  `[AUTOSK] SUM`(收尾:每槽发动数 + 墙钟/战斗钟**中位发动间隔** + 全部计数器)。
+  换算的判据是纯函数 `src/Policy/AutoSkillCadencePolicy.cs`(`UnitsPerSecond` / `SecondsFor` /
+  `IntervalSeconds` / `Median`);`chargeSec = SecondsFor(cool, upsGame)` **就是**把充能折算回 R63 那条
+  「主表秒数」的口径,两者可对账。
+- **为什么值得单独成规则**:它是把「自动技能 240–300 秒」与「从伤害通道反推的 ≈13.5 s」这对矛盾拆开的
+  **唯一**办法(继续从伤害反推永远分不开),而这一步的算术必须能被离线执行,不能只活在探针里。
+
+**守卫**:`tests/BehaviorTests/Cases.AutoSkillCadence.cs` 29 例(9000/7200 帧必须回到主表的 300/240 秒、
+回填的计数器保持负号、`0` 是「没测到」的哨兵而不是节奏、中位数不就地排序);
+变异负控 4 条(`autoskill-charge-forgets-the-clock`、`autoskill-rate-clamps-a-backwards-counter`、
+`autoskill-median-keeps-the-sentinel`、`autoskill-median-sorts-the-callers-array`,逐条红在具名用例)。
+**未覆盖**:`AutoSkillProbe.cs` 不在 BehaviorTests 的编译清单里(需要 IL2CPP 面),所以**探针本身没有行为测试**;
+patch 是否解析上、以及「自动技能几秒一发」,都要等下一场实机日志的 `[AUTOSK]` 行。
+
 **实机结果(已确认)**:部署后用户自行重启,自检行 `表成功=20 表缺失=0 表异常=0 行异常=0`、`auto_skill=120`;
 `masterdata/auto_skill.json` 落盘。她那一行(unit 84 -> `awake_potential` category 3/acquire_id 403 ->
 `auto_skill_id=84`)是 `暗沌への導き`:`minCoolTime/maxCoolTime = 300/240`(**主表单位 = 秒**)、

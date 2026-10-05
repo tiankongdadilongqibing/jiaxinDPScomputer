@@ -644,12 +644,32 @@ MUTATIONS = [
          find="	public const double FallbackUnitsPerGameSecond = BattleClockPolicy.DefaultUnitsPerGameSecond;",
          repl="	public const double FallbackUnitsPerGameSecond = 40.0;",
          expect="policy/skill-cooldown/the-fallback-rate-is-the-clock-policy-default"),
+    # ---- R64: the auto-skill charge/cadence arithmetic. The probe can only be read in a live battle, so
+    # the executable half is these three conversions -- and each mutation removes one of the three things
+    # the round claims: that the charge must be divided by the measured rate before it can be compared with
+    # the master's seconds, that a counter which ran BACKWARDS is a reset and not a small positive rate,
+    # and that the median must not be dragged onto IntervalSeconds' own "no interval" sentinel.
+    dict(name="autoskill-charge-forgets-the-clock", file="Policy/AutoSkillCadencePolicy.cs",
+         find="		double v = units / unitsPerSecond;",
+         repl="		double v = units;",
+         expect="policy/autoskill-cadence/the-9000-frame-charge-is-the-masters-300s"),
+    dict(name="autoskill-rate-clamps-a-backwards-counter", file="Policy/AutoSkillCadencePolicy.cs",
+         find="		if (double.IsNaN(v) || double.IsInfinity(v)) return 0.0;\n		return v;\n	}\n\n	/// <summary>\n	/// How many seconds a charge of `units`",
+         repl="		if (double.IsNaN(v) || double.IsInfinity(v)) return 0.0;\n		return (v < 0.0) ? 0.0 : v;\n	}\n\n	/// <summary>\n	/// How many seconds a charge of `units`",
+         expect="policy/autoskill-cadence/a-counter-that-ran-backwards-keeps-its-sign"),
+    dict(name="autoskill-median-keeps-the-sentinel", file="Policy/AutoSkillCadencePolicy.cs",
+         find="			if (double.IsNaN(v) || v <= 0.0) continue;",
+         repl="			if (double.IsNaN(v)) continue;",
+         expect="policy/autoskill-cadence/a-duplicate-record-does-not-drag-the-median"),
+    dict(name="autoskill-median-sorts-the-callers-array", file="Policy/AutoSkillCadencePolicy.cs",
+         find="		double[] copy = new double[values.Length];",
+         repl="		double[] copy = values;",
+         expect="policy/autoskill-cadence/the-median-does-not-reorder-the-callers-array"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",
          expect=None),
 ]
-
 
 def build_and_run(srcroot):
     """Returns (build_ok, exit_code, stdout). Child output goes to a FILE, never through a pipe."""

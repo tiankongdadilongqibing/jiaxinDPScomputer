@@ -152,6 +152,23 @@ public static partial class Aggregator
 		{
 			RuntimeLog.Write("[DpsMeter][ROSTER] 自检行输出失败(不影响导出): " + ex.Message);
 		}
+		// R64: the auto-skill cadence this battle actually produced -- per slot, the number of activations
+		// and the MEDIAN interval between them on both clocks, plus every counter, so "it never fired" and
+		// "the probe could not read it" are different lines. The per-activation [AUTOSK] act rows are
+		// already in the log; this is the headline that can be quoted without re-parsing them.
+		try
+		{
+			string ask = AutoSkillProbe.Summary();
+			if (!string.IsNullOrEmpty(ask))
+			{
+				Plugin.LogSource.LogInfo(ask);
+				RuntimeLog.Write(ask);
+			}
+		}
+		catch (Exception ex)
+		{
+			RuntimeLog.Write("[AUTOSK] 自检行输出失败(不影响导出): " + ex.Message);
+		}
 		// Feasibility probe for the 1.1 design (Diagnostics/SlotProbe.cs): must run BEFORE the export clears
 		// the actors' BattleObject references (below), and before _calcEvents.Clear(). Gated by Debug/SlotProbe.
 		if (Plugin.CfgSlotProbe != null && Plugin.CfgSlotProbe.Value) SlotProbe.Run(s);

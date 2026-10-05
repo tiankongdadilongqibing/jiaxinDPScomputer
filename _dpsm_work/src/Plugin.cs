@@ -161,6 +161,15 @@ public class Plugin : BasePlugin
 	/// session cannot fill the disk with 25 MB bundles.</summary>
 	public static ConfigEntry<int> CfgExtractKeep;
 
+	/// <summary>PROBE (R64): read each party unit's AUTO SKILL from the live `Skill` side
+	/// (`Player.AutoSkill1/2`, `Skill.Type = AutoSkill1ForPassiveSkill/...`) and log the activation
+	/// instant plus the charge counter, as [AUTOSK] lines. WHY: R63 published the auto-skill master row
+	/// (240-300 s cooldown) but the cadence previously reverse-inferred from a damage channel (~13.5 s)
+	/// contradicts it, and the master cooldown cannot be checked without reading the live skill. One
+	/// Harmony patch on the game's own command entry point plus a read-only 2 s sampler; see
+	/// Diagnostics/AutoSkillProbe.cs.</summary>
+	public static ConfigEntry<bool> CfgAutoSkillProbe;
+
 	private Harmony _harmony;
 
 	/// <summary>
@@ -238,6 +247,33 @@ public class Plugin : BasePlugin
 		catch (Exception ex)
 		{
 			LogSource.LogInfo("[DpsMeter] give-applier hook failed for " + label + " (meter unaffected): " + ex.Message);
+		}
+	}
+
+	/// <summary>
+	/// R64: patch the game's own auto-skill command entry point
+	/// (`GameCmdExecuter.ActExecutePlayerAutoSkillForPassive`) SEPARATELY from PatchAll -- same isolation
+	/// rule as the other probes. If the signature does not resolve, the probe still reports the charge
+	/// and still derives the activation moments from the sampler's rising edge, so the round produces
+	/// evidence either way; the [AUTOSK] SUM line states which channel supplied each row.
+	/// </summary>
+	private void TryPatchAutoSkillActivation()
+	{
+		try
+		{
+			var m = AccessTools.Method(typeof(GameCmdExecuter), "ActExecutePlayerAutoSkillForPassive",
+				new Type[] { typeof(Player), typeof(int), typeof(UnityEngine.Vector3) });
+			if (m == null)
+			{
+				LogSource.LogInfo("[DpsMeter] GameCmdExecuter.ActExecutePlayerAutoSkillForPassive not found; auto-skill activation postfix skipped (the sampler still records the charge and the poll edge).");
+				return;
+			}
+			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(AutoSkillHooks), nameof(AutoSkillHooks.PostfixAutoSkillForPassive)));
+			LogSource.LogInfo("[DpsMeter] auto-skill activation postfix applied (GameCmdExecuter.ActExecutePlayerAutoSkillForPassive).");
+		}
+		catch (Exception ex)
+		{
+			LogSource.LogInfo("[DpsMeter] auto-skill activation postfix failed (meter unaffected): " + ex.Message);
 		}
 	}
 
@@ -367,6 +403,7 @@ public class Plugin : BasePlugin
 		CfgExtractOnBattleEnd = Config.Bind<bool>("General", "ExtractOnBattleEnd", true, "FEATURE (R52 证据提取流程): at battle end, write a SELF-CONTAINED evidence bundle to BepInEx\\plugins\\DpsMeter\\extract\\<stamp>\\ containing (1) battle.json from the same serializer as the normal export, (2) contrib_census.json -- every UNRESOLVED fold grouped by reason/kind/origin/label/factor with its victim and, for the granted channel, the loadout-side carrier verdict (who HOLDS a rule that grants that modifier), (3) masterdata/ as a copy of the game's own table dump, (4) manifest.json hashing every file plus the deployed assembly. WHY: 'what is unknown_kind made of' and 'why is the giver always null' used to cost a one-off script over a 24 MB file, and the answer was not reproducible. ON by default (user request, 2026-10-05): writing the bundle must not depend on the user knowing about a key. A bundle is a ~25 MB copy, so ExtractKeep (default 5) bounds the disk cost; set this false to stop writing them, and press the key below for a one-off on demand. Never throws into the finalisation.");
 		CfgExtractKey = Config.Bind<string>("General", "ExtractKey", ExtractPolicy.DefaultKey, "FEATURE (R52): press this key for an evidence bundle on demand (works in and out of a battle). F1-F12, A-Z or 0-9; NONE disables it. F4 by default because the overlay already owns F5-F12 and F8/F9 must keep their meanings. Every press writes a bundle, so ExtractKeep bounds how many stay on disk.");
 		CfgExtractKeep = Config.Bind<int>("General", "ExtractKeep", ExtractPolicy.DefaultKeep, "FEATURE (R52): how many evidence bundles to keep under BepInEx\\plugins\\DpsMeter\\extract (oldest deleted first, decided by a pure string sort of the timestamped directory names). 1..50.");
+		CfgAutoSkillProbe = Config.Bind<bool>("Debug", "AutoSkillProbe", true, "PROBE (R64): read each party unit's AUTO SKILL from the live Skill side and log (a) the instant it fires as an [AUTOSK] act row and (b) its charge counter every 2 s as an [AUTOSK] chg row, plus a per-slot median interval at battle end. WHY: R63 published the auto-skill master row (暗沌への導き: minCoolTime/maxCoolTime = 300/240 s = 9000/7200 frames) but the ~13.5 s cadence earlier reverse-inferred from a damage channel contradicts it, and the master number cannot be checked without the live skill -- the auto skill is NOT in the standby list the [CLOCKP] line walks (verified: that list holds 地下からの完全顕現/電脳掌都/狂気の眼球, and only 暗沌への導き of those four names is in auto_skill.json). One isolated Harmony postfix on GameCmdExecuter.ActExecutePlayerAutoSkillForPassive + a read-only sampler (Player.AutoSkill1/2, Skill.Type/GetStatus/WaitCountFrame/CoolTimeFrame); if the patch does not resolve, the sampler's rising edge still times the activations and the SUM line says so. Set false to stop both.");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");
@@ -376,6 +413,7 @@ public class Plugin : BasePlugin
 			TryPatchPowerProbe();
 			TryPatchMadnessApplier();
 			TryPatchGiveApplier();
+			TryPatchAutoSkillActivation();
 		}
 		catch (Exception ex)
 		{

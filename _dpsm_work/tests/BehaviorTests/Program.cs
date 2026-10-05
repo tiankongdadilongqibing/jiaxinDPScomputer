@@ -5,7 +5,7 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 987;
+	public const int ExpectedCases = 1016;
 
 	private static int Main(string[] args)
 	{
@@ -69,6 +69,8 @@ internal static class Program
 		Cases.BattleRefCases(r);
 		// R63: the master-data skill cooldown unit conversion (master seconds -> the game's update count).
 		Cases.SkillCooldown(r);
+		// R64: the auto-skill cadence arithmetic (charge rate, charge in seconds, interval, median).
+		Cases.AutoSkillCadence(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

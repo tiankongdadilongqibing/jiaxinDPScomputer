@@ -163,6 +163,11 @@ public static partial class Aggregator
 			// Driven by the battle clock (not the wall clock) so a pause defers it exactly like everything
 			// else, and placed AFTER Advance so the deadline comparison sees the current time.
 			StatusDeltaProbe.Tick(Session.ActiveSeconds);
+			// R64: the auto skill's charge counter, read from the live `Skill` side. Throttled to one scan
+			// per 0.5 s and one printed line per 2 s per slot INSIDE the probe, so this is cheap enough to
+			// sit on the frame path; it also stamps the activation instant when the command postfix is
+			// absent. See Diagnostics/AutoSkillProbe.cs.
+			AutoSkillProbe.Observe(val, Session);
 			// diagnostic: real clock vs game counter vs engine deltas. One run is enough to check that
 			// active tracks wall 1:1 and to spot the engine's fixed-step behaviour (see the Clock field).
 			try

@@ -1,0 +1,17 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_tool_registry.py --selftest
+  [PASS] a registered path that is not on disk is caught (A)
+  [PASS] a scanned script missing from the registry is caught (B)
+  [PASS] a pipeline script that is not active is caught (C)
+  [PASS] a pipeline script missing from the registry is caught (C)
+  [PASS] an in_pipeline flag the pipeline disagrees with is caught (D)
+  [PASS] an active entry without an expected exit code is caught (E)
+  [PASS] an active entry without declared outputs is caught (E)
+  [PASS] an indexed script imported by a LIVE script is caught (G)
+  [PASS] an indexed script imported only by a DEAD script is NOT reported (G)
+  [PASS] an indexed script named on a RUN line of the pipeline is caught (J)
+  [PASS] an indexed script named only in a COMMENT is NOT reported (J)
+  [PASS] a referenced-input with no declared reader is caught (K)
+  [PASS] a referenced-input whose reader is not active (or does not read it) is caught (K)
+  [PASS] the unclassified pin is enforced (F)
+---- selftest: PASS

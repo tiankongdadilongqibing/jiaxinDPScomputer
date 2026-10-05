@@ -90,6 +90,8 @@ public static partial class Aggregator
 		ParamOwnerProbe.Reset();
 		AtkAddFold.Reset();
 		FactStore.Reset();
+		// R64: the auto-skill probe's per-slot charge state and activation history are per battle.
+		AutoSkillProbe.Reset();
 		// Ability rosters and talent activation counters are per-battle state cached on ActorStats.
 		TalentRuntime.ResetSession();
 		OverlayUGUI.LogSessionStart(battleSession.QuestId);
