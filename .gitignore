@@ -89,7 +89,10 @@
 
 # Scratch files under tests/ (commit messages, throwaway harnesses). tests/ is re-included above, so
 # without this rule a `git add -A` picks a temporary file up and the next commit deletes it again.
-/_dpsm_work/tests/_*.tmp
+# R53: broadened from "_*.tmp" to "_*" -- AGENTS section 4 says scratch files live here, and trusting the
+# suffix meant a "_census_r53.tmp.json" got committed (a .tmp stem with a .json tail). The rule now
+# enforces itself; no tracked file under tests/ starts with an underscore.
+/_dpsm_work/tests/_*
 
 # --- derived output / caches, anywhere ---
 bin/

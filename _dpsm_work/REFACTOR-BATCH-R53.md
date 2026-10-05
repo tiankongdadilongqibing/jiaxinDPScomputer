@@ -66,6 +66,13 @@
 | 复核 | 两个 crash `.bak` 哈希**未变**(`2E1819F2…` / `F7FF1EB8…`) |
 | 回退 | `Copy-Item _dpsm_work/deploy-backup/pre-r53-AA836C06/DpsMeter.dll BepInEx/plugins/DpsMeter/DpsMeter.dll -Force` |
 
+## 5b. 顺带修掉的一个自伤
+
+提交后自查发现 `_dpsm_work/tests/_census_r53.tmp.json`(我这次探针的 JSON 输出)**被提交了**:它长成
+「`_*.tmp` 词干 + `.json` 尾巴」,而忽略规则只写了 `/_dpsm_work/tests/_*.tmp`。已 `git rm --cached` 并删除,
+同时把规则放宽为 `/_dpsm_work/tests/_*` —— AGENTS §4 说临时文件放这里,那就不该靠后缀自觉,规则要能自己生效
+(删前确认:tests/ 下没有任何已跟踪文件以 `_` 开头)。
+
 ## 6. 未做(诚实清单)
 
 * **修复版仍未实机验证**:需要你再打一场(或战斗中按一次 F4)才会产生第一个真的证据包;包一出现我立刻跑
