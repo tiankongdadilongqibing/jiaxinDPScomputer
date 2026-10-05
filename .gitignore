@@ -22,6 +22,8 @@
 !/changelog.txt
 !/dpsmeter_analyze.py
 !/dpsmeter_contrib.py
+!/README.md
+!/AGENTS.md
 !/_dpsm_work/
 
 # --- the live plugin config is small text and IS part of the baseline ---
