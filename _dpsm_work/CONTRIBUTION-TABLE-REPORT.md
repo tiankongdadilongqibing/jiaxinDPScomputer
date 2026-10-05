@@ -29,7 +29,7 @@
 > `CONTRIBUTION-DATA-DICTIONARY.md` §1.4 / §12。
 >
 > **现状补充(2026-10-05 R63)**:插件 **1.7.15 已部署**(线上 DLL `68E10640…`,438,272 B;**当前语料 103 份**)、`contribution.schemaVersion` 仍为 **1.2** —— 本轮**不动归属口径、不动任何既有数值**,只**新增一张主表**与一条纯单位规则:新增 `auto_skill` 主表转储(20 张表 / 输出 21 个文件),并把冷却的**秒 ↔ 游戏帧**(30 单位/游戏秒,实测)写进 `src/Policy/SkillCooldownPolicy.cs`,同一行给 `*CoolTime` 与 `*CoolTimeFrames`。见 `REFACTOR-BATCH-R63.md`。
-> **上一版说明(2026-10-05 R62)**:插件 **1.7.14**(线上 DLL `C9D1B0CC…`,435,712 B)—— 修三个**读数**问题:(1) `events[].source`/`calcHitType`/`calcEffectId` 是「最佳努力配对」的产物(训练场 9999 里 3,240/11,096 条贯通命中被记进 `sources[0]`,普通关卡 411001 仅 6/39,467),现在当合成能证伪时**拒绝入账**并计入 `hitDetail.matchRejected`(`hitMatch=3`);(2) 离线残差改用**游戏口径** `(applied+absorbed)/theory`;(3) 全局「敌方受伤」因子从 `dealtMult` 移入 `takenMult`(**乘积不变**,只有分开读与伤害/被伤害才受影响;1.7.13 及更早的旧文件仍是旧栏位)。
+> **上一版说明(2026-10-05 R62)**:插件 **1.7.14**(线上 DLL `C9D1B0CC…`,435,712 B)—— 修三个**读数**问题:(1) `events[].source`/`calcHitType`/`calcEffectId` 是「最佳努力配对」的产物(训练场 9999 里 3,240/11,096 条贯通命中的 `source` 留在 0,但拆开看 97% 是「没有可用记录」、只有约 0.5% 是「记录属于别的命中」;1.7.15 实机 5,746 条里 52 条被拒绝、0 条错标留存),现在当合成能证伪时**拒绝入账**并计入 `hitDetail.matchRejected`(`hitMatch=3`);(2) 离线残差改用**游戏口径** `(applied+absorbed)/theory`;(3) 全局「敌方受伤」因子从 `dealtMult` 移入 `takenMult`(**乘积不变**,只有分开读与伤害/被伤害才受影响;1.7.13 及更早的旧文件仍是旧栏位)。
 > **上一版说明(2026-10-05 R61,用户决定)**:插件 **1.7.13**(线上 DLL `32BFEC3B…`,435,200 B)、`contribution.schemaVersion` **1.2** —— 同队/自我伤害
 > (敌方 `回復反転` 的效果)**移出归属池**,改由 `damageLedger.selfTeam*` 与逐角色 `friendly`/`friendlyHits` 计数;
 > `analyzableDealt`、`directDamage`、`总贡献`、`命中` 从此只含**对敌命中**(实测同一场:池 6,146,573 → 4,222,552,
