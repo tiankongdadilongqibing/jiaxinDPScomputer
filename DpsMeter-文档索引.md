@@ -38,7 +38,7 @@
   ルゥ=ルルサ 给敌方 ×1.5)、赋予(マッドシーカー 的刻印授予 +10%)、全局规则(母なる変異の飛沫、海魔の残滓)。
 * **队伍贡献表**:每角色 自伤 / 自身规则 / 受队友赋能 / 为团队赋能(对数份额口径),**域内 creditedShare 100%(未归因池 0.0%)**;**整场覆盖率是 `overallAttributedCoverage`,并非 100%**。
 * **时间线**:受击方 18 抗性槽 + 10 状态位,只在变化时出行。
-* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **44 条命令 / 76 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **971 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数/活动环/文字排版与数字格式/列定义/数据行构造/回退渲染器文本/主数据选名/composition 容差)与 **142 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
+* **离线验证**:`recon_probe` ALL CHECKS PASSED;守卫是 **44 条命令 / 76 条检查的验收流水线**(`n0_acceptance.py`,含冻结输入 / 输出隔离 / 桶分布 / 逐文件钉住 / 每条闸门的退出码),另有 **987 用例的 C# 行为测试**(时钟/窗口/会话/序列/缓存/策略/状态机/战场规则分类/规则注册表/缓存判据/规则算术/单场计数/活动环/文字排版与数字格式/列定义/数据行构造/回退渲染器文本/主数据选名/composition 容差)与 **144 例变异负控**;完整清单见 `_dpsm_work\PROJECT-STATUS.md` §4。
 * **阶段 E(1.6.0 起,1.6.1 实机验收通过)**:导出新增 `contribution` 段 —— 每角色 基础/自身规则/辅助/总贡献、
   规则当量、提供者→受益者关系,全部由逐击折叠导出现算。**验收 = 与独立 Python 核心逐字段一致**
   (`contrib.crosscheck` status=OK / mismatches=0,11 角色/21 规则/20 关系);schema 与 v150 problems=0。
@@ -187,7 +187,7 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 | `_dpsm_work\evidence_*` | 复算脚本与输出(1.15² / 1.5.2 实机 / 1.5.3 实机 / 贡献联结 / 1.5.5 验收) |
 | `_dpsm_work\export_archive_20261003.zip` | 3 份证据战场(旧导出清空时留存) |
 | `_dpsm_work\doc_archive_20261003.zip` | 8 份逐版说明(1.4.0–1.5.5)归档 |
-| `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(971 用例 / 100 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
+| `_dpsm_work\tests\BehaviorTests\` | RF1 规范化行为测试(987 用例 / 101 组;`--quiet` 出汇总行、`pinned` 防丢用例) |
 | `_dpsm_work\tests\`(IlDump / il_equiv.py / negative_control.py / rf2_split.py) | RF2 等价证据与拆分器、RF1 变异负控 |
 | [`REPO-BOUNDARY.md`](<REPO-BOUNDARY.md>) · [`_dpsm_work\baseline-manifest.json`](<_dpsm_work/baseline-manifest.json>) · [`_dpsm_work\batch-inputs-rf0.json`](<_dpsm_work/batch-inputs-rf0.json>) | 仓库边界 / 基线清单(源码·工具·配置·语料·外部程序集)/ 本批冻结输入清单 |
 | [`_dpsm_work\REFACTOR-BATCH-RF0-RF2.md`](<_dpsm_work/REFACTOR-BATCH-RF0-RF2.md>) | **重构第 1 轮记录**:RF0–RF2 的文件清单 / 证据 / 未覆盖项 / 回滚 |
@@ -209,4 +209,4 @@ Python C:\Users\24134\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\
 * **2026-10-03 深夜(阶段 A/B/C)**:新增贡献指标字典 + `contrib/` 离线核心(纯新增,未删任何文件;
   只删了自己刚生成的旧命名 `compare_all.*`);`check_docs_123.py` 的 FILES 追加 4 个新增 CJK 文件;
   记录见 §7.2.82。
-> **部署状态(R63 起)**:DLL = **68E10640**…(**438,272 字节**,1.7.15;新增「自动技能」主表 `auto_skill` 的转储(20 张表 / 输出 21 个文件)+ 冷却单位纯规则 `SkillCooldownPolicy`(主表**秒** ↔ 线上**帧**,30 单位/游戏秒),同一行同时给 `*CoolTime` 与 `*CoolTimeFrames`;**不动任何既有数值与 credit**)。**当前语料 82 份**(411001/700817/试炼场 9999;9999 一律 `not_comparable`)。上一版 **C9D1B0CC**…(435,712 字节,1.7.14;命中记录错配改「可证伪即拒绝」+`hitMatch=3`/`hitDetail.matchRejected`、离线残差改游戏口径、全局敌方受伤因子移入 `takenMult`)备份于 `_dpsm_work/deploy-backup/pre-r63-C9D1B0CC/`;上一版 **32BFEC3B**…(435,200 字节,1.7.13;同队/自我伤害移出归属池、`schemaVersion` 1.2,离线核心同步双模式)备份于 `pre-r62-32BFEC3B/`;上一版 **F791F1CF**…(434,688 字节,1.7.12;自伤三件套 —— 根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1「自伤」列,并修 `contrib/crosscheck.py` 对 schema 1.1 段 `totalDamage` 的 1.0 旧公式)备份于 `pre-r61-F791F1CF/`;上一版 **C1DBBD8F**…(433,664 字节,1.7.11)备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`;上一版 **F6948470**…(433,664 字节)备份于 `_dpsm_work/deploy-backup/pre-r57-F6948470/`,更早在 `pre-r56-390C1340/`、`pre-r55-76CEAC00/`、`pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。
+> **部署状态(R63 起)**:DLL = **68E10640**…(**438,272 字节**,1.7.15;新增「自动技能」主表 `auto_skill` 的转储(20 张表 / 输出 21 个文件)+ 冷却单位纯规则 `SkillCooldownPolicy`(主表**秒** ↔ 线上**帧**,30 单位/游戏秒),同一行同时给 `*CoolTime` 与 `*CoolTimeFrames`;**不动任何既有数值与 credit**)。**当前语料 82 份**(411001/700817/试炼场 9999;9999 一律 `not_comparable`)。上一版 **C9D1B0CC**…(435,712 字节,1.7.14;命中记录错配改「可证伪即拒绝」+`hitMatch=3`/`hitDetail.matchRejected`、离线残差改游戏口径、全局敌方受伤因子移入 `takenMult`)备份于 `_dpsm_work/deploy-backup/pre-r63-C9D1B0CC/`;上一版 **32BFEC3B**…(435,200 字节,1.7.13;同队/自我伤害移出归属池、`schemaVersion` 1.2,离线核心同步双模式)备份于 `pre-r62-32BFEC3B/`;上一版 **F791F1CF**…(434,688 字节,1.7.12;自伤三件套 —— 根 `config.filterFriendlyFire`、`contribution.actors[].friendly/friendlyHits/hostileDamage`、F5 表 1「自伤」列,并修 `contrib/crosscheck.py` 对 schema 1.1 段 `totalDamage` 的 1.0 旧公式)备份于 `pre-r61-F791F1CF/`;上一版 **C1DBBD8F**…(433,664 字节,1.7.11)备份于 `_dpsm_work/deploy-backup/pre-r60-C1DBBD8F/`;上一版 **F6948470**…(433,664 字节)备份于 `_dpsm_work/deploy-backup/pre-r57-F6948470/`,更早在 `pre-r56-390C1340/`、`pre-r55-76CEAC00/`、`pre-r54-3A89D30A/`、`pre-r53-AA836C06/`、`pre-r52-28B8CCAF/`,基线 **36EC96D4**…(387,072 字节)在 `baseline-1.7.11/`,回退为一条 Copy-Item。**当前语料 103 份**(411001/700817/试炼场 9999;9999 一律 `not_comparable`)。

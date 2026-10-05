@@ -13,7 +13,7 @@ PASS REJECTS a non-numeric actor credit                   caught=1  [contributio
 PASS REJECTS a broken attributed+unattributed=total identity caught=1  [contribution identity broken: attributed(2900)+unattributed(0) != total(3000)]
 PASS accepts a 1-unit rounding gap in the totals identity caught=0
 PASS REJECTS a broken per-actor base+self+assist=total identity caught=1  [contribution.actors[key=2] identity broken: base+self+assist(1) != total(1000)]
-PASS REJECTS a broken per-actor base+self+received=direct identity caught=1  [contribution.actors[key=1] identity broken: base+self+received(3500) != direct(3000)]
+PASS REJECTS a broken per-actor base+self+received=direct identity (1.2) caught=1  [contribution.actors[key=1] identity broken: base+self+received(1800) != direct(400)]
 PASS REJECTS an actor without receivedAssist              caught=1  [contribution.actors[] entry missing receivedAssist]
 PASS REJECTS a broken credited+unattributed share identity caught=1  [contribution share identity broken: credited+unattributed = 1.200000000]
 PASS REJECTS a degraded contribution error stub           caught=8  [contribution reported an internal error (the export itself is intact): NullReferenceException: boom; contribution.totalDamage missing; contribution.attributedDamage missing]
@@ -70,3 +70,8 @@ PASS REJECTS a non-integer hitDetail.matchRejected        caught=1  [hitDetail.m
 PASS accepts a 1.7.14 calc whose fold sides match dealtMult/takenMult caught=0
 PASS REJECTS a 1.7.14 calc whose fold sides do not match the multipliers caught=2  [events[0].calc.dealtMult(1.0000) != prod(atk folds)(1.1500) [since 1.7.14]; events[0].calc.takenMult(1.1500) != prod(vic folds)(1.0000) [since 1.7.14]]
 PASS accepts a 1.7.13 calc with the pre-R62 bucketing     caught=0
+PASS accepts a 1.2 actor with more same-team hits than in-pool hits caught=0
+PASS REJECTS a 1.1 actor whose friendlyHits exceed its hits caught=1  [contribution.actors[key=1] friendlyHits(9) > hits(5)]
+PASS REJECTS a 1.2 section whose actor hits do not sum to the ledger caught=1  [contribution actor hits sum(9) != damageLedger.analyzableHits(4) [schema 1.2]]
+PASS REJECTS a 1.2 section whose directDamage does not sum to analyzableDealt caught=1  [contribution.actors[key=1] identity broken: base+self+received(400) != direct(999)]
+PASS accepts a 1.1 actor whose directDamage the old formula cannot close caught=0

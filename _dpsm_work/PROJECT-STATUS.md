@@ -21,7 +21,7 @@
 | 源码规模 | `_dpsm_work/src`:**95 个 .cs / 25,526 行**(不含 obj/bin;RF2 拆 `Aggregator` 为 6 个 partial,RF3 新增 `src/Policy/` 纯策略文件,R63 新增 `src/Policy/SkillCooldownPolicy.cs`,RF4 新增 `src/Runtime/` 状态容器);守卫口径 **131** 个 .cs(src + recon_probe + test + **tests**) |
 | 配置 | `BepInEx\config\dev.dpsmeter.cfg` = `8E5D2C840AC953E5CD62B8E9C0809DE227156568010A44F59E1FD3C0C5D39641`(R61:游戏用 1.7.12 启动后 BepInEx 只重写了首行 `created by plugin DpsMeter v1.7.12`;上一版 `E00E63E0…` 见 R60 记录。开关值未变——`ExtractOnBattleEnd=true`、`FilterFriendlyFire=false`);贡献相关开关全 true,R54 起 `ExtractOnBattleEnd=true`(每场自动出证据包,保留 `ExtractKeep=5`),R55 起**插件默认值**也是 true(不再依赖用户读配置) |
 | 语料 | **35 份**(冻结快照 [`batch-inputs-rf0.json`](<batch-inputs-rf0.json>),hard-link 目录 `batch_inputs/rf0/`,约 600 MB)。`BepInEx\plugins\DpsMeter\exports\` 是**活的** —— 游戏正在运行,写本文时已 36 份;批次只读快照,见 §4 |
-| 导出段 schema | `contribution.schemaVersion` = **1.2**(R61/R62 起;当前语料 **82 份**里 **22 份带段**:1.0 ×13 / 1.1 ×9,1.2 只存在于 R61 之后的新导出);方法 `log-share/1` |
+| 导出段 schema | `contribution.schemaVersion` = **1.2**(R61/R62 起;当前语料 **103 份**里 **22 份带段**:1.0 ×13 / 1.1 ×9,1.2 只存在于 R61 之后的新导出);方法 `log-share/1` |
 | 版本控制 | **本地 Git**(无远端):基线提交 `a2a09c2`,标签 `baseline-1.7.11`,380 个纳入文件;边界见 [`REPO-BOUNDARY.md`](<../../REPO-BOUNDARY.md>) |
 | C# 测试工程 | `tests/BehaviorTests`(RF1+RF3+RF3c+RF4+RF5a–h+RF6a+RF7b+R60+R61+R62+R63):**987 个命名用例 / 101 组**,**144 例变异负控**;**执行生产源码**(含 `src/Policy/`、`src/Runtime/`),不是复制公式 |
 | 离线守卫 | **44 条命令 / 76 条检查**的验收流水线(`n0_acceptance.py`,默认读冻结快照写 `--out`);**RF2 起的各轮终验收都是 0 项**;RF0–RF2 的基线轮 59 ok / 4 项(见 §12)。工具本体见 [`TOOL-REGISTRY.md`](<TOOL-REGISTRY.md>):**100 条登记 / 31 条活跃 / 67 条已索引 / 2 条被引用输入 / 0 条未判定**(RF7 工具治理收口)(上限已收紧到 31,守卫的 G 检查复核 `indexed` 的声明) |

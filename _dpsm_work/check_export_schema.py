@@ -422,11 +422,15 @@ def _check_contribution(d, problems, cov):
                     problems.append('contribution.actors[key=%s] identity broken: base+self+assist(%.0f) != total(%.0f)'
                                     % (row.get('key'), b + s_ + a, tc))
                     break
-                # 1.7.11: the SAME row also publishes what happens to the character's own hits --
-                # 直接打出 = 自身(基础+自身规则) + 被队友分走 -- and that is what the regrouped F5 table
-                # shows. Measured on all 17 sections on disk (181 actor rows): max gap 0.0001 (F4).
+                # 1.7.12/schema 1.2: 直接打出 = 自身(基础+自身规则) + 被队友分走. R62 GATED IT ON is_120:
+                # MEASURED 2026-10-06 over the live corpus, 49 of the 271 actor rows in 1.7.11 sections
+                # violate it (up to 4%), while all 337 rows of the 1.2 sections satisfy it exactly. The
+                # 1.1 form cannot hold in general: `directDamage` is what the actor dealt, and the part of
+                # it taken by a TEAMMATE's rule is not on this row at all (it lands in that teammate's
+                # `assistCredit`), so the identity only closed on the 17 sections it was measured on.
+                # The identity that IS true for every version is checked just above: base+self+assist == total.
                 dv, rv = row.get('directDamage'), row.get('receivedAssist')
-                if all(isinstance(x, (int, float)) for x in (b, s_, dv, rv)) and not _close(b + s_ + rv, dv):
+                if is_120 and all(isinstance(x, (int, float)) for x in (b, s_, dv, rv)) and not _close(b + s_ + rv, dv):
                     problems.append('contribution.actors[key=%s] identity broken: base+self+received(%.0f) != direct(%.0f)'
                                     % (row.get('key'), b + s_ + rv, dv))
                     break
@@ -446,14 +450,48 @@ def _check_contribution(d, problems, cov):
                             problems.append('contribution.actors[key=%s] identity broken: friendly+hostile(%.0f) != direct(%.0f)'
                                             % (row.get('key'), fr + ho, dv))
                             break
-                # A friendly-hits count can never exceed the actor's hits, in either contract.
+                # R62: NOT an identity under 1.2. `hits` is the actor's IN-POOL (enemy-facing) hits and
+                # `friendlyHits` the same-team hits the contract EXCLUDES, i.e. two DISJOINT buckets, so
+                # more same-team hits than in-pool hits is normal. MEASURED 2026-10-06 over the live
+                # 103-export corpus: 26 real rows violate the old rule (1.7.13 x17, 1.7.15 x9; e.g. 24
+                # same-team hits against 10 in-pool hits), all of them in the training ground. Kept for
+                # <= 1.1 sections, where `hits` counted EVERY hit -- which is what it was measured on.
                 fh, hh = row.get('friendlyHits'), row.get('hits')
-                if (isinstance(fh, int) and not isinstance(fh, bool) and isinstance(hh, int)
+                if (not is_120 and isinstance(fh, int) and not isinstance(fh, bool) and isinstance(hh, int)
                         and not isinstance(hh, bool) and fh > hh):
                     problems.append('contribution.actors[key=%s] friendlyHits(%d) > hits(%d)'
                                     % (row.get('key'), fh, hh))
                     break
-
+            # R62: the two AGGREGATE identities that ARE true for 1.2 -- the per-actor rows PARTITION the
+            # ledger's analysed pool. MEASURED 2026-10-06 on all 38 real 1.2 sections of the live corpus:
+            # 0 mismatches for both. `friendlyHits` is deliberately NOT summed against
+            # ledger.selfTeamHits: the ledger also counts same-team hits whose attacker is outside the
+            # analysed pool (measured 61 vs 88 on one battle), so that sum is not an identity.
+            if is_120:
+                _led = sec.get('damageLedger') or {}
+                _sh = 0
+                _sd = 0.0
+                _sh_ok = True
+                for row in rows:
+                    if not isinstance(row, dict):
+                        _sh_ok = False
+                        break
+                    h = row.get('hits')
+                    if isinstance(h, int) and not isinstance(h, bool):
+                        _sh += h
+                    else:
+                        _sh_ok = False
+                    dv_ = row.get('directDamage')
+                    if isinstance(dv_, (int, float)) and not isinstance(dv_, bool):
+                        _sd += dv_
+                    else:
+                        _sh_ok = False
+                if _sh_ok and isinstance(_led.get('analyzableHits'), int) and _sh != _led['analyzableHits']:
+                    problems.append('contribution actor hits sum(%d) != damageLedger.analyzableHits(%d) [schema 1.2]'
+                                    % (_sh, _led['analyzableHits']))
+                if _sh_ok and _isnum(_led.get('analyzableDealt')) and abs(_sd - float(_led['analyzableDealt'])) > CONTRIB_TOL_ABS:
+                    problems.append('contribution actor directDamage sum(%.0f) != damageLedger.analyzableDealt(%.0f) [schema 1.2]'
+                                    % (_sd, _led['analyzableDealt']))
 
 
 
@@ -924,9 +962,11 @@ def _contrib_fixture_120():
             'outsideTeamDealt': 400, 'unknownAttackerHits': 2, 'unknownAttackerDealt': 400,
             'selfTeamHits': 1, 'selfTeamDealt': 200, 'eventSumAll': 1400, 'reconciliationGap': 0,
         },
+        # R62: `hits` must PARTITION the ledger (sum(actor.hits) == analyzableHits == 4) -- the fixture
+        # claimed 5 while the ledger it ships said 4, which the new aggregate identity caught.
         'actors': [{'key': 1, 'name': 'Alpha', 'directDamage': 400, 'baseCredit': 300,
                     'selfRuleCredit': 0, 'assistCredit': 0, 'receivedAssist': 100, 'totalCredit': 300,
-                    'friendly': 200, 'friendlyHits': 1, 'hits': 5}],
+                    'friendly': 200, 'friendlyHits': 1, 'hits': 4}],
         'rules': [{'ruleName': 'x', 'kind': 'given', 'side': 'vic', 'hits': 1, 'damageEquivalent': 300}],
         'links': [{'fromKey': 1, 'toKey': 1, 'amount': 300, 'hits': 1}],
     }
@@ -1078,12 +1118,12 @@ def selftest():
     c_actor['contribution']['actors'][1]['assistCredit'] = 1.0
     cases.append(('REJECTS a broken per-actor base+self+assist=total identity', c_actor, 1))
 
-    # 1.7.11: the regrouped F5 row prints 自身 and 被队友分走; the guard must reject a row whose own-hit
-    # ledger does not close, or the column would be decoration.
-    c_own = _fixture()
-    c_own['contribution'] = _contrib_fixture()
+    # 1.7.12/1.2: the regrouped F5 row prints 自身 and 被队友分走; the guard must reject a row whose
+    # own-hit ledger does not close, or the column would be decoration. R62 moved this control onto the
+    # 1.2 fixture: the identity is only asserted for is_120 (49 of the 271 REAL 1.7.11 rows break it).
+    c_own = _fixture_113()
     c_own['contribution']['actors'][0]['receivedAssist'] = 1500.0
-    cases.append(('REJECTS a broken per-actor base+self+received=direct identity', c_own, 1))
+    cases.append(('REJECTS a broken per-actor base+self+received=direct identity (1.2)', c_own, 1))
 
     c_norecv = _fixture()
     c_norecv['contribution'] = _contrib_fixture()
@@ -1378,6 +1418,29 @@ def selftest():
     old_fold['events'][0]['calc']['dealtMult'] = 1.15
     old_fold['events'][0]['calc']['takenMult'] = 1.0
     cases.append(('accepts a 1.7.13 calc with the pre-R62 bucketing', old_fold, 0))
+
+    # ---- R62: two actor rules that REAL data falsified, and the identities that replace them ----
+    # (1) friendlyHits vs hits: under 1.2 they are DISJOINT buckets (in-pool vs excluded same-team), so
+    # more same-team hits than in-pool hits is normal -- 26 real rows in the live corpus (1.7.13/1.7.15).
+    f_ok12 = _fixture_113()
+    f_ok12['contribution']['actors'][0].update({'friendly': 900.0, 'friendlyHits': 9})
+    cases.append(('accepts a 1.2 actor with more same-team hits than in-pool hits', f_ok12, 0))
+    # ... while the <= 1.1 contract still forbids it (that is where `hits` counted every hit).
+    f_bad11 = _fixture_178()
+    f_bad11['contribution']['actors'][0].update({'friendly': 900.0, 'friendlyHits': 9, 'hits': 5})
+    cases.append(('REJECTS a 1.1 actor whose friendlyHits exceed its hits', f_bad11, 1))
+    # (2) the per-actor rows must PARTITION the analysed pool: sum(hits) == ledger.analyzableHits
+    # (measured 0 mismatches on all 38 real 1.2 sections) -- the fixture itself used to break it.
+    sum_bad = _fixture_113()
+    sum_bad['contribution']['actors'][0]['hits'] = 9
+    cases.append(('REJECTS a 1.2 section whose actor hits do not sum to the ledger', sum_bad, 1))
+    sum_bad2 = _fixture_113()
+    sum_bad2['contribution']['actors'][0]['directDamage'] = 999
+    cases.append(('REJECTS a 1.2 section whose directDamage does not sum to analyzableDealt', sum_bad2, 1))
+    # (3) base+self+received == direct is a 1.2 identity only; 49 of the 271 real 1.7.11 rows break it.
+    old11 = _fixture_178()
+    old11['contribution']['actors'][0]['directDamage'] = 900
+    cases.append(('accepts a 1.1 actor whose directDamage the old formula cannot close', old11, 0))
 
     out = []
     fails = 0
