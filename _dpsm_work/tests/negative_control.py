@@ -1020,6 +1020,34 @@ MUTATIONS = [
          find="\t\t\tcase AbsorbVerdict.OversizedPool:\n\t\t\tcase AbsorbVerdict.OversizedPartial:",
          repl="\t\t\tcase AbsorbVerdict.None:\n\t\t\tcase AbsorbVerdict.OversizedPartial:",
          expect="policy/absorb-classify/only-the-oversized-and-carrier-verdicts-are-key"),
+    # ---- R77: the two REPORT-LAYER defects the first 1.7.26 battle exposed. Neither changes a judgement or a
+    # published number; both make the `[ABSPROBE] sum` line lie about itself. (a) `ovz=<count>/<amounts>` took
+    # the count from the corroborated bucket and the amounts from all four oversized buckets, so a battle with
+    # no corroborated hit printed a count of ZERO beside 6,500,000. (b) `None` had no counter at all, so 5,489
+    # calls against 5,470 counted buckets left 19 calls readable only by subtraction. The mutations below
+    # re-introduce each defect, and one more that lets a `None` the life reading never measured be counted as a
+    # whole application.
+    # (a-i) the defect at its SOURCE: the corroborated triple's AMOUNTS take in all four oversized buckets
+    # while its COUNT keeps counting only the corroborated one -- exactly the shape R76 printed, where a count
+    # of zero sat beside 6,500,000.
+    dict(name="absorb-ovz-triple-amounts-cover-every-bucket", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tOversizedAll++;\n\t\t\tOversizedLandedTotal += o.Landed();\n\t\t\tOversizedOverflowTotal += o.Overflow();",
+         repl="\t\t\tOversizedAll++;\n\t\t\tOversizedLandedTotal += o.Landed();\n\t\t\tOversizedOverflowTotal += o.Overflow();\n\t\t\tOversizedLanded += o.Landed();\n\t\t\tOversizedOverflow += o.Overflow();",
+         expect="policy/absorb-classify/the-oversized-triple-covers-only-the-corroborated-bucket"),
+    # (a-ii) the same defect at the RENDERER: print the all-bucket totals beside the corroborated count. A
+    # rendering swap is caught by the case that pins the whole line, which is why that case still exists.
+    dict(name="absorb-ovz-triple-rendered-from-the-all-buckets", file="Policy/AbsorbClassifyPolicy.cs",
+         find=".Append('/').Append(OversizedLanded.ToString(CultureInfo.InvariantCulture))",
+         repl=".Append('/').Append(OversizedLandedTotal.ToString(CultureInfo.InvariantCulture))",
+         expect="policy/absorb-classify/a-filled-report-pins-every-bucket"),
+    dict(name="absorb-none-bucket-not-counted", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tcase AbsorbVerdict.None:\n\t\t\t\tNone++;\n\t\t\t\tif (IsMeasuredFullApplication(o)) FullLanded++;\n\t\t\t\tbreak;",
+         repl="\t\t\tcase AbsorbVerdict.None:\n\t\t\t\tif (IsMeasuredFullApplication(o)) FullLanded++;\n\t\t\t\tbreak;",
+         expect="policy/absorb-classify/every-call-lands-in-exactly-one-bucket"),
+    dict(name="absorb-every-none-counts-as-a-whole-application", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\t\tif (IsMeasuredFullApplication(o)) FullLanded++;",
+         repl="\t\t\t\tFullLanded++;",
+         expect="policy/absorb-classify/only-the-measured-whole-application-counts-as-full"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

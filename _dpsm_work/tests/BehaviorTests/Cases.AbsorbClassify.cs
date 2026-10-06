@@ -34,7 +34,8 @@ internal static partial class Cases
 
 		var empty = new AbsorbProbeReport();
 		r.Str("an-untouched-report-pins-every-bucket", empty.Describe(),
-			"calls=0 ovz=0/0/0 pool=0 partial=0 ovzUnread=0 noMove=0 missing=0 lifeUnread=0"
+			"calls=0 ovz=0/0/0 ovzAll=0/0/0 ovzPool=0 ovzPartial=0 ovzUnread=0 noMove=0 missing=0"
+			+ " lifeUnread=0 full=0 none=0"
 			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
 			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=0 active=0 barrUnread=0"
 			+ " first(nom/res/landed/overflow)=0/0/?/? rows=0 key=0 dropped=0 keyDropped=0");
@@ -48,16 +49,47 @@ internal static partial class Cases
 		d.Note(Live(1000, 0, 5000, 4500), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 4500)));
 		d.Note(Live(800000, 300000, 500000, 300000), AbsorbClassifyPolicy.Classify(Live(800000, 300000, 500000, 300000)));
 		r.Str("a-filled-report-pins-every-bucket", d.Describe(),
-			"calls=7 ovz=1/1100000/800000 pool=1 partial=1 ovzUnread=0 noMove=1 missing=1 lifeUnread=1"
+			"calls=7 ovz=1/500000/100000 ovzAll=3/1100000/800000 ovzPool=1 ovzPartial=1 ovzUnread=0"
+			+ " noMove=1 missing=1 lifeUnread=1 full=1 none=1"
 			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
 			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=2 active=0 barrUnread=0"
 			+ " first(nom/res/landed/overflow)=600000/100000/500000/100000 rows=0 key=0 dropped=0 keyDropped=0");
 
-		// The headline sums cover EVERY oversized call, not only the ones the life reading corroborated, so the
-		// number does not flatter itself: 500,000+100,000+500,000 landed and 100,000+400,000+300,000 overflow.
+		// The ALL-bucket sums cover EVERY oversized call, not only the ones the life reading corroborated, so
+		// the headline does not flatter itself: 500,000+100,000+500,000 landed and 100,000+400,000+300,000
+		// overflow.
 		r.True("the-oversized-sums-cover-every-oversized-bucket",
 			d.OversizedLandedTotal == 1100000L && d.OversizedOverflowTotal == 800000L
 			&& d.Oversized == 1 && d.OversizedPool == 1 && d.OversizedPartial == 1);
+
+		// R77 defect A: a count and the amounts printed beside it must describe the SAME population. The first
+		// battle the R76 line ran in read `ovz=0/6500000/2358285` -- a corroborated count of ZERO next to
+		// amounts summed over all four oversized buckets -- so the two triples are now pinned apart: `ovz`
+		// carries the corroborated hit's own 500,000/100,000, `ovzAll` all three buckets' 1,100,000/800,000.
+		// The roll-up count has to equal the four family counts, or a bucket stopped counting and the line
+		// would be summing a population it does not print.
+		r.True("the-oversized-triple-covers-only-the-corroborated-bucket",
+			d.OversizedLanded == 500000L && d.OversizedOverflow == 100000L
+			&& d.OversizedAll == 3
+			&& d.OversizedAll == d.Oversized + d.OversizedPool + d.OversizedPartial + d.OversizedUnreadable);
+
+		// R77 defect B: the line must account for every call it counted. R76's line printed 5,489 calls against
+		// 5,470 counted buckets, and the only way to find the remaining 19 was SUBTRACTION -- they were `None`.
+		r.True("every-call-lands-in-exactly-one-bucket",
+			d.Oversized + d.OversizedPool + d.OversizedPartial + d.OversizedUnreadable
+			+ d.NoLifeMovement + d.WithheldNoReturn + d.LifeUnreadable
+			+ d.SolvedBarrier + d.SolvedBarrierShort + d.SolvedTakeOver + d.SolvedFixed
+			+ d.SolvedInvincible + d.SolvedUnreadable + d.None == d.Calls);
+
+		// `None` has FOUR paths and only one of them is a hit that landed in full, so the bucket count and the
+		// measured subset must stay apart: all four shapes are `None`, exactly one is `full`.
+		var none = new AbsorbProbeReport();
+		none.Note(Plain(0, 0), AbsorbClassifyPolicy.Classify(Plain(0, 0)));                              // nothing to judge
+		none.Note(Plain(1000, 1000), AbsorbClassifyPolicy.Classify(Plain(1000, 1000)));                  // not an overflow
+		none.Note(Live(1000, 0, 5000, 6000), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 6000)));  // the life rose
+		none.Note(Live(1000, 0, 5000, 4000), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 4000)));  // landed whole
+		r.True("only-the-measured-whole-application-counts-as-full",
+			none.Calls == 4 && none.None == 4 && none.FullLanded == 1);
 
 		r.True("the-first-quad-is-the-first-oversized-hit",
 			d.HasFirst && d.FirstNominal == 600000 && d.FirstResult == 100000
@@ -68,7 +100,8 @@ internal static partial class Cases
 
 		d.Clear();
 		r.Str("clear-empties-every-bucket", d.Describe(),
-			"calls=0 ovz=0/0/0 pool=0 partial=0 ovzUnread=0 noMove=0 missing=0 lifeUnread=0"
+			"calls=0 ovz=0/0/0 ovzAll=0/0/0 ovzPool=0 ovzPartial=0 ovzUnread=0 noMove=0 missing=0"
+			+ " lifeUnread=0 full=0 none=0"
 			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
 			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=0 active=0 barrUnread=0"
 			+ " first(nom/res/landed/overflow)=0/0/?/? rows=0 key=0 dropped=0 keyDropped=0");

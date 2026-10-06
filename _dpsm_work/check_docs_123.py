@@ -149,6 +149,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R75.md',
     # R76: 超量命中单独判定(落地 = nominal − res、溢出 = res;Life 读数优先) + 关键行独立行预算
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R76.md',
+    # R77: `[ABSPROBE] sum` 一行的两个报告层缺陷(计数与金额同族群、`None` 补计数器)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R77.md',
     # 会心逐击可观测性调查 + 折衷方案(报告,非逐轮记录)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
 ]

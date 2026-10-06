@@ -25,7 +25,7 @@ internal static class Program
 	/// (`landed`/`overflow`), the life reading got the veto that removes R75's false `Masked` bucket, and the
 	/// two-tier row budget that keeps the deciding rows out of `dropped` is pinned here).
 	/// </summary>
-	public const int ExpectedCases = 1307;
+	public const int ExpectedCases = 1310;
 
 	private static int Main(string[] args)
 	{

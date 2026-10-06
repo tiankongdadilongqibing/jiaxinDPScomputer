@@ -280,17 +280,53 @@ internal static class AbsorbClassifyPolicy
 /// written even after the ordinary cap is full, bounded by its own cap so a pathological battle still cannot
 /// flood the log, and both refusals are counted separately. It lives here, in the pure class, so a mutation
 /// can redden the case that pins it.
+///
+/// R77: A COUNT AND ITS AMOUNTS MUST COME FROM THE SAME POPULATION, AND NO CALL MAY GO UNCOUNTED. The first
+/// battle the R76 line ran in (quest 411001, 2026-10-07 01:48) printed `ovz=0/6500000/2358285`: the count
+/// came from the corroborated bucket alone while the amounts summed all four oversized buckets, so a battle
+/// with ZERO corroborated hits showed a zero standing next to six and a half million -- the label
+/// contradicted its own number. The same line printed 5,489 calls against 5,470 counted buckets, and the 19
+/// unaccounted ones (`None`, with four different paths behind them) were readable only by SUBTRACTION. So
+/// `ovz` now prints the corroborated triple, `ovzAll` the all-bucket triple, every family keeps its own
+/// count, and `None` is counted like the rest with its measured subset `full` broken out.
 /// </summary>
 internal sealed class AbsorbProbeReport
 {
 	/// <summary>Every damage-application call the probe observed.</summary>
 	internal int Calls;
 
-	/// <summary>Oversized calls whose life movement CORROBORATED the split.</summary>
+	/// <summary>Every call the policy answered <see cref="AbsorbVerdict.None"/> for. R77 added this because
+	/// the first battle the R76 line ran in printed 5,489 calls against 5,470 counted buckets: the remaining
+	/// 19 were `None`, and with no counter of their own the only way to find them was SUBTRACTION. `None` has
+	/// four paths, so <see cref="FullLanded"/> keeps the measured one apart from the other three.</summary>
+	internal int None;
+
+	/// <summary>The `None` calls the life reading itself measured as an application of the WHOLE nominal:
+	/// positive nominal, no overflow reported, readable life, `lifeDrop == nominal`. That is the classifier's
+	/// `drop == o.Nominal` rule -- the one that deleted R75's 790 false withheld rows -- counted instead of
+	/// only classified. The other three `None` paths (nothing to judge, a return that is not an overflow, a
+	/// life that rose) must never land here, or the count drifts back to "somewhere inside `None`".</summary>
+	internal int FullLanded;
+
+	/// <summary>Oversized calls whose life movement CORROBORATED the split. Its count and the two sums below
+	/// are the SAME population, which is why the line prints them as one triple: R76 printed this count beside
+	/// amounts summed over all four oversized buckets, so a battle with no corroborated hit read as
+	/// `ovz=0/6500000/2358285` -- a zero standing next to six and a half million.</summary>
 	internal int Oversized;
+
+	/// <summary>Sum of `nominal - res` and of `res` over the CORROBORATED oversized calls only -- the pair
+	/// printed with <see cref="Oversized"/>.</summary>
+	internal long OversizedLanded;
+	internal long OversizedOverflow;
+
 	internal int OversizedPool;
 	internal int OversizedPartial;
 	internal int OversizedUnreadable;
+
+	/// <summary>Every oversized call, counted once whatever the life reading sorted it into. Kept as its own
+	/// counter rather than re-added from the four buckets, so a bucket that stops being incremented shows up as
+	/// `ovzAll != ovz + ovzPool + ovzPartial + ovzUnread` on the line instead of hiding inside an aggregate.</summary>
+	internal int OversizedAll;
 
 	/// <summary>Sum of `nominal - res` and of `res` over every oversized call (all four buckets), so the
 	/// headline does not depend on how well the life reading corroborated each one.</summary>
@@ -342,10 +378,15 @@ internal sealed class AbsorbProbeReport
 	internal void Clear()
 	{
 		Calls = 0;
+		None = 0;
+		FullLanded = 0;
 		Oversized = 0;
+		OversizedLanded = 0L;
+		OversizedOverflow = 0L;
 		OversizedPool = 0;
 		OversizedPartial = 0;
 		OversizedUnreadable = 0;
+		OversizedAll = 0;
 		OversizedLandedTotal = 0L;
 		OversizedOverflowTotal = 0L;
 		NoLifeMovement = 0;
@@ -382,6 +423,7 @@ internal sealed class AbsorbProbeReport
 
 		if (o.IsOversized())
 		{
+			OversizedAll++;
 			OversizedLandedTotal += o.Landed();
 			OversizedOverflowTotal += o.Overflow();
 			if (!HasFirst)
@@ -396,7 +438,15 @@ internal sealed class AbsorbProbeReport
 
 		switch (v)
 		{
-			case AbsorbVerdict.Oversized: Oversized++; break;
+			case AbsorbVerdict.None:
+				None++;
+				if (IsMeasuredFullApplication(o)) FullLanded++;
+				break;
+			case AbsorbVerdict.Oversized:
+				Oversized++;
+				OversizedLanded += o.Landed();
+				OversizedOverflow += o.Overflow();
+				break;
 			case AbsorbVerdict.OversizedPool: OversizedPool++; break;
 			case AbsorbVerdict.OversizedPartial: OversizedPartial++; break;
 			case AbsorbVerdict.OversizedUnreadable: OversizedUnreadable++; break;
@@ -417,6 +467,18 @@ internal sealed class AbsorbProbeReport
 		}
 		if (o.BarrierActiveBefore) BarrierActive++;
 		if (o.BarrierActiveBefore && !o.BarrierReadable) BarrierUnreadable++;
+	}
+
+	/// <summary>
+	/// `true` when the classifier's `drop == o.Nominal` rule is what decided this call: a positive nominal, no
+	/// overflow reported, a readable life, and a movement equal to the whole nominal. Written out in full
+	/// rather than as "`v == None` and the life moved" so the other three `None` paths -- nothing to judge, a
+	/// return that is not an overflow, a life that rose -- cannot be counted as a whole application. This is
+	/// the predicate R77 added to answer "how many hits landed in full" without subtracting buckets.
+	/// </summary>
+	private static bool IsMeasuredFullApplication(AbsorbObservation o)
+	{
+		return o.Nominal > 0 && o.Result <= 0 && o.LifeReadable && o.LifeDrop() == o.Nominal;
 	}
 
 	/// <summary>Counters fed by the carrier hooks themselves (they fire outside the classifier).</summary>
@@ -473,14 +535,19 @@ internal sealed class AbsorbProbeReport
 		var sb = new StringBuilder(360);
 		sb.Append("calls=").Append(Calls.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" ovz=").Append(Oversized.ToString(CultureInfo.InvariantCulture))
+		  .Append('/').Append(OversizedLanded.ToString(CultureInfo.InvariantCulture))
+		  .Append('/').Append(OversizedOverflow.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" ovzAll=").Append(OversizedAll.ToString(CultureInfo.InvariantCulture))
 		  .Append('/').Append(OversizedLandedTotal.ToString(CultureInfo.InvariantCulture))
 		  .Append('/').Append(OversizedOverflowTotal.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" pool=").Append(OversizedPool.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" partial=").Append(OversizedPartial.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" ovzPool=").Append(OversizedPool.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" ovzPartial=").Append(OversizedPartial.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" ovzUnread=").Append(OversizedUnreadable.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" noMove=").Append(NoLifeMovement.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" missing=").Append(WithheldNoReturn.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" lifeUnread=").Append(LifeUnreadable.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" full=").Append(FullLanded.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" none=").Append(None.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" carrier(barrier/pool/takeover/fixed/invincible/unreadable)=")
 		  .Append(SolvedBarrier.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(SolvedBarrierShort.ToString(CultureInfo.InvariantCulture)).Append('/')
