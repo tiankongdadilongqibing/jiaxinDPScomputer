@@ -1,0 +1,38 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\battle_select.py list --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+battle_select list: 35 file(s), 0 with a battleRef, 35 legacy
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_205449.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_230040.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_230311.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_230615.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_231044.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_231340.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261003_235204.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_012328.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_015919.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_021914.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_023627.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_033231.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_035437.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_041309.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_042637.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_042844.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_113553.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_115024.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_115417.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_134524.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_134853.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_144548.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_170157.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_180353.json
+  legacy                                     q=411001  -      rev=None reset=None battle_411001_20261004_180834.json
+  legacy                                     q=700817  -      rev=None reset=None battle_700817_20261004_114821.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261003_205129.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261003_225530.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261003_225647.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261003_225905.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261004_012138.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261004_042458.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261004_135214.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261004_165952.json
+  legacy                                     q=9999    -      rev=None reset=None battle_9999_20261004_175957.json

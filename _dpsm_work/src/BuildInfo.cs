@@ -11,5 +11,5 @@ public static class BuildInfo
 {
 	public const string Guid = "dev.dpsmeter";
 	public const string Name = "DpsMeter";
-	public const string Version = "1.7.24";
+	public const string Version = "1.7.25";
 }

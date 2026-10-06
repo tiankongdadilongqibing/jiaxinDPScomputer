@@ -18,8 +18,10 @@ internal static class Program
 	/// runtime/clock-origin 11, runtime/clock-origin-counter 4 -- plus 1 case for the hold-overflow refusal
 	/// in policy/battle-clock-calibration, and the counters-shape pin moved from 13 to 16 members, which is
 	/// a rename rather than a new case).
+	/// R75: 1275 -> 1298 (+23 for policy/absorb-classify: what withheld part of a hit, the decision order that
+	/// names an OBSERVED carrier, and the rule that an unobserved or unreadable one is never named).
 	/// </summary>
-	public const int ExpectedCases = 1275;
+	public const int ExpectedCases = 1298;
 
 	private static int Main(string[] args)
 	{
@@ -97,6 +99,10 @@ internal static class Program
 		// for the first charge (`m_firstCoolTimeFrame` when it answers, the seconds property x units as the
 		// recorded fallback).
 		Cases.ClockLagDiagnosticsCases(r);
+		// R75: which mechanism withheld part of a damage-application call (a barrier, a flat cut, a takeover,
+		// or an honest "we did not see it"), decided from readings instead of from the difference -- plus the
+		// `[ABSPROBE]` line that has to stay readable in every battle.
+		Cases.AbsorbClassifyCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

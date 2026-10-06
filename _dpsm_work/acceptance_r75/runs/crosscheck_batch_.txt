@@ -1,0 +1,101 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe -m contrib.crosscheck --batch D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0\battle_*.json --outdir D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\acceptance_r75\crosscheck
+battle_411001_20261003_205449.json         version=1.5.3  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=11028 == entries(7352) + applied hits(3676): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.3 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_230040.json         version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=7932 == entries(5288) + applied hits(2644): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_230311.json         version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=9963 == entries(6642) + applied hits(3321): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_230615.json         version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=8211 == entries(5474) + applied hits(2737): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_231044.json         version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=10131 == entries(6754) + applied hits(3377): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_231340.json         version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=8706 == entries(5804) + applied hits(2902): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261003_235204.json         version=1.5.5  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=9270 == entries(6180) + applied hits(3090): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.5 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261004_012328.json         version=1.5.5  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [note] giveApplied=7668 == entries(5112) + applied hits(2556): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.5 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_411001_20261004_015919.json         version=1.6.0  status=ERROR                 exit=1 mismatches=58 omissions=0
+    [ok] contribution section present (plugin version 1.6.0)
+    [error] 58 value mismatch(es) between the plugin section and the offline core; first: actors[key=4].baseCredit
+battle_411001_20261004_021914.json         version=1.6.1  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.6.1)
+battle_411001_20261004_023627.json         version=1.7.0  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.0)
+battle_411001_20261004_033231.json         version=1.7.2  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.2)
+battle_411001_20261004_035437.json         version=1.7.3  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.3)
+battle_411001_20261004_041309.json         version=1.7.4  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.4)
+battle_411001_20261004_042637.json         version=1.7.5  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.5)
+battle_411001_20261004_042844.json         version=1.7.5  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.5)
+battle_411001_20261004_113553.json         version=1.7.5  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.5)
+battle_411001_20261004_115024.json         version=1.7.6  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.6)
+battle_411001_20261004_115417.json         version=1.7.6  status=WARNING               exit=0 mismatches=0 omissions=0
+    [warning] atkAdd.selfValues=7003 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit
+    [ok] contribution section present (plugin version 1.7.6)
+battle_411001_20261004_134524.json         version=1.7.8  status=WARNING               exit=0 mismatches=0 omissions=0
+    [warning] atkAdd.selfByKey=7002 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit
+    [warning] atkAdd.selfValues=7002 exceeds atkAdd.hits=6191: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit
+    [ok] contribution section present (plugin version 1.7.8)
+battle_411001_20261004_134853.json         version=1.7.8  status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.8)
+battle_411001_20261004_144548.json         version=1.7.10 status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.10)
+battle_411001_20261004_170157.json         version=1.7.11 status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.11)
+battle_411001_20261004_180353.json         version=1.7.11 status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.11)
+battle_411001_20261004_180834.json         version=1.7.11 status=PASS                  exit=0 mismatches=0 omissions=0
+    [ok] contribution section present (plugin version 1.7.11)
+battle_700817_20261004_114821.json         version=1.7.6  status=WARNING               exit=0 mismatches=0 omissions=0
+    [warning] atkAdd.selfValues=179 exceeds atkAdd.hits=129: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit
+    [ok] contribution section present (plugin version 1.7.6)
+battle_9999_20261003_205129.json           version=1.5.3  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [note] giveApplied=930 == entries(695) + applied hits(235): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.3 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_9999_20261003_225530.json           version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [note] giveApplied=36 == entries(27) + applied hits(9): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_9999_20261003_225647.json           version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [note] giveApplied=70 == entries(46) + applied hits(24): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_9999_20261003_225905.json           version=1.5.4  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [note] giveApplied=76 == entries(54) + applied hits(22): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.4 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_9999_20261004_012138.json           version=1.5.5  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [note] giveApplied=24 == entries(18) + applied hits(6): this version added one increment per granted entry and one per hit into the same counter, so it measures neither. 1.7.9 split the hit-level increment into giveFoldHits. Not an error here because a legacy export cannot be re-written.
+    [legacy] plugin export version 1.5.5 predates the contribution schema (first emitted by 1.6.0); the section cannot be expected here, so this gate does not apply -- it is NOT a pass for the current version
+battle_9999_20261004_042458.json           version=1.7.5  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [ok] contribution section present (plugin version 1.7.5)
+battle_9999_20261004_135214.json           version=1.7.8  status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [ok] contribution section present (plugin version 1.7.8)
+battle_9999_20261004_165952.json           version=1.7.11 status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [warning] atkAdd.emitted=137 exceeds atkAdd.hits=108: one hit may emit one row per giver or carry several values, so this is legal but means the counter is per-value, not per-hit
+    [ok] contribution section present (plugin version 1.7.11)
+battle_9999_20261004_175957.json           version=1.7.11 status=LEGACY_NOT_APPLICABLE exit=0 mismatches=0 omissions=0
+    [legacy] quest 9999 is the training ground (special x0.03 / sub-unity rules): the normal contribution model is recorded but NOT comparable with ordinary battles, and this gate returns its own applicability result instead of the normal PASS
+    [ok] contribution section present (plugin version 1.7.11)
+batch: 35 file(s) {"ERROR": 1, "LEGACY_NOT_APPLICABLE": 17, "PASS": 14, "WARNING": 3} -> worst=ERROR exit=1

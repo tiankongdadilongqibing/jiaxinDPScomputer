@@ -35,6 +35,13 @@ public static class DamageHook
 			StatusDeltaProbe.NoteBefore(__instance);
 		}
 		catch { }
+		// R75: the absorb probe's own before-state, in its own try/catch so that a failure in either probe
+		// cannot silence the other one. Read-only; see Diagnostics/AbsorbProbe.cs.
+		try
+		{
+			AbsorbProbe.NoteBefore(__instance);
+		}
+		catch { }
 	}
 
 	public static void Postfix(BattleObject __instance, int __0, BattleObject __1, BattleObject __2, int __result)
@@ -43,6 +50,14 @@ public static class DamageHook
 		{
 			int damage = (__result > 0) ? __result : __0;
 			Aggregator.RecordDamage(__instance, __1, __2, damage, __0);
+		}
+		catch { }
+		// R75: classify THIS call AFTER the accounting, so nothing the probe does can move a published
+		// number. The accounting above is deliberately untouched this round -- a fully withheld hit still
+		// arrives as result<=0, and the probe only COUNTS that case (masked=).
+		try
+		{
+			AbsorbProbe.NoteHit(__instance, __0, __result);
 		}
 		catch { }
 	}

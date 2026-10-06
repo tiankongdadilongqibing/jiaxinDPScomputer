@@ -85,6 +85,27 @@ public static partial class Aggregator
 		Plugin.LogSource.LogInfo(text);
 		RuntimeLog.Write(text);
 
+		// R75: what the absorb probe saw, one bucket per value. It sits right after the text that carries the
+		// 被吸收 line because it exists to explain THAT number: a verdict of `barrier` means a barrier's own
+		// life moved by the withheld amount, `pool` that it moved by less (a pool running out inside a hit),
+		// `unknown` that something withheld damage and no carrier was observed -- and a CONSTANT value in that
+		// bucket is the evidence for a flat per-hit cut no exported table carries, which is not a shield. The
+		// `masked=` bucket counts the fully withheld hits the existing accounting cannot show at all (it books
+		// `result <= 0` as full damage), so this line also measures its own blind spot.
+		try
+		{
+			string abs = AbsorbProbe.Summary();
+			if (!string.IsNullOrEmpty(abs))
+			{
+				Plugin.LogSource.LogInfo(abs);
+				RuntimeLog.Write(abs);
+			}
+		}
+		catch (Exception ex)
+		{
+			RuntimeLog.Write("[ABSPROBE] 自检行输出失败(不影响导出): " + ex.Message);
+		}
+
 		// Clock self-check. For the "real" source the battle clock and the wall clock measure the same
 		// thing, so active/wall must be ~1.00; anything far from it means the clock is fed the wrong time
 		// base (0.67 was measured while it consumed Time.unscaledDeltaTime = the 1/45 s logic step). For

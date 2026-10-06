@@ -92,6 +92,9 @@ public static partial class Aggregator
 		FactStore.Reset();
 		// R64: the auto-skill probe's per-slot charge state and activation history are per battle.
 		AutoSkillProbe.Reset();
+		// R75: the absorb probe's per-victim before-state (keyed by BattleObject) and its buckets are per
+		// battle; the keys must not outlive the objects they point at.
+		AbsorbProbe.Reset();
 		// R66: the 技能时间表's activation list is per battle too (the page shows THIS battle).
 		SkillTimelineProbe.Reset();
 		// Ability rosters and talent activation counters are per-battle state cached on ActorStats.

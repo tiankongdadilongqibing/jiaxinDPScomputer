@@ -181,6 +181,33 @@ public class Plugin : BasePlugin
 	/// One isolated postfix plus a bounded list; see Diagnostics/SkillTimelineProbe.cs.</summary>
 	public static ConfigEntry<bool> CfgSkillTimeline;
 
+	/// <summary>R75: what actually withheld part of a damage-application call. WHY: `被吸收/无效化` has been
+	/// published as `nominal - damage` since 1.5.5 and nothing ever carried it -- 397 records over 46 exports,
+	/// 395 of them exactly 500,000, all on ショゴス, while `masterdata/*.json` has no field, row or value of
+	/// 500,000 and the boss's live talent list holds only `1002 ModeChange` + `6 攻击力/150/-1`. The probe reads
+	/// the victim's `Life`, its `Character.Barrier` (`IsActived`/`mLife`) and the five invincibility-family
+	/// flags around the call the existing hook already intercepts, and classifies the withholding into
+	/// barrier / partial-pool / unknown / takeover / fixed / invincible / masked / unreadable. **No new
+	/// Harmony patch is involved** and the accounting is NOT touched: a fully withheld hit still arrives as
+	/// `result <= 0` and is only COUNTED (`masked=`), because changing it would move every published taken
+	/// total. Set false to stop both the readings and the `[ABSPROBE]` lines.</summary>
+	public static ConfigEntry<bool> CfgAbsorbProbe;
+
+	/// <summary>R75: the CARRIER hooks -- `Barrier.Activate`/`Deactivate`/`CalcLife`/`Damage`,
+	/// `TalentActionAddBarrier.ActExecute`, `BattleObject.DamageTakeOver`/`AddDamageTakeOverChara` and
+	/// `BattleObject.TryGetFixedDamage`. **OFF by default, deliberately**: the one crash this project ever
+	/// caused (1.0.48/1.0.49, `BattleObject.ActDamage`) happened inside the generated thunk that converts a
+	/// patched method's arguments, before any postfix body ran, so a diagnostic must never be able to disable
+	/// the patch set -- these are patched one by one from `TryPatchAbsorbCarrierHooks`, never by PatchAll. Turn
+	/// them on for the SECOND battle, after the read-only probe has shown which bucket the 500,000 lands in.
+	/// Requires a restart (the decision is made while patching at startup).</summary>
+	public static ConfigEntry<bool> CfgAbsorbProbeHooks;
+
+	/// <summary>R75: how many `[ABSPROBE]` rows one battle may write (default 400). Every row beyond the cap
+	/// is counted as `dropped=` and printed in the battle-end summary, so a bounded log can never look like a
+	/// quiet one.</summary>
+	public static ConfigEntry<int> CfgAbsorbProbeMaxRows;
+
 	private Harmony _harmony;
 
 	/// <summary>
@@ -204,6 +231,79 @@ public class Plugin : BasePlugin
 		catch (Exception ex)
 		{
 			LogSource.LogInfo("[DpsMeter] crit probe patch failed (meter unaffected): " + ex.Message);
+		}
+	}
+
+	/// <summary>
+	/// R75: the ABSORB CARRIER hooks, installed one by one and only when the user opted in
+	/// (`Debug/AbsorbProbeHooks`).
+	///
+	/// WHY OFF BY DEFAULT. The crash this project caused in 1.0.48/1.0.49 came from patching
+	/// `BattleObject.ActDamage`, and it happened while the generated (il2cpp -> managed) thunk CONVERTED the
+	/// arguments -- before any postfix body ran, and an inert body did not help. The risk therefore lives in
+	/// the patch itself rather than in what the body does, so these stay dark until the read-only probe has
+	/// said which bucket the 500,000 lands in.
+	///
+	/// WHY EACH TARGET IS SEPARATE. A carrier that does not resolve must cost its own hook and nothing else:
+	/// the `Barrier` / `TalentActionAddBarrier` / `BattleObject.DamageTakeOver` family is exactly where a
+	/// method may be missing or renamed in another game version, and `PatchAll` aborts the whole set on the
+	/// first unresolvable target.
+	/// </summary>
+	private void TryPatchAbsorbCarrierHooks()
+	{
+		if (CfgAbsorbProbeHooks == null || !CfgAbsorbProbeHooks.Value)
+		{
+			LogSource.LogInfo("[DpsMeter] absorb carrier hooks OFF (Debug/AbsorbProbeHooks=false); the read-only absorb probe still runs.");
+			return;
+		}
+		LogSource.LogInfo("[DpsMeter] absorb carrier hooks ON (opt-in diagnostic; see Debug/AbsorbProbeHooks).");
+		TryPatchAbsorbOne("Barrier.Activate", typeof(Barrier), "Activate", typeof(AbsorbBarrierActivateHook), nameof(AbsorbBarrierActivateHook.Postfix));
+		TryPatchAbsorbOne("Barrier.Deactivate", typeof(Barrier), "Deactivate", typeof(AbsorbBarrierDeactivateHook), nameof(AbsorbBarrierDeactivateHook.Postfix));
+		TryPatchAbsorbOne("Barrier.CalcLife", typeof(Barrier), "CalcLife", typeof(AbsorbBarrierCalcLifeHook), nameof(AbsorbBarrierCalcLifeHook.Postfix));
+		TryPatchAbsorbOne("Barrier.Damage", typeof(Barrier), "Damage", typeof(AbsorbBarrierDamageHook), nameof(AbsorbBarrierDamageHook.Postfix));
+		TryPatchAbsorbOne("TalentActionAddBarrier.ActExecute", typeof(TalentActionAddBarrier), "ActExecute", typeof(AbsorbAddBarrierTalentHook), nameof(AbsorbAddBarrierTalentHook.Postfix));
+		TryPatchAbsorbOne("BattleObject.DamageTakeOver", typeof(BattleObject), "DamageTakeOver", typeof(AbsorbTakeOverHook), nameof(AbsorbTakeOverHook.Postfix));
+		TryPatchAbsorbOne("BattleObject.AddDamageTakeOverChara", typeof(BattleObject), "AddDamageTakeOverChara", typeof(AbsorbTakeOverLinkHook), nameof(AbsorbTakeOverLinkHook.Postfix));
+		TryPatchAbsorbOne("BattleObject.TryGetFixedDamage", typeof(BattleObject), "TryGetFixedDamage", typeof(AbsorbFixedDamageHook), nameof(AbsorbFixedDamageHook.Postfix));
+	}
+
+	/// <summary>
+	/// One absorb carrier target, isolated. The lookup falls back to a name-only scan of the declared methods
+	/// when `AccessTools.Method(type, name)` cannot resolve it -- the generated interop surface can carry
+	/// overload sets that helper refuses -- and the fallback is accepted only when EXACTLY ONE candidate holds
+	/// that name, because guessing between overloads is how a probe ends up measuring a different function
+	/// than the one it claims to.
+	/// </summary>
+	private void TryPatchAbsorbOne(string label, Type t, string method, Type hookType, string postfix)
+	{
+		try
+		{
+			var m = AccessTools.Method(t, method);
+			if (m == null)
+			{
+				int cands = 0;
+				foreach (var mi in AccessTools.GetDeclaredMethods(t))
+				{
+					if (mi.Name == method)
+					{
+						cands++;
+						m = mi;
+					}
+				}
+				if (cands != 1) m = null;
+				if (m != null) LogSource.LogInfo("[DpsMeter] absorb carrier " + label + ": resolved by the name-only fallback.");
+			}
+			if (m == null)
+			{
+				LogSource.LogInfo("[DpsMeter] absorb carrier target " + label + " not found; that carrier stays unobserved (meter unaffected).");
+				return;
+			}
+			_harmony.Patch(m, postfix: new HarmonyMethod(hookType, postfix));
+			LogSource.LogInfo("[DpsMeter] absorb carrier hook applied: " + label);
+		}
+		catch (Exception ex)
+		{
+			LogSource.LogInfo("[DpsMeter] absorb carrier hook " + label + " failed (meter unaffected): " + ex.Message);
 		}
 	}
 
@@ -457,6 +557,9 @@ public class Plugin : BasePlugin
 		CfgExtractKeep = Config.Bind<int>("General", "ExtractKeep", ExtractPolicy.DefaultKeep, "FEATURE (R52): how many evidence bundles to keep under BepInEx\\plugins\\DpsMeter\\extract (oldest deleted first, decided by a pure string sort of the timestamped directory names). 1..50.");
 		CfgAutoSkillProbe = Config.Bind<bool>("Debug", "AutoSkillProbe", true, "PROBE (R64): read each party unit's AUTO SKILL from the live Skill side and log (a) the instant it fires as an [AUTOSK] act row and (b) its charge counter every 2 s as an [AUTOSK] chg row, plus a per-slot median interval at battle end. WHY: R63 published the auto-skill master row (暗沌への導き: minCoolTime/maxCoolTime = 300/240 s = 9000/7200 frames) but the ~13.5 s cadence earlier reverse-inferred from a damage channel contradicts it, and the master number cannot be checked without the live skill -- the auto skill is NOT in the standby list the [CLOCKP] line walks (verified: that list holds 地下からの完全顕現/電脳掌都/狂気の眼球, and only 暗沌への導き of those four names is in auto_skill.json). One isolated Harmony postfix on GameCmdExecuter.ActExecutePlayerAutoSkillForPassive + a read-only sampler (Player.AutoSkill1/2, Skill.Type/GetStatus/WaitCountFrame/CoolTimeFrame); if the patch does not resolve, the sampler's rising edge still times the activations and the SUM line says so. Set false to stop both.");
 		CfgSkillTimeline = Config.Bind<bool>("Debug", "SkillTimeline", true, "FEATURE/PROBE (R66, corrected in R69): collect OUR units' 奥义/特殊/自动 skill activation moments into the overlay's 技能时间表 page (F4 while the panel is visible) and write them to the runtime log as [SKILLTL] rows. WHY: the auto skill's charge (Skill.CoolTimeFrame / 30) is NOT its firing interval -- an auto skill that has finished charging waits for the unit's next normal attack (measured over 9 battles: トレイラ CoolTimeFrame 240 = 8.0 game s, median observed gap 9.00 game s). TWO CHANNELS: the R64 auto-skill command postfix (proven, 471 rows) plus R67's three isolated postfixes on GameCmdExecuter.ActExecutePlayer{ActiveSkill,Skill,SpecialSkill}, which observe 奥义/特殊 (41 accepted rows against 595 calls in the 411001 battle). R69 CORRECTION -- a call is only an ACTIVATION when the skill's own status is `Using`; the game calls the auto-skill command once per attack and returns ok=1 whether or not the skill fired (マッドシーカー: 25 calls, 1 activation, counter 2970 frames = 99 game s), so the other calls are counted as 试触发 and never placed on the time axis. R69 also deleted the R66 postfix on GameCmdExecuter.AddPlayerSkillGameRecord: it was installed and produced 0 rows with 0 skips in two battles. Bounded (600 events), our side only, read-only. Off = no hook work, no page, no [SKILLTL] lines.");
+		CfgAbsorbProbe = Config.Bind<bool>("Debug", "AbsorbProbe", true, "PROBE (R75): read what actually withheld part of a damage-application call and log it as [ABSPROBE] rows plus one [ABSPROBE] sum line at battle end. WHY: `被吸收/无效化` is the plugin's own name for `nominal - damage` and nothing ever carried it -- 397 records over 46 exports, 395 of them exactly 500,000 and all of them on ショゴス, while the ally-side ones are irregular (2,821 / 19,010 / 56,087) and `masterdata/*.json` contains no field, row or value of 500,000. Per call it reads the victim's `Life`, its `Character.Barrier` (`IsActived`/`mLife`) and its five invincibility-family flags around the call the `BattleObject.Damage` hook already intercepts, and classifies the result as barrier / pool / unknown / takeover / fixed / invincible / masked / unreadable. Read-only, NO new Harmony patch, and the accounting is untouched -- a fully withheld hit (`result <= 0`) is still booked as full damage by the existing fallback, it is only COUNTED (masked=), because changing it would move every published taken total. Set false to stop both the readings and the lines.");
+		CfgAbsorbProbeHooks = Config.Bind<bool>("Debug", "AbsorbProbeHooks", false, "PROBE (R75), OFF BY DEFAULT: the CARRIER hooks that let the classifier NAME a mechanism -- `Barrier.Activate` / `Deactivate` / `CalcLife` / `Damage`, `TalentActionAddBarrier.ActExecute`, `BattleObject.DamageTakeOver` / `AddDamageTakeOverChara`, `BattleObject.TryGetFixedDamage`. WHY OFF: the one crash this project ever caused (1.0.48/1.0.49 on `BattleObject.ActDamage`) happened inside the generated (il2cpp -> managed) thunk while it CONVERTED a patched method's arguments -- before any postfix body ran, and an inert body did not help -- so a diagnostic must never be able to disable the patch set. Each target is therefore patched one by one from TryPatchAbsorbCarrierHooks (never by PatchAll, which is also why these classes carry no [HarmonyPatch] attribute), each with its own try/catch and its own applied/failed log line, and every postfix declares only `__instance` plus an int/bool argument. Turn it on for the SECOND battle, once the read-only probe has shown which bucket the 500,000 lands in; restart required, because the decision is made while patching at startup.");
+		CfgAbsorbProbeMaxRows = Config.Bind<int>("Debug", "AbsorbProbeMaxRows", 400, "PROBE (R75): the maximum number of [ABSPROBE] rows one battle may write (per-hit rows and carrier rows share the cap). Every row the cap refuses is counted as dropped= in the [ABSPROBE] sum line, so a bounded log can never be mistaken for a quiet one.");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");
@@ -468,6 +571,7 @@ public class Plugin : BasePlugin
 			TryPatchGiveApplier();
 			TryPatchAutoSkillActivation();
 			TryPatchSkillCommands();
+			TryPatchAbsorbCarrierHooks();
 		}
 		catch (Exception ex)
 		{

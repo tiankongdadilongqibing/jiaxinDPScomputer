@@ -1,0 +1,11 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\repo_manifest.py --verify --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+verify: tracked=2710 hashed_excluded=346 corpus=35
+GREW (new since the baseline; not drift): excluded_hashed/DpsMeter-0.9.0-r2/.workbuddy-ai/memory/MEMORY.md
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r75/runs/repo_manifest_verify.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r75/runs/selftest_attribution_census.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r75/runs/selftest_battle_select.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r75/runs/selftest_v150.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r75/runs/test_gate.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/baseline-manifest.json
+manifest verify: drift=0 changed=6 grew=1 notes=0

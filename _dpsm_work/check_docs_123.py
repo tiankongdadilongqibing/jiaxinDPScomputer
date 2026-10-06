@@ -145,6 +145,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R72.md',
     # R74: 校准仪的读数单位(初动改读 m_firstCoolTimeFrame)+ 拒因具名 + [CLOCK] calib 行 + 时间线进证据包
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R74.md',
+    # R75: 「被吸收/无效化」探针(先读后命名:受击方 Life / Character.Barrier / 无敌族标志 → 分类)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R75.md',
     # 会心逐击可观测性调查 + 折衷方案(报告,非逐轮记录)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
 ]

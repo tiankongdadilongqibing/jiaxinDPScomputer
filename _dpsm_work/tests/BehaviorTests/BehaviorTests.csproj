@@ -84,6 +84,11 @@
          counters and the exact `[CLOCK] calib` text are executed rather than eyeballed, which is the whole
          point of a line that exists to be read. -->
     <Compile Include="$(SrcRoot)\Policy\ClockLagDiagnostics.cs" />
+    <!-- R75: which mechanism withheld part of a damage-application call. Pure: the READINGS need the IL2CPP
+         surface (Diagnostics/AbsorbProbe.cs), the decision that turns them into a verdict does not, and that
+         decision is exactly where an invented carrier would hide. `CarrierUnknown` and `Unreadable` are
+         answers the suite has to be able to hold the classifier to. -->
+    <Compile Include="$(SrcRoot)\Policy\AbsorbClassifyPolicy.cs" />
     <!-- R72: the rule that makes the shift LAND: an event arriving before the origin is decided is held and
          replayed at its arrival + the lag, instead of being published on the old axis and blocking the
          shift (which is what happened in every battle the user played). Pure arithmetic + the queue type. -->

@@ -1112,6 +1112,29 @@ R71 算对了 lag,却因为**顺序**而每场都拒绝:它只在「本场第 2 
 - **口径不变**:1.7.23 与 1.7.22 的 `ActiveSeconds` 是同一条轴(游戏自己的战斗开始);变的只是**它现在真的被应用**。
   引用 1.7.23 之前的文件时,先看那一场的 `[CLOCK]` 行:`origin=none reason=events` 表示**那场仍是旧原点**。
 
+##### R75(插件 1.7.25):「被吸收/无效化」的**载体**仍未命名 —— 本轮把它变成**可测**
+
+`被吸收/无效化` 自 1.5.5 起就是 `nominal − damage`(游戏口径 − 入耐久)的**别名**,不是游戏文案:产地是
+`src/Aggregator.Stats.cs` 的 `int absorbed = nominal - damage;` 与 `[ABSORB]` 行、战末 `>>> 被吸收/无效化`;
+显示层在 `src/Composition/CompositionProbe.Chain.cs`;`totals.absorbed`、`dealtWithAbsorbed`、`reconcile.absorbed/absorbedAmount`、
+`events[].nominal`、`events[].calc.absorbed`、`actors[].absorbed` 全部由它派生。**同名的第二样东西(无关)**:
+`src/Composition/CompositionProbe.Text.cs` 里 `case 11: return "吸收";` 是游戏 `DamageSource` 枚举第 11 项的中文直译,
+而实测那一场 5,501 条事件里 `source=11` **一次都没出现**。
+
+**本轮结论(实测)**:46 份 `battle_411001_2026*.json` 共 **397 条**被吸收记录,**395 条差额恰好 500,000**,
+受害方**全是 `ショゴス`**,攻击者跨四个角色(エヴァラス・フラウ / ネーフェ＝ジアー / メアリー / [賢導]トレイラ)
+⇒ 恒定值属**受害方侧**;另 2 条是**友方受击**的不规则值(2,821 / 19,010),形状与 boss 侧不同。载体**仍然找不到**:
+`masterdata/*.json` 里没有任何字段/行/值等于 500,000,boss 的运行时天赋只有 `1002 ModeChange` + `6 攻击力/150/-1`,
+`timeline` 488 行对受害的三个战斗对象(key 58/106/178)**零行** ⇒ **待验证**,不再用「护盾」命名。
+
+新增 `[ABSPROBE]` 诊断行(**只进运行日志,不进导出**):`calls=` / `withheld=` / `sum=` / `masked=` /
+`lifeMismatch=` / `verdict(barrier/pool/unknown/takeover/fixed/invincible/unreadable)=` /
+`seen(barrierDmg/addBarrier/takeover/fixed)=` / `active=` / `unreadable=` / `first(nom/res/life/bar)=` / `rows=` / `dropped=`。
+
+**引用注意**:`totals.absorbed` 等字段的口径**未变**;`masked=` 揭示的是现有口径的**盲区** ——
+`src/Hooks/BattleObjectHooks.cs` 的 `(__result > 0) ? __result : __0` 会把**整击被吸收**(`__result <= 0`)记成**满额伤害**,
+所以现有 taken 合计对这类命中**可能偏大**;本轮**只测不改**(改它会移动每一个已发布的承伤合计)。
+
 ##### R74(插件 1.7.24):校准仪的**读数单位** —— 1.7.22/1.7.23 的原点修正**一次都没生效**
 
 R71 算对了 0.90 s、R72 把「何时决定」也改对了,但**测量仪一次也没返回过数据**:
