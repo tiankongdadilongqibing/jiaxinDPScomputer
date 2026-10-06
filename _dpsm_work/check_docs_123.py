@@ -141,6 +141,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R70.md',
     # R71: 战斗钟的原点对齐到游戏自己的战斗开始(开局补回 0.90 s;方案 B)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R71.md',
+    # R72: 让原点修正真正落地(在创建 session 处对齐 + 未定案前扣住开局事件再按到达时刻重放)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R72.md',
 ]
 
 

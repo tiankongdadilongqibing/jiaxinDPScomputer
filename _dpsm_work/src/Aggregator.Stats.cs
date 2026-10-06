@@ -58,7 +58,7 @@ public static partial class Aggregator
 		// self-injury must not become the "biggest hit" of an attacker
 		if (!friendly && damage > st.MaxHitDamage) st.MaxHitDamage = damage;
 		st.AddSample(Session.ActiveSeconds, st.DamageDealt);
-		st.AddSecondDamage((int)Session.ActiveSeconds, damage);
+		st.AddSecondDamage(ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds), damage);
 	}
 
 	/// <param name="nominal">
@@ -70,6 +70,17 @@ public static partial class Aggregator
 	{
 		if (damage <= 0 && nominal <= 0) return;
 		if (nominal < damage) nominal = damage;
+		EnsureSessionStartedFor(attacker, victim);
+		// R72: while the battle clock's ORIGIN is undecided this event is HELD, not aggregated (see
+		// ClockOriginHoldPolicy). Aggregating it now would stamp it on the old axis, and R71's shift could
+		// then no longer be applied without publishing two axes in one battle -- which is exactly how the
+		// user's two battles ended up with `reason=events` and no shift at all.
+		if (HoldOriginEvent(false, victim, attacker, owner, damage, nominal)) return;
+		RecordDamageNow(victim, attacker, owner, damage, nominal);
+	}
+
+	private static void RecordDamageNow(BattleObject victim, BattleObject attacker, BattleObject owner, int damage, int nominal)
+	{
 		int absorbed = nominal - damage;
 		EnsureSessionStartedFor(attacker, victim);
 		BeginTimingIfNeeded();
@@ -82,9 +93,9 @@ public static partial class Aggregator
 			victimStats.DamageTaken += damage;
 			victimStats.DamageTakenNominal += nominal;
 			victimStats.DamageAbsorbed += absorbed;
-			victimStats.AddSecondTaken((int)Session.ActiveSeconds, damage);
+			victimStats.AddSecondTaken(ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds), damage);
 			if (CharacterInfo.IsAllyTeam(victimStats.Team))
-				Session.AddTeamTaken((int)Session.ActiveSeconds, damage);
+				Session.AddTeamTaken(ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds), damage);
 		}
 		if (absorbed > 0)
 		{
@@ -304,6 +315,15 @@ public static partial class Aggregator
 	{
 		if (actual <= 0 && nominal <= 0) return;
 		EnsureSessionStartedFor(healer, target);
+		// R72: same hold as the damage path, so a battle cannot end up with a heal on one axis and a hit on
+		// the other (see ClockOriginHoldPolicy).
+		if (HoldOriginEvent(true, target, healer, null, actual, nominal)) return;
+		RecordHealNow(target, healer, actual, nominal);
+	}
+
+	private static void RecordHealNow(BattleObject target, BattleObject healer, int actual, int nominal)
+	{
+		EnsureSessionStartedFor(healer, target);
 		BeginTimingIfNeeded();
 		Rt.EventCount++;
 		Session.NoteEvent();
@@ -312,9 +332,9 @@ public static partial class Aggregator
 		{
 			actor.HealingTaken += actual;
 			actor.HealingTakenNominal += nominal;
-			actor.AddSecondHeal((int)Session.ActiveSeconds, actual);
+			actor.AddSecondHeal(ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds), actual);
 			if (CharacterInfo.IsAllyTeam(actor.Team))
-				Session.AddTeamHeal((int)Session.ActiveSeconds, actual);
+				Session.AddTeamHeal(ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds), actual);
 		}
 		// 1.5.0 (A4): resolved OUTSIDE the block below so the event can carry stable keys. `healerStats` is
 		// null when the healer object is missing, which is exactly what key 0 means.

@@ -37,7 +37,10 @@
     <Compile Include="..\src\Output\JsonText.cs" />
     <Compile Include="..\src\Output\Contribution.cs" />
     <!-- 1.7.2 (阶段 G): the applied-parameter OWNER channel. Compiled (not referenced) for the same
-         reason as the others: its counters and its JSON shape are asserted by execution. -->
+         reason as the others: its counters and its JSON shape are asserted by execution.
+         R72: this file now moves its row stamps by the decided clock-origin lag, so the pure policy that
+         owns that arithmetic is compiled here too (it has no dependencies of its own). -->
+    <Compile Include="..\src\Policy\ClockOriginHoldPolicy.cs" />
     <Compile Include="..\src\Diagnostics\ParamOwnerProbe.cs" />
     <!-- 1.7.4 (阶段 G): the attack-power attribution formula. Pure by construction, so the factor, the
          collision rule and every refusal guard are EXECUTED here rather than eyeballed. -->

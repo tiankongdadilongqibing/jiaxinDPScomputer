@@ -246,17 +246,22 @@ public static partial class Aggregator
 	}
 
 	/// <summary>
-	/// R71: one-shot alignment of the battle clock's ORIGIN with the game's own battle start (the user chose
-	/// this after the defect was measured: see <see cref="BattleClockCalibrationPolicy"/> for the three
-	/// independent measurements -- the auto-skill charge counters, the game's own on-screen battle timer, and
-	/// the page's earliest activation per skill vs the master's `FirstCoolTime`).
+	/// R71/R72: one-shot decision of the battle clock's ORIGIN.
 	///
-	/// Called once per frame from <see cref="Tick"/> BEFORE the frame's advance, and it decides exactly once
-	/// per battle. It only ever ADDS a constant to `ActiveSeconds`/`CombatSeconds`, so:
-	///   * one battle, one origin (never two numbers for one event);
-	///   * every time the plugin publishes shifts together (page, `active=` columns, export
-	///     `events[].t`, `duration`, the per-second buckets);
-	///   * the shift is bounded, reported and refused when the evidence is weak.
+	/// R72 changed WHEN it is attempted, not what it computes. R71 attempted it from the session's SECOND
+	/// frame on and refused whenever `Rt.EventCount != 0` -- and the game stamps its opening damage in the
+	/// very frame the session is created, so the shift was refused in both of the user's battles
+	/// (`[CLOCK] origin=none reason=events hits=5` 0.121 s after one session started, `hits=1` 0.029 s after
+	/// the other) although the auto-skill counters at that moment all said 0.90-0.93 s. The cure is twofold:
+	///   * the decision is attempted when the session is CREATED (<see cref="StartSession"/>), i.e. before
+	///     anything can be stamped -- the common case now needs no correction at all;
+	///   * anything that still arrives before the evidence is HELD and replayed
+	///     (<see cref="ClockOriginHoldPolicy"/>), so the guard below cannot be reached with a published
+	///     event of this battle in the way.
+	///
+	/// Called once per frame from <see cref="Tick"/> and once from the session-creation path; it decides
+	/// exactly once per battle and reports which of the states it entered (applied / off / window / hold /
+	/// events / range), because "no shift" and "refused" must not look alike.
 	/// </summary>
 	private static void TryAlignClockOrigin(GameSystem val, BattleSession s)
 	{
@@ -265,9 +270,8 @@ public static partial class Aggregator
 		{
 			if (Plugin.CfgClockAlign == null || !Plugin.CfgClockAlign.Value)
 			{
-				s.ClockOriginDecided = true;
-				s.ClockOriginReason = "off";
-				RuntimeLog.Write("[CLOCK] origin=none reason=off (General/ClockAlignToBattleStart=false; times start when the plugin saw the battle)");
+				DecideClockOrigin(s, "off", 0.0, 0,
+					"General/ClockAlignToBattleStart=false; times start when the plugin saw the battle");
 				return;
 			}
 			double lag;
@@ -276,49 +280,181 @@ public static partial class Aggregator
 				out lag, out samples);
 			if (samples > 0) s.ClockOriginSamples = samples;
 
-			if (measured && BattleClockCalibrationPolicy.ShouldRebase(lag, s.ActiveSeconds, Rt.EventCount))
+			if (measured && BattleClockCalibrationPolicy.ShouldRebase(lag, s.ActiveSeconds, Rt.EventCount,
+				Rt.OriginHoldOverflowed))
 			{
-				s.ActiveSeconds += lag;
-				s.CombatSeconds += lag;
-				s.ClockOriginShift = lag;
-				s.ClockOriginSamples = samples;
-				s.ClockOriginDecided = true;
-				s.ClockOriginReason = "applied";
-				RuntimeLog.Write("[CLOCK] origin=+" + lag.ToString("F2") + "s samples=" + samples
-					+ " active=" + BattleTime.Log(s.ActiveSeconds) + " hits=" + Rt.EventCount
-					+ " (this battle's times now start at the GAME's battle start)");
+				DecideClockOrigin(s, "applied", lag, samples,
+					"this battle's times now start at the GAME's battle start");
 				return;
 			}
 			// Not yet decidable, or refused for a reason that will not change: give up at the window's edge,
 			// where the calibrating slots are no longer guaranteed to be on their first charge.
 			if (s.ActiveSeconds > BattleClockCalibrationPolicy.WindowSeconds)
 			{
-				s.ClockOriginDecided = true;
-				s.ClockOriginReason = "window";
-				RuntimeLog.Write("[CLOCK] origin=none reason=window samples=" + samples + " active="
-					+ BattleTime.Log(s.ActiveSeconds) + " (times start when the plugin saw the battle)");
+				DecideClockOrigin(s, "window", 0.0, samples,
+					"active is past the calibration window; times start when the plugin saw the battle");
+				return;
+			}
+			if (Rt.OriginHoldOverflowed)
+			{
+				// Events already exist on the old axis (the hold cap was hit): shifting now would put one
+				// battle on two axes, which is worse than a late origin.
+				DecideClockOrigin(s, "hold", 0.0, samples,
+					"more than " + ClockOriginHoldPolicy.MaxHeld + " events arrived before the origin was decided; times start when the plugin saw the battle");
 				return;
 			}
 			if (Rt.EventCount > 0)
 			{
-				s.ClockOriginDecided = true;
-				s.ClockOriginReason = "events";
-				RuntimeLog.Write("[CLOCK] origin=none reason=events hits=" + Rt.EventCount
-					+ " (an event was already stamped; one battle, one origin)");
+				DecideClockOrigin(s, "events", 0.0, samples,
+					"an event was already stamped; one battle, one origin");
 				return;
 			}
 			if (!measured && samples >= BattleClockCalibrationPolicy.MinSamples)
 			{
 				// Samples exist but the combined value was refused (out of bounds): that is not a condition
 				// that improves by waiting, and a wrong shift would corrupt every time in the file.
-				s.ClockOriginDecided = true;
-				s.ClockOriginReason = "range";
-				RuntimeLog.Write("[CLOCK] origin=none reason=range samples=" + samples
-					+ " (combined lag outside [" + BattleClockCalibrationPolicy.MinLagSeconds.ToString("F2") + ", "
-					+ BattleClockCalibrationPolicy.MaxLagSeconds.ToString("F1") + "]s; times unaffected)");
+				DecideClockOrigin(s, "range", 0.0, samples,
+					"combined lag outside [" + BattleClockCalibrationPolicy.MinLagSeconds.ToString("F2") + ", "
+					+ BattleClockCalibrationPolicy.MaxLagSeconds.ToString("F1") + "]s; times unaffected");
 				return;
 			}
-			// Fewer than two usable slots so far: keep trying until the window closes.
+			// Fewer than two usable slots so far: keep trying until the window closes. The events that
+			// arrive in the meantime are held, not published (HoldOriginEvent).
+		}
+		catch { }
+	}
+
+	/// <summary>
+	/// R72: end the origin question for this battle -- apply the shift or refuse it -- and make everything
+	/// that already exists consistent with the answer. ONE exit, so no branch can forget the held events:
+	/// a refusal replays them with no shift, an application replays them on the corrected axis.
+	/// </summary>
+	private static void DecideClockOrigin(BattleSession s, string reason, double lag, int samples, string note)
+	{
+		if (s == null || s.ClockOriginDecided) return;
+		bool applied = lag >= BattleClockCalibrationPolicy.MinLagSeconds;
+		// FIRST, so the replayed events are aggregated instead of being held again.
+		s.ClockOriginDecided = true;
+		s.ClockOriginReason = reason;
+		if (samples > 0) s.ClockOriginSamples = samples;
+		if (applied)
+		{
+			s.ApplyClockOrigin(lag);
+			ShiftStampsOutsideRecorder(lag);
+		}
+		int held = Rt.OriginHeld.Count;
+		FlushOriginHeld(applied ? lag : 0.0);
+		RuntimeLog.Write("[CLOCK] " + (applied ? "origin=+" + lag.ToString("F2") + "s" : "origin=none")
+			+ " reason=" + reason
+			+ " samples=" + s.ClockOriginSamples
+			+ " active=" + BattleTime.Log(s.ActiveSeconds)
+			+ " hits=" + Rt.EventCount
+			+ " held=" + held
+			+ " (" + note + ")");
+	}
+
+	/// <summary>
+	/// R72: the stamps written BEFORE the decision by code paths the held recorder does not cover. Each of
+	/// them stored the battle clock once, so adding the decided lag IS the correction; a path left out would
+	/// be a silently mixed axis (the page's activation rows are the one the user reads).
+	/// </summary>
+	private static void ShiftStampsOutsideRecorder(double lag)
+	{
+		if (!(lag > 0.0)) return;
+		// the 技能时间表 page: the activation stamps the user compares against 初动
+		try { SkillTimelineProbe.ShiftActiveTimes(lag); } catch { }
+		// the charge sampler's per-slot bookkeeping: its intervals are differences, but the "last seen at"
+		// stamp is compared against the live clock
+		try { AutoSkillProbe.ShiftBookkeeping(lag); } catch { }
+		// the diagnostic exports' rows (status applier / talent giver / param owner) and the attack snapshot
+		try { StatusApplierProbe.ShiftTimes(lag); } catch { }
+		try { GiveApplierProbe.ShiftTimes(lag); } catch { }
+		try { ParamOwnerProbe.ShiftTimes(lag); } catch { }
+		try { _active.ShiftAt(lag); } catch { }
+	}
+
+	/// <summary>
+	/// R72: hold one arriving damage/heal event while the origin is undecided, or report the cap.
+	///
+	/// Returns true when the event was held (and must NOT be aggregated now). The cap is a REFUSAL, not a
+	/// silent fallback: once it is hit the shift cannot be applied any more without splitting the battle
+	/// across two origins, so the flag it sets makes <see cref="TryAlignClockOrigin"/> refuse and the event
+	/// is stamped on the old axis like everything before it.
+	/// </summary>
+	private static bool HoldOriginEvent(bool heal, BattleObject victim, BattleObject actor, BattleObject owner,
+		int amount, int nominal)
+	{
+		try
+		{
+			BattleSession s = Session;
+			if (s == null) return false;
+			int held = Rt.OriginHeld.Count;
+			if (ClockOriginHoldPolicy.ShouldHold(s.ClockOriginDecided, held))
+			{
+				Rt.OriginHeld.Add(new OriginHeldEvent
+				{
+					Heal = heal,
+					Victim = victim,
+					Actor = actor,
+					Owner = owner,
+					Amount = amount,
+					Nominal = nominal,
+					ArrivalSeconds = s.ActiveSeconds
+				});
+				return true;
+			}
+			if (ClockOriginHoldPolicy.Overflowed(s.ClockOriginDecided, held) && !Rt.OriginHoldOverflowed)
+			{
+				Rt.OriginHoldOverflowed = true;
+				RuntimeLog.Write("[CLOCK] hold overflow held=" + held + " limit="
+					+ ClockOriginHoldPolicy.MaxHeld
+					+ " (the origin shift is REFUSED so this battle keeps ONE axis)");
+			}
+			return false;
+		}
+		catch { return false; }
+	}
+
+	/// <summary>
+	/// R72: re-aggregate the held events, each at the instant it ARRIVED plus the decided lag (no shift on
+	/// the refusal path). The recorder is entered with the battle clock set to that instant, so every value
+	/// it derives -- `events[].t`, the actor's first/last hit, the per-second bucket, the damage curve, the
+	/// pending-figure match, the reaction deadline -- is written once and already correct; nothing downstream
+	/// has to know that the event was held.
+	///
+	/// Called from the decision, from a finalisation and from a manual reset, so a held event can never be
+	/// dropped silently. The clock is restored afterwards, so the replay is invisible to the frame.
+	/// </summary>
+	internal static void FlushOriginHeld(double lag)
+	{
+		try
+		{
+			BattleSession s = Session;
+			if (s == null) { Rt.OriginHeld.Clear(); return; }
+			int n = Rt.OriginHeld.Count;
+			if (n == 0) return;
+			double savedActive = s.ActiveSeconds;
+			double savedCombat = s.CombatSeconds;
+			for (int i = 0; i < n; i++)
+			{
+				OriginHeldEvent e = Rt.OriginHeld[i];
+				double at = ClockOriginHoldPolicy.ReplayActive(e.ArrivalSeconds, lag);
+				s.ActiveSeconds = at;
+				// The hold window is a fraction of a second and no pause is modelled inside it: the arrival
+				// was, by construction, as unpaused as the decision that follows it.
+				s.CombatSeconds = at;
+				if (e.Heal) RecordHealNow(e.Victim, e.Actor, e.Amount, e.Nominal);
+				else RecordDamageNow(e.Victim, e.Actor, e.Owner, e.Amount, e.Nominal);
+			}
+			Rt.OriginHeld.Clear();
+			s.ActiveSeconds = savedActive;
+			s.CombatSeconds = savedCombat;
+			// The battle DID receive events during the hold, so the "silence" the idle rule measures starts
+			// now: keeping the pre-replay stamp would let it close a session that just got its opening hits.
+			s.LastEventCombat = savedCombat;
+			Rt.OriginHeldReplayed += n;
+			RuntimeLog.Write("[CLOCK] held=" + n + " replayed at +" + lag.ToString("F2")
+				+ "s (event(s) arrived before the origin was decided; stamped at their arrival, not at the replay)");
 		}
 		catch { }
 	}
@@ -328,7 +464,12 @@ public static partial class Aggregator
 		try
 		{
 			if (Session == null || !Session.InBattle) return;
-			int sec = (int)Session.ActiveSeconds;
+			// R72: the HP series is indexed by battle second, so while the origin is undecided a sample
+			// would be filed under the OLD axis and the curve would start 0.9 s early. A sample series loses
+			// nothing by waiting for the decision (one to four frames); every other series is fed by the
+			// held recorder, which is replayed on the corrected axis.
+			if (!Session.ClockOriginDecided) return;
+			int sec = ClockOriginHoldPolicy.SecondIndex(Session.ActiveSeconds);
 			if (sec < 0) return;
 			foreach (var a in Session.OrderedActors)
 			{

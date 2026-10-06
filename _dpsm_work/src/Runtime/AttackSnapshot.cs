@@ -45,4 +45,19 @@ internal sealed class AttackSnapshot<TCalc> where TCalc : class
 	{
 		return now - At;
 	}
+
+	/// <summary>
+	/// R72: move the stamp onto the corrected battle-clock axis, because the ORIGIN of the clock was decided
+	/// after this snapshot was taken (the calc itself is untouched: it describes a hit, and the hit did not
+	/// move). Without this a held event replayed with the corrected clock would compare against a
+	/// pre-correction stamp and fall out of the pairing window -- or, worse, match a later calc.
+	///
+	/// The "never begun" sentinel (-1) is preserved: shifting it would turn "no snapshot" into "a snapshot
+	/// at t=+0.9", which is exactly the previous-battle defect this class was extracted around.
+	/// </summary>
+	public void ShiftAt(double delta)
+	{
+		if (!(At >= 0.0)) return;
+		At = ClockOriginHoldPolicy.Shift(At, delta);
+	}
 }

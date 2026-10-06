@@ -69,15 +69,18 @@ internal static partial class Cases
 		r.Eq("a-manual-reset-keeps-the-start-stamp", c.GameTimeAtStart, 111);
 
 		r.Group("runtime/counters-shape");
-		// The family is COMPLETE and pinned by name: adding a fourteenth counter means deciding its
-		// lifecycle (which transition clears it) and updating this list on purpose.
+		// The family is COMPLETE and pinned by name: adding a member means deciding its lifecycle (which
+		// transition clears it) and updating this list on purpose. R72 added three: the origin hold queue
+		// (cleared by BOTH transitions -- a held hit must not be replayed into a battle that F9 just reset),
+		// its overflow flag and the replayed count (per battle, so only OnSessionStart clears them).
 		var names = new List<string>();
 		foreach (FieldInfo f in typeof(BattleRuntimeCounters).GetFields(BindingFlags.Public | BindingFlags.Instance))
 			names.Add(f.Name);
 		names.Sort();
-		r.Eq("the-family-has-thirteen-counters", names.Count, 13);
+		r.Eq("the-family-has-sixteen-members", names.Count, 16);
 		r.Str("the-family-members-are-pinned", string.Join(",", names),
 		      "AbsorbedHits,AbsorbedTotal,EventCount,GameTimeAtStart,HitDetailErrors,HitDetailProduced,"
-		      + "HitDetailTrimmed,HitMatchExact,HitMatchNone,HitMatchPair,HitMatchRejected,LastSummaryLog,LastTimeLog");
+		      + "HitDetailTrimmed,HitMatchExact,HitMatchNone,HitMatchPair,HitMatchRejected,LastSummaryLog,LastTimeLog,"
+		      + "OriginHeld,OriginHeldReplayed,OriginHoldOverflowed");
 	}
 }

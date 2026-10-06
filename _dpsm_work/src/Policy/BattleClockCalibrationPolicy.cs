@@ -110,9 +110,15 @@ internal static class BattleClockCalibrationPolicy
 	/// wrong: shifting after the first event was stamped (two origins in one battle), shifting outside the
 	/// window (the calibrating slots are no longer on their first charge), or shifting by a value the bounds
 	/// above do not accept.
+	///
+	/// R72: <paramref name="holdOverflowed"/> is the second way an event can already be on the old axis. The
+	/// hold that keeps the battle's opening events out of the way (<see cref="ClockOriginHoldPolicy"/>) is
+	/// bounded; once its cap is reached the events past it ARE published, so the shift must be refused for
+	/// the same reason as <paramref name="eventsRecorded"/>.
 	/// </summary>
-	internal static bool ShouldRebase(double lag, double activeSeconds, int eventsRecorded)
+	internal static bool ShouldRebase(double lag, double activeSeconds, int eventsRecorded, bool holdOverflowed)
 	{
+		if (holdOverflowed) return false;
 		if (eventsRecorded != 0) return false;
 		if (double.IsNaN(activeSeconds) || activeSeconds < 0.0 || activeSeconds > WindowSeconds) return false;
 		if (double.IsNaN(lag)) return false;

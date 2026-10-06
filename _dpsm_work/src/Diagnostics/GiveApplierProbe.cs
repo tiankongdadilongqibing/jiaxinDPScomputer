@@ -184,6 +184,19 @@ internal static class GiveApplierProbe
 		GrantKeyReads = 0; GrantKeyErrors = 0; ExactHits = 0; ExactMisses = 0; TargetOnlyRejected = 0;
 	}
 
+	/// <summary>R72: same correction as <see cref="StatusApplierProbe.ShiftTimes"/> -- this probe is fed by a
+	/// talent-grant hook, not by the held recorder, so its stamps must be moved by hand.</summary>
+	internal static void ShiftTimes(double delta)
+	{
+		if (!(delta > 0.0)) return;
+		for (int i = 0; i < _rows.Count; i++)
+		{
+			Row r = _rows[i];
+			r.T = ClockOriginHoldPolicy.Shift(r.T, delta);
+			_rows[i] = r;
+		}
+	}
+
 	internal static string Summary()
 	{
 		var sb = new StringBuilder(120);

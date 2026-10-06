@@ -105,6 +105,11 @@ public static partial class Aggregator
 				: " (run start)");
 		Plugin.LogSource.LogInfo(text);
 		RuntimeLog.Write(text);
+		// R72: decide the clock's ORIGIN here, while the battle has published NOTHING yet. R71 attempted it
+		// from the next frame on, and the game stamps its opening damage inside this very frame, so the
+		// attempt was refused in every battle the user played (`reason=events`). Anything that still arrives
+		// before the evidence is held and replayed (ClockOriginHoldPolicy).
+		try { TryAlignClockOrigin(val, battleSession); } catch { }
 	}
 
 	public static void EnsureSessionStarted()

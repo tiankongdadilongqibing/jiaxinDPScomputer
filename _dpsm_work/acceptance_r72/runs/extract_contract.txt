@@ -1,0 +1,4 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_extract_contract.py
+extract contract: read=34 extra=29 schemas=2 files=3
+---- extract contract: PASS

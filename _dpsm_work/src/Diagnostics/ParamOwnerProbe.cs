@@ -104,6 +104,21 @@ internal static class ParamOwnerProbe
 		_firstError = "";
 	}
 
+	/// <summary>R72: move the owner rows' first/last stamps onto the corrected battle-clock axis, for the
+	/// rows taken before the origin was decided (this probe is fed by a parameter walk, not by the held
+	/// recorder). Both ends of a row move, so the interval it describes is unchanged.</summary>
+	internal static void ShiftTimes(double delta)
+	{
+		if (!(delta > 0.0)) return;
+		for (int i = 0; i < _union.Count; i++)
+		{
+			Row r = _union[i];
+			r.FirstT = ClockOriginHoldPolicy.Shift(r.FirstT, delta);
+			r.LastT = ClockOriginHoldPolicy.Shift(r.LastT, delta);
+			_union[i] = r;
+		}
+	}
+
 	/// <summary>Called ONCE per walk by the same code that produced the owner rows.
 	///
 	/// 1.7.2 rev2 (pre-review Q6): the FIRST cut stopped iterating at 64 entries, so 8,908 of 24,447

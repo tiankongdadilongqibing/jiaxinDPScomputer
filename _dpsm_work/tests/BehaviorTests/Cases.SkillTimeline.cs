@@ -294,17 +294,21 @@ internal static partial class Cases
 			0.0);
 
 		// The decision: one battle, one origin -- and only inside the window, before the first event.
-		r.True("a-measured-lag-is-applied", BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 0));
+		r.True("a-measured-lag-is-applied", BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 0, false));
 		r.True("the-shift-is-refused-after-an-event",
-			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 1));
+			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 1, false));
 		r.True("the-shift-is-refused-outside-the-window",
-			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 3.0, 0));
+			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 3.0, 0, false));
 		r.True("the-shift-is-refused-below-the-minimum",
-			!BattleClockCalibrationPolicy.ShouldRebase(0.01, 0.03, 0));
+			!BattleClockCalibrationPolicy.ShouldRebase(0.01, 0.03, 0, false));
 		r.True("the-shift-is-refused-above-the-maximum",
-			!BattleClockCalibrationPolicy.ShouldRebase(6.0, 0.03, 0));
-		r.True("a-zero-lag-is-not-a-shift", !BattleClockCalibrationPolicy.ShouldRebase(0.0, 0.03, 0));
-		r.True("a-nan-lag-is-refused", !BattleClockCalibrationPolicy.ShouldRebase(double.NaN, 0.03, 0));
+			!BattleClockCalibrationPolicy.ShouldRebase(6.0, 0.03, 0, false));
+		r.True("a-zero-lag-is-not-a-shift", !BattleClockCalibrationPolicy.ShouldRebase(0.0, 0.03, 0, false));
+		r.True("a-nan-lag-is-refused", !BattleClockCalibrationPolicy.ShouldRebase(double.NaN, 0.03, 0, false));
+		// R72: the hold cap is the SECOND way an event can already sit on the old axis (the first is
+		// `eventsRecorded`), and it refuses the shift for the same reason: one battle, one origin.
+		r.True("a-hold-overflow-refuses-the-shift",
+			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 0, true));
 		r.Eq("the-bounds-are-pinned",
 			BattleClockCalibrationPolicy.MinSamples * 1000 + (int)(BattleClockCalibrationPolicy.MinLagSeconds * 100)
 			+ (int)BattleClockCalibrationPolicy.MaxLagSeconds, 2000 + 5 + 5);

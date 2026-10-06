@@ -358,6 +358,33 @@ internal static class SkillTimelineProbe
 		lock (Gate) return new List<SkillTimelineEvent>(Events);
 	}
 
+	/// <summary>
+	/// R72: move the activation stamps collected so far onto the corrected battle-clock axis, because the
+	/// clock's ORIGIN was decided after they were taken (the auto-skill command hook runs outside the frame
+	/// loop, so a row can exist before any frame-level decision). Exact: every stamp is a constant offset from
+	/// the origin, so one addition IS the corrected value -- and the FOLD is unaffected, because folding
+	/// compares differences.
+	///
+	/// ONLY `Active` moves. `Wall` is real seconds since the session started, which the shift does not
+	/// change; the page's axis and every published time are the battle clock.
+	/// </summary>
+	internal static void ShiftActiveTimes(double delta)
+	{
+		if (!(delta > 0.0)) return;
+		try
+		{
+			lock (Gate)
+			{
+				for (int i = 0; i < Events.Count; i++)
+				{
+					SkillTimelineEvent e = Events[i];
+					if (e != null) e.Active = ClockOriginHoldPolicy.Shift(e.Active, delta);
+				}
+			}
+		}
+		catch { ReadErrors++; }
+	}
+
 	/// <summary>R69: the attempt tallies, copied under the lock. The row objects are copied too, because the
 	/// page reads them after the lock is released and the hooks keep incrementing them.</summary>
 	internal static List<SkillTimelineAttempt> AttemptSnapshot()

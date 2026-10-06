@@ -12,6 +12,11 @@ public static partial class Aggregator
 
 	private static void FinalizeLocked(BattleSession s, GameResult result, string why)
 	{
+		// R72: a held event must never be dropped by the end of the battle. Flush BEFORE anything reads the
+		// totals (including `s.InBattle = false` below -- the replay goes through the recorder, which needs a
+		// live session), with no shift: at this point the origin question is over, and an unshifted replay is
+		// the only consistent answer available.
+		try { FlushOriginHeld(0.0); } catch { }
 		s.InBattle = false;
 		// R56 (BID-1, plan §3/§4): stamp the close BEFORE anything reads the identity, so the export,
 		// the evidence bundle, the summary and the overlay all describe the same state/reason pair. A

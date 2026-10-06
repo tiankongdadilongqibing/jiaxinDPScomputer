@@ -119,6 +119,20 @@ internal static class StatusApplierProbe
 		SelfApplied = 0;
 	}
 
+	/// <summary>R72: move the rows taken before the battle clock's ORIGIN was decided onto the corrected
+	/// axis. This probe is fed by a status hook, which is not the recorder that R72 holds, so its stamps are
+	/// the ones that would otherwise stay 0.9 s early in the export.</summary>
+	internal static void ShiftTimes(double delta)
+	{
+		if (!(delta > 0.0)) return;
+		for (int i = 0; i < _rows.Count; i++)
+		{
+			Row r = _rows[i];
+			r.T = ClockOriginHoldPolicy.Shift(r.T, delta);
+			_rows[i] = r;
+		}
+	}
+
 	internal static string Summary()
 	{
 		var sb = new StringBuilder(96);

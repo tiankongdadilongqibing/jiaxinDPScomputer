@@ -95,6 +95,36 @@ public sealed class BattleSession
 	/// stops looking. Never reset within a battle.</summary>
 	public bool ClockOriginDecided;
 
+	/// <summary>
+	/// R71/R72: apply the decided origin shift. ONE place moves the battle clock, and it moves everything the
+	/// session itself stamped before the decision:
+	///   * `ActiveSeconds`/`CombatSeconds` (so every later stamp is on the new axis) and `LastEventCombat`
+	///     (so the idle rule measures silence on the same axis);
+	///   * the pending damage figures (`PendingHits[].T`), which the damage CALC hooks write outside the
+	///     recorder: a figure produced before the shift must stay inside the 0.35 s pairing window of the
+	///     hit it belongs to, and the hit is about to be replayed on the corrected axis.
+	///
+	/// The damage/heal events themselves are NOT edited here: they are held and re-aggregated (see
+	/// <see cref="ClockOriginHoldPolicy"/>), so their stamps are written once, correctly. This method is
+	/// called before that replay, with the same lag.
+	///
+	/// Only ever ADDS a constant, so: one battle, one origin; every published time (page, `active=` columns,
+	/// export `events[].t`/`duration`, per-second buckets) moves together.
+	/// </summary>
+	public void ApplyClockOrigin(double lag)
+	{
+		if (double.IsNaN(lag) || lag <= 0.0) return;
+		ActiveSeconds += lag;
+		CombatSeconds += lag;
+		if (LastEventCombat >= 0.0) LastEventCombat += lag;
+		ClockOriginShift = lag;
+		for (int i = 0; i < PendingHits.Count; i++)
+		{
+			HitRecord h = PendingHits[i];
+			if (h != null) h.T = ClockOriginHoldPolicy.Shift(h.T, lag);
+		}
+	}
+
 	/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).
 	/// The only place battle time is accumulated.</summary>
 	public void Advance(double dt, bool paused)

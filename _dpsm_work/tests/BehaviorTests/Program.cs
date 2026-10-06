@@ -13,8 +13,13 @@ internal static class Program
 	/// delta).
 	/// R71: 1171 -> 1205 (+34: +31 policy/battle-clock-calibration for the origin shift -- the lag arithmetic
 	/// from the charge counters, its bounds, the median, the one-origin-per-battle rule -- plus 3 for the
-	/// page's origin line).</summary>
-	public const int ExpectedCases = 1205;
+	/// page's origin line).
+	/// R72: 1205 -> 1254 (+49: +48 for the hold that makes the shift LAND -- policy/clock-origin-hold 33,
+	/// runtime/clock-origin 11, runtime/clock-origin-counter 4 -- plus 1 case for the hold-overflow refusal
+	/// in policy/battle-clock-calibration, and the counters-shape pin moved from 13 to 16 members, which is
+	/// a rename rather than a new case).
+	/// </summary>
+	public const int ExpectedCases = 1254;
 
 	private static int Main(string[] args)
 	{
@@ -84,6 +89,9 @@ internal static class Program
 		// R66: the 技能时间表 -- one row per (unit, skill) out of a raw activation stream (merge window,
 		// battle-clock axis, order, burst/overflow marks) plus the page text built from it.
 		Cases.SkillTimeline(r);
+		// R72: the hold that makes R71's origin shift land (an event that arrives before the evidence is
+		// replayed on the corrected axis instead of blocking the shift).
+		Cases.ClockOriginHoldCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

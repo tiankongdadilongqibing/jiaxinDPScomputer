@@ -227,6 +227,32 @@ internal static class AutoSkillProbe
 	}
 
 	/// <summary>
+	/// R72: move the per-slot stamps that were taken before the battle clock's ORIGIN was decided onto the
+	/// corrected axis. <see cref="SlotState.LastActive"/>/<see cref="SlotState.PrevActActive"/> are compared
+	/// against the live clock, so leaving them on the old axis would make the first interval after the
+	/// decision read 0.9 s too long (and the charge rate derived from it too slow) -- a probe artefact that
+	/// would look like a game behaviour.
+	///
+	/// The WALL stamps deliberately do not move: real seconds are not a battle-clock quantity.
+	/// </summary>
+	internal static void ShiftBookkeeping(double delta)
+	{
+		if (!(delta > 0.0)) return;
+		try
+		{
+			foreach (KeyValuePair<string, SlotState> kv in Slots)
+			{
+				SlotState st = kv.Value;
+				if (st == null) continue;
+				st.LastActive = ClockOriginHoldPolicy.Shift(st.LastActive, delta);
+				if (st.HasActivation)
+					st.PrevActActive = ClockOriginHoldPolicy.Shift(st.PrevActActive, delta);
+			}
+		}
+		catch { ReadErrors++; }
+	}
+
+	/// <summary>
 	/// The command postfix. Called from <see cref="AutoSkillHooks"/> with only the arguments a
 	/// `Player`+`int` signature can supply: the `Vector3` parameter is deliberately NOT declared, because
 	/// materialising an argument is the part of a detour that has crashed this plugin before

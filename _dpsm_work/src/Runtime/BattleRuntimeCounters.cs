@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DpsMeter;
 
 /// <summary>
@@ -63,6 +65,26 @@ internal sealed class BattleRuntimeCounters
 	/// facade owns every native read.</summary>
 	public int GameTimeAtStart;
 
+	/// <summary>
+	/// R72: the damage/heal events that arrived BEFORE the battle clock's origin was decided, in arrival
+	/// order. They are replayed through the recorder with the clock set to their arrival instant plus the
+	/// decided lag, so a battle never publishes two origins (see <see cref="ClockOriginHoldPolicy"/>).
+	///
+	/// Per battle, and therefore cleared by BOTH transitions below: a new session starts with an empty
+	/// queue, and F9 drops the battle's content, so re-adding a hit to the battle that was just reset
+	/// would resurrect damage the user asked to forget.
+	/// </summary>
+	public readonly List<OriginHeldEvent> OriginHeld = new List<OriginHeldEvent>();
+
+	/// <summary>R72: true once <see cref="ClockOriginHoldPolicy.MaxHeld"/> was reached while the origin was
+	/// still undecided. Reported in the `[CLOCK]` line and passed to
+	/// <see cref="BattleClockCalibrationPolicy.ShouldRebase"/> as a REFUSAL: with events already stamped on
+	/// the old axis, applying the shift would split the battle across two origins.</summary>
+	public bool OriginHoldOverflowed;
+
+	/// <summary>R72: held events that were replayed at the decided shift (the `[CLOCK]` line's `held=`).</summary>
+	public int OriginHeldReplayed;
+
 	/// <summary>A new battle: everything above starts at zero.</summary>
 	public void OnSessionStart()
 	{
@@ -78,15 +100,23 @@ internal sealed class BattleRuntimeCounters
 		HitMatchRejected = 0;
 		LastSummaryLog = 0.0;
 		LastTimeLog = 0.0;
+		OriginHeld.Clear();
+		OriginHoldOverflowed = false;
+		OriginHeldReplayed = 0;
 	}
 
 	/// <summary>
 	/// F9 / manual reset. ONLY the event count is dropped: the players are re-listed (ResetActors) and the
 	/// event count restarts, while the absorbed totals and the damage-detail self-report still describe the
 	/// whole battle and are deliberately kept -- the export reports them at the end.
+	///
+	/// R72: the ORIGIN HOLD is dropped too, and that is not the same decision as the counters above: the
+	/// reset clears the actors and the event log, so a held event replayed afterwards would add damage to a
+	/// battle that no longer has the actor it belonged to.
 	/// </summary>
 	public void OnManualReset()
 	{
 		EventCount = 0;
+		OriginHeld.Clear();
 	}
 }
