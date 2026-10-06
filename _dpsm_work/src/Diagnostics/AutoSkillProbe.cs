@@ -161,6 +161,11 @@ internal static class AutoSkillProbe
 
 	private static double _lastScanWall = double.MinValue;
 
+	/// <summary>R74: the calibration sampler's own evidence, printed as one `[CLOCK] calib` line when the
+	/// origin is decided (see `Aggregator.DecideClockOrigin`). Filled by every attempt inside the window,
+	/// cleared per battle by <see cref="Reset"/>. Pure container: `Policy/ClockLagDiagnostics.cs`.</summary>
+	internal static readonly ClockLagDiagnostics Calib = new ClockLagDiagnostics();
+
 	/// <summary>Per (unit, slot) state. R65: keyed by `EntryId|name|skillId` -- NOT by the slot index --
 	/// because `Player.AutoSkill1` can hand back a DIFFERENT `Skill` over time (measured 2026-10-06:
 	/// T.O.W.E.R.typeR's slot read `CoolTimeFrame` 420 in two `cmd` rows and 300 in every `chg` sample),
@@ -203,6 +208,7 @@ internal static class AutoSkillProbe
 		InstanceTags.Clear();
 		_instSeq = 0;
 		_lastScanWall = double.MinValue;
+		Calib.Clear();
 		SampleRows = 0;
 		CommandActivations = 0;
 		AttemptRows = 0;
@@ -399,8 +405,9 @@ internal static class AutoSkillProbe
 
 	/// <summary>
 	/// R71: measure how much our battle clock LAGS the game's battle start, from the auto-skill slots that
-	/// are still on their FIRST charge (`Skill.FirstCoolTime` vs `Skill.WaitCountFrame`; see
-	/// <see cref="BattleClockCalibrationPolicy"/> for why that difference IS the origin offset).
+	/// are still on their FIRST charge (the first charge in game UNITS vs `Skill.WaitCountFrame`; see
+	/// <see cref="BattleClockCalibrationPolicy"/> for why that difference IS the origin offset, and R74's
+	/// <see cref="BattleClockCalibrationPolicy.FirstCoolFrames"/> for which reading supplies the unit value).
 	///
 	/// Only the two NAMED auto slots are read. The 奥義/特殊 slots are not: their initial counter value was
 	/// never measured, and a wrong-but-plausible reading there would shift every time in the battle.
@@ -417,9 +424,11 @@ internal static class AutoSkillProbe
 		samples = 0;
 		try
 		{
+			Calib.Attempts++;
 			if (val == null) return false;
 			var party = new List<Player>(16);
 			CollectParty(val, party, false);
+			if (party.Count > Calib.Party) Calib.Party = party.Count;
 			var lags = new List<double>(party.Count * 2);
 			for (int i = 0; i < party.Count; i++)
 			{
@@ -428,6 +437,7 @@ internal static class AutoSkillProbe
 				if (lags.Count >= BattleClockCalibrationPolicy.MaxSamples) break;
 			}
 			samples = lags.Count;
+			Calib.Usable += lags.Count;
 			if (lags.Count < BattleClockCalibrationPolicy.MinSamples) return false;
 			lag = BattleClockCalibrationPolicy.Combine(lags);
 			return lag > 0.0;
@@ -438,11 +448,24 @@ internal static class AutoSkillProbe
 	private static void AddClockLagSample(List<double> into, Skill sk, double unitsPerSecond, double activeSeconds)
 	{
 		if (sk == null || into.Count >= BattleClockCalibrationPolicy.MaxSamples) return;
-		int first = 0, wait = 0;
-		try { first = sk.FirstCoolTime; } catch { ReadErrors++; return; }
+		// R74: BOTH readings, unconditionally. `FirstCoolTime` is the property R71/R72 wrongly handed to the
+		// policy as a unit count, and `m_firstCoolTimeFrame` is the frame-denominated field the interop
+		// metadata puts next to `m_coolTimeFrame` ON THE MASTER-DATA OBJECT (R74: `Skill.m_firstCoolTimeFrame`
+		// is CS1061; `Skill.m_data.m_firstCoolTimeFrame` compiles). Printing them together is what settles the
+		// unit question from the battle's own log instead of from the master table.
+		int seconds = ReadFirstCoolSeconds(sk);
+		int frame = ReadFirstCoolFrame(sk);
+		int wait = 0;
 		try { wait = sk.WaitCountFrame; } catch { ReadErrors++; return; }
+		bool usedFallback;
+		int first = BattleClockCalibrationPolicy.FirstCoolFrames(seconds, frame, unitsPerSecond, out usedFallback);
+		Calib.SlotsRead++;
+		Calib.NoteReading(seconds, frame, wait, usedFallback);
 		double lag;
-		if (BattleClockCalibrationPolicy.TryLag(first, wait, unitsPerSecond, activeSeconds, out lag)) into.Add(lag);
+		BattleClockCalibrationPolicy.LagReason why =
+			BattleClockCalibrationPolicy.Reject(first, wait, unitsPerSecond, activeSeconds, out lag);
+		Calib.Note(why);
+		if (why == BattleClockCalibrationPolicy.LagReason.Usable) into.Add(lag);
 	}
 
 	private static void ObservePlayer(Player p, BattleSession s, double wall)
@@ -643,6 +666,12 @@ internal static class AutoSkillProbe
 			.Append(" status=").Append(status)
 			.Append(" wait=").Append(wait).Append('/').Append(cool)
 			.Append(" ct=").Append(ReadCoolSeconds(sk))
+			// R74: the two first-charge readings side by side. `first=` is the SECONDS property (what
+			// R71/R72 used as if it were a unit count), `firstFrame=` is the frame-denominated field the
+			// calibration now prefers. Printed on every sample so one battle answers both open questions:
+			// "seconds or units" and "initial value or live remaining".
+			.Append(" first=").Append(ReadFirstCoolSeconds(sk))
+			.Append(" firstFrame=").Append(ReadFirstCoolFrame(sk))
 			.Append(" dur=").Append(ReadDuration(sk))
 			.Append(" stock=").Append(ReadStock(sk))
 			.Append(" passiveAuto=").Append(ReadIsPassiveAuto(sk) ? 1 : 0)
@@ -957,6 +986,24 @@ internal static class AutoSkillProbe
 	{
 		if (sk == null) return int.MinValue;
 		try { return sk.CoolTimeFrame; } catch { ReadErrors++; return int.MinValue; }
+	}
+
+	/// <summary>R74: `Skill.FirstCoolTime`, the SECONDS sibling of `Skill.CoolTime` (see
+	/// `BattleClockCalibrationPolicy.FirstCoolFrames` for the unit argument). Read for the diagnostic and as
+	/// the fallback source only; `int.MinValue` = unreadable, never a silent 0.</summary>
+	private static int ReadFirstCoolSeconds(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return sk.FirstCoolTime; } catch { ReadErrors++; return int.MinValue; }
+	}
+
+	/// <summary>R74: `m_firstCoolTimeFrame`, the frame-denominated first charge (the sibling of
+	/// `m_coolTimeFrame`, produced by the game's own `CalcFirstCoolTimeFrame`). `int.MinValue` = unreadable,
+	/// never a silent 0.</summary>
+	private static int ReadFirstCoolFrame(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return sk.m_data.m_firstCoolTimeFrame; } catch { ReadErrors++; return int.MinValue; }
 	}
 
 	private static int ReadCoolSeconds(Skill sk)

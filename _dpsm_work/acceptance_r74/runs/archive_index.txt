@@ -1,0 +1,4 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\archive_index.py
+archive index: recorded=56 rooted=evidence_,probe_,review_contrib_core
+---- archive index: PASS

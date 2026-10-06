@@ -317,6 +317,84 @@ internal static partial class Cases
 		var fresh = new BattleSession();
 		r.EqD("a-fresh-session-has-no-origin-shift", fresh.ClockOriginShift, 0.0);
 		r.Eq("a-fresh-session-has-not-decided-yet", fresh.ClockOriginDecided ? 1 : 0, 0);
+
+		// ---- R74: the SAME clauses, now NAMED ----
+		// R73 spent two rounds on "why is samples=0" because the only signal a refusal produced was a
+		// boolean, and the `[CLOCK] samples=` it printed is structurally 0 on the deciding path (that frame
+		// always fails the window clause). These cases pin which clause answered.
+		r.Eq("the-reason-of-a-usable-reading",
+			(long)BattleClockCalibrationPolicy.Reject(120, 92, 30.0, 0.03, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.Usable);
+		r.Eq("the-reason-of-a-missing-first-charge",
+			(long)BattleClockCalibrationPolicy.Reject(0, 0, 30.0, 0.03, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.NoFirstCool);
+		// THE R71/R72 DEFECT, named: a first charge read in SECONDS (6) against a counter in UNITS (150)
+		// lands here -- and this is why every slot was refused in every frame of both battles.
+		r.Eq("the-reason-of-seconds-compared-against-units",
+			(long)BattleClockCalibrationPolicy.Reject(6, 150, 30.0, 0.07, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.WaitOutOfRange);
+		r.Eq("the-reason-of-a-counter-above-its-first-charge",
+			(long)BattleClockCalibrationPolicy.Reject(120, 121, 30.0, 0.03, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.WaitOutOfRange);
+		r.Eq("the-reason-of-a-negative-counter",
+			(long)BattleClockCalibrationPolicy.Reject(120, -1, 30.0, 0.03, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.WaitOutOfRange);
+		r.Eq("the-reason-of-unknown-units",
+			(long)BattleClockCalibrationPolicy.Reject(120, 92, 0.0, 0.03, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.BadUnits);
+		r.Eq("the-reason-of-a-clock-outside-the-window",
+			(long)BattleClockCalibrationPolicy.Reject(900, 800, 30.0, 5.0, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.OutOfWindow);
+		r.Eq("the-reason-of-an-absurd-lag",
+			(long)BattleClockCalibrationPolicy.Reject(9000, 0, 30.0, 0.0, out lag),
+			(long)BattleClockCalibrationPolicy.LagReason.LagOutOfRange);
+		// The wrapper and the reason can never disagree: the boolean is defined as "reason == Usable".
+		r.Eq("trylag-and-reject-never-disagree",
+			AgreeCount(), 12);
+
+		// ---- R74: which reading supplies the first charge in UNITS ----
+		// The frame-denominated field wins when it answers; the seconds property is the fallback, and the
+		// route is reported so a fallback can never be read as a measurement.
+		bool fallback;
+		r.Eq("the-frame-field-wins-over-the-seconds-property",
+			BattleClockCalibrationPolicy.FirstCoolFrames(6, 180, 30.0, out fallback) + (fallback ? 100000 : 0), 180);
+		r.Eq("the-seconds-property-is-only-a-fallback",
+			BattleClockCalibrationPolicy.FirstCoolFrames(6, 0, 30.0, out fallback) + (fallback ? 100000 : 0), 100180);
+		r.Eq("a-fallback-without-units-is-refused",
+			BattleClockCalibrationPolicy.FirstCoolFrames(6, 0, 0.0, out fallback) + (fallback ? 100000 : 0), 0);
+		r.Eq("a-fallback-without-seconds-is-refused",
+			BattleClockCalibrationPolicy.FirstCoolFrames(0, 0, 30.0, out fallback) + (fallback ? 100000 : 0), 0);
+		// An unreadable field is `int.MinValue`, never a silent 0: neither reading may become a first charge.
+		r.Eq("an-unreadable-reading-is-never-a-first-charge",
+			BattleClockCalibrationPolicy.FirstCoolFrames(int.MinValue, int.MinValue, 30.0, out fallback)
+			+ (fallback ? 100000 : 0), 0);
+		// The fallback is a division-undone, so it rounds to the nearest unit instead of truncating (3 s at
+		// 30.5 units/s is 91.5 units -> 92, and truncation would publish 91).
+		r.Eq("the-fallback-rounds-to-the-nearest-unit",
+			BattleClockCalibrationPolicy.FirstCoolFrames(3, 0, 30.5, out fallback) + (fallback ? 100000 : 0), 100092);
+	}
+
+	/// <summary>R74: how many of the twelve probe readings agree between <see cref="BattleClockCalibrationPolicy.TryLag"/>
+	/// and `Reject(...) == Usable`. A wrong number here means the wrapper and the reason drifted apart.</summary>
+	private static long AgreeCount()
+	{
+		int[,] probes =
+		{
+			{ 120, 92 }, { 120, 120 }, { 0, 0 }, { -300, 100 }, { 120, 121 }, { 120, -1 },
+			{ 6, 150 }, { 9000, 0 }, { 30, 30 }, { 300, 0 }, { 1, 1 }, { 2970, 2940 },
+		};
+		double[] actives = { 0.03, 0.0, 0.03, 0.03, 0.03, 0.03, 0.07, 0.0, 1.99, 2.01, 0.5, 2.0 };
+		long agree = 0;
+		for (int i = 0; i < actives.Length; i++)
+		{
+			double lagA;
+			bool a = BattleClockCalibrationPolicy.TryLag(probes[i, 0], probes[i, 1], 30.0, actives[i], out lagA);
+			double lagB;
+			bool b = BattleClockCalibrationPolicy.Reject(probes[i, 0], probes[i, 1], 30.0, actives[i], out lagB)
+				== BattleClockCalibrationPolicy.LagReason.Usable;
+			if (a == b && Math.Abs(lagA - lagB) < 1e-12) agree++;
+		}
+		return agree;
 	}
 
 	// ------------------------------------------------------------------ R70: whose skills are these

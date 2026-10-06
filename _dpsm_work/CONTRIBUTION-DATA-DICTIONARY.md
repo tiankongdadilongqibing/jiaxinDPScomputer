@@ -1111,3 +1111,30 @@ R71 算对了 lag,却因为**顺序**而每场都拒绝:它只在「本场第 2 
 - `[CLOCK]` 行**每条分支都带同样的字段**:`origin=+0.90s|none reason=… samples=N active=… hits=N held=N`;
 - **口径不变**:1.7.23 与 1.7.22 的 `ActiveSeconds` 是同一条轴(游戏自己的战斗开始);变的只是**它现在真的被应用**。
   引用 1.7.23 之前的文件时,先看那一场的 `[CLOCK]` 行:`origin=none reason=events` 表示**那场仍是旧原点**。
+
+##### R74(插件 1.7.24):校准仪的**读数单位** —— 1.7.22/1.7.23 的原点修正**一次都没生效**
+
+R71 算对了 0.90 s、R72 把「何时决定」也改对了,但**测量仪一次也没返回过数据**:
+
+- 校准读的是 `Skill.FirstCoolTime`,它是 `Skill.CoolTime` 的**同级属性 = 秒**(插件自己用
+  `Skill.CoolTimeFrame / Skill.CoolTime` = 240/8 = 30 得到「每游戏秒 30 单位」),却被当成**单位**去和
+  `WaitCountFrame`(=150 之类)比较 ⇒ `waitFrames > firstCoolFrames` 把**每个槽、每一帧**都拒掉 ⇒
+  `samples` 恒 0 ⇒ 原点永不 decided ⇒ `[CLOCK] origin=none` 是每一场的**必然**。
+- **口径后果(引用文件时必须先看这一行)**:凡 `[CLOCK] origin=none` 的场次(实测 1.7.22 与 1.7.23 **每一场**都是),
+  其绝对时刻**仍旧是旧原点**(比游戏自己的初动/冷却/屏幕倒计时早约 0.9 s);相对量(份额、DPS、间隔)不受影响。
+- R74 改读**单位制**的 `Skill.m_data.m_firstCoolTimeFrame`(字段在**主数据**类上;`Skill` 本身没有这个名字 ——
+  R73 的「挂在 `Skill` 上」被编译器以 CS1061 纠正),秒值 `FirstCoolTime × unitsPerGameSecond` 只作**记录在案的退路**
+  (`FirstCoolFrames(..., out usedFallback)`),因为「用哪条路」必须能被分辨。
+- 新增诊断(**不是导出契约**,只是可诊断性):
+  - `[CLOCK] calib attempts=… party=… slots=… usable=… via(field/fallback)=…/… first(sec/frame/wait)=…/…/…
+    rejected(noFirst/wait/units/window/range)=…/…/…/…/…`
+    —— 决定帧**必然**过不了窗口条款,所以旧的 `samples=0` 在 `window` 路径上天然为 0,「没槽能回答」与「窗口先关」
+    长得一模一样(这正是 R71/R72 两轮说不清原因的地方);
+  - `[AUTOSK] chg` 行新增 `first=`(秒属性)与 `firstFrame=`(单位字段);**读不到打印 `?...` 而不是 0**
+    (「读不到」和「读到 0」必须是两个答案)。
+- **证据包新增 `skill_timeline.txt`**:技能时间线(与 F4 页面、战末 `[SKILLTL]` 行**同一批字符串**),在上一步列入
+  `manifest.json` 并校验 ⇒ **旧包没有它、新包有**;探针关掉时不生成该文件(manifest 的 `notes` 说明这一点),所以
+  「文件缺席」不能被读成「没有发动」。导出契约(`contribution.schemaVersion`)与 `battle.json` 的形状**都没变**。
+- **仍未定案**:`m_firstCoolTimeFrame` 是初始/目标值还是实时剩余值(本轮不写死 —— 实时剩余会让算出的 lag ≈ −active
+  被既有边界拒),以及实机确认(需要一场新战斗的 `[CLOCK] origin=+0.9Xs` + `calib … usable=N via(field/fallback)=N/0`)。
+

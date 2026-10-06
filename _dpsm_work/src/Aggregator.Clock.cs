@@ -351,6 +351,10 @@ public static partial class Aggregator
 			+ " hits=" + Rt.EventCount
 			+ " held=" + held
 			+ " (" + note + ")");
+		// R74: the sampler's own counters, one bucket each. R73 needed a whole round to prove that
+		// `samples=0` cannot tell "no slot answered" from "the window closed first" -- the deciding frame
+		// ALWAYS fails the window clause, so that number is structurally 0 on this path. Printed next to it.
+		try { RuntimeLog.Write("[CLOCK] calib " + AutoSkillProbe.Calib.Describe()); } catch { }
 	}
 
 	/// <summary>

@@ -143,6 +143,10 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R71.md',
     # R72: 让原点修正真正落地(在创建 session 处对齐 + 未定案前扣住开局事件再按到达时刻重放)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R72.md',
+    # R74: 校准仪的读数单位(初动改读 m_firstCoolTimeFrame)+ 拒因具名 + [CLOCK] calib 行 + 时间线进证据包
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R74.md',
+    # 会心逐击可观测性调查 + 折衷方案(报告,非逐轮记录)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
 ]
 
 

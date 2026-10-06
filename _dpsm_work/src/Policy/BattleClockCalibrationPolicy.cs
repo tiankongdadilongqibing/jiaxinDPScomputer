@@ -65,22 +65,98 @@ internal static class BattleClockCalibrationPolicy
 	internal const int MaxSamples = 16;
 
 	/// <summary>
-	/// One slot's contribution, or false when the slot cannot answer: an unreadable/zero `FirstCoolTime`
-	/// (a skill without a first charge, e.g. an 奥義 that starts ready), a counter that is not inside
-	/// `[0, FirstCoolTime]` (it already fired and was reset to `CoolTime`, or the fields disagreed), or a
-	/// clock that is not inside the calibration window.
+	/// R74: WHY a slot's reading was not usable. R73 needed two rounds to answer "why is `samples=0`"
+	/// because a refusal could not name itself: the deciding frame ALWAYS rejects on the window clause
+	/// (`TryAlignClockOrigin` only decides once `ActiveSeconds > WindowSeconds`), so the `samples=` it
+	/// printed was structurally 0, and the real cause -- every slot refused by `waitFrames > firstCoolFrames`
+	/// because the value handed in was in SECONDS while the counter is in UNITS -- stayed invisible in both
+	/// the R71 and the R72 log.
+	/// </summary>
+	internal enum LagReason
+	{
+		Usable = 0,
+		/// <summary>No readable first charge (the frame-denominated field did not resolve and the seconds
+		/// fallback produced nothing): a slot that starts ready, e.g. an over-skill with no first wait.</summary>
+		NoFirstCool,
+		/// <summary>The live counter is not inside `[0, firstCool]`: either it already fired and was reset to
+		/// `CoolTime`, or the two readings are in different units (exactly the R71/R72 defect).</summary>
+		WaitOutOfRange,
+		/// <summary>Units per game second unknown (`Skill.CoolTimeFrame / Skill.CoolTime` unreadable).</summary>
+		BadUnits,
+		/// <summary>Our clock is outside the calibration window: the calibrating slots are no longer
+		/// guaranteed to be on their first charge, so no reading taken now may move the axis.</summary>
+		OutOfWindow,
+		/// <summary>Inside the window, but outside the accepted lag bounds (see <see cref="MinLagSeconds"/>,
+		/// <see cref="MaxAheadSeconds"/> and <see cref="MaxLagSeconds"/>).</summary>
+		LagOutOfRange
+	}
+
+	/// <summary>
+	/// R74: the FIRST CHARGE in game UNITS, from the two readings the runtime `Skill` offers.
+	///
+	/// R73 (read from `BepInEx/interop/Assembly-CSharp.dll`) and R74 (settled by the compiler): the runtime
+	/// `Skill` has NO `FirstCoolTimeFrame` property and no `m_firstCoolTimeFrame` FIELD either --
+	/// `get_FirstCoolTimeFrame` occurs 0 times, and the only member named `m_firstCoolTimeFrame` sits in the
+	/// MASTER-DATA member block next to `m_coolTimeFrame`, `SetCoolTimeFrame` and the game's own
+	/// `CalcFirstCoolTimeFrame`/`GetFirstCoolTimeFrame`, i.e. it is reached as
+	/// `Skill.m_data.m_firstCoolTimeFrame` (`Skill.m_firstCoolTimeFrame` is a compile error, CS1061).
+	/// `FirstCoolTime` is the sibling property of `CoolTime`, and the plugin's own
+	/// conversion proves *that* one is in SECONDS (`Skill.CoolTimeFrame / Skill.CoolTime` = 240/8 = 30
+	/// units per game second) -- which is why `(FirstCoolTime - WaitCountFrame)` mixed units and refused
+	/// every slot in every frame of every battle.
+	///
+	/// So the frame-denominated field WINS whenever it reads above 0; the seconds property is only the
+	/// fallback for a build where that field cannot be read, and the caller records which route was used so
+	/// a fallback value can never be mistaken for a primary one.
+	///
+	/// WHAT IS DELIBERATELY NOT DECIDED HERE: whether `m_firstCoolTimeFrame` holds the INITIAL/target first
+	/// charge (static) or the CURRENT remaining first charge (a live countdown). This method picks a SOURCE
+	/// only. The semantics are settled by measurement: a live-countdown reading makes `first - wait` about
+	/// 0, which <see cref="Reject"/> refuses by its bounds on its own, and both readings are printed side by
+	/// side in the `chg` line and the `[CLOCK] calib` line so ONE battle settles it.
+	/// </summary>
+	internal static int FirstCoolFrames(int firstCoolSeconds, int firstCoolTimeFrame, double unitsPerSecond,
+		out bool usedFallback)
+	{
+		usedFallback = false;
+		if (firstCoolTimeFrame > 0) return firstCoolTimeFrame;
+		if (firstCoolSeconds <= 0 || unitsPerSecond <= 1.0) return 0;
+		double frames = firstCoolSeconds * unitsPerSecond;
+		if (double.IsNaN(frames) || frames > int.MaxValue) return 0;
+		usedFallback = true;
+		// Round to the nearest unit: the counter is an integer and the seconds property was itself derived
+		// by a division, so truncating would bias every slot low by up to one unit.
+		return (int)(frames + 0.5);
+	}
+
+	/// <summary>
+	/// One slot's contribution, or false when the slot cannot answer: an unreadable/zero first charge (a
+	/// skill without a first charge), a counter that is not inside `[0, firstCool]` (it already fired and was
+	/// reset to `CoolTime`, or -- the R71/R72 defect -- the two readings were in different units), an
+	/// unknown units-per-second, or a clock that is not inside the calibration window.
+	///
+	/// R74: the REASON is available from <see cref="Reject"/>; this wrapper keeps the boolean shape so the
+	/// existing callers and pinned cases read exactly as before.
 	/// </summary>
 	internal static bool TryLag(int firstCoolFrames, int waitFrames, double unitsPerSecond,
 		double activeSeconds, out double lag)
 	{
+		return Reject(firstCoolFrames, waitFrames, unitsPerSecond, activeSeconds, out lag) == LagReason.Usable;
+	}
+
+	/// <summary>R74: <see cref="TryLag"/> with the reason instead of a bare false. The clauses and their
+	/// order are identical (the first one that fires is the answer), so the two can never disagree.</summary>
+	internal static LagReason Reject(int firstCoolFrames, int waitFrames, double unitsPerSecond,
+		double activeSeconds, out double lag)
+	{
 		lag = 0.0;
-		if (firstCoolFrames <= 0) return false;
-		if (waitFrames < 0 || waitFrames > firstCoolFrames) return false;
-		if (unitsPerSecond <= 1.0) return false;
-		if (double.IsNaN(activeSeconds) || activeSeconds < 0.0 || activeSeconds > WindowSeconds) return false;
+		if (firstCoolFrames <= 0) return LagReason.NoFirstCool;
+		if (waitFrames < 0 || waitFrames > firstCoolFrames) return LagReason.WaitOutOfRange;
+		if (unitsPerSecond <= 1.0) return LagReason.BadUnits;
+		if (double.IsNaN(activeSeconds) || activeSeconds < 0.0 || activeSeconds > WindowSeconds) return LagReason.OutOfWindow;
 		lag = (firstCoolFrames - waitFrames) / unitsPerSecond - activeSeconds;
-		if (double.IsNaN(lag) || lag < -MaxAheadSeconds || lag > MaxLagSeconds) return false;
-		return true;
+		if (double.IsNaN(lag) || lag < -MaxAheadSeconds || lag > MaxLagSeconds) return LagReason.LagOutOfRange;
+		return LagReason.Usable;
 	}
 
 	/// <summary>

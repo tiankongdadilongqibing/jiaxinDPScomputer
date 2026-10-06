@@ -19,7 +19,7 @@ internal static class Program
 	/// in policy/battle-clock-calibration, and the counters-shape pin moved from 13 to 16 members, which is
 	/// a rename rather than a new case).
 	/// </summary>
-	public const int ExpectedCases = 1254;
+	public const int ExpectedCases = 1275;
 
 	private static int Main(string[] args)
 	{
@@ -92,6 +92,11 @@ internal static class Program
 		// R72: the hold that makes R71's origin shift land (an event that arrives before the evidence is
 		// replayed on the corrected axis instead of blocking the shift).
 		Cases.ClockOriginHoldCases(r);
+		// R74: the calibration sampler's own evidence (why "no samples" happened, one bucket per value) --
+		// the line that replaces the structurally-useless `samples=0` R71/R72 shipped, plus the unit choice
+		// for the first charge (`m_firstCoolTimeFrame` when it answers, the seconds property x units as the
+		// recorded fallback).
+		Cases.ClockLagDiagnosticsCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

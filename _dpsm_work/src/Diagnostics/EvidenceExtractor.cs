@@ -165,6 +165,25 @@ internal static class EvidenceExtractor
 			string census = BuildCensus(quest, seconds, res, reason, stamp, useFolds, input);
 			names.Add("contrib_census.json");
 			WriteChecked(Path.Combine(dir, "contrib_census.json"), census, "contrib_census");
+			// 2b) R74: the 技能时间表 text, so the page's activation stamps are recomputable FROM THE BUNDLE
+			// instead of only from the runtime log (which rotates away). R73 had to diagnose "邪龍の息吹 5 s
+			// against a 初动 of 6 s" from a log line and could check it against no file at all, because
+			// battle.json carries no skill-timeline section (R73 report). Same strings as the page and the
+			// [SKILLTL] lines, deliberately. Written as UTF-8 TEXT: it IS a rendered table, so WriteChecked's
+			// JSON validation would only report it as invalid JSON. Absent when the probe is off, which the
+			// manifest's notes say, so "no file" cannot be read as "nothing fired".
+			try
+			{
+				string timeline = SkillTimelineProbe.Summary();
+				if (!string.IsNullOrEmpty(timeline))
+				{
+					names.Add("skill_timeline.txt");
+					File.WriteAllText(Path.Combine(dir, "skill_timeline.txt"), timeline, new UTF8Encoding(false));
+					RuntimeLog.Write("[DpsMeter][EXTRACT] skill_timeline 字符="
+						+ timeline.Length.ToString(CultureInfo.InvariantCulture));
+				}
+			}
+			catch { }
 			// 3) the game's own tables, copied (they are dumped once per process, at battle end)
 			int mdFiles = 0;
 			long mdBytes = 0;
@@ -380,6 +399,7 @@ internal static class EvidenceExtractor
 		sb.Append(",\"masterdata is a COPY of the dump made at battle end; absent means it was never produced\"");
 		sb.Append(",\"carrierVerdict is an inference from the roster loadout, not a measured runtime read\"");
 		sb.Append(",\"inputSource says whether this was written from the live session or from the snapshot of the last finalised battle\"");
+		sb.Append(",\"skill_timeline.txt is the skill-timeline page text exactly as the page shows it; absent when the probe is off (R74)\"");
 		sb.Append("]}");
 		return sb.ToString();
 	}

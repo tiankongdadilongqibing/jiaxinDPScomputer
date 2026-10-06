@@ -80,6 +80,10 @@
     <!-- R71: the battle clock's ORIGIN calibration (lag from the auto-skill counters, its bounds, the median
          and the one-origin-per-battle rule). Pure: the facade reads the live counters and adds the result. -->
     <Compile Include="$(SrcRoot)\Policy\BattleClockCalibrationPolicy.cs" />
+    <!-- R74: what the calibration sampler saw, one bucket per value. Pure (no Unity/IL2CPP/Plugin), so the
+         counters and the exact `[CLOCK] calib` text are executed rather than eyeballed, which is the whole
+         point of a line that exists to be read. -->
+    <Compile Include="$(SrcRoot)\Policy\ClockLagDiagnostics.cs" />
     <!-- R72: the rule that makes the shift LAND: an event arriving before the origin is decided is held and
          replayed at its arrival + the lag, instead of being published on the old axis and blocking the
          shift (which is what happened in every battle the user played). Pure arithmetic + the queue type. -->

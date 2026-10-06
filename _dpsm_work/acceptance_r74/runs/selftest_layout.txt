@@ -1,0 +1,822 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_contribution_layout.py --selftest
+selftest(numeric slack): widths=[94, 94, 77, 53] bad=[] bad_fit=[] compact=[¥Æ¥¹¥È]
+selftest(source drift check): tampered definition -> 1 problem(s)
+  VIOLATIONS (1):
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7      8,840   5.43%      8,840          0          0        0    5.43%    13
+BAD  battle_104030_20261004_183041.json  rows=4 violations=1
+  VIOLATIONS (16):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  8,457,237   9.44%  8,457,237          0  1,936,113        0   11.62%   153
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6  8,065,006   9.00%  8,065,006          0  3,436,753        0   12.88%   127
+    T1 \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5 width=97 want=94    \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5    282,226   0.32%     30,423    251,803     15,729        0    0.05%    89
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          191    191   8,199,095
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          671    671   5,136,301
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          471    471   4,610,153
+BAD  battle_401004_20261006_105754__B-20261006-025754-C916794113964F30-001.json  rows=34 violations=16
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6  9,420,710  10.62%  9,420,710          0  2,789,441        0   13.85%   123
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  7,770,613   8.76%  7,770,613          0  1,811,624        0   10.81%   150
+    T1 \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5 width=97 want=94    \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5    264,606   0.30%     30,463    234,144     19,375        0    0.06%    95
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          233    233  10,643,588
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          624    624   4,312,823
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          431    431   4,195,414
+BAD  battle_401004_20261006_110409__B-20261006-025754-C916794113964F30-002.json  rows=34 violations=16
+  VIOLATIONS (16):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  8,787,799   9.00%  8,787,799          0  2,554,367        0   11.63%   153
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6  8,445,234   8.65%  8,445,234          0  3,490,975        0   12.27%   129
+    T1 \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5 width=97 want=94    \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5    270,544   0.28%     29,379    241,165     19,737        0    0.05%    91
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          234    234  10,726,334
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          639    639   5,153,662
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          468    468   4,644,801
+BAD  battle_401004_20261006_110840__B-20261006-025754-C916794113964F30-003.json  rows=34 violations=16
+  VIOLATIONS (12):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,749,904   5.96% 11,749,904          0  6,685,329        0    9.35%   176
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,309   0.05%    104,309          0    104,288        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          855    855  20,091,880
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    463  1,852  13,491,356
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    463    926  10,643,186
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=81 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30e1\u30a2\u30ea\u30fc          787  1,574   7,335,879
+BAD  battle_411001_20261004_015919.json  rows=36 violations=12
+  VIOLATIONS (12):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 14,196,608   7.18% 14,196,608          0  7,964,019        0   11.21%   179
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,054   0.05%    104,054          0    110,411        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          879    879  19,636,617
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    467  1,868  13,281,383
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    467    934  10,477,541
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=81 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30e1\u30a2\u30ea\u30fc          816  1,632   7,109,996
+BAD  battle_411001_20261004_021914.json  rows=36 violations=12
+  VIOLATIONS (12):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 13,970,808   6.57% 13,970,808          0  8,459,719        0   10.56%   190
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,903   0.05%    103,903          0    116,837        0    0.10%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          855    855  20,439,239
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    470  1,880  15,104,175
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    470    940  11,915,522
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=81 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30e1\u30a2\u30ea\u30fc          801  1,602   7,405,914
+BAD  battle_411001_20261004_023627.json  rows=36 violations=12
+  VIOLATIONS (12):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 13,914,112   6.94% 13,914,112          0  7,810,085        0   10.83%   192
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,973   0.05%    103,973          0    111,974        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          900    900  20,553,463
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    468  1,872  13,094,207
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    468    936  10,329,879
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=81 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30e1\u30a2\u30ea\u30fc          869  1,738   8,026,055
+BAD  battle_411001_20261004_033231.json  rows=36 violations=12
+  VIOLATIONS (12):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 13,585,012   6.95% 13,585,012          0  7,556,944        0   10.81%   190
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,060   0.05%    104,060          0    110,166        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          912    912  19,101,474
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    472  1,888  13,477,068
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    472    944  10,631,915
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=81 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30e1\u30a2\u30ea\u30fc          792  1,584   6,305,154
+BAD  battle_411001_20261004_035437.json  rows=36 violations=12
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,474,035   5.63% 11,474,035          0 10,426,024        0   10.75%   190
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,830   0.05%    103,830          0    109,402        0    0.10%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          900    900  14,611,208
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,011  1,011  13,559,767
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          291    291  12,048,512
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    467  1,868  11,610,728
+BAD  battle_411001_20261004_041309.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,441,260   5.71% 11,441,260          0 10,936,835        0   11.17%   185
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,974   0.05%    103,974          0    115,360        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          882    882  14,025,704
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,011  1,011  13,519,249
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    468  1,872  11,502,952
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          294    294  10,578,296
+BAD  battle_411001_20261004_042637.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,549,575   5.88% 11,549,575          0 10,293,730        0   11.12%   181
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2     95,360   0.05%     95,360          0    115,847        0    0.11%   131
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,011  1,011  14,443,889
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          891    891  13,879,331
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          297    297  11,092,304
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    452  1,808  10,876,933
+BAD  battle_411001_20261004_042844.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,248,481   5.66% 11,248,481          0  9,969,954        0   10.68%   190
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2     95,360   0.05%     95,360          0    123,933        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          891    891  14,117,695
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,011  1,011  13,412,540
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    480  1,920  11,697,448
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          268    268  10,347,258
+BAD  battle_411001_20261004_113553.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,426,082   5.66% 11,426,082          0 10,227,053        0   10.72%   184
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,071   0.05%    104,071          0    111,127        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          900    900  14,318,413
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,011  1,011  13,699,150
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    479  1,916  11,794,414
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          273    273  10,777,538
+BAD  battle_411001_20261004_115024.json  rows=36 violations=15
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,112,759   5.82% 11,112,759          0  9,912,434        0   11.01%   186
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,735   0.05%    103,735          0     95,460        0    0.10%   131
+    T2 \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3\xd71.50 width=79 want=77    \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3x1.50madness vic  \u30eb\u30a5=\u30eb\u30eb\u30b5     3,268  3,268  18,062,727
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,200  1,200  16,308,231
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          900    900  13,420,930
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          292    292  11,101,562
+BAD  battle_411001_20261004_115417.json  rows=35 violations=16
+  VIOLATIONS (14):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,480,495   5.89% 11,480,495          0 10,990,178        0   11.53%   192
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,064   0.05%    104,064          0    101,584        0    0.11%   131
+    T2 \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3\xd71.50 width=79 want=77    \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3x1.50madness vic  \u30eb\u30a5=\u30eb\u30eb\u30b5     3,270  3,270  19,441,164
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,200  1,200  16,730,924
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          897    897  13,802,226
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          300    300  12,116,155
+BAD  battle_411001_20261004_134524.json  rows=35 violations=14
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,274,864   5.62% 11,274,864          0 10,153,825        0   10.67%   192
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,084   0.05%    104,084          0    109,359        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          900    900  14,581,587
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  13,856,740
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          295    295  11,630,172
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    478  1,912  11,394,543
+BAD  battle_411001_20261004_134853.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,010,531   5.66% 11,010,531          0 10,053,032        0   10.82%   182
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,823   0.05%    103,823          0    113,338        0    0.11%   131
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  13,834,238
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          888    888  13,700,197
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    454  1,816  11,005,103
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          278    278  10,535,521
+BAD  battle_411001_20261004_144548.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 12,108,070   5.72% 12,108,070          0 11,171,716        0   11.00%   195
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,123   0.05%    104,123          0    114,470        0    0.10%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          897    897  14,943,059
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  13,887,816
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    482  1,928  12,299,005
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          287    287  11,433,476
+BAD  battle_411001_20261004_170157.json  rows=36 violations=15
+  VIOLATIONS (14):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,672,608   5.81% 11,672,608          0 11,050,141        0   11.31%   191
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,053   0.05%    104,053          0    109,211        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          894    894  14,936,196
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  14,058,761
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          312    312  12,876,107
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    466  1,864  10,846,957
+BAD  battle_411001_20261004_180353.json  rows=36 violations=14
+  VIOLATIONS (17):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 12,841,715   6.59% 12,841,715          0  7,453,544        0   10.41%   179
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  9,080,044   4.66%  9,080,044          0  6,573,068        0    8.03%   150
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,017   0.05%    104,017          0     59,803        0    0.08%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          855    855  11,268,332
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    484  1,936  11,209,167
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          963    963  10,457,153
+BAD  battle_411001_20261004_180834.json  rows=36 violations=17
+  VIOLATIONS (17):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 12,631,616   6.44% 12,631,616          0  6,362,598        0   10.22%   190
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  8,495,704   4.33%  8,495,704          0  5,363,883        0    7.87%   150
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,483   0.05%    104,483          0     45,369        0    0.08%   132
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          918    918  11,790,605
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    477  1,908  10,918,692
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          949    949   9,303,845
+BAD  battle_411001_20261004_181951.json  rows=36 violations=17
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,581,252  78.10%  1,581,252          0      5,300        0   78.36%    27
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7     38,080   1.88%     38,080          0          0        0    1.88%    56
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     27     27       5,300
+    T3 2->6                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     27       5,300
+BAD  battle_411001_20261004_195307.json  rows=8 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    307,492  45.77%    307,492          0      1,300        0   45.97%    13
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7     29,920   4.45%     29,920          0          0        0    4.45%    44
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     13     13       1,300
+    T3 2->6                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     13       1,300
+BAD  battle_411001_20261004_195527.json  rows=8 violations=4
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    716,240  71.14%    716,240          0      2,500        0   71.39%    17
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     17     17       2,500
+    T3 3->6                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     17       2,500
+BAD  battle_411001_20261004_195639.json  rows=7 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    307,492  26.14%    307,492          0      1,300        0   26.26%    13
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7     32,640   2.78%     32,640          0          0        0    2.78%    48
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     13     13       1,300
+    T3 2->5                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     13       1,300
+BAD  battle_411001_20261004_195755.json  rows=7 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    557,020  34.14%    557,020          0      2,000        0   34.27%    16
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7     38,080   2.33%     38,080          0          0        0    2.33%    56
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     16     16       2,000
+    T3 2->5                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     16       2,000
+BAD  battle_411001_20261004_195853.json  rows=7 violations=4
+  VIOLATIONS (1):
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7        680 100.00%        680          0          0        0  100.00%     1
+BAD  battle_411001_20261004_195922.json  rows=2 violations=1
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    673,448  40.04%    673,448          0      2,700        0   40.20%    19
+    T1 \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7 width=99 want=94    \u6df7\u6c8c \u30cb\u30e3\u30eb\u30e9\u30c8\u30db\u30c6\u30d7     44,880   2.67%     44,880          0          0        0    2.67%    66
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     19     19       2,700
+    T3 3->6                          width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     19       2,700
+BAD  battle_411001_20261004_200006.json  rows=8 violations=4
+  VIOLATIONS (14):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 10,620,143   5.49% 10,620,143          0  7,940,490        0   10.15%   170
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,252   0.05%    104,252          0     96,015        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          861    861  13,047,952
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    447  1,788  12,492,297
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          939    939  11,804,896
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    447    894   9,855,039
+BAD  battle_411001_20261005_082525.json  rows=36 violations=14
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,622,651   5.79% 11,622,651          0  9,650,346        0   11.11%   193
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,122   0.05%    104,122          0     95,784        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          873    873  13,532,297
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  12,821,918
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    471  1,884  11,634,228
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          304    304  11,355,508
+BAD  battle_411001_20261005_132514.json  rows=36 violations=16
+  VIOLATIONS (16):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  8,079,051   9.32%  8,079,051          0  3,612,509        0   13.49%   137
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6  7,095,964   8.19%  7,095,964          0  3,907,268        0   12.70%   181
+    T1 \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5 width=97 want=94    \u5927\u3044\u306a\u308b \u30af\u30c8\u30a5\u30eb\u30d5    257,462   0.30%     34,175    223,287     20,550        0    0.06%    89
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          993    993   9,373,031
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          305    305   7,619,552
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+300 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          337    337   5,918,618
+BAD  battle_411001_20261005_135533.json  rows=34 violations=16
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 10,560,421   5.56% 10,560,421          0  9,023,493        0   10.80%   176
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,946   0.05%    103,946          0     93,629        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          876    876  13,632,440
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  12,758,033
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    437  1,748  10,527,247
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          272    272  10,476,582
+BAD  battle_411001_20261005_142931.json  rows=36 violations=15
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,972,430   5.93% 11,972,430          0 10,047,435        0   11.37%   191
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2     94,591   0.05%     94,591          0    104,950        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          897    897  14,190,839
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  13,041,862
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          297    297  11,889,697
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    474  1,896  11,615,652
+BAD  battle_411001_20261006_121130__B-20261006-041130-7AA0C98126494171-001.json  rows=36 violations=16
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 10,415,213   5.36% 10,415,213          0  8,873,078        0   10.37%   185
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,603   0.05%    103,603          0     98,868        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          873    873  13,704,600
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  12,813,343
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    467  1,868  11,071,934
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          303    303  10,950,075
+BAD  battle_411001_20261006_140741__B-20261006-060741-6441AB90F1C942BA-001.json  rows=36 violations=16
+  VIOLATIONS (16):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 10,296,924   5.41% 10,296,924          0  8,616,760        0   10.43%   182
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,468   0.05%    104,468          0     90,761        0    0.11%   131
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  13,246,564
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          852    852  12,681,283
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    470  1,880  11,321,167
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          264    264   9,933,690
+BAD  battle_411001_20261006_161909__B-20261006-081406-C3BAF595E0994E67-002.json  rows=36 violations=16
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,629,009   7.00% 11,629,009          0  7,665,671        0   12.35%   185
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    103,754   0.06%    103,754          0     92,098        0    0.13%   131
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+300 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          435    435  12,064,540
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          867    867  11,764,468
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    473  1,892  11,243,546
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09 width=83 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+20%\uff08\u524d\u885b\u306e\u307f\uff09text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    473    946   8,869,913
+BAD  battle_411001_20261006_162941__B-20261006-081406-C3BAF595E0994E67-003.json  rows=36 violations=15
+  VIOLATIONS (15):
+    T1 \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 width=96 want=94    \u30a8\u30f4\u30a1\u30e9\u30b9\u30fb\u30d5\u30e9\u30a6 11,487,549   5.89% 11,487,549          0  9,270,142        0   11.24%   184
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2    104,092   0.05%    104,092          0     95,753        0    0.11%   131
+    T2 \u72c2\u6c17 \u4e0e\u4f24\u5bb3\xd72.50(\u72c2\u6c17\u6bd4250) width=82 want=77    \u72c2\u6c17 \u4e0e\u4f24\u5bb3x2.50(\u72c2\u6c17\u6bd4250)madness atk  \u30e1\u30a2\u30ea\u30fc          882    882  13,354,241
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refExistenceTime3000)+Rate+10+Rate+400+Rate+7 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+300(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9        1,023  1,023  12,631,020
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=79 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  \u30cd\u30fc\u30d5\u30a7\uff1d\u30b8\u30a2\u30fc    467  1,868  11,579,263
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refExistenceTime3000)+Actual+300(/refExistenceTime3000)+Rate+10+Rate+400 width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+200(/refE\u2026atkadd  atk  \u30eb\u30ca\u30ea\u30b9          283    283  10,439,926
+BAD  battle_411001_20261006_173353__B-20261006-093208-306521E642454F7D-002.json  rows=36 violations=15
+  VIOLATIONS (9):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    452,829  19.78%    452,829          0      1,727        0   19.86%    21
+    T1 \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2 width=97 want=94    \u751f\u3051\u308b\u708e \u30af\u30c8\u30a5\u30b0\u30a2     65,854   2.88%     65,854          0          0        0    2.88%    59
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Rate+6 width=79 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Rate+6     atkadd  atk  [\u7729\u611b]\u30c1\u30a7\u30a4\u30b7\u30a3     20     20      11,568
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     21     21       1,727
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  \u30a2\u30fc\u30d5\u30ca            4      4         700
+    T2 \u4e0e\u30c0\u30e1\u30fc\u30b8+50% width=78 want=77    \u4e0e\u30c0\u30e1\u30fc\u30b8+50%        talent  atk  \u30af\u30c8\u30a5\u30b0\u30a1\u7832\u53f0R      1      1          25
+BAD  battle_700817_20261004_114821.json  rows=25 violations=9
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    849,243  19.51%    849,243          0     71,109        0   21.15%    34
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     34     34       7,912
+    T3 12->14                        width=57 want=53    \u30ea\u30f4\u30a1\u30b7\u30fc    \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      3      63,197
+    T3 15->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     34       7,912
+BAD  battle_9999_20261004_042458.json  rows=21 violations=4
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,235,567  16.55%  1,235,567          0    189,576        0   19.08%    44
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     44     44       4,654
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      1      1          78
+    T3 8->16                         width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     44     184,922
+    T3 14->16                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     44       4,654
+BAD  battle_9999_20261004_135214.json  rows=25 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     41,788   2.97%     41,788          0      6,395        0    3.42%     8
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      1      1         201
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      8      8         139
+    T3 6->21                         width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      8       6,256
+    T3 9->21                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      8         139
+BAD  battle_9999_20261004_165952.json  rows=25 violations=5
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    318,493  13.95%    318,493          0     48,896        0   16.09%    14
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     14     14       1,232
+    T3 15->13                        width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     14      47,665
+    T3 9->13                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     14       1,232
+BAD  battle_9999_20261004_175957.json  rows=24 violations=4
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    402,729  18.32%    402,729          0     61,615        0   21.13%    13
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     13     13       1,324
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      2      2         429
+    T3 16->18                        width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     13      60,292
+    T3 10->18                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     13       1,324
+BAD  battle_9999_20261004_194948.json  rows=25 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,381,565  24.23%  1,381,565          0    102,116        0   26.02%    35
+    T2 \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3\xd71.50 width=79 want=77    \u72c2\u6c17(\u53d7\u51fb\u65b9) \u88ab\u4f24\u5bb3x1.50madness vic  \u30eb\u30a5=\u30eb\u30eb\u30b5         8      8      15,470
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     35     35       6,668
+    T3 4->10                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     18      95,448
+    T3 15->10                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     35       6,668
+BAD  battle_9999_20261005_064910.json  rows=27 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    414,016  28.64%    414,016          0      3,530        0   28.89%    10
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     10     10       1,334
+    T3 11->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     10       1,334
+    T3 7->14                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      1       1,098
+    T3 9->14                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      1       1,098
+BAD  battle_9999_20261005_164431__B-20261005-084431-C090E1C550B84C10-001.json  rows=34 violations=5
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     82,043   2.43%     82,043          0     56,017        0    4.10%     5
+    T3 2->15                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4      27,782
+    T3 12->15                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4      27,782
+BAD  battle_9999_20261005_164532__B-20261005-084431-C090E1C550B84C10-002.json  rows=34 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     94,673   3.89%     94,673          0     21,313        0    4.76%     5
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      5      5         401
+    T3 4->15                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4      10,456
+    T3 16->15                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4      10,456
+BAD  battle_9999_20261005_164623__B-20261005-084431-C090E1C550B84C10-003.json  rows=34 violations=4
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    209,142  11.56%    209,142          0        752        0   11.61%     8
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      8      8         752
+    T3 16->12                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      8         752
+BAD  battle_9999_20261005_164710__B-20261005-084431-C090E1C550B84C10-004.json  rows=31 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    404,389  13.25%    404,389          0     50,054        0   14.89%    12
+    T3 4->14                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      6      42,507
+    T3 16->14                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      2       5,886
+    T3 17->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     12       1,662
+BAD  battle_9999_20261005_164820__B-20261005-084431-C090E1C550B84C10-005.json  rows=34 violations=4
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    429,512  12.18%    429,512          0    205,517        0   18.01%    14
+    T3 2->17                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     11     102,330
+    T3 4->17                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     11     101,574
+BAD  battle_9999_20261005_164941__B-20261005-084431-C090E1C550B84C10-006.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,133,124  15.56%  1,133,124          0    375,452        0   20.71%    31
+    T3 18->13                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     25     185,133
+    T3 12->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     25     185,133
+BAD  battle_9999_20261005_181631__B-20261005-101631-C3F24E1814C94EE5-001.json  rows=34 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,286,310  34.10%  1,286,310          0    164,128        0   38.45%    39
+    T3 4->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24      94,794
+    T3 14->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     18      62,704
+    T3 18->13                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     39       6,630
+BAD  battle_9999_20261005_181754__B-20261005-101631-C3F24E1814C94EE5-002.json  rows=34 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,570,930  31.22%  1,570,930          0    385,889        0   38.89%    45
+    T3 4->16                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     28     189,091
+    T3 14->16                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     28     189,091
+    T3 11->16                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     45       7,707
+BAD  battle_9999_20261005_184958__B-20261005-104958-3F7329C2E1F84313-001.json  rows=33 violations=4
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    922,585  24.77%    922,585          0    176,015        0   29.50%    29
+    T3 13->19                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     21      85,824
+    T3 14->19                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     21      85,824
+BAD  battle_9999_20261005_185135__B-20261005-104958-3F7329C2E1F84313-002.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,331,719  26.40%  1,331,719          0    363,370        0   33.60%    50
+    T3 6->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     33     178,013
+    T3 10->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     33     178,013
+BAD  battle_9999_20261005_185300__B-20261005-104958-3F7329C2E1F84313-003.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    396,659   8.27%    396,659          0    135,720        0   11.10%    20
+    T3 5->18                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     19      66,714
+    T3 13->18                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     19      66,714
+BAD  battle_9999_20261005_185525__B-20261005-104958-3F7329C2E1F84313-004.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    921,020  15.59%    921,020          0    150,612        0   18.14%    31
+    T3 4->14                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     16      74,147
+    T3 8->14                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     16      72,612
+BAD  battle_9999_20261005_185653__B-20261005-104958-3F7329C2E1F84313-005.json  rows=34 violations=3
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,059,394  19.29%  1,059,394          0    174,554        0   22.46%    37
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     37     37       4,928
+    T3 4->14                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     20      84,813
+    T3 8->14                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     20      84,813
+    T3 17->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     37       4,928
+BAD  battle_9999_20261005_185906__B-20261005-104958-3F7329C2E1F84313-006.json  rows=34 violations=5
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    795,360  12.94%    795,360          0     82,019        0   14.27%    25
+    T3 14->18                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      43,818
+    T3 16->18                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      35,304
+BAD  battle_9999_20261005_195024__B-20261005-115024-D88099F7C45D4078-001.json  rows=34 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,211,827  38.18%  1,211,827          0     17,773        0   38.74%    44
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     44     44       5,889
+    T3 4->16                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      7      11,884
+    T3 8->16                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     44       5,889
+BAD  battle_9999_20261005_214130__B-20261005-134130-83559094DF634D7F-001.json  rows=25 violations=4
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,422,391  35.07%  1,422,391          0     87,483        0   37.23%    49
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     49     49       5,397
+    T3 2->13                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     18      82,086
+    T3 17->13                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     49       5,397
+    T3 4->9                          width=54 want=53    \u30cd\u30d5\u30a7\u30b9\u30c6\u30a3\u30b9\u2192   T.O.W.E.R.type\u2026      1         197
+    T3 2->9                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         105
+BAD  battle_9999_20261005_214357__B-20261005-134130-83559094DF634D7F-002.json  rows=33 violations=6
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,271,694  33.39%  1,271,694          0    244,696        0   39.81%    43
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     43     43       5,253
+    T3 8->18                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     43     239,443
+    T3 17->18                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     43       5,253
+    T3 8->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         420
+BAD  battle_9999_20261005_214556__B-20261005-134130-83559094DF634D7F-003.json  rows=32 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    491,634  30.33%    491,634          0     88,534        0   35.79%    17
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     17     17       3,486
+    T3 6->9                          width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     17      85,047
+    T3 10->9                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     17       3,486
+    T3 6->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      2         317
+BAD  battle_9999_20261005_214916__B-20261005-134130-83559094DF634D7F-004.json  rows=32 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    851,059  30.81%    851,059          0    143,804        0   36.01%    39
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     39     39       5,465
+    T3 2->11                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     39     138,339
+    T3 19->11                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     39       5,465
+    T3 2->10                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      2         309
+BAD  battle_9999_20261005_215031__B-20261005-134130-83559094DF634D7F-005.json  rows=32 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,249,716  45.12%  1,249,716          0     47,741        0   46.85%    29
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     29     29       4,694
+    T3 9->15                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     10      43,047
+    T3 12->15                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29       4,694
+    T3 9->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         227
+BAD  battle_9999_20261005_215231__B-20261005-134130-83559094DF634D7F-006.json  rows=32 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    896,972  37.09%    896,972          0     91,377        0   40.87%    22
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     22     22       3,085
+    T3 6->15                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     14      88,292
+    T3 9->15                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     22       3,085
+    T3 19->1                         width=54 want=53    \u30cd\u30d5\u30a7\u30b9\u30c6\u30a3\u30b9\u2192   T.O.W.E.R.type\u2026      1         508
+BAD  battle_9999_20261005_215403__B-20261005-134130-83559094DF634D7F-007.json  rows=32 violations=5
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    884,180  30.87%    884,180          0     47,825        0   32.54%    32
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     32     32       3,925
+    T3 15->16                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     17      43,899
+    T3 12->16                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     32       3,925
+BAD  battle_9999_20261005_215520__B-20261005-134130-83559094DF634D7F-008.json  rows=29 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    959,215  35.43%    959,215          0    180,655        0   42.10%    27
+    T3 14->10                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     27     175,236
+    T3 19->10                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     27       5,419
+    T3 14->1                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         420
+BAD  battle_9999_20261005_215755__B-20261005-134130-83559094DF634D7F-009.json  rows=32 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,290,658  37.62%  1,290,658          0    201,120        0   43.48%    39
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     39     39       7,168
+    T3 13->8                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     39     193,953
+    T3 17->8                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     39       7,168
+BAD  battle_9999_20261005_220210__B-20261005-134130-83559094DF634D7F-010.json  rows=31 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,014,672  24.66%  1,014,672          0    215,897        0   29.90%    42
+    T3 4->10                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     42     210,272
+    T3 11->10                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     42       5,625
+    T3 4->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+BAD  battle_9999_20261005_220325__B-20261005-134130-83559094DF634D7F-011.json  rows=32 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    110,413   7.47%    110,413          0     18,401        0    8.72%     9
+    T3 14->16                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      17,641
+    T3 9->16                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9         760
+    T3 14->1                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+BAD  battle_9999_20261005_220857__B-20261005-134130-83559094DF634D7F-012.json  rows=32 violations=4
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    950,809  29.49%    950,809          0    184,956        0   35.22%    29
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     29     29       4,350
+    T3 2->16                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29     180,606
+    T3 18->16                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29       4,350
+    T3 2->8                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+BAD  battle_9999_20261005_221440__B-20261005-134130-83559094DF634D7F-013.json  rows=32 violations=5
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,159,241  36.52%  1,159,241          0    220,781        0   43.48%    36
+    T3 4->15                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     36     216,115
+    T3 11->15                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     36       4,665
+    T3 4->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         420
+BAD  battle_9999_20261005_221621__B-20261005-134130-83559094DF634D7F-014.json  rows=32 violations=4
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,014,029  34.46%  1,014,029          0    182,936        0   40.68%    24
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     24     24       5,787
+    T3 13->18                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24     177,149
+    T3 5->18                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24       5,787
+    T3 13->1                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+BAD  battle_9999_20261005_221736__B-20261005-134130-83559094DF634D7F-015.json  rows=32 violations=5
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,006,031  37.86%  1,006,031          0    140,827        0   43.16%    30
+    T3 9->18                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     30     135,892
+    T3 17->18                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     30       4,935
+    T3 9->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      2         317
+BAD  battle_9999_20261005_221835__B-20261005-134130-83559094DF634D7F-016.json  rows=32 violations=4
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     61,130   8.94%     61,130          0      6,272        0    9.86%     3
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      3      3         251
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      1      2         174
+    T3 12->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      3       6,020
+    T3 12->6                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         420
+    T3 17->13                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      3         251
+BAD  battle_9999_20261005_223937__B-20261005-134130-83559094DF634D7F-017.json  rows=30 violations=6
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     59,342   6.65%     59,342          0     10,560        0    7.83%     4
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      4      4         332
+    T3 4->14                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4      10,228
+    T3 9->14                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      4         332
+BAD  battle_9999_20261006_012304__B-20261005-172304-A229034B13BC4140-001.json  rows=30 violations=4
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    264,032  20.09%    264,032          0     71,511        0   25.53%     9
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      9      9       1,201
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      2      4         267
+    T3 8->13                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      70,310
+    T3 18->13                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9       1,201
+    T3 8->7                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      2         556
+BAD  battle_9999_20261006_012402__B-20261005-172304-A229034B13BC4140-002.json  rows=29 violations=6
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    122,291  14.39%    122,291          0     31,795        0   18.13%     5
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      5      5         492
+    T3 12->10                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      5      31,303
+    T3 12->5                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      3         681
+    T3 19->5                         width=54 want=53    \u30cd\u30d5\u30a7\u30b9\u30c6\u30a3\u30b9\u2192   T.O.W.E.R.type\u2026      1         519
+    T3 4->10                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      5         492
+BAD  battle_9999_20261006_012455__B-20261005-172304-A229034B13BC4140-003.json  rows=33 violations=6
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     80,873   5.57%     80,873          0     20,115        0    6.96%     6
+    T3 10->14                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      6      19,714
+    T3 8->14                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      6         401
+BAD  battle_9999_20261006_012556__B-20261005-172304-A229034B13BC4140-004.json  rows=30 violations=3
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    336,832  17.48%    336,832          0     33,847        0   19.23%    10
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9      9      9       1,076
+    T3 7->12                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      32,772
+    T3 18->12                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9       1,076
+    T3 8->3                          width=54 want=53    \u30cd\u30d5\u30a7\u30b9\u30c6\u30a3\u30b9\u2192   T.O.W.E.R.type\u2026      2         814
+    T3 7->3                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      2         252
+BAD  battle_9999_20261006_012658__B-20261005-172304-A229034B13BC4140-005.json  rows=32 violations=6
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,202,156  38.57%  1,202,156          0    239,518        0   46.25%    29
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     29     29       5,562
+    T3 6->19                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29     233,956
+    T3 9->19                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29       5,562
+    T3 6->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         420
+BAD  battle_9999_20261006_012854__B-20261005-172304-A229034B13BC4140-006.json  rows=31 violations=5
+  VIOLATIONS (5):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,162,635  25.85%  1,162,635          0    190,820        0   30.09%    40
+    T3 6->14                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     40     185,462
+    T3 17->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     40       5,358
+    T3 6->7                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+    T3 15->7                         width=54 want=53    \u30bd\u30d5\u30a3\u30fc      \u2192   T.O.W.E.R.type\u2026      1         109
+BAD  battle_9999_20261006_013019__B-20261005-172304-A229034B13BC4140-007.json  rows=34 violations=5
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    476,024  21.97%    476,024          0    103,726        0   26.75%    18
+    T3 8->17                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     18     101,043
+    T3 19->17                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     18       2,683
+BAD  battle_9999_20261006_013208__B-20261005-172304-A229034B13BC4140-008.json  rows=31 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,104,728  37.81%  1,104,728          0      5,206        0   37.99%    36
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     36     36       5,206
+    T3 16->18                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     36       5,206
+BAD  battle_9999_20261006_013526__B-20261005-172304-A229034B13BC4140-009.json  rows=20 violations=3
+  VIOLATIONS (6):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,155,134  44.94%  1,155,134          0      4,450        0   45.11%    28
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     28     28       4,450
+    T2 \u8150\u98df\u306e\u6bd2\u85ac width=78 want=77    \u8150\u98df\u306e\u6bd2\u85ac            text    atk  T.O.W.E.R.type\u2026      2      4         488
+    T3 7->10                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     28       4,450
+    T3 17->1                         width=54 want=53    \u30cd\u30d5\u30a7\u30b9\u30c6\u30a3\u30b9\u2192   T.O.W.E.R.type\u2026      1         560
+    T3 5->1                          width=54 want=53    \u30bd\u30d5\u30a3\u30fc      \u2192   T.O.W.E.R.type\u2026      2         232
+BAD  battle_9999_20261006_013630__B-20261005-172304-A229034B13BC4140-010.json  rows=24 violations=6
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,297,220  36.99%  1,297,220          0      7,485        0   37.21%    42
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     42     42       7,485
+    T3 15->18                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     42       7,485
+BAD  battle_9999_20261006_013758__B-20261005-172304-A229034B13BC4140-011.json  rows=20 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,299,258  27.93%  1,299,258          0    318,515        0   34.77%    43
+    T3 8->16                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     43     310,974
+    T3 9->16                         width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     43       7,540
+    T3 8->1                          width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         158
+BAD  battle_9999_20261006_013923__B-20261005-172304-A229034B13BC4140-012.json  rows=34 violations=4
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    855,174  35.21%    855,174          0     98,327        0   39.26%    24
+    T3 13->17                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24      93,995
+    T3 16->17                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24       4,332
+    T3 13->1                         width=54 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   T.O.W.E.R.type\u2026      1         436
+BAD  battle_9999_20261006_014047__B-20261005-172304-A229034B13BC4140-013.json  rows=34 violations=4
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    920,489  23.75%    920,489          0    160,534        0   27.90%    36
+    T3 13->14                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     36     156,149
+    T3 17->14                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     36       4,385
+BAD  battle_9999_20261006_014202__B-20261005-172304-A229034B13BC4140-014.json  rows=31 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    969,063  20.50%    969,063          0    312,979        0   27.12%    40
+    T3 14->19                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     40     167,777
+    T3 6->19                         width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     40     140,157
+BAD  battle_9999_20261006_014410__B-20261005-172304-A229034B13BC4140-015.json  rows=35 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,392,090  35.13%  1,392,090          0    366,918        0   44.39%    51
+    T3 4->15                         width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     51     197,226
+    T3 6->15                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     51     163,753
+BAD  battle_9999_20261006_014526__B-20261005-172304-A229034B13BC4140-016.json  rows=35 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    807,797  21.73%    807,797          0    215,839        0   27.53%    31
+    T3 14->15                        width=57 want=53    \u30a8\u30ec\u30ce\u30ef\u30fc\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     31     114,501
+    T3 2->15                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     31      97,679
+BAD  battle_9999_20261006_014636__B-20261005-172304-A229034B13BC4140-017.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,244,762  26.69%  1,244,762          0    306,179        0   33.25%    40
+    T3 14->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     40     214,564
+    T3 5->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     22      84,894
+BAD  battle_9999_20261006_014825__B-20261005-172304-A229034B13BC4140-018.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    750,631  17.68%    750,631          0    448,588        0   28.24%    30
+    T3 7->11                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     30     266,494
+    T3 5->11                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     26     177,555
+BAD  battle_9999_20261006_014930__B-20261005-172304-A229034B13BC4140-019.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    763,871  23.36%    763,871          0    241,322        0   30.73%    22
+    T3 10->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     22     159,056
+    T3 16->13                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     14      77,384
+BAD  battle_9999_20261006_015035__B-20261005-172304-A229034B13BC4140-020.json  rows=33 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    576,765  18.03%    576,765          0    195,828        0   24.15%    24
+    T3 6->13                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     24     127,047
+    T3 9->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     14      64,962
+BAD  battle_9999_20261006_015144__B-20261005-172304-A229034B13BC4140-021.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,169,172  30.78%  1,169,172          0    332,058        0   39.53%    42
+    T3 14->15                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     42     225,459
+    T3 4->15                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     28     101,218
+BAD  battle_9999_20261006_032953__B-20261005-192953-6E7D7198B94042B2-001.json  rows=33 violations=3
+  VIOLATIONS (2):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*     59,829   4.60%     59,829          0      5,913        0    5.07%     2
+    T3 12->14                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      2       5,913
+BAD  battle_9999_20261006_111510__B-20261006-025754-C916794113964F30-004.json  rows=34 violations=2
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    281,965  11.59%    281,965          0    113,054        0   16.23%    13
+    T3 4->12                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     13      71,521
+    T3 16->12                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      40,141
+BAD  battle_9999_20261006_111732__B-20261006-025754-C916794113964F30-005.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    147,362   5.50%    147,362          0     65,559        0    7.95%    10
+    T3 4->11                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     10      40,695
+    T3 3->11                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      24,045
+BAD  battle_9999_20261006_111854__B-20261006-025754-C916794113964F30-006.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    117,364   7.30%    117,364          0     50,537        0   10.45%     7
+    T3 16->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      7      31,571
+    T3 3->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      5      18,364
+BAD  battle_9999_20261006_111955__B-20261006-025754-C916794113964F30-007.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    253,448   7.23%    253,448          0    101,005        0   10.11%     8
+    T3 6->12                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      8      63,867
+    T3 3->12                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      5      35,780
+BAD  battle_9999_20261006_112106__B-20261006-025754-C916794113964F30-008.json  rows=33 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    187,418   6.12%    187,418          0     66,765        0    8.29%     9
+    T3 4->12                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      9      43,164
+    T3 13->12                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9      7      22,675
+BAD  battle_9999_20261006_112250__B-20261006-025754-C916794113964F30-009.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,128,796  27.17%  1,128,796          0    268,415        0   33.63%    35
+    T3 11->13                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     35     190,942
+    T3 2->13                         width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     17      73,041
+BAD  battle_9999_20261006_151957__B-20261006-071957-4D8D2BAE28394C5A-001.json  rows=33 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*  1,420,708  25.32%  1,420,708          0    432,672        0   33.03%    45
+    T3 14->15                        width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     45     288,729
+    T3 18->15                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     29     138,498
+BAD  battle_9999_20261006_161406__B-20261006-081406-C3BAF595E0994E67-001.json  rows=34 violations=3
+  VIOLATIONS (3):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    998,894  29.58%    998,894          0    343,557        0   39.76%    35
+    T3 6->16                         width=57 want=53    \u30e1\u30eb\u30c6\u30a3\u30a8\u30eb  \u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     35     224,036
+    T3 12->16                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     26     115,153
+BAD  battle_9999_20261006_173208__B-20261006-093208-306521E642454F7D-001.json  rows=34 violations=3
+  VIOLATIONS (4):
+    T1 \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9 width=97 want=94    \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9*    815,324  26.30%    815,324          0    131,016        0   37.45%    27
+    T2 \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refCurrentPower0) width=83 want=77    \u653b\u51fb\u529b\u52a0\u7b97 Actual+100(/refC\u2026atkadd  atk  [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9     27     27       4,198
+    T3 11->21                        width=57 want=53    \u30de\u30c3\u30c9\u30b7\u30fc\u30ab\u30fc\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     16     126,819
+    T3 19->21                        width=57 want=53    [\u8ce2\u5c0e]\u30c8\u30ec\u30a4\u30e9\u2192   \u90aa\u60aa\u306a\u308b\u6b7b\u306e\u30ab\u30e9\u30b9     27       4,198
+BAD  battle_9999_20261006_185542__B-20261006-105542-B139CF4E62744878-001.json  rows=36 violations=4
+---- layout: files=122 with-section=109 absent=13 bad=109 rows-checked=3356
+bad files: battle_104030_20261004_183041.json, battle_401004_20261006_105754__B-20261006-025754-C916794113964F30-001.json, battle_401004_20261006_110409__B-20261006-025754-C916794113964F30-002.json, battle_401004_20261006_110840__B-20261006-025754-C916794113964F30-003.json, battle_411001_20261004_015919.json, battle_411001_20261004_021914.json, battle_411001_20261004_023627.json, battle_411001_20261004_033231.json, battle_411001_20261004_035437.json, battle_411001_20261004_041309.json, battle_411001_20261004_042637.json, battle_411001_20261004_042844.json, battle_411001_20261004_113553.json, battle_411001_20261004_115024.json, battle_411001_20261004_115417.json, battle_411001_20261004_134524.json, battle_411001_20261004_134853.json, battle_411001_20261004_144548.json, battle_411001_20261004_170157.json, battle_411001_20261004_180353.json, battle_411001_20261004_180834.json, battle_411001_20261004_181951.json, battle_411001_20261004_195307.json, battle_411001_20261004_195527.json, battle_411001_20261004_195639.json, battle_411001_20261004_195755.json, battle_411001_20261004_195853.json, battle_411001_20261004_195922.json, battle_411001_20261004_200006.json, battle_411001_20261005_082525.json, battle_411001_20261005_132514.json, battle_411001_20261005_135533.json, battle_411001_20261005_142931.json, battle_411001_20261006_121130__B-20261006-041130-7AA0C98126494171-001.json, battle_411001_20261006_140741__B-20261006-060741-6441AB90F1C942BA-001.json, battle_411001_20261006_161909__B-20261006-081406-C3BAF595E0994E67-002.json, battle_411001_20261006_162941__B-20261006-081406-C3BAF595E0994E67-003.json, battle_411001_20261006_173353__B-20261006-093208-306521E642454F7D-002.json, battle_700817_20261004_114821.json, battle_9999_20261004_042458.json, battle_9999_20261004_135214.json, battle_9999_20261004_165952.json, battle_9999_20261004_175957.json, battle_9999_20261004_194948.json, battle_9999_20261005_064910.json, battle_9999_20261005_164431__B-20261005-084431-C090E1C550B84C10-001.json, battle_9999_20261005_164532__B-20261005-084431-C090E1C550B84C10-002.json, battle_9999_20261005_164623__B-20261005-084431-C090E1C550B84C10-003.json, battle_9999_20261005_164710__B-20261005-084431-C090E1C550B84C10-004.json, battle_9999_20261005_164820__B-20261005-084431-C090E1C550B84C10-005.json, battle_9999_20261005_164941__B-20261005-084431-C090E1C550B84C10-006.json, battle_9999_20261005_181631__B-20261005-101631-C3F24E1814C94EE5-001.json, battle_9999_20261005_181754__B-20261005-101631-C3F24E1814C94EE5-002.json, battle_9999_20261005_184958__B-20261005-104958-3F7329C2E1F84313-001.json, battle_9999_20261005_185135__B-20261005-104958-3F7329C2E1F84313-002.json, battle_9999_20261005_185300__B-20261005-104958-3F7329C2E1F84313-003.json, battle_9999_20261005_185525__B-20261005-104958-3F7329C2E1F84313-004.json, battle_9999_20261005_185653__B-20261005-104958-3F7329C2E1F84313-005.json, battle_9999_20261005_185906__B-20261005-104958-3F7329C2E1F84313-006.json, battle_9999_20261005_195024__B-20261005-115024-D88099F7C45D4078-001.json, battle_9999_20261005_214130__B-20261005-134130-83559094DF634D7F-001.json, battle_9999_20261005_214357__B-20261005-134130-83559094DF634D7F-002.json, battle_9999_20261005_214556__B-20261005-134130-83559094DF634D7F-003.json, battle_9999_20261005_214916__B-20261005-134130-83559094DF634D7F-004.json, battle_9999_20261005_215031__B-20261005-134130-83559094DF634D7F-005.json, battle_9999_20261005_215231__B-20261005-134130-83559094DF634D7F-006.json, battle_9999_20261005_215403__B-20261005-134130-83559094DF634D7F-007.json, battle_9999_20261005_215520__B-20261005-134130-83559094DF634D7F-008.json, battle_9999_20261005_215755__B-20261005-134130-83559094DF634D7F-009.json, battle_9999_20261005_220210__B-20261005-134130-83559094DF634D7F-010.json, battle_9999_20261005_220325__B-20261005-134130-83559094DF634D7F-011.json, battle_9999_20261005_220857__B-20261005-134130-83559094DF634D7F-012.json, battle_9999_20261005_221440__B-20261005-134130-83559094DF634D7F-013.json, battle_9999_20261005_221621__B-20261005-134130-83559094DF634D7F-014.json, battle_9999_20261005_221736__B-20261005-134130-83559094DF634D7F-015.json, battle_9999_20261005_221835__B-20261005-134130-83559094DF634D7F-016.json, battle_9999_20261005_223937__B-20261005-134130-83559094DF634D7F-017.json, battle_9999_20261006_012304__B-20261005-172304-A229034B13BC4140-001.json, battle_9999_20261006_012402__B-20261005-172304-A229034B13BC4140-002.json, battle_9999_20261006_012455__B-20261005-172304-A229034B13BC4140-003.json, battle_9999_20261006_012556__B-20261005-172304-A229034B13BC4140-004.json, battle_9999_20261006_012658__B-20261005-172304-A229034B13BC4140-005.json, battle_9999_20261006_012854__B-20261005-172304-A229034B13BC4140-006.json, battle_9999_20261006_013019__B-20261005-172304-A229034B13BC4140-007.json, battle_9999_20261006_013208__B-20261005-172304-A229034B13BC4140-008.json, battle_9999_20261006_013526__B-20261005-172304-A229034B13BC4140-009.json, battle_9999_20261006_013630__B-20261005-172304-A229034B13BC4140-010.json, battle_9999_20261006_013758__B-20261005-172304-A229034B13BC4140-011.json, battle_9999_20261006_013923__B-20261005-172304-A229034B13BC4140-012.json, battle_9999_20261006_014047__B-20261005-172304-A229034B13BC4140-013.json, battle_9999_20261006_014202__B-20261005-172304-A229034B13BC4140-014.json, battle_9999_20261006_014410__B-20261005-172304-A229034B13BC4140-015.json, battle_9999_20261006_014526__B-20261005-172304-A229034B13BC4140-016.json, battle_9999_20261006_014636__B-20261005-172304-A229034B13BC4140-017.json, battle_9999_20261006_014825__B-20261005-172304-A229034B13BC4140-018.json, battle_9999_20261006_014930__B-20261005-172304-A229034B13BC4140-019.json, battle_9999_20261006_015035__B-20261005-172304-A229034B13BC4140-020.json, battle_9999_20261006_015144__B-20261005-172304-A229034B13BC4140-021.json, battle_9999_20261006_032953__B-20261005-192953-6E7D7198B94042B2-001.json, battle_9999_20261006_111510__B-20261006-025754-C916794113964F30-004.json, battle_9999_20261006_111732__B-20261006-025754-C916794113964F30-005.json, battle_9999_20261006_111854__B-20261006-025754-C916794113964F30-006.json, battle_9999_20261006_111955__B-20261006-025754-C916794113964F30-007.json, battle_9999_20261006_112106__B-20261006-025754-C916794113964F30-008.json, battle_9999_20261006_112250__B-20261006-025754-C916794113964F30-009.json, battle_9999_20261006_151957__B-20261006-071957-4D8D2BAE28394C5A-001.json, battle_9999_20261006_161406__B-20261006-081406-C3BAF595E0994E67-001.json, battle_9999_20261006_173208__B-20261006-093208-306521E642454F7D-001.json, battle_9999_20261006_185542__B-20261006-105542-B139CF4E62744878-001.json
+OK   battle_104030_20261004_183041.json  rows=4
+OK   battle_401004_20261006_105754__B-20261006-025754-C916794113964F30-001.json  rows=34
+OK   battle_401004_20261006_110409__B-20261006-025754-C916794113964F30-002.json  rows=34
+OK   battle_401004_20261006_110840__B-20261006-025754-C916794113964F30-003.json  rows=34
+OK   battle_411001_20261004_015919.json  rows=36
+OK   battle_411001_20261004_021914.json  rows=36
+OK   battle_411001_20261004_023627.json  rows=36
+OK   battle_411001_20261004_033231.json  rows=36
+OK   battle_411001_20261004_035437.json  rows=36
+OK   battle_411001_20261004_041309.json  rows=36
+OK   battle_411001_20261004_042637.json  rows=36
+OK   battle_411001_20261004_042844.json  rows=36
+OK   battle_411001_20261004_113553.json  rows=36
+OK   battle_411001_20261004_115024.json  rows=36
+OK   battle_411001_20261004_115417.json  rows=35
+OK   battle_411001_20261004_134524.json  rows=35
+OK   battle_411001_20261004_134853.json  rows=36
+OK   battle_411001_20261004_144548.json  rows=36
+OK   battle_411001_20261004_170157.json  rows=36
+OK   battle_411001_20261004_180353.json  rows=36
+OK   battle_411001_20261004_180834.json  rows=36
+OK   battle_411001_20261004_181951.json  rows=36
+OK   battle_411001_20261004_195307.json  rows=8
+OK   battle_411001_20261004_195527.json  rows=8
+OK   battle_411001_20261004_195639.json  rows=7
+OK   battle_411001_20261004_195755.json  rows=7
+OK   battle_411001_20261004_195853.json  rows=7
+OK   battle_411001_20261004_195922.json  rows=2
+OK   battle_411001_20261004_200006.json  rows=8
+OK   battle_411001_20261005_082525.json  rows=36
+OK   battle_411001_20261005_132514.json  rows=36
+OK   battle_411001_20261005_135533.json  rows=34
+OK   battle_411001_20261005_142931.json  rows=36
+OK   battle_411001_20261006_121130__B-20261006-041130-7AA0C98126494171-001.json  rows=36
+OK   battle_411001_20261006_140741__B-20261006-060741-6441AB90F1C942BA-001.json  rows=36
+OK   battle_411001_20261006_161909__B-20261006-081406-C3BAF595E0994E67-002.json  rows=36
+OK   battle_411001_20261006_162941__B-20261006-081406-C3BAF595E0994E67-003.json  rows=36
+OK   battle_411001_20261006_173353__B-20261006-093208-306521E642454F7D-002.json  rows=36
+OK   battle_700817_20261004_114821.json  rows=25
+OK   battle_9999_20261004_042458.json  rows=21
+OK   battle_9999_20261004_135214.json  rows=25
+OK   battle_9999_20261004_165952.json  rows=25
+OK   battle_9999_20261004_175957.json  rows=24
+OK   battle_9999_20261004_194948.json  rows=25
+OK   battle_9999_20261005_064910.json  rows=27
+OK   battle_9999_20261005_164431__B-20261005-084431-C090E1C550B84C10-001.json  rows=34
+OK   battle_9999_20261005_164532__B-20261005-084431-C090E1C550B84C10-002.json  rows=34
+OK   battle_9999_20261005_164623__B-20261005-084431-C090E1C550B84C10-003.json  rows=34
+OK   battle_9999_20261005_164710__B-20261005-084431-C090E1C550B84C10-004.json  rows=31
+OK   battle_9999_20261005_164820__B-20261005-084431-C090E1C550B84C10-005.json  rows=34
+OK   battle_9999_20261005_164941__B-20261005-084431-C090E1C550B84C10-006.json  rows=34
+OK   battle_9999_20261005_181631__B-20261005-101631-C3F24E1814C94EE5-001.json  rows=34
+OK   battle_9999_20261005_181754__B-20261005-101631-C3F24E1814C94EE5-002.json  rows=34
+OK   battle_9999_20261005_184958__B-20261005-104958-3F7329C2E1F84313-001.json  rows=33
+OK   battle_9999_20261005_185135__B-20261005-104958-3F7329C2E1F84313-002.json  rows=34
+OK   battle_9999_20261005_185300__B-20261005-104958-3F7329C2E1F84313-003.json  rows=34
+OK   battle_9999_20261005_185525__B-20261005-104958-3F7329C2E1F84313-004.json  rows=34
+OK   battle_9999_20261005_185653__B-20261005-104958-3F7329C2E1F84313-005.json  rows=34
+OK   battle_9999_20261005_185906__B-20261005-104958-3F7329C2E1F84313-006.json  rows=34
+OK   battle_9999_20261005_195024__B-20261005-115024-D88099F7C45D4078-001.json  rows=34
+OK   battle_9999_20261005_214130__B-20261005-134130-83559094DF634D7F-001.json  rows=25
+OK   battle_9999_20261005_214357__B-20261005-134130-83559094DF634D7F-002.json  rows=33
+OK   battle_9999_20261005_214556__B-20261005-134130-83559094DF634D7F-003.json  rows=32
+OK   battle_9999_20261005_214916__B-20261005-134130-83559094DF634D7F-004.json  rows=32
+OK   battle_9999_20261005_215031__B-20261005-134130-83559094DF634D7F-005.json  rows=32
+OK   battle_9999_20261005_215231__B-20261005-134130-83559094DF634D7F-006.json  rows=32
+OK   battle_9999_20261005_215403__B-20261005-134130-83559094DF634D7F-007.json  rows=32
+OK   battle_9999_20261005_215520__B-20261005-134130-83559094DF634D7F-008.json  rows=29
+OK   battle_9999_20261005_215755__B-20261005-134130-83559094DF634D7F-009.json  rows=32
+OK   battle_9999_20261005_220210__B-20261005-134130-83559094DF634D7F-010.json  rows=31
+OK   battle_9999_20261005_220325__B-20261005-134130-83559094DF634D7F-011.json  rows=32
+OK   battle_9999_20261005_220857__B-20261005-134130-83559094DF634D7F-012.json  rows=32
+OK   battle_9999_20261005_221440__B-20261005-134130-83559094DF634D7F-013.json  rows=32
+OK   battle_9999_20261005_221621__B-20261005-134130-83559094DF634D7F-014.json  rows=32
+OK   battle_9999_20261005_221736__B-20261005-134130-83559094DF634D7F-015.json  rows=32
+OK   battle_9999_20261005_221835__B-20261005-134130-83559094DF634D7F-016.json  rows=32
+OK   battle_9999_20261005_223937__B-20261005-134130-83559094DF634D7F-017.json  rows=30
+OK   battle_9999_20261006_012304__B-20261005-172304-A229034B13BC4140-001.json  rows=30
+OK   battle_9999_20261006_012402__B-20261005-172304-A229034B13BC4140-002.json  rows=29
+OK   battle_9999_20261006_012455__B-20261005-172304-A229034B13BC4140-003.json  rows=33
+OK   battle_9999_20261006_012556__B-20261005-172304-A229034B13BC4140-004.json  rows=30
+OK   battle_9999_20261006_012658__B-20261005-172304-A229034B13BC4140-005.json  rows=32
+OK   battle_9999_20261006_012854__B-20261005-172304-A229034B13BC4140-006.json  rows=31
+OK   battle_9999_20261006_013019__B-20261005-172304-A229034B13BC4140-007.json  rows=34
+OK   battle_9999_20261006_013208__B-20261005-172304-A229034B13BC4140-008.json  rows=31
+OK   battle_9999_20261006_013526__B-20261005-172304-A229034B13BC4140-009.json  rows=20
+OK   battle_9999_20261006_013630__B-20261005-172304-A229034B13BC4140-010.json  rows=24
+OK   battle_9999_20261006_013758__B-20261005-172304-A229034B13BC4140-011.json  rows=20
+OK   battle_9999_20261006_013923__B-20261005-172304-A229034B13BC4140-012.json  rows=34
+OK   battle_9999_20261006_014047__B-20261005-172304-A229034B13BC4140-013.json  rows=34
+OK   battle_9999_20261006_014202__B-20261005-172304-A229034B13BC4140-014.json  rows=31
+OK   battle_9999_20261006_014410__B-20261005-172304-A229034B13BC4140-015.json  rows=35
+OK   battle_9999_20261006_014526__B-20261005-172304-A229034B13BC4140-016.json  rows=35
+OK   battle_9999_20261006_014636__B-20261005-172304-A229034B13BC4140-017.json  rows=34
+OK   battle_9999_20261006_014825__B-20261005-172304-A229034B13BC4140-018.json  rows=34
+OK   battle_9999_20261006_014930__B-20261005-172304-A229034B13BC4140-019.json  rows=34
+OK   battle_9999_20261006_015035__B-20261005-172304-A229034B13BC4140-020.json  rows=33
+OK   battle_9999_20261006_015144__B-20261005-172304-A229034B13BC4140-021.json  rows=34
+OK   battle_9999_20261006_032953__B-20261005-192953-6E7D7198B94042B2-001.json  rows=33
+OK   battle_9999_20261006_111510__B-20261006-025754-C916794113964F30-004.json  rows=34
+OK   battle_9999_20261006_111732__B-20261006-025754-C916794113964F30-005.json  rows=34
+OK   battle_9999_20261006_111854__B-20261006-025754-C916794113964F30-006.json  rows=34
+OK   battle_9999_20261006_111955__B-20261006-025754-C916794113964F30-007.json  rows=34
+OK   battle_9999_20261006_112106__B-20261006-025754-C916794113964F30-008.json  rows=33
+OK   battle_9999_20261006_112250__B-20261006-025754-C916794113964F30-009.json  rows=34
+OK   battle_9999_20261006_151957__B-20261006-071957-4D8D2BAE28394C5A-001.json  rows=33
+OK   battle_9999_20261006_161406__B-20261006-081406-C3BAF595E0994E67-001.json  rows=34
+OK   battle_9999_20261006_173208__B-20261006-093208-306521E642454F7D-001.json  rows=34
+OK   battle_9999_20261006_185542__B-20261006-105542-B139CF4E62744878-001.json  rows=36
+---- layout: files=122 with-section=109 absent=13 bad=0 rows-checked=3356
+selftest: old(1.7.6 Fit) bad=109 rows=3356 violations=754 | new(1.7.7 Fit) bad=0 rows=3356 violations=0
+selftest: PASS
