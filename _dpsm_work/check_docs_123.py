@@ -137,6 +137,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R67.md',
     # R69: 调用 ≠ 发动(Using 判据 / 折叠窗口改成技能自己的冷却 / 试N / 删 rec 通道)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R69.md',
+    # R70: 敌方技能混进我方时间表(三路统一团队判据)+ 一行的发动时刻放不下就往下撑
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R70.md',
 ]
 
 

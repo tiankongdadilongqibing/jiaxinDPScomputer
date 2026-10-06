@@ -235,8 +235,24 @@ internal static partial class Cases
 			cluster[0].StampFold.Count, cluster[0].Stamps.Count);
 
 		SkillActivationCases(r);
+		SkillSideCases(r);
 		SkillAttemptCases(r);
 		SkillTimelineTextCases(r);
+	}
+
+	// ------------------------------------------------------------------ R70: whose skills are these
+	private static void SkillSideCases(Runner r)
+	{
+		r.Group("policy/skill-side");
+
+		// MEASURED 2026-10-06 (quest 9999): `actors[].team` = 1 for our units and 2 for the enemy's, and the
+		// page had been mixing them because only the `skl` route applied this test.
+		r.Eq("our-team-is-one", SkillSidePolicy.OurTeam, 1);
+		r.True("team-one-is-ours", SkillSidePolicy.IsOurs(1));
+		r.True("team-two-is-not-ours", !SkillSidePolicy.IsOurs(2));
+		r.True("team-zero-is-not-ours", !SkillSidePolicy.IsOurs(0));
+		r.True("a-negative-team-is-not-ours", !SkillSidePolicy.IsOurs(-1));
+		r.True("an-unreadable-team-is-not-ours", !SkillSidePolicy.IsOurs(int.MinValue));
 	}
 
 	// ------------------------------------------------------------------ R69: activation vs attempt
@@ -460,11 +476,64 @@ internal static partial class Cases
 		// ---- truncation is always stated ----
 		var many = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 15; i++) many.Add(Ev("A", "S", 3, 5.0 + i * 2.0, "cmd"));
-		// 15 stamps, 9 cells: 8 stamps + the "+7" cell
-		r.True("stamps-beyond-the-printed-ones-are-counted",
-			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many)[0]).Text.Contains("+7"));
+		// R70: 15 stamps no longer need a `+N` at all -- the row grows a continuation line and prints all of
+		// them. The `+N` mark moved to the LAST continuation line, i.e. it now means "more than 51".
+		List<TimelineLine> fifteen = SkillTimelineText.GroupLines(SkillTimelinePolicy.Group(many)[0]);
+		r.Eq("fifteen-stamps-take-two-lines", fifteen.Count, 2);
+		r.True("fifteen-stamps-are-all-printed", fifteen[1].Text.Contains("33.0") && !fifteen[1].Text.Contains("+"));
 		r.Eq("exactly-nine-stamps-print-without-a-plus",
 			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many.GetRange(0, 9))[0]).Text.Contains("+") ? 1 : 0, 0);
+		// ... and the first line still carries the first NINE of them (10 stamps: the 9th is 53.0, the 10th 59.0).
+		r.True("the-first-line-prints-the-first-nine-stamps",
+			SkillTimelineText.GroupLine(GroupOf(10)).Text.Contains("53.0")
+			&& !SkillTimelineText.GroupLine(GroupOf(10)).Text.Contains("59.0"));
+
+		// ---- R70: a row grows DOWNWARDS instead of ending in `+N` (the user's request) ----
+		r.Eq("a-continuation-line-carries-fourteen-stamps", SkillTimelineText.ContinuationStamps, 14);
+		r.Eq("a-row-may-take-three-continuation-lines", SkillTimelineText.MaxStampLines, 3);
+		r.Eq("the-row-cap-is-fifty-one-stamps",
+			SkillTimelineText.MaxStamps + SkillTimelineText.MaxStampLines * SkillTimelineText.ContinuationStamps, 51);
+		// 9 + 14 = 23 -> exactly two lines; 24 -> three; 51 -> four lines and still no `+`.
+		r.Eq("twenty-three-stamps-take-two-lines", WrapLines(23), 2);
+		r.Eq("twenty-four-stamps-take-three-lines", WrapLines(24), 3);
+		r.Eq("fifty-one-stamps-take-four-lines", WrapLines(51), 4);
+		r.True("fifty-one-stamps-still-print-everything",
+			!SkillTimelineText.GroupLines(GroupOf(51))[3].Text.Contains("+"));
+		// 52 -> the last continuation line spends a cell on `+2` (the mark costs the cell it sits in, so the
+		// row shows 50 of the 52 stamps).
+		List<TimelineLine> over = SkillTimelineText.GroupLines(GroupOf(52));
+		r.Eq("fifty-two-stamps-still-take-four-lines", over.Count, 4);
+		r.True("the-fifty-second-stamp-is-reported-as-plus-two", over[3].Text.Contains("+2"));
+		// The cap is real: 80 stamps print 50 and say `+30`.
+		List<TimelineLine> huge = SkillTimelineText.GroupLines(GroupOf(80));
+		r.Eq("a-huge-row-stops-at-four-lines", huge.Count, 4);
+		r.True("a-huge-row-states-what-it-dropped", huge[3].Text.Contains("+30"));
+		// Every continuation line starts at the first line's stamp column, so the columns stay aligned.
+		string pad = new string(' ', SkillTimelineText.Indent);
+		foreach (TimelineLine cl in huge.GetRange(1, 3))
+			r.True("a-continuation-line-starts-under-the-stamp-column", cl.Text.StartsWith(pad));
+		r.True("a-continuation-line-carries-no-name-or-tail",
+			!huge[1].Text.Contains("A") && !huge[1].Text.Contains("n="));
+		r.True("every-continuation-line-fits-the-pinned-width",
+			DisplayFormat.DispWidth(huge[3].Text) <= SkillTimelineText.LineWidth);
+		// A row with no stamps (attempt-only) must NOT grow a continuation line.
+		List<SkillTimelineGroup> onlyTries = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>());
+		SkillTimelinePolicy.ApplyAttempts(onlyTries, new List<SkillTimelineAttempt> { Att("A", "S", 3, 4) });
+		r.Eq("an-attempt-only-row-takes-one-line", SkillTimelineText.GroupLines(onlyTries[0]).Count, 1);
+		r.Str("the-first-line-of-a-row-is-the-row", SkillTimelineText.GroupLines(GroupOf(30))[0].Text,
+			SkillTimelineText.GroupLine(GroupOf(30)).Text);
+
+		// ---- R70: the page says how many non-ally observations were dropped (the title promises 我方) ----
+		r.Str("the-channel-line-hides-a-zero-drop-count", SkillTimelineText.ChannelLine(63, 22, 0),
+			SkillTimelineText.ChannelLine(63, 22));
+		r.True("the-channel-line-reports-the-non-ally-drops",
+			SkillTimelineText.ChannelLine(63, 22, 17).Contains("剔除非我方 17 条"));
+		r.True("the-page-prints-the-non-ally-drops",
+			Has(SkillTimelineText.Rows(viaSkl, tries, 17, true), "剔除非我方 17 条"));
+		r.True("the-page-shows-no-drop-suffix-when-nothing-was-dropped",
+			!Has(SkillTimelineText.Rows(viaSkl, tries, 0, true), "剔除非我方"));
+		r.True("the-legend-mentions-the-continuation-lines",
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "发动时刻一屏放不下时接着下一行"));
 
 		var lots = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 16; i++) lots.Add(Ev("U" + i.ToString("D2", CultureInfo.InvariantCulture), "S", 3, 5.0 + i, "cmd"));
@@ -497,6 +566,19 @@ internal static partial class Cases
 	private static SkillTimelineAttempt Att(string unit, string skill, int type, int count)
 	{
 		return new SkillTimelineAttempt { Unit = unit, Skill = skill, Type = type, Count = count };
+	}
+
+	/// <summary>R70: one row with `n` stamps 6 s apart, so no fold can absorb them.</summary>
+	private static SkillTimelineGroup GroupOf(int n)
+	{
+		var evs = new List<SkillTimelineEvent>();
+		for (int i = 0; i < n; i++) evs.Add(Ev("A", "S", 3, 5.0 + i * 6.0, "cmd"));
+		return SkillTimelinePolicy.Group(evs)[0];
+	}
+
+	private static int WrapLines(int n)
+	{
+		return SkillTimelineText.GroupLines(GroupOf(n)).Count;
 	}
 
 	private static string Stamps(SkillTimelineGroup g)

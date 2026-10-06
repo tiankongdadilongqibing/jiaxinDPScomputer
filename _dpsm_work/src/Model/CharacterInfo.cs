@@ -44,14 +44,17 @@ public static class CharacterInfo
 
 	public static bool IsAlly(BattleObject bo)
 	{
+		// R70: the verdict moved into `SkillSidePolicy` (pure, unit-tested, mutable), because the 技能时间表
+		// claimed to use this test on all three of its routes and really used it on one -- the enemy's auto
+		// skills were published as ours. This stays the reader: one place reads `TeamType`, one place decides.
 		if (!GameRef.IsNull(bo))
-			return (int)bo.TeamType == 1;
+			return SkillSidePolicy.IsOurs((int)bo.TeamType);
 		return false;
 	}
 
 	public static bool IsAllyTeam(TeamType t)
 	{
-		try { return (int)t == 1; }
+		try { return SkillSidePolicy.IsOurs((int)t); }
 		catch { return false; }
 	}
 

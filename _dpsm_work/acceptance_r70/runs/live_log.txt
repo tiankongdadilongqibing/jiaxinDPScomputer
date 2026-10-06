@@ -1,0 +1,8 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_live_log.py --log D:\dmmplayer\rlyehshoujotaix_cl\BepInEx\LogOutput.log
+live-log gate: PASS
+  note: no DpsMeter [Error] line in the log
+  note: 1 exported battle(s) paired with the machine log; version 1.7.20
+  note: history counter non-decreasing across 45 frame(s) (max 1)
+  note: 45 frame(s) carry unattrRow but none held a comparable figure
+---- exit 0

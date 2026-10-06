@@ -1,0 +1,11 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\budget_census.py --selftest --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+  [PASS] a dropped step is counted with its damage                  {'hits': 1, 'steps': 2, 'damage': 1000.0, 'share': 0.6666666666666666, 'foldCounts': {'26': 1}}
+  [PASS] the fold count on the dropped hit is recorded              {'26': 1}
+  [PASS] a clean export reports no drops                            {'hits': 0, 'steps': 0, 'damage': 0.0, 'share': 0.0, 'foldCounts': {}}
+  [PASS] read errors, overflow and unknown identity are kept separate {'triggerErrors': 3} | {'timeline.rowsDropped': 5} | {'paramOwners.ownerUnknown': 7, 'ledger.unknownAttackerHits': 2, 'ledger.unknownAttackerDealt': 123.0}
+  [PASS] the per-battle table is ranked by affected DAMAGE, not by hit count big.json first
+  [PASS] every issue carries the four required fields               5 issues
+  [PASS] the dropped share is a share of dealt                      0.057197
+  [PASS] a real export censuses and the residual detector sees residuals battle_411001_20261003_205449.json dealt=198588964 buckets=12
+---- selftest: PASS

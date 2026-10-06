@@ -1055,3 +1055,21 @@ R66 已把 `Skill.ActivationType`/`ActivationTypeParam` 打进行(`act=`/`actP=`
 - **`rec` 通道与钩子已删除**(见上条);`Hooks/SkillRecordHooks.cs` 改名 `Hooks/SkillCommandHooks.cs`。
 - **`Skill.ActivationType`/`ActivationTypeParam` 没有解释力**:实测每个单位每个技能都是 `act=0 actP=0`
   (与主表 `activationType=0` 一致)。R66 §2b 把它当作"什么触发它"的答案,该期望不成立,不要再引用。
+
+##### R70(插件 1.7.21):技能时间表**只统计我方**(三路统一),一行的时刻放不下就**往下撑**
+
+本轮**不动归属口径、不动任何伤害/归属数值、不改导出形状**(`contribution.schemaVersion` 仍 **1.2**)。
+
+- **队伍口径(新写的、之前只是"文档里说过了")**:`team == 1` = 我方,判据抽成纯策略 `SkillSidePolicy.IsOurs`
+  (`CharacterInfo.IsAlly/IsAllyTeam` 现在都调它;导出的 `actors[].team`、`events[].atkTeam/vicTeam` 用同一套编号,
+  实测 `(1,2)` = 我方命中敌方、`(2,1)` = 反向)。**读不出来的 team 一律不算我方**(失败关闭)。
+- **R66-R69 的时间表其实只在一路上做了这个判断** —— `skl`(奥义/特殊命令)有,`cmd`(自动技能命令后缀)与
+  **充能采样器**都没有。实测(任务 9999,60.7 s,导出 `…151957…-001.json`):页面里有 **ムスクーマ** 与
+  **ネフェスティス**,而这两个名字在本场 `actors[].team` **只有 team 2**;同场 `skl` 的 SUM 却报 `foreignSide=9`
+  (敌方那 9 次调用被丢掉)。因为同名角色两边都有,`cmd` 的文字身份键会把敌方同名单位的发动**并进我方同一行** ——
+  于是既"统计进来了"又"看不出敌我"。三路现在统一走 `SkillTimelineProbe.NoteForeign`:
+  计数(`[SKILLTL] SUM foreign(cmd/skl/chg)=a/b/c`、`[AUTOSK] SUM foreignSide=/foreignUnits=`)并打证据行
+  (`[SKILLTL] foreign … (not our side; not stored and not timed)`),页面的通道行追加 **`剔除非我方 N 条`**。
+- **一行的发动时刻放不下就往下撑**:首行不变(身份 + 9 个时刻 + 尾部),**续行只印时刻**并与首行的时刻列对齐,
+  每行 **14** 个,最多 **3** 个续行 ⇒ 一行最多印 51 个时刻;再多时 `+N` 落在最后一个续行的末格(含义不变)。
+  引用这一页时:`n=` 是**发动次数**、`试N` 是**调用但没发动**的次数、续行属于**同一行**。

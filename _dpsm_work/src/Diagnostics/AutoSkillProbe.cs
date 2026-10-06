@@ -254,6 +254,18 @@ internal static class AutoSkillProbe
 			// fire during the post-battle sequence, and dropping those rows would lose real activations.
 			if (Aggregator.Session == null) return;
 			if (player == null) { NullPlayers++; return; }
+			// R70: THE COMMAND LAYER IS PATCHED PROCESS-WIDE, SO IT SEES THE ENEMY TOO. This hook is on
+			// `GameCmdExecuter.ActExecutePlayerAutoSkillForPassive`, which the enemy's units call exactly
+			// like ours. MEASURED 2026-10-06 (quest 9999, 60.7 s): the 技能时间表 listed ムスクーマ and
+			// ネフェスティス, and the export's `actors[].team` puts those two on team 2 ONLY -- i.e. the
+			// page had been publishing the enemy's auto skills as ours since R66 (the `skl` channel had the
+			// filter, this one never did; its SUM `foreignSide=9` is that channel's proof the filter works).
+			// `CharacterInfo.IsAlly` is the same team test every other surface uses (team == 1).
+			if (!CharacterInfo.IsAlly(player))
+			{
+				SkillTimelineProbe.NoteForeign(player, "cmd", index);
+				return;
+			}
 			string resolvedBy;
 			Skill sk = ResolveCommandSkill(player, index, out resolvedBy);
 			if (sk == null)
@@ -327,6 +339,16 @@ internal static class AutoSkillProbe
 			if (GameRef.IsNull(p)) continue;
 			long ptr = PointerOf(p);
 			if (ptr != 0L && !seen.Add(ptr)) continue;
+			// R70: THE STANDBY LIST IS NOT PARTY-ONLY EITHER. MEASURED 2026-10-06 (quest 9999): the sampler
+			// walked 9 units and two of them (ムスクーマ, ネフェスティス) exist ONLY on the enemy team in
+			// that battle's export, so their `chg`/`roster` rows were the enemy's charge evidence sitting in
+			// a page titled 我方. Same team test as everywhere else; counted AND written out once per unit,
+			// because "the sampler skipped a unit" must not look like "this battle had fewer units".
+			if (!CharacterInfo.IsAlly(p))
+			{
+				SkillTimelineProbe.NoteForeign(p, "chg", -1);
+				continue;
+			}
 			PlayersSeen++;
 			ObservePlayer(p, s, wall);
 		}
@@ -968,6 +990,8 @@ internal static class AutoSkillProbe
 			.Append(" actCmd=").Append(CommandActivations)
 			.Append(" tries=").Append(AttemptRows)
 			.Append(" unclassified=").Append(UnclassifiedRows)
+			.Append(" foreignSide=").Append(SkillTimelineProbe.ForeignCommand)
+			.Append(" foreignUnits=").Append(SkillTimelineProbe.ForeignSample)
 			.Append(" cmdUnresolved=").Append(CommandUnresolved)
 			.Append(" indexReadingsDiffer=").Append(IndexReadingsDiffer)
 			.Append(" useEdges=").Append(UsingEdges)

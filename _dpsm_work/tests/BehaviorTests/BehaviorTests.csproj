@@ -74,6 +74,9 @@
          enter the fold or a median) and the verdict that decides activation vs attempt. Both pure. -->
     <Compile Include="$(SrcRoot)\Model\SkillTimelineAttempt.cs" />
     <Compile Include="$(SrcRoot)\Policy\SkillActivationPolicy.cs" />
+    <!-- R70: whose side an observation belongs to (team 1 = ours). Moved out of `CharacterInfo.IsAlly` so the
+         three skill routes and the contribution surfaces share one verdict, and so it can be mutated. -->
+    <Compile Include="$(SrcRoot)\Policy\SkillSidePolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\SkillTimelinePolicy.cs" />
     <!-- R52: the extraction-flow decisions (trigger key, bundle name, retention). Game-free by
          construction, which is what lets the retention rule be executed instead of argued about. -->

@@ -55,6 +55,30 @@ internal static class SkillTimelineText
 	/// with 5 columns a 3-digit stamp ("107.3") filled its cell completely and the row read
 	/// `96.2107.3118.3`. 6 columns keep at least one space in front of every stamp below 10000 s.</summary>
 	internal const int StampW = 6;
+	/// <summary>Activation stamps printed on the FIRST line of a row (the same number the policy publishes,
+	/// so the two cannot drift).</summary>
+	internal const int MaxStamps = SkillTimelinePolicy.MaxStamps;
+
+	/// <summary>R70: how many CONTINUATION lines a row may take. The user asked for a row whose activation
+	/// stamps do not fit to grow downwards instead of ending in `+N`; three extra lines carry 42 more stamps,
+	/// so a row shows up to 51 activations. Bounded on purpose -- an unbounded row would let one unit own the
+	/// page, and `+N` stays meaningful once even the continuations run out.</summary>
+	internal const int MaxStampLines = 3;
+
+	/// <summary>R70: stamps one continuation line carries. They start under the first line's stamp column
+	/// (so the columns stay aligned) and need no tail, which is why a continuation fits more than a first
+	/// line does.</summary>
+	internal static int ContinuationStamps
+	{
+		get { return (LineWidth - Indent) / StampW; }
+	}
+
+	/// <summary>Leading columns before the first stamp cell: 2 spaces + the three identity columns.</summary>
+	internal static int Indent
+	{
+		get { return 2 + NameW + KindW + SkillW; }
+	}
+
 	/// <summary>Width reserved for the `并N条M格` burst mark, the activation count, the R69 attempt count
 	/// and the median gap. The tail is NOT truncated: it is the last column, so an over-long tail costs
 	/// trailing width only, and hiding the median behind ".." would hide exactly the number the page exists
@@ -80,6 +104,15 @@ internal static class SkillTimelineText
 	/// then filtering it out again is how R66/R67 published マッドシーカー's 試行 as 発動.</summary>
 	internal static List<TimelineLine> Rows(IList<SkillTimelineEvent> events, IList<SkillTimelineAttempt> attempts,
 		bool inBattle)
+	{
+		return Rows(events, attempts, 0, inBattle);
+	}
+
+	/// <summary>R70: the same page, plus the number of NON-ALLY observations the probe dropped
+	/// (`SkillTimelineProbe.NoteForeign`). The count is printed because the page's title says 我方: without it
+	/// a reader cannot tell "the enemy had no skills" from "the filter worked".</summary>
+	internal static List<TimelineLine> Rows(IList<SkillTimelineEvent> events, IList<SkillTimelineAttempt> attempts,
+		int foreignDropped, bool inBattle)
 	{
 		var lines = new List<TimelineLine>();
 		int cmd = 0, skl = 0, tries = 0;
@@ -111,15 +144,15 @@ internal static class SkillTimelineText
 			"  单位:战斗时钟秒(游戏秒)  并N条M格 = N 条发动并进了 M 格(间隔<该技能自己的冷却)",
 			TimelineLineStyle.Dim));
 		lines.Add(new TimelineLine(
-			"  试N = 本场调用 N 次但没有发动(不计入时刻与中位)  med = 合并后相邻格子间隔的中位数",
-			TimelineLineStyle.Dim));
+			"  试N = 本场调用 N 次但没有发动(不计入时刻与中位)  med = 合并后相邻格子间隔的中位数  "
+			+ "发动时刻一屏放不下时接着下一行(续行只印时刻)", TimelineLineStyle.Dim));
 
 		if (cmd + skl + tries == 0)
 		{
 			lines.Add(new TimelineLine(
 				inBattle ? "  (本场尚未观测到我方技能发动,也没有试触发)" : "  (未在战斗中,也没有上一场的记录)",
 				TimelineLineStyle.Warn));
-			lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl), TimelineLineStyle.Dim));
+			lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl, foreignDropped), TimelineLineStyle.Dim));
 			return lines;
 		}
 		if (!inBattle)
@@ -137,7 +170,7 @@ internal static class SkillTimelineText
 			+ groups.Count.ToString(CultureInfo.InvariantCulture) + " 行 / "
 			+ rows.ToString(CultureInfo.InvariantCulture) + " 次发动(合并 "
 			+ merged.ToString(CultureInfo.InvariantCulture) + " 条)", TimelineLineStyle.Dim));
-		lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl), TimelineLineStyle.Dim));
+		lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl, foreignDropped), TimelineLineStyle.Dim));
 		// R69: `skl` is the only channel that observes 奥义/特殊 (the R66 record sink was deleted), so this
 		// warning now fires on it alone -- and it names the counter to look at, because "the hook never ran"
 		// and "nothing was accepted" are different facts.
@@ -163,7 +196,9 @@ internal static class SkillTimelineText
 
 		int shown = groups.Count;
 		if (shown > SkillTimelinePolicy.MaxGroups) shown = SkillTimelinePolicy.MaxGroups;
-		for (int i = 0; i < shown; i++) lines.Add(GroupLine(groups[i]));
+		// R70: one row can now occupy several lines (see GroupLines), so the page is a LINE stream whose
+		// first line of each row carries the identity and the tail.
+		for (int i = 0; i < shown; i++) lines.AddRange(GroupLines(groups[i]));
 		if (groups.Count > shown)
 			lines.Add(new TimelineLine("  ... 还有 " + (groups.Count - shown).ToString(CultureInfo.InvariantCulture)
 				+ " 行(共 " + groups.Count.ToString(CultureInfo.InvariantCulture) + " 行;F6 明细有逐次伤害)",
@@ -175,6 +210,24 @@ internal static class SkillTimelineText
 	/// activation count and the median gap.</summary>
 	internal static TimelineLine GroupLine(SkillTimelineGroup g)
 	{
+		return GroupLines(g)[0];
+	}
+
+	/// <summary>
+	/// R70: a row as one or more physical lines. The FIRST line is the row as R66/R67 printed it (identity,
+	/// <see cref="MaxStamps"/> stamps, the tail); every further line carries
+	/// <see cref="ContinuationStamps"/> more stamps, aligned under the first line's stamp column, and nothing
+	/// else. The user's request was exactly this: a row whose activation moments do not fit should grow
+	/// downwards instead of ending in `+N` after nine of them.
+	///
+	/// `+N` still exists, at the END of the last continuation line, and it still means "N further activations
+	/// were not printed" -- the cap is <see cref="MaxStampLines"/> extra lines, so a row shows every stamp up
+	/// to 9 + 3*14 = 51, and 50 stamps plus a `+N` cell beyond that (the mark always costs the cell it sits
+	/// in). Truncation is therefore never silent, which is the invariant every version of this page has kept.
+	/// </summary>
+	internal static List<TimelineLine> GroupLines(SkillTimelineGroup g)
+	{
+		var lines = new List<TimelineLine>(1 + MaxStampLines);
 		var sb = new StringBuilder(LineWidth + 8);
 		sb.Append("  ");
 		sb.Append(DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(g.Unit), NameW), NameW));
@@ -182,18 +235,14 @@ internal static class SkillTimelineText
 		sb.Append(DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(g.Skill), SkillW), SkillW));
 
 		int n = g.Stamps.Count;
-		// Overflow is not allowed to widen the row: when there are more stamps than fit, the LAST cell is
-		// spent on the `+N` mark instead of on a stamp, so the field stays exactly StampW*MaxStamps wide
-		// and the columns to its right cannot move. `+N` therefore means "N further activations were not
-		// printed", never "one more".
-		bool overflow = n > SkillTimelinePolicy.MaxStamps;
-		int shown = overflow ? SkillTimelinePolicy.MaxStamps - 1 : n;
-		var stamps = new StringBuilder(StampW * SkillTimelinePolicy.MaxStamps);
-		for (int i = 0; i < shown; i++)
+		// The FIRST line carries up to MaxStamps stamps and never a `+N`: the overflow mark moved to the last
+		// continuation line in R70, so the field stays exactly StampW*MaxStamps wide and the columns to its
+		// right cannot move.
+		int firstShown = (n < MaxStamps) ? n : MaxStamps;
+		var stamps = new StringBuilder(StampW * MaxStamps);
+		for (int i = 0; i < firstShown; i++)
 			stamps.Append(DisplayFormat.PadL(g.Stamps[i].ToString("F1", CultureInfo.InvariantCulture), StampW));
-		if (overflow)
-			stamps.Append(DisplayFormat.PadL("+" + (n - shown).ToString(CultureInfo.InvariantCulture), StampW));
-		sb.Append(DisplayFormat.PadR(stamps.ToString(), StampW * SkillTimelinePolicy.MaxStamps));
+		sb.Append(DisplayFormat.PadR(stamps.ToString(), StampW * MaxStamps));
 
 		var tail = new StringBuilder(36);
 		// R67: N rows folded, M cells they landed in. Two numbers, because one number cannot tell "a
@@ -214,16 +263,52 @@ internal static class SkillTimelineText
 		// hiding the median behind a ".." would hide exactly the number the page exists to publish. The
 		// leading space keeps `+4` (the overflow cell) from running into `并2条2格`.
 		sb.Append(' ').Append(tail.ToString());
-		return new TimelineLine(sb.ToString(), SkillTimelinePolicy.IsAuto(g.Type) ? TimelineLineStyle.Row
-			: TimelineLineStyle.Header);
+		TimelineLineStyle style = SkillTimelinePolicy.IsAuto(g.Type) ? TimelineLineStyle.Row
+			: TimelineLineStyle.Header;
+		lines.Add(new TimelineLine(sb.ToString(), style));
+
+		// ---- R70: the continuation lines -------------------------------------------------------------
+		int idx = firstShown;
+		for (int line = 1; idx < n && line <= MaxStampLines; line++)
+		{
+			int remaining = n - idx;
+			int cap = ContinuationStamps;
+			bool lastAllowed = (line == MaxStampLines);
+			int take = remaining;
+			bool overflow = false;
+			if (remaining > cap)
+			{
+				if (lastAllowed) { take = cap - 1; overflow = true; }
+				else take = cap;
+			}
+			var csb = new StringBuilder(Indent + StampW * cap);
+			csb.Append(' ', Indent);
+			for (int k = 0; k < take; k++)
+				csb.Append(DisplayFormat.PadL(g.Stamps[idx + k].ToString("F1", CultureInfo.InvariantCulture), StampW));
+			if (overflow)
+				csb.Append(DisplayFormat.PadL("+" + (remaining - take).ToString(CultureInfo.InvariantCulture), StampW));
+			lines.Add(new TimelineLine(csb.ToString(), style));
+			idx += take;
+		}
+		return lines;
 	}
 
 	/// <summary>Which channels produced the rows. Printed also when the page is empty, because "the command
 	/// hook produced nothing" and "our units fired nothing" are different statements. R69: the `rec` column
-	/// is gone with the channel it described (patched, never called).</summary>
+	/// is gone with the channel it described (patched, never called). R70: the non-ally drop count is
+	/// appended, because the page's title promises 我方 and a promise needs its evidence -- and it is what
+	/// tells "the enemy had no skills" apart from "the filter worked".</summary>
 	internal static string ChannelLine(int cmd, int skl)
 	{
-		return "观测通道 cmd(自动技能命令) " + cmd.ToString(CultureInfo.InvariantCulture)
+		return ChannelLine(cmd, skl, 0);
+	}
+
+	internal static string ChannelLine(int cmd, int skl, int foreignDropped)
+	{
+		string s = "观测通道 cmd(自动技能命令) " + cmd.ToString(CultureInfo.InvariantCulture)
 			+ " 条 / skl(奥义特殊命令) " + skl.ToString(CultureInfo.InvariantCulture) + " 条";
+		if (foreignDropped > 0)
+			s += " / 剔除非我方 " + foreignDropped.ToString(CultureInfo.InvariantCulture) + " 条";
+		return s;
 	}
 }

@@ -10,8 +10,11 @@ internal static class Program
 	/// R69: 1090 -> 1140 (+50: +16 policy/skill-timeline for the cooldown fold, +14 policy/skill-activation
 	/// for the Using verdict, +18 policy/skill-attempts for the attempt tallies and their rows, +2 for the
 	/// whole-page width pin, and the rewritten page cases -- the deleted `rec` channel cases are inside that
-	/// delta).</summary>
-	public const int ExpectedCases = 1140;
+	/// delta).
+	/// R70: 1140 -> 1171 (+31: +6 policy/skill-side for the non-ally verdict, +25 for the multi-line row
+	/// (wrap capacity, the `+N` that moved to the last continuation line, alignment and the width pin) plus
+	/// the non-ally drop count on the channel line).</summary>
+	public const int ExpectedCases = 1171;
 
 	private static int Main(string[] args)
 	{

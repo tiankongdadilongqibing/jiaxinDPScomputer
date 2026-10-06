@@ -33,7 +33,11 @@ namespace DpsMeter;
 /// this, and a probe that hides the calls it decided against cannot be audited.
 ///
 /// FILTERING. Only our side (`CharacterInfo.IsAlly`: team 1, the same test every other surface uses) and
-/// only our own battle session. A foreign unit's skill use is counted, never stored.
+/// only our own battle session. A foreign unit's skill use is counted, never stored. **R70: this paragraph
+/// was already here in R66 and was only true of the `skl` channel** -- the auto-skill channel and the charge
+/// sampler had no team test at all, so the page published the ENEMY's auto skills (measured 2026-10-06:
+/// ムスクーマ / ネフェスティス, both team 2 only in that battle's export). All three routes now go through
+/// <see cref="NoteForeign"/>.
 ///
 /// BOUNDED. At most <see cref="MaxEvents"/> events are kept; the overflow is counted, so a page that stops
 /// growing mid-battle says why instead of quietly showing a stale tail.
@@ -56,6 +60,54 @@ internal static class SkillTimelineProbe
 	private static readonly Dictionary<string, SkillTimelineAttempt> Attempts =
 		new Dictionary<string, SkillTimelineAttempt>(StringComparer.Ordinal);
 
+	/// <summary>R70: (unit, channel, index) foreign observations already written to the log, and how many
+	/// such rows were written (bounded).</summary>
+	private static readonly HashSet<string> ForeignLogged = new HashSet<string>(StringComparer.Ordinal);
+	private const int MaxForeignLogRows = 40;
+	private static int _foreignLogRows;
+
+	/// <summary>
+	/// R70: ONE place that decides "this observation is not our side's", so the three routes into the probe
+	/// (the auto-skill command hook, the active/special command hook, the charge sampler) cannot disagree --
+	/// and so the DROP IS VISIBLE. The filter itself is `CharacterInfo.IsAlly` (team == 1), the same test the
+	/// contribution surfaces use.
+	///
+	/// WHY THIS IS A CORRECTION AND NOT A FEATURE. R66's docs claimed the page only ever stored our side;
+	/// that was true of the `skl` channel (whose SUM reported the 9 foreign calls of the 9999 battle) and
+	/// FALSE of the auto-skill channel and the sampler, which had no team test at all. MEASURED 2026-10-06
+	/// (quest 9999, 60.7 s, export `battle_9999_20261006_151957__B-…-001.json`): the page listed ムスクーマ
+	/// and ネフェスティス, and `actors[].team` puts BOTH of those on team 2 only -- the page had been
+	/// publishing the enemy's auto skills since R66, under a title that says 我方.
+	///
+	/// Counted always (so the [SKILLTL]/[AUTOSK] SUM lines can report the drops even with the page off) and
+	/// written to the log once per (unit, channel, index) while the feature is on: a silent filter would be
+	/// indistinguishable from "the enemy had no skills".
+	/// </summary>
+	internal static void NoteForeign(Player player, string channel, int index)
+	{
+		try
+		{
+			if (channel == "cmd") ForeignCommand++;
+			else if (channel == "skl") ForeignSkill++;
+			else ForeignSample++;
+
+			string unit = UnitLabel(player);
+			bool log = false;
+			lock (Gate)
+			{
+				if (On() && _foreignLogRows < MaxForeignLogRows && ForeignLogged.Add(unit + "|" + channel + "|" + index))
+				{
+					_foreignLogRows++;
+					log = true;
+				}
+			}
+			if (log)
+				RuntimeLog.Write("[SKILLTL] foreign ch=" + channel + " unit=" + unit + " gameIdx=" + index
+					+ " (not our side; not stored and not timed)");
+		}
+		catch { ReadErrors++; }
+	}
+
 	/// <summary>Activations observed through the auto-skill command postfix.</summary>
 	internal static int CommandEvents;
 	/// <summary>R69: calls that did not execute the skill, through the auto-skill command postfix. This is
@@ -66,8 +118,19 @@ internal static class SkillTimelineProbe
 	internal static int UnclassifiedEvents;
 	/// <summary>R69: attempt rows dropped after <see cref="MaxAttemptRows"/>.</summary>
 	internal static int DroppedAttemptRows;
-	/// <summary>Calls that were NOT our side (the enemy's skills go through the same hooks).</summary>
-	internal static int ForeignSideSkips;
+	/// <summary>Calls that were NOT our side (the hooks are patched process-wide, so the enemy's units go
+	/// through them too). R70: split by route, because the three routes leak differently.</summary>
+	internal static int ForeignCommand;
+	/// <summary>R70: `skl` entry-point calls from a unit that is not ours.</summary>
+	internal static int ForeignSkill;
+	/// <summary>R70: standby-list units the charge sampler skipped for the same reason.</summary>
+	internal static int ForeignSample;
+
+	/// <summary>Total non-ally observations dropped. This is what the page prints as 剔除非我方.</summary>
+	internal static int ForeignTotal
+	{
+		get { return ForeignCommand + ForeignSkill + ForeignSample; }
+	}
 	/// <summary>Calls whose `Player` or `Skill` was null (or whose name could not be read).</summary>
 	internal static int NullSkips;
 	/// <summary>Record calls of a type that is not a skill ACTIVATION (`*Finish`, Attack*, screen
@@ -88,7 +151,11 @@ internal static class SkillTimelineProbe
 			AttemptEvents = 0;
 			UnclassifiedEvents = 0;
 			DroppedAttemptRows = 0;
-			ForeignSideSkips = 0;
+			ForeignCommand = 0;
+			ForeignSkill = 0;
+			ForeignSample = 0;
+			ForeignLogged.Clear();
+			_foreignLogRows = 0;
 			NullSkips = 0;
 			NoSessionSkips = 0;
 			DroppedEvents = 0;
@@ -201,7 +268,7 @@ internal static class SkillTimelineProbe
 			}
 			if (Aggregator.Session == null) { lock (Gate) NoSessionSkips++; return; }
 			if (player == null) { lock (Gate) NullSkips++; return; }
-			if (!CharacterInfo.IsAlly(player)) { lock (Gate) ForeignSideSkips++; return; }
+			if (!CharacterInfo.IsAlly(player)) { NoteForeign(player, "skl", 0); return; }
 			if (!accepted) { lock (Gate) SkillCmdRejected++; return; }
 
 			Skill sk = null;
@@ -264,13 +331,13 @@ internal static class SkillTimelineProbe
 		catch { ReadErrors++; return 0.0; }
 	}
 
-	/// <summary>The page's rows, built by the pure text layer from a snapshot of the events and of the
-	/// attempt tallies. Both copies are taken under the same lock the hooks use, so a row can never be read
-	/// half-written.</summary>
+	/// <summary>The page's rows, built by the pure text layer from a snapshot of the events, of the attempt
+	/// tallies and of the non-ally drop count. All copies are taken under the same lock the hooks use, so a
+	/// row can never be read half-written.</summary>
 	internal static List<TimelineLine> Rows(bool inBattle)
 	{
 		List<SkillTimelineEvent> copy = Snapshot();
-		return SkillTimelineText.Rows(copy, AttemptSnapshot(), inBattle);
+		return SkillTimelineText.Rows(copy, AttemptSnapshot(), ForeignTotal, inBattle);
 	}
 
 	internal static List<SkillTimelineEvent> Snapshot()
@@ -316,14 +383,15 @@ internal static class SkillTimelineProbe
 			.Append(" sklNoSkill=").Append(SkillCmdNoSkill)
 			.Append(" kept=").Append(copy.Count)
 			.Append(" attemptRows=").Append(attempts.Count)
-			.Append(" foreignSide=").Append(ForeignSideSkips)
+			.Append(" foreign(cmd/skl/chg)=").Append(ForeignCommand).Append('/').Append(ForeignSkill)
+			.Append('/').Append(ForeignSample)
 			.Append(" nullSkips=").Append(NullSkips)
 			.Append(" noSession=").Append(NoSessionSkips)
 			.Append(" dropped=").Append(DroppedEvents)
 			.Append(" droppedAttemptRows=").Append(DroppedAttemptRows)
 			.Append(" readErrors=").Append(ReadErrors);
 		if (copy.Count == 0 && attempts.Count == 0) return sb.ToString();
-		List<TimelineLine> lines = SkillTimelineText.Rows(copy, attempts, true);
+		List<TimelineLine> lines = SkillTimelineText.Rows(copy, attempts, ForeignTotal, true);
 		for (int i = 0; i < lines.Count; i++)
 			sb.Append("\n[SKILLTL] panel ").Append(lines[i].Text);
 		return sb.ToString();

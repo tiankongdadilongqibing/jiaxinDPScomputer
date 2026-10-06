@@ -711,10 +711,12 @@ MUTATIONS = [
          find="\t\t\tif (!string.IsNullOrEmpty(e.Channel) && !g.Channels.Contains(e.Channel)) g.Channels.Add(e.Channel);",
          repl="\t\t\tif (!string.IsNullOrEmpty(e.Channel) && !g.Channels.Contains(e.Channel)) g.Channels.Insert(0, e.Channel);",
          expect="policy/skill-timeline/a-row-keeps-the-first-seen-channel-first"),
-    dict(name="skilltimeline-overflow-prints-one-stamp-too-many", file="Ui/SkillTimelineText.cs",
-         find="\t\tint shown = overflow ? SkillTimelinePolicy.MaxStamps - 1 : n;",
-         repl="\t\tint shown = overflow ? SkillTimelinePolicy.MaxStamps : n;",
-         expect="ui/skill-timeline-text/stamps-beyond-the-printed-ones-are-counted"),
+    # R69 re-anchored (R70): the first line no longer prints a `+N`, so this now shortens the first line's
+    # stamp field by one -- which silently pushes a stamp onto a continuation line.
+    dict(name="skilltimeline-first-line-prints-one-less-stamp", file="Ui/SkillTimelineText.cs",
+         find="\t\tint firstShown = (n < MaxStamps) ? n : MaxStamps;",
+         repl="\t\tint firstShown = (n < MaxStamps) ? n : MaxStamps - 1;",
+         expect="ui/skill-timeline-text/the-first-line-prints-the-first-nine-stamps"),
     # R67: the burst mark is `并N条M格` now (R66's `x(N+1)` read as "N in one cell" and was false for 3 of
     # the 5 marked rows in the first live battle); the anchor moved with it.
     dict(name="skilltimeline-burst-marker-hides-its-count", file="Ui/SkillTimelineText.cs",
@@ -788,9 +790,40 @@ MUTATIONS = [
          find="\t\treturn string.Equals(status, StatusUsing, System.StringComparison.Ordinal);",
          repl="\t\treturn status != null;",
          expect="policy/skill-activation/an-unknown-status-is-neither"),
+    # ---- R70: whose skills are on the page, and a row that grows downwards ----
+    # The user's report was that the enemy's skills were on a page titled 我方; only the `skl` route applied
+    # the team test, so this mutation re-creates the leak at the one place all three routes now share.
+    dict(name="skillside-enemy-counts-as-ours", file="Policy/SkillSidePolicy.cs",
+         find="\t\treturn team == OurTeam;",
+         repl="\t\treturn team >= OurTeam;",
+         expect="policy/skill-side/team-two-is-not-ours"),
+    dict(name="skilltimeline-continuation-carries-one-less-stamp", file="Ui/SkillTimelineText.cs",
+         find="\t\tget { return (LineWidth - Indent) / StampW; }",
+         repl="\t\tget { return (LineWidth - Indent) / StampW - 1; }",
+         expect="ui/skill-timeline-text/a-continuation-line-carries-fourteen-stamps"),
+    dict(name="skilltimeline-row-takes-unbounded-lines", file="Ui/SkillTimelineText.cs",
+         find="\tinternal const int MaxStampLines = 3;",
+         repl="\tinternal const int MaxStampLines = 99;",
+         expect="ui/skill-timeline-text/a-row-may-take-three-continuation-lines"),
+    # The R66/R67 defect, re-created: the wrap stops stating what it dropped.
+    dict(name="skilltimeline-wrap-hides-what-it-dropped", file="Ui/SkillTimelineText.cs",
+         find="\t\t\t\tif (lastAllowed) { take = cap - 1; overflow = true; }",
+         repl="\t\t\t\tif (lastAllowed) { take = cap; overflow = false; }",
+         expect="ui/skill-timeline-text/the-fifty-second-stamp-is-reported-as-plus-two"),
+    dict(name="skilltimeline-continuation-misaligned", file="Ui/SkillTimelineText.cs",
+         find="\t\t\tcsb.Append(' ', Indent);",
+         repl="\t\t\tcsb.Append(\"  \");",
+         expect="ui/skill-timeline-text/a-continuation-line-starts-under-the-stamp-column"),
+    dict(name="skilltimeline-channel-line-hides-the-foreign-drops", file="Ui/SkillTimelineText.cs",
+         find="\t\tif (foreignDropped > 0)",
+         repl="\t\tif (false)",
+         expect="ui/skill-timeline-text/the-channel-line-reports-the-non-ally-drops"),
+    # R70 re-anchored: the row style is a local now (`GroupLines` builds the first line and the
+    # continuations, which must share it), so the mutation makes every row the ordinary (non-highlighted)
+    # style -- the 奥义 row loses the "look here" colour.
     dict(name="skilltimeline-over-row-loses-its-highlight", file="Ui/SkillTimelineText.cs",
-         find="\t\t\t: TimelineLineStyle.Header);",
-         repl="\t\t\t: TimelineLineStyle.Row);",
+         find="\t\t\t: TimelineLineStyle.Header;",
+         repl="\t\t\t: TimelineLineStyle.Row;",
          expect="ui/skill-timeline-text/an-over-skill-row-is-highlighted"),
     dict(name="skilltimeline-channel-line-drops-its-label", file="Ui/SkillTimelineText.cs",
          find="\t\t\t+ \" \u6761 / skl(\u5965\u4e49\u7279\u6b8a\u547d\u4ee4) \" + skl.ToString(CultureInfo.InvariantCulture)",
