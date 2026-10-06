@@ -286,46 +286,24 @@ public class Plugin : BasePlugin
 	}
 
 	/// <summary>
-	/// R66: patch the game's unified skill-record sink
-	/// (`GameCmdExecuter.AddPlayerSkillGameRecord`) SEPARATELY from PatchAll -- same isolation rule as the
-	/// other probes. This is the ONLY channel that observes 奥义/特殊技能 activations (the auto skill has its
-	/// own command hook); if it does not resolve, the 技能时间表 page still shows the auto-skill rows and
-	/// prints `rec 0 条`, so the round produces evidence either way.
-	/// </summary>
-	private void TryPatchSkillRecord()
-	{
-		try
-		{
-			var m = AccessTools.Method(typeof(GameCmdExecuter), "AddPlayerSkillGameRecord",
-				new Type[] { typeof(Player), typeof(Skill), typeof(eUserRecordType), typeof(UnityEngine.Vector3) });
-			if (m == null)
-			{
-				LogSource.LogInfo("[DpsMeter] GameCmdExecuter.AddPlayerSkillGameRecord not found; the 技能时间表 keeps the auto-skill channel only (奥义/特殊 would show rec 0 条).");
-				return;
-			}
-			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(SkillRecordHooks), nameof(SkillRecordHooks.PostfixSkillRecord)));
-			LogSource.LogInfo("[DpsMeter] skill-record postfix applied (GameCmdExecuter.AddPlayerSkillGameRecord).");
-		}
-		catch (Exception ex)
-		{
-			LogSource.LogInfo("[DpsMeter] skill-record postfix failed (meter unaffected): " + ex.Message);
-		}
-	}
-
-	/// <summary>
 	/// R67: the three active/special command entry points of `GameCmdExecuter`, each patched in its OWN
 	/// try (one unresolved signature must not cost the other two). Same layer as the proven auto-skill
 	/// command hook; added because R66's record sink was never called in a full battle.
+	///
+	/// R69 removed that record hook (`TryPatchSkillRecord` and `AddPlayerSkillGameRecord`): it was installed
+	/// and produced 0 rows with 0 skips in TWO battles, one of them a real quest, so the patch was cost
+	/// without observation. These three are the channel that actually observes 奥义/特殊 (41 rows in the
+	/// 411001 battle, against 595 calls the game itself rejected).
 	/// </summary>
 	private void TryPatchSkillCommands()
 	{
 		var pos = typeof(Il2CppSystem.Collections.Generic.IEnumerable<UnityEngine.Vector3>);
 		TryPatchSkillCommand("ActExecutePlayerActiveSkill", new Type[] { typeof(Player), pos },
-			nameof(SkillRecordHooks.PostfixActiveSkill));
+			nameof(SkillCommandHooks.PostfixActiveSkill));
 		TryPatchSkillCommand("ActExecutePlayerSkill", new Type[] { typeof(Player), pos },
-			nameof(SkillRecordHooks.PostfixSkill));
+			nameof(SkillCommandHooks.PostfixSkill));
 		TryPatchSkillCommand("ActExecutePlayerSpecialSkill", new Type[] { typeof(Player), typeof(UnityEngine.Vector3) },
-			nameof(SkillRecordHooks.PostfixSpecialSkill));
+			nameof(SkillCommandHooks.PostfixSpecialSkill));
 	}
 
 	private void TryPatchSkillCommand(string method, Type[] args, string postfix)
@@ -338,7 +316,7 @@ public class Plugin : BasePlugin
 				LogSource.LogInfo("[DpsMeter] GameCmdExecuter." + method + " not found; that skl entry stays dark (see [SKILLTL] SUM sklCalls).");
 				return;
 			}
-			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(SkillRecordHooks), postfix));
+			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(SkillCommandHooks), postfix));
 			LogSource.LogInfo("[DpsMeter] skill-command postfix applied (GameCmdExecuter." + method + ").");
 		}
 		catch (Exception ex)
@@ -474,7 +452,7 @@ public class Plugin : BasePlugin
 		CfgExtractKey = Config.Bind<string>("General", "ExtractKey", ExtractPolicy.DefaultKey, "FEATURE (R52): press this key for an evidence bundle on demand. R66: the key now has TWO meanings and the panel decides which -- while the overlay is VISIBLE it opens the 技能时间表 page (the hotkey bar says so), and while the panel is HIDDEN (F8) the same key writes the bundle, because that is when a bundle cannot be requested any other way. F1-F12, A-Z or 0-9; NONE disables the key route entirely and leaves the battle-end route (ExtractOnBattleEnd) alone. F4 by default because the overlay already owns F5-F12 and F8/F9 must keep their meanings. Every bundle write is bounded by ExtractKeep.");
 		CfgExtractKeep = Config.Bind<int>("General", "ExtractKeep", ExtractPolicy.DefaultKeep, "FEATURE (R52): how many evidence bundles to keep under BepInEx\\plugins\\DpsMeter\\extract (oldest deleted first, decided by a pure string sort of the timestamped directory names). 1..50.");
 		CfgAutoSkillProbe = Config.Bind<bool>("Debug", "AutoSkillProbe", true, "PROBE (R64): read each party unit's AUTO SKILL from the live Skill side and log (a) the instant it fires as an [AUTOSK] act row and (b) its charge counter every 2 s as an [AUTOSK] chg row, plus a per-slot median interval at battle end. WHY: R63 published the auto-skill master row (暗沌への導き: minCoolTime/maxCoolTime = 300/240 s = 9000/7200 frames) but the ~13.5 s cadence earlier reverse-inferred from a damage channel contradicts it, and the master number cannot be checked without the live skill -- the auto skill is NOT in the standby list the [CLOCKP] line walks (verified: that list holds 地下からの完全顕現/電脳掌都/狂気の眼球, and only 暗沌への導き of those four names is in auto_skill.json). One isolated Harmony postfix on GameCmdExecuter.ActExecutePlayerAutoSkillForPassive + a read-only sampler (Player.AutoSkill1/2, Skill.Type/GetStatus/WaitCountFrame/CoolTimeFrame); if the patch does not resolve, the sampler's rising edge still times the activations and the SUM line says so. Set false to stop both.");
-		CfgSkillTimeline = Config.Bind<bool>("Debug", "SkillTimeline", true, "FEATURE/PROBE (R66): collect OUR units' 奥义/特殊/自动 skill activation moments into the overlay's 技能时间表 page (F4 while the panel is visible) and write them to the runtime log as [SKILLTL] rows. WHY: the auto skill's charge (Skill.CoolTimeFrame / 30) is NOT its firing interval -- an auto skill that has finished charging waits for the unit's next normal attack (measured over 9 battles: トレイラ CoolTimeFrame 240 = 8.0 game s, median observed gap 9.00 game s, and マッドシーカー fires every ~5 s with a 99 game-second charge), and 奥义/特殊 had no observation channel at all. Two channels: the R64 auto-skill command postfix (proven, 471 rows) plus one isolated postfix on GameCmdExecuter.AddPlayerSkillGameRecord, which is the only place that carries both a Skill object and the game's own eUserRecordType (OverSkillStart/SpecialSkillStart/...). Bounded (600 events), our side only, read-only. Off = no hook work, no page, no [SKILLTL] lines.");
+		CfgSkillTimeline = Config.Bind<bool>("Debug", "SkillTimeline", true, "FEATURE/PROBE (R66, corrected in R69): collect OUR units' 奥义/特殊/自动 skill activation moments into the overlay's 技能时间表 page (F4 while the panel is visible) and write them to the runtime log as [SKILLTL] rows. WHY: the auto skill's charge (Skill.CoolTimeFrame / 30) is NOT its firing interval -- an auto skill that has finished charging waits for the unit's next normal attack (measured over 9 battles: トレイラ CoolTimeFrame 240 = 8.0 game s, median observed gap 9.00 game s). TWO CHANNELS: the R64 auto-skill command postfix (proven, 471 rows) plus R67's three isolated postfixes on GameCmdExecuter.ActExecutePlayer{ActiveSkill,Skill,SpecialSkill}, which observe 奥义/特殊 (41 accepted rows against 595 calls in the 411001 battle). R69 CORRECTION -- a call is only an ACTIVATION when the skill's own status is `Using`; the game calls the auto-skill command once per attack and returns ok=1 whether or not the skill fired (マッドシーカー: 25 calls, 1 activation, counter 2970 frames = 99 game s), so the other calls are counted as 试触发 and never placed on the time axis. R69 also deleted the R66 postfix on GameCmdExecuter.AddPlayerSkillGameRecord: it was installed and produced 0 rows with 0 skips in two battles. Bounded (600 events), our side only, read-only. Off = no hook work, no page, no [SKILLTL] lines.");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");
@@ -485,7 +463,6 @@ public class Plugin : BasePlugin
 			TryPatchMadnessApplier();
 			TryPatchGiveApplier();
 			TryPatchAutoSkillActivation();
-			TryPatchSkillRecord();
 			TryPatchSkillCommands();
 		}
 		catch (Exception ex)

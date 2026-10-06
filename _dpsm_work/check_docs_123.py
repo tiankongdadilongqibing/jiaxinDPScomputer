@@ -135,6 +135,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R66.md',
     # R67: 用户截图核对时间表(并N条M格 / 时间格加宽 / 奥义换通道 / gameIdx 结案)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R67.md',
+    # R69: 调用 ≠ 发动(Using 判据 / 折叠窗口改成技能自己的冷却 / 试N / 删 rec 通道)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R69.md',
 ]
 
 

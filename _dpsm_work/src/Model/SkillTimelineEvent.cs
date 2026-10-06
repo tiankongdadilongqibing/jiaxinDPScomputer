@@ -30,16 +30,11 @@ internal sealed class SkillTimelineEvent
 	internal int Type = -1;
 
 	/// <summary>Which observation channel produced this row: <see cref="ChannelCommand"/> (the game's own
-	/// auto-skill command entry point) or <see cref="ChannelRecord"/> (the game's skill-record sink, which
-	/// is the only channel that also covers 奥义/特殊技能). Two channels may report the SAME activation,
-	/// which is what the merge window in the policy exists for.</summary>
+	/// auto-skill command entry point) or <see cref="ChannelSkillCommand"/> (the active/special command
+	/// entry points, added in R67). Two channels may report the SAME skill, which is what the fold in the
+	/// policy exists for. R69 deleted the third channel (`rec`, the game's skill-record sink): it was
+	/// patched and never called, in two battles, one of them a real quest.</summary>
 	internal string Channel = ChannelCommand;
-
-	/// <summary>The game's `eUserRecordType` value for record-channel rows, 0 for command rows. Kept so
-	/// the raw evidence can be audited without re-deriving which record type meant "started". The `= 0` is
-	/// explicit because this model is also compiled into the behaviour tests, where the probe that fills it
-	/// is not present -- and a warning-free build is a rule of this repository.</summary>
-	internal int RecordType = 0;
 
 	/// <summary>Real seconds since the session's first tick.</summary>
 	internal double Wall;
@@ -47,12 +42,21 @@ internal sealed class SkillTimelineEvent
 	/// <summary>Battle-clock seconds (`Session.ActiveSeconds`).</summary>
 	internal double Active;
 
+	/// <summary>R69: this skill's own cooldown in GAME seconds (`Skill.CoolTime`, which equals
+	/// `Skill.CoolTimeFrame / 30` on every one of the 568 measured command rows -- verified 2026-10-06, 0
+	/// mismatches). It is the physics of the fold: the game CANNOT execute the same skill twice inside its
+	/// own cooldown, so two `Using` calls closer than this belong to ONE execution.
+	///
+	/// 0 = the field could not be read (or the skill really has no cooldown). That is NOT "fold nothing":
+	/// <see cref="SkillTimelinePolicy"/> then falls back to its fixed floor, so an unreadable cooldown can
+	/// only ever fold the same-instant double reports it folded before R69.</summary>
+	internal double CoolSeconds;
+
 	internal const string ChannelCommand = "cmd";
-	internal const string ChannelRecord = "rec";
 
 	/// <summary>R67: the game's command entry points for the ACTIVE/SPECIAL skills
 	/// (`GameCmdExecuter.ActExecutePlayer{ActiveSkill,Skill,SpecialSkill}`) -- the same layer as the proven
 	/// auto-skill command hook. Added because the record sink was installed and NEVER CALLED in a full
-	/// battle (R66 live log: rec=0 with every skip counter 0), so 奥义/特殊 had no working channel.</summary>
+	/// battle (`rec=0` with every skip counter 0), so 奥义/特殊 had no working channel.</summary>
 	internal const string ChannelSkillCommand = "skl";
 }

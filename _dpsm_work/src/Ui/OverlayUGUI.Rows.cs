@@ -102,9 +102,11 @@ public static partial class OverlayUGUI
 			: (View == ViewMode.Contribution
 				? Mathf.Min((float)Screen.width - 40f, 880f)   // the contribution table needs its columns (94 with 自伤)
 				// R66: the 技能时间表 is a column table too -- one line per (unit, skill) with up to
-				// SkillTimelinePolicy.MaxStamps timestamps, ~114 display columns.
+				// SkillTimelinePolicy.MaxStamps timestamps. R69: SkillTimelineText.LineWidth is 129 display
+				// columns (the tail grew by 8 to carry `试N`); at fontSize 14 a column is ~7.44 px, so the
+				// panel has to be ~960 px or the longest rows overhang their own background.
 				: (View == ViewMode.Timeline
-					? Mathf.Min((float)Screen.width - 40f, 900f)
+					? Mathf.Min((float)Screen.width - 40f, 960f)
 					: Mathf.Min((float)Screen.width - 20f, 560f)));
 
 		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a

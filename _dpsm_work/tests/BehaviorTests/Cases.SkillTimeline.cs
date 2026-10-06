@@ -17,15 +17,17 @@ internal static partial class Cases
 	/// decision that turns those readings into the table, and those are exactly the decisions that can be
 	/// wrong while looking right:
 	///
-	///   * the MERGE WINDOW -- two channels report the same activation (the game's auto-skill command
-	///     postfix and its skill-record sink). Merge too eagerly and a real 0.3 s repeat disappears; do not
-	///     merge at all and every activation is listed twice;
+	///   * the FOLD (R69) -- one activation leaves a CLUSTER of command calls spread over the skill's
+	///     execution window (measured spans up to 4.53 s). Fold too eagerly and a real repeat disappears;
+	///     fold too little (R66's fixed 0.25 s) and one activation is published as several -- which is how a
+	///     99-second skill came to read `med=4.97s`;
 	///   * the TIME AXIS -- everything is on the battle clock, never the wall clock, because the game
 	///     pauses its battle clock (measured: a counter stood still for 6 wall seconds);
 	///   * the ORDER -- rows must not reorder as the battle goes on, or the table cannot be read while
 	///     playing;
-	///   * the MARKS -- `xN` (a burst folded into one cell) and `+N` (stamps beyond the printed ones) are
-	///     the only reasons the table is not a silent truncation.
+	///   * the MARKS -- `并N条M格` (folds) and `+N` (stamps beyond the printed ones) are the only reasons
+	///     the table is not a silent truncation, and `试N` (R69) is the only reason a row cannot be read as
+	///     "it fired once and stopped".
 	/// </summary>
 	public static void SkillTimeline(Runner r)
 	{
@@ -53,31 +55,64 @@ internal static partial class Cases
 			Ev("A", "S", 3, 10.0, "cmd"), Ev("A", "S", 3, 4.0, "cmd"), Ev("A", "S", 3, 7.0, "cmd"),
 		})[0]), "4.0,7.0,10.0");
 
-		// ---- the merge window (the measured 0.25 battle seconds) ----
+		// ---- the fold FLOOR: same-instant double reports, when no cooldown was read ----
 		List<SkillTimelineGroup> merged = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("A", "S", 3, 20.00, "cmd"), Ev("A", "S", 3, 20.10, "rec"),
+			Ev("A", "S", 3, 20.00, "cmd"), Ev("A", "S", 3, 20.10, "skl"),
 		});
 		r.Eq("a-double-report-is-one-stamp", merged[0].Stamps.Count, 1);
 		r.Eq("a-double-report-is-counted-not-hidden", merged[0].Merged, 1);
 		r.Eq("a-double-report-keeps-both-raw-events", merged[0].Events, 2);
-		// The shortest repeat the charge counter corroborates in the 9-battle corpus is 0.30 s, so the
-		// window is EXCLUSIVE at its own value and 0.30 s must survive as two activations.
-		r.Eq("exactly-the-window-is-not-merged", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		r.Eq("exactly-the-floor-is-not-merged", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
 			Ev("A", "S", 3, 20.00, "cmd"), Ev("A", "S", 3, 20.25, "cmd"),
 		})[0].Stamps.Count, 2);
-		r.Eq("the-shortest-corroborated-repeat-survives", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
-		{
-			Ev("T.O.W.E.R.typeR", "電触補壁", 3, 20.00, "cmd"), Ev("T.O.W.E.R.typeR", "電触補壁", 3, 20.30, "cmd"),
-		})[0].Stamps.Count, 2);
-		// A third report inside the same window folds into the SAME cell -- it does not open a new one.
+		// A third report inside the same floor folds into the SAME cell -- it does not open a new one.
 		List<SkillTimelineGroup> triple = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("A", "S", 3, 20.00, "cmd"), Ev("A", "S", 3, 20.10, "rec"), Ev("A", "S", 3, 20.40, "cmd"),
+			Ev("A", "S", 3, 20.00, "cmd"), Ev("A", "S", 3, 20.10, "skl"), Ev("A", "S", 3, 20.40, "cmd"),
 		});
 		r.Str("a-burst-folds-into-the-previous-cell", Stamps(triple[0]), "20.0,20.4");
 		r.Eq("a-burst-counts-the-cells-it-lost", triple[0].Merged, 1);
+
+		// ---- R69: the fold is the SKILL'S OWN COOLDOWN, not a fixed window ----
+		// MEASURED (quest 411001 and the 9-battle corpus): one activation leaves a cluster of `Using` calls
+		// spread over the execution window -- 暗沌への導き (8 s cooldown) produced calls at 5.27/6.77 and
+		// 18.70/20.80. Those are two activations, not four.
+		r.EqD("the-fold-of-a-row-with-no-cooldown-is-the-floor",
+			SkillTimelinePolicy.FoldSeconds(Ev("A", "S", 3, 1.0, "cmd")), 0.25);
+		r.EqD("the-fold-is-the-skills-own-cooldown",
+			SkillTimelinePolicy.FoldSeconds(Ev("A", "S", 3, 1.0, "cmd", 8.0)), 8.0);
+		r.EqD("a-nan-cooldown-falls-back-to-the-floor",
+			SkillTimelinePolicy.FoldSeconds(Ev("A", "S", 3, 1.0, "cmd", double.NaN)), 0.25);
+		r.EqD("a-negative-cooldown-falls-back-to-the-floor",
+			SkillTimelinePolicy.FoldSeconds(Ev("A", "S", 3, 1.0, "cmd", -5.0)), 0.25);
+		List<SkillTimelineGroup> cluster = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 5.27, "cmd", 8.0), Ev("A", "S", 3, 6.77, "cmd", 8.0),
+			Ev("A", "S", 3, 18.70, "cmd", 8.0), Ev("A", "S", 3, 20.80, "cmd", 8.0),
+		});
+		r.Str("calls-inside-one-cooldown-are-one-activation", Stamps(cluster[0]), "5.3,18.7");
+		r.Eq("the-cluster-counts-its-two-folds", cluster[0].Merged, 2);
+		r.EqD("the-cluster-median-is-the-real-cadence", SkillTimelinePolicy.MedianInterval(cluster[0]), 13.43);
+		r.Eq("a-cluster-within-the-cooldown-never-widens-the-row", cluster[0].Multiplicity.Count, 2);
+		// The threshold travels with the stamp that STARTED the cluster: a later row cannot re-open it.
+		r.Eq("the-fold-follows-the-stamp-that-started-the-cluster",
+			SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+			{
+				Ev("A", "S", 3, 20.0, "cmd", 8.0), Ev("A", "S", 3, 21.0, "cmd", 0.0),
+			})[0].Stamps.Count, 1);
+		// ... and a real repeat is never eaten: 21.5 s is inside 8 s of nothing.
+		r.Eq("a-real-repeat-outside-the-cooldown-survives", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 20.0, "cmd", 8.0), Ev("A", "S", 3, 28.5, "cmd", 8.0),
+		})[0].Stamps.Count, 2);
+		// Without a cooldown reading the old floor applies, so a 1.5 s gap still opens a new stamp --
+		// exactly the R66 behaviour, kept as the documented degradation and not as the rule.
+		r.Eq("an-unreadable-cooldown-does-not-invent-a-fold", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 20.0, "cmd"), Ev("A", "S", 3, 21.5, "cmd"),
+		})[0].Stamps.Count, 2);
 
 		// ---- what must NEVER be merged ----
 		r.Eq("two-units-at-the-same-instant-stay-apart", SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
@@ -118,8 +153,8 @@ internal static partial class Cases
 		// ---- the invariant that makes "nothing is hidden" true ----
 		List<SkillTimelineGroup> mixed = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("A", "S", 3, 1.0, "cmd"), Ev("A", "S", 3, 1.05, "rec"), Ev("A", "S", 3, 9.0, "cmd"),
-			Ev("A", "S", 3, 9.05, "rec"), Ev("A", "S", 3, 9.10, "cmd"), Ev("B", "T", 2, 2.0, "rec"),
+			Ev("A", "S", 3, 1.0, "cmd"), Ev("A", "S", 3, 1.05, "skl"), Ev("A", "S", 3, 9.0, "cmd"),
+			Ev("A", "S", 3, 9.05, "skl"), Ev("A", "S", 3, 9.10, "cmd"), Ev("B", "T", 2, 2.0, "skl"),
 			null, Ev("C", "", 3, 3.0, "cmd"),
 		});
 		int folded = 0;
@@ -142,7 +177,7 @@ internal static partial class Cases
 		// ---- order: stable, and by unit then kind ----
 		List<SkillTimelineGroup> order = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("B", "S", 3, 1.0, "cmd"), Ev("A", "S", 3, 5.0, "cmd"), Ev("A", "奥", 2, 20.0, "rec"),
+			Ev("B", "S", 3, 1.0, "cmd"), Ev("A", "S", 3, 5.0, "cmd"), Ev("A", "奥", 2, 20.0, "skl"),
 		});
 		r.Str("groups-are-ordered-by-unit-then-kind", Names(order), "A/奥|A/S|B/S");
 		r.Str("rows-of-one-unit-stay-adjacent", Names(SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
@@ -153,10 +188,10 @@ internal static partial class Cases
 		// ---- the channels of a row ----
 		List<SkillTimelineGroup> chans = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("A", "S", 3, 1.0, "rec"), Ev("A", "S", 3, 9.0, "cmd"), Ev("A", "S", 3, 18.0, "rec"),
+			Ev("A", "S", 3, 1.0, "skl"), Ev("A", "S", 3, 9.0, "cmd"), Ev("A", "S", 3, 18.0, "skl"),
 		});
 		r.Eq("a-row-lists-each-channel-once", chans[0].Channels.Count, 2);
-		r.Str("a-row-keeps-the-first-seen-channel-first", chans[0].Channels[0], "rec");
+		r.Str("a-row-keeps-the-first-seen-channel-first", chans[0].Channels[0], "skl");
 
 		// ---- labels and ranks ----
 		r.Str("kind-0-is-the-plain-skill", SkillTimelinePolicy.KindLabel(0), "技能");
@@ -173,7 +208,7 @@ internal static partial class Cases
 			&& !SkillTimelinePolicy.IsAuto(0) && !SkillTimelinePolicy.IsAuto(1) && !SkillTimelinePolicy.IsAuto(2));
 
 		// ---- the pinned constants (the text layer and the panel width are built on them) ----
-		r.EqD("the-merge-window-is-the-measured-0.25s", SkillTimelinePolicy.MergeSeconds, 0.25);
+		r.EqD("the-fold-floor-is-the-measured-0.25s", SkillTimelinePolicy.MergeSeconds, 0.25);
 		r.Eq("the-table-shows-14-rows", SkillTimelinePolicy.MaxGroups, 14);
 		r.Eq("a-row-prints-9-stamps", SkillTimelinePolicy.MaxStamps, 9);
 
@@ -190,14 +225,102 @@ internal static partial class Cases
 		r.Str("each-cell-keeps-its-own-multiplicity", Mult(spread[0]), "2,1,2");
 		List<SkillTimelineGroup> stacked = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
-			Ev("A", "S", 3, 10.00, "cmd"), Ev("A", "S", 3, 10.05, "rec"), Ev("A", "S", 3, 10.10, "cmd"),
+			Ev("A", "S", 3, 10.00, "cmd"), Ev("A", "S", 3, 10.05, "skl"), Ev("A", "S", 3, 10.10, "cmd"),
 		});
 		r.Eq("a-triple-in-one-cell-counts-two-rows", stacked[0].Merged, 2);
 		r.Eq("a-triple-in-one-cell-counts-one-cell", stacked[0].BurstCells, 1);
 		r.Str("a-triple-in-one-cell-has-multiplicity-three", Mult(stacked[0]), "3");
 		r.Eq("multiplicity-is-parallel-to-the-stamps", spread[0].Multiplicity.Count, spread[0].Stamps.Count);
+		r.Eq("the-fold-thresholds-are-parallel-to-the-stamps",
+			cluster[0].StampFold.Count, cluster[0].Stamps.Count);
 
+		SkillActivationCases(r);
+		SkillAttemptCases(r);
 		SkillTimelineTextCases(r);
+	}
+
+	// ------------------------------------------------------------------ R69: activation vs attempt
+	private static void SkillActivationCases(Runner r)
+	{
+		r.Group("policy/skill-activation");
+
+		// The verdict is the game's own state machine, read at the moment of the call. MEASURED (quest
+		// 411001): of マッドシーカー's 25 calls, 1 was `Using` and 24 were `Charge`.
+		r.True("using-is-an-activation", SkillActivationPolicy.IsActivation("Using"));
+		r.True("charge-is-not-an-activation", !SkillActivationPolicy.IsActivation("Charge"));
+		r.True("usable-is-not-an-activation", !SkillActivationPolicy.IsActivation("Usable"));
+		r.True("nothave-is-not-an-activation", !SkillActivationPolicy.IsActivation("NotHave"));
+		r.True("an-unreadable-status-is-not-an-activation", !SkillActivationPolicy.IsActivation("?"));
+		r.True("a-null-status-is-not-an-activation", !SkillActivationPolicy.IsActivation(null));
+		r.True("an-empty-status-is-not-an-activation", !SkillActivationPolicy.IsActivation(""));
+		r.True("charge-is-an-attempt", SkillActivationPolicy.IsAttempt("Charge"));
+		r.True("usable-is-an-attempt", SkillActivationPolicy.IsAttempt("Usable"));
+		r.True("using-is-not-an-attempt", !SkillActivationPolicy.IsAttempt("Using"));
+		// FAIL CLOSED: an unknown state is neither, so the probe counts it and publishes nothing.
+		r.True("an-unknown-status-is-neither", !SkillActivationPolicy.IsActivation("Status5")
+			&& !SkillActivationPolicy.IsAttempt("Status5"));
+		r.True("an-unreadable-status-is-neither", !SkillActivationPolicy.IsAttempt("?"));
+		r.True("the-status-names-are-the-games-own", SkillActivationPolicy.StatusUsing == "Using"
+			&& SkillActivationPolicy.StatusCharge == "Charge" && SkillActivationPolicy.StatusUsable == "Usable");
+	}
+
+	// ------------------------------------------------------------------ R69: the attempt tallies
+	private static void SkillAttemptCases(Runner r)
+	{
+		r.Group("policy/skill-attempts");
+
+		// An attempt belongs to the row it was tried with, and it is ADDED to the count, not replaced.
+		List<SkillTimelineGroup> g = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("マッドシーカー", "実験失敗！", 3, 99.1, "cmd", 99.0),
+		});
+		SkillTimelinePolicy.ApplyAttempts(g, new List<SkillTimelineAttempt>
+		{
+			Att("マッドシーカー", "実験失敗！", 3, 20), Att("マッドシーカー", "実験失敗！", 3, 4),
+		});
+		r.Eq("attempts-do-not-open-a-new-row", g.Count, 1);
+		r.Eq("attempts-do-not-add-a-stamp", g[0].Stamps.Count, 1);
+		r.Eq("attempts-are-summed-onto-the-row", g[0].Attempts, 24);
+		r.EqD("attempts-never-enter-the-median", SkillTimelinePolicy.MedianInterval(g[0]), 0.0);
+
+		// A skill that was ONLY ever tried gets a row of its own: "never fired" must be visible, because
+		// the alternative is that the unit looks like it has no such skill.
+		List<SkillTimelineGroup> only = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>());
+		SkillTimelinePolicy.ApplyAttempts(only, new List<SkillTimelineAttempt>
+		{
+			Att("ネア・ウルム", "ヴェールの拒絶", 3, 1),
+		});
+		r.Eq("an-attempt-only-skill-still-gets-a-row", only.Count, 1);
+		r.Eq("an-attempt-only-row-has-no-stamp", only[0].Stamps.Count, 0);
+		r.Eq("an-attempt-only-row-carries-its-count", only[0].Attempts, 1);
+		r.Eq("an-attempt-only-row-carries-its-kind", only[0].Type, 3);
+
+		// Rows added after the fact land in the SAME order as the rows that were already there.
+		List<SkillTimelineGroup> sorted = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("B", "S", 3, 1.0, "cmd"),
+		});
+		SkillTimelinePolicy.ApplyAttempts(sorted, new List<SkillTimelineAttempt>
+		{
+			Att("A", "Z", 2, 2), Att("B", "A", 3, 1), Att("B", "S", 3, 3),
+		});
+		r.Str("attempt-rows-are-inserted-in-the-tables-order", Names(sorted), "A/Z|B/A|B/S");
+		r.Eq("an-attempt-row-merges-into-the-existing-kind", sorted[2].Attempts, 3);
+
+		// Nothing may be invented out of a malformed tally.
+		List<SkillTimelineGroup> dirty = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>());
+		SkillTimelinePolicy.ApplyAttempts(dirty, new List<SkillTimelineAttempt>
+		{
+			null, Att("", "S", 3, 4), Att("A", "", 3, 4), Att("A", "S", 3, 0), Att("A", "S", 3, -2),
+		});
+		r.Eq("a-malformed-attempt-tally-adds-no-row", dirty.Count, 0);
+		List<SkillTimelineGroup> none = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 1.0, "cmd"),
+		});
+		SkillTimelinePolicy.ApplyAttempts(none, null);
+		r.Eq("a-null-attempt-list-changes-nothing", none[0].Attempts, 0);
+		r.Eq("a-null-attempt-list-adds-no-row", none.Count, 1);
 	}
 
 	// ------------------------------------------------------------------ the page text
@@ -206,41 +329,65 @@ internal static partial class Cases
 		r.Group("ui/skill-timeline-text");
 
 		// ---- the empty page: "nothing fired" and "the hook saw nothing" are different lines ----
-		List<TimelineLine> empty = SkillTimelineText.Rows(new List<SkillTimelineEvent>(), true);
-		r.True("an-empty-page-in-battle-says-so", Has(empty, "  (本场尚未观测到我方技能发动)"));
+		List<TimelineLine> empty = SkillTimelineText.Rows(new List<SkillTimelineEvent>(),
+			new List<SkillTimelineAttempt>(), true);
+		r.True("an-empty-page-in-battle-says-so", Has(empty, "  (本场尚未观测到我方技能发动,也没有试触发)"));
 		r.True("an-empty-page-still-prints-the-channel-counts", Has(empty, "观测通道 cmd(自动技能命令) 0 条"));
-		List<TimelineLine> idle = SkillTimelineText.Rows(new List<SkillTimelineEvent>(), false);
+		List<TimelineLine> idle = SkillTimelineText.Rows(new List<SkillTimelineEvent>(),
+			new List<SkillTimelineAttempt>(), false);
 		r.True("an-empty-page-out-of-battle-says-so-too", Has(idle, "  (未在战斗中,也没有上一场的记录)"));
-		r.Str("the-channel-line-counts-all-three-channels",
-			SkillTimelineText.ChannelLine(97, 5, 0),
-			"观测通道 cmd(自动技能命令) 97 条 / skl(奥义特殊命令) 5 条 / rec(技能记录) 0 条");
+		// R69: the `rec` column is gone with the channel it described (patched, never called in 2 battles).
+		r.Str("the-channel-line-names-the-two-live-channels",
+			SkillTimelineText.ChannelLine(97, 5),
+			"观测通道 cmd(自动技能命令) 97 条 / skl(奥义特殊命令) 5 条");
+		r.True("the-channel-line-no-longer-mentions-the-deleted-record-sink",
+			!SkillTimelineText.ChannelLine(97, 5).Contains("rec"));
 
-		// ---- the channel diagnosis: 奥义/特殊 are seen by skl (R67) or rec (R66), never by cmd ----
+		// ---- the channel diagnosis: 奥义/特殊 are seen by skl, never by cmd ----
 		List<SkillTimelineEvent> cmdOnly = new List<SkillTimelineEvent>
 		{
 			Ev("[賢導]トレイラ", "暗沌への導き", 3, 4.0, "cmd"), Ev("[賢導]トレイラ", "暗沌への導き", 3, 13.0, "cmd"),
 		};
-		r.True("no-over-channel-rows-warns", Has(SkillTimelineText.Rows(cmdOnly, true), "两条通道(skl/rec)本场都是 0 条"));
-		List<SkillTimelineEvent> both = new List<SkillTimelineEvent>(cmdOnly);
-		both.Add(Ev("[賢導]トレイラ", "真なる奥義", 2, 31.0, "rec"));
-		r.True("a-record-channel-with-rows-does-not-warn",
-			!Has(SkillTimelineText.Rows(both, true), "两条通道(skl/rec)本场都是 0 条"));
+		r.True("no-over-channel-rows-warns",
+			Has(SkillTimelineText.Rows(cmdOnly, null, true), "奥义/特殊 通道(skl)本场 0 条。"));
 		List<SkillTimelineEvent> viaSkl = new List<SkillTimelineEvent>(cmdOnly);
 		viaSkl.Add(Ev("[賢導]トレイラ", "真なる奥義", 2, 31.0, SkillTimelineEvent.ChannelSkillCommand));
 		r.True("a-skill-command-channel-with-rows-does-not-warn",
-			!Has(SkillTimelineText.Rows(viaSkl, true), "两条通道(skl/rec)本场都是 0 条"));
+			!Has(SkillTimelineText.Rows(viaSkl, null, true), "奥义/特殊 通道(skl)本场 0 条。"));
 		r.True("skl-rows-are-counted-in-their-own-channel",
-			Has(SkillTimelineText.Rows(viaSkl, true), "skl(奥义特殊命令) 1 条"));
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "skl(奥义特殊命令) 1 条"));
 		r.True("skl-rows-are-counted-in-the-raw-total",
-			Has(SkillTimelineText.Rows(viaSkl, true), "原始 3 条"));
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "原始 3 条发动"));
 		r.True("a-public-page-does-not-claim-to-have-no-record",
-			!Has(SkillTimelineText.Rows(cmdOnly, false), "也没有上一场的记录"));
+			!Has(SkillTimelineText.Rows(cmdOnly, null, false), "也没有上一场的记录"));
+
+		// ---- R69: the attempt count, on the summary line and on the row ----
+		List<SkillTimelineAttempt> tries = new List<SkillTimelineAttempt>
+		{
+			Att("マッドシーカー", "実験失敗！", 3, 24),
+		};
+		List<TimelineLine> mad = SkillTimelineText.Rows(new List<SkillTimelineEvent>
+		{
+			Ev("マッドシーカー", "実験失敗！", 3, 99.1, "cmd", 99.0),
+		}, tries, true);
+		r.True("the-summary-line-counts-the-attempts", Has(mad, "试触发 24 条(未计入)"));
+		r.True("an-attempt-count-is-printed-on-its-own-row", Has(mad, "n=1 试24"));
+		r.True("a-99-second-skill-shows-one-activation-and-no-median", !Has(mad, "med="));
+		// A tally with no event at all still produces the row (and only that row).
+		List<TimelineLine> tryOnly = SkillTimelineText.Rows(new List<SkillTimelineEvent>(), tries, true);
+		r.True("an-attempt-only-skill-is-printed", Has(tryOnly, "実験失敗！"));
+		r.True("an-attempt-only-row-says-n-zero", Has(tryOnly, "n=0 试24"));
+		r.True("an-attempt-only-page-does-not-claim-nothing-was-observed",
+			!Has(tryOnly, "本场尚未观测到我方技能发动"));
+		r.True("a-zero-attempt-count-is-not-printed",
+			!Has(SkillTimelineText.Rows(cmdOnly, new List<SkillTimelineAttempt>
+			{ Att("[賢導]トレイラ", "暗沌への導き", 3, 0) }, true), "试0"));
 
 		// ---- one row: geometry, content and the two marks ----
 		List<SkillTimelineGroup> g = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
 			Ev("[賢導]トレイラ", "暗沌への導き", 3, 4.8, "cmd"), Ev("[賢導]トレイラ", "暗沌への導き", 3, 18.2, "cmd"),
-			Ev("[賢導]トレイラ", "暗沌への導き", 3, 18.25, "rec"), Ev("[賢導]トレイラ", "暗沌への導き", 3, 31.7, "cmd"),
+			Ev("[賢導]トレイラ", "暗沌への導き", 3, 18.25, "skl"), Ev("[賢導]トレイラ", "暗沌への導き", 3, 31.7, "cmd"),
 		});
 		TimelineLine row = SkillTimelineText.GroupLine(g[0]);
 		r.Str("a-row-is-two-spaces-then-the-name", row.Text.Substring(0, 2), "  ");
@@ -252,7 +399,11 @@ internal static partial class Cases
 		r.True("a-row-marks-a-folded-burst", row.Text.Contains("并1条1格"));
 		r.True("every-row-fits-the-pinned-line-width",
 			DisplayFormat.DispWidth(row.Text) <= SkillTimelineText.LineWidth);
-		r.Eq("the-line-width-is-pinned", SkillTimelineText.LineWidth, 121);
+		// R69: the tail grew by 8 columns to carry `试N`, which is what moved the panel width.
+		r.Eq("the-line-width-is-pinned", SkillTimelineText.LineWidth, 129);
+		r.Eq("the-tail-width-is-pinned", SkillTimelineText.TailW, 33);
+		r.True("the-longest-tail-still-fits-the-tail-column",
+			DisplayFormat.DispWidth("并12条9格 n=24 试111 med=13.33s") <= SkillTimelineText.TailW);
 		// R67: the measured defects of the R66 page, as cases.
 		TimelineLine spreadRow = SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 		{
@@ -268,23 +419,43 @@ internal static partial class Cases
 		r.True("three-digit-stamps-stay-separated", late.Text.Contains(" 96.2 107.3 118.3"));
 		r.True("three-digit-stamps-never-run-together", !late.Text.Contains("96.2107.3"));
 		r.True("the-table-header-names-its-four-columns",
-			Has(SkillTimelineText.Rows(both, true), "角色") && Has(SkillTimelineText.Rows(both, true), "种类")
-			&& Has(SkillTimelineText.Rows(both, true), "技能") && Has(SkillTimelineText.Rows(both, true), "发动时刻"));
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "角色")
+			&& Has(SkillTimelineText.Rows(viaSkl, null, true), "种类")
+			&& Has(SkillTimelineText.Rows(viaSkl, null, true), "技能")
+			&& Has(SkillTimelineText.Rows(viaSkl, null, true), "发动时刻"));
 		r.True("the-page-starts-with-its-title",
-			SkillTimelineText.Rows(both, true)[0].Text.StartsWith("技能时间表"));
+			SkillTimelineText.Rows(viaSkl, null, true)[0].Text.StartsWith("技能时间表"));
 		r.True("the-title-line-is-the-header-style",
-			SkillTimelineText.Rows(both, true)[0].Style == TimelineLineStyle.Header);
+			SkillTimelineText.Rows(viaSkl, null, true)[0].Style == TimelineLineStyle.Header);
 		r.True("the-title-says-the-key-that-leaves-the-page",
-			SkillTimelineText.Rows(both, true)[0].Text.Contains("F4 返回"));
+			SkillTimelineText.Rows(viaSkl, null, true)[0].Text.Contains("F4 返回"));
+		// R69: the legend must state the rule that replaced the fixed window.
+		r.True("the-legend-states-the-cooldown-rule",
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "间隔<该技能自己的冷却"));
+		r.True("the-legend-explains-the-attempt-count",
+			Has(SkillTimelineText.Rows(viaSkl, null, true), "试N = 本场调用 N 次但没有发动"));
 
 		// an 奥义 row is the amber "look here" style, an auto row is the ordinary one
 		r.True("an-over-skill-row-is-highlighted", SkillTimelineText.GroupLine(
-			SkillTimelinePolicy.Group(new List<SkillTimelineEvent> { Ev("A", "奥", 2, 5.0, "rec") })[0]
+			SkillTimelinePolicy.Group(new List<SkillTimelineEvent> { Ev("A", "奥", 2, 5.0, "skl") })[0]
 			).Style == TimelineLineStyle.Header);
 		r.True("an-auto-row-is-not-highlighted", SkillTimelineText.GroupLine(g[0]).Style == TimelineLineStyle.Row);
 		r.True("a-row-with-a-single-activation-prints-no-median",
 			!SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
 			{ Ev("A", "S", 3, 5.0, "cmd") })[0]).Text.Contains("med="));
+
+		// R69: the pinned width has to hold for EVERY line of the page, not only for the row the R67 case
+		// checked -- the R69 legend reached 189 columns against a width of 129 (measured by rendering the
+		// real battle's rows), which is exactly the kind of "everything fits except one line" that a
+		// row-only case cannot see.
+		List<TimelineLine> whole = SkillTimelineText.Rows(viaSkl, tries, true);
+		int overWide = 0;
+		for (int i = 0; i < whole.Count; i++)
+			if (DisplayFormat.DispWidth(whole[i].Text) > SkillTimelineText.LineWidth) overWide++;
+		r.Eq("no-line-of-the-page-exceeds-the-pinned-width", overWide, 0);
+		r.True("the-page-never-wraps-its-own-legend",
+			DisplayFormat.DispWidth(SkillTimelineText.Rows(new List<SkillTimelineEvent>(),
+				new List<SkillTimelineAttempt>(), true)[1].Text) <= SkillTimelineText.LineWidth);
 
 		// ---- truncation is always stated ----
 		var many = new List<SkillTimelineEvent>();
@@ -297,7 +468,7 @@ internal static partial class Cases
 
 		var lots = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 16; i++) lots.Add(Ev("U" + i.ToString("D2", CultureInfo.InvariantCulture), "S", 3, 5.0 + i, "cmd"));
-		List<TimelineLine> lotsLines = SkillTimelineText.Rows(lots, true);
+		List<TimelineLine> lotsLines = SkillTimelineText.Rows(lots, null, true);
 		int rows = 0;
 		for (int i = 0; i < lotsLines.Count; i++) if (lotsLines[i].Text.Contains("自动1")) rows++;
 		r.Eq("only-14-rows-are-printed", rows, 14);
@@ -308,11 +479,24 @@ internal static partial class Cases
 
 	private static SkillTimelineEvent Ev(string unit, string skill, int type, double active, string channel)
 	{
+		return Ev(unit, skill, type, active, channel, 0.0);
+	}
+
+	/// <summary>R69: <paramref name="coolSeconds"/> is the skill's own cooldown, the fold threshold. 0
+	/// keeps the R66 behaviour (the fixed floor), which is what the pre-R69 cases exercise.</summary>
+	private static SkillTimelineEvent Ev(string unit, string skill, int type, double active, string channel,
+		double coolSeconds)
+	{
 		return new SkillTimelineEvent
 		{
 			Unit = unit, Skill = skill, Type = type, Channel = channel,
-			Active = active, Wall = active * 1.48,
+			Active = active, Wall = active * 1.48, CoolSeconds = coolSeconds,
 		};
+	}
+
+	private static SkillTimelineAttempt Att(string unit, string skill, int type, int count)
+	{
+		return new SkillTimelineAttempt { Unit = unit, Skill = skill, Type = type, Count = count };
 	}
 
 	private static string Stamps(SkillTimelineGroup g)

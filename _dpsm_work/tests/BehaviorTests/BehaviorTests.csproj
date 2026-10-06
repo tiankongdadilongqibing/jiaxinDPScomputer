@@ -70,6 +70,10 @@
          publishes them does not, and that arithmetic is where a wrong table would hide (a merge window
          that eats a real activation, a median taken over the wrong gaps, rows that reorder mid-battle). -->
     <Compile Include="$(SrcRoot)\Model\SkillTimelineEvent.cs" />
+    <!-- R69: the attempt tally (a count, not a stamped event: an attempt has no moment and must never
+         enter the fold or a median) and the verdict that decides activation vs attempt. Both pure. -->
+    <Compile Include="$(SrcRoot)\Model\SkillTimelineAttempt.cs" />
+    <Compile Include="$(SrcRoot)\Policy\SkillActivationPolicy.cs" />
     <Compile Include="$(SrcRoot)\Policy\SkillTimelinePolicy.cs" />
     <!-- R52: the extraction-flow decisions (trigger key, bundle name, retention). Game-free by
          construction, which is what lets the retention rule be executed instead of argued about. -->

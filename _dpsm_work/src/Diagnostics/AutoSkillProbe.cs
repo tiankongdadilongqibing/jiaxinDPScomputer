@@ -33,17 +33,28 @@ namespace DpsMeter;
 ///     machine `Status { NotHave, Charge, Usable, Using }`. `Skill.Type` is read too, so a slot holding
 ///     an ACTIVE skill is labelled as such instead of being reported as an auto skill.
 ///
-/// TWO CHANNELS, ON PURPOSE -- BUT ONLY ONE OF THEM IS AN ACTIVATION (corrected in R65)
+/// TWO CHANNELS, ON PURPOSE -- BUT ONLY ONE OF THEM IS AN ACTIVATION (corrected in R65, corrected AGAIN
+/// in R69)
 ///   1. `via=cmd` -- a postfix on the game's own command entry point
-///      `GameCmdExecuter.ActExecutePlayerAutoSkillForPassive(Player, int index, Vector3)`. This is the
-///      activation, and it carries the game's own return value. **Every published interval comes from
-///      here.** The raw `index` is printed as `gameIdx=` and the resolution used is printed inside `via=`
-///      (`cmd/named` vs `cmd/rosterPos`), because the game's index semantics are not yet settled.
+///      `GameCmdExecuter.ActExecutePlayerAutoSkillForPassive(Player, int index, Vector3)`. **Every
+///      published interval comes from here.** The raw `index` is printed as `gameIdx=` and the resolution
+///      used is printed inside `via=` (`cmd/named` vs `cmd/rosterPos`), because the game's index semantics
+///      are not yet settled.
 ///   2. `via=usingEdge` -- the rising edge of `GetStatus() == Using` on the same `Skill` objects. R64
 ///      treated this as a second activation channel and let it into the median. **MEASURED 2026-10-06: it
-///      is not an activation.** `Using` flickers, so for トレイラ it produced 9 "events" with a 1.10 s
+///      is not usable as one.** `Using` flickers, so for トレイラ it produced 9 "events" with a 1.10 s
 ///      median gap while the command channel showed real firing gaps of 8.08 and 10.18 s. It is kept as
 ///      evidence of the flicker, labelled `not an activation`, and excluded from every interval.
+///
+/// R69: A COMMAND CALL IS NOT AN ACTIVATION EITHER -- the call's own STATUS decides. The command returns
+/// `ok=1` whether or not the skill fired (it is the passive's entry point, called once per attack), so
+/// R66/R67 published every call as an activation and マッドシーカー's 99 game-second 実験失敗！ read as
+/// "fires every ~5 s" (25 calls, 1 real activation, measured in quest 411001). Now a call is an activation
+/// only when the skill's status at that moment is `Using` (<see cref="SkillActivationPolicy"/>); the
+/// Charge/Usable calls are attempts, counted per row and in `[AUTOSK] SUM tries=`, and they never enter an
+/// interval. The flicker above is why the STATUS alone is not enough either: the page folds repeated
+/// `Using` calls by the skill's own cooldown (<see cref="SkillTimelinePolicy.FoldSeconds"/>), which is a
+/// physical bound rather than a tuned window.
 ///
 /// The sampler is read-only, bounded (one line per slot per <see cref="SampleSeconds"/>, at most
 /// <see cref="MaxSlots"/> slots, at most <see cref="MaxActivationRows"/> intervals), and counts every
@@ -70,6 +81,13 @@ internal static class AutoSkillProbe
 	/// <summary>Activation rows written from the command postfix. THIS is the channel the published
 	/// interval comes from.</summary>
 	internal static int CommandActivations;
+	/// <summary>R69: command calls that did NOT execute the skill (`status` Charge/Usable). These used to be
+	/// published as activations -- マッドシーカー's 実験失敗！ (99 game-second counter) read as "fires every
+	/// ~5 s" because 24 of her 25 calls arrived while the skill was still charging.</summary>
+	internal static int AttemptRows;
+	/// <summary>R69: command calls whose `status` was neither `Using` nor `Charge`/`Usable` -- counted, and
+	/// deliberately NOT treated as activations (fail closed).</summary>
+	internal static int UnclassifiedRows;
 	/// <summary>Rows written from the sampler's `GetStatus() == Using` rising edge. R65: NOT an activation
 	/// and deliberately EXCLUDED from every interval. Measured 2026-10-06: `Using` flickers, so this edge
 	/// fired 9 times in 44 s for トレイラ (median gap 1.10 s) while her real firing gaps were 8.08 and
@@ -170,6 +188,9 @@ internal static class AutoSkillProbe
 		internal double PrevActWall;
 		internal double PrevActActive;
 		internal int Activations;
+		/// <summary>R69: calls of this slot that did NOT execute the skill (Charge/Usable). Published next to
+		/// `n=` so a row can never be read as "it fired N times" when most calls were 試行.</summary>
+		internal int Attempts;
 		internal readonly List<double> WallIntervals = new List<double>();
 		internal readonly List<double> ActiveIntervals = new List<double>();
 	}
@@ -184,6 +205,8 @@ internal static class AutoSkillProbe
 		_lastScanWall = double.MinValue;
 		SampleRows = 0;
 		CommandActivations = 0;
+		AttemptRows = 0;
+		UnclassifiedRows = 0;
 		UsingEdges = 0;
 		CommandUnresolved = 0;
 		PlaceholderSlots = 0;
@@ -532,10 +555,14 @@ internal static class AutoSkillProbe
 	}
 
 	/// <summary>
-	/// One activation row. `via` names the channel AND how the skill was resolved
-	/// (`cmd/named`, `cmd/rosterPos`), so the two readings of the game's index stay distinguishable.
-	/// R65: only `cmd*` rows feed the interval; the `usingEdge` rows are written by `SampleSlot` and are
-	/// deliberately not routed here at all.
+	/// One command call: logged ALWAYS, counted as an activation only when the game's own status says the
+	/// skill executed (R69). `via` names the channel AND how the skill was resolved (`cmd/named`,
+	/// `cmd/rosterPos`), so the two readings of the game's index stay distinguishable.
+	///
+	/// WHY THE ROW IS WRITTEN EVEN FOR AN ATTEMPT. That row IS the evidence: マッドシーカー's 25 calls with
+	/// `status=Charge` and 1 with `status=Using` are what proved the page had been publishing 試行 as 発動.
+	/// A probe that stops logging the calls it decided against cannot be audited, so the row carries
+	/// `verdict=act|try|unknown` and only `act` rows touch the interval bookkeeping, `n=` and the page.
 	/// </summary>
 	private static void NoteActivation(Player player, int index, Skill sk, string via, int result)
 	{
@@ -548,34 +575,49 @@ internal static class AutoSkillProbe
 			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk), Instance = InstanceTag(sk), Pointer = PointerOf(sk) };
 			Slots[key] = st;
 		}
-		CommandActivations++;
-		st.Activations++;
-		// R66: the SAME activation feeds the 技能时间表 page. Called from here (and not from the hook)
-		// because this is the one place that has already decided "this is an activation of this Skill", so
-		// the page and the probe can never disagree about what counts.
-		SkillTimelineProbe.NoteCommandActivation(player, sk);
+		string status = StatusName(sk);
+		bool activation = SkillActivationPolicy.IsActivation(status);
+		bool attempt = !activation && SkillActivationPolicy.IsAttempt(status);
+		string verdict = activation ? "act" : (attempt ? "try" : "unknown");
 
 		double wall, active;
 		bool clocked = Clocks(out wall, out active);
 
 		// The interval is measured on BOTH clocks from the same stored previous moment, so the two
-		// published numbers describe the same pair of activations.
+		// published numbers describe the same pair of activations -- and ONLY activations: an attempt has no
+		// moment to measure from, which is exactly the defect R69 fixed.
 		double dWall = 0.0, dActive = 0.0;
-		if (clocked && st.HasActivation)
+		if (activation)
 		{
-			dWall = AutoSkillCadencePolicy.IntervalSeconds(st.PrevActWall, wall);
-			dActive = AutoSkillCadencePolicy.IntervalSeconds(st.PrevActActive, active);
-			if (dWall > 0.0) st.WallIntervals.Add(dWall);
-			if (dActive > 0.0) st.ActiveIntervals.Add(dActive);
+			CommandActivations++;
+			st.Activations++;
+			// R66: the SAME activation feeds the 技能时间表 page. Called from here (and not from the hook)
+			// because this is the one place that has already decided "this is an activation of this Skill",
+			// so the page and the probe can never disagree about what counts. R69 adds the cooldown the page
+			// folds by.
+			SkillTimelineProbe.NoteCommandActivation(player, sk, CoolSeconds(sk));
+			if (clocked && st.HasActivation)
+			{
+				dWall = AutoSkillCadencePolicy.IntervalSeconds(st.PrevActWall, wall);
+				dActive = AutoSkillCadencePolicy.IntervalSeconds(st.PrevActActive, active);
+				if (dWall > 0.0) st.WallIntervals.Add(dWall);
+				if (dActive > 0.0) st.ActiveIntervals.Add(dActive);
+			}
+			if (clocked)
+			{
+				st.HasActivation = true;
+				st.PrevActWall = wall;
+				st.PrevActActive = active;
+			}
 		}
-		if (clocked)
+		else
 		{
-			st.HasActivation = true;
-			st.PrevActWall = wall;
-			st.PrevActActive = active;
+			st.Attempts++;
+			if (attempt) { AttemptRows++; SkillTimelineProbe.NoteCommandAttempt(player, sk); }
+			else UnclassifiedRows++;
 		}
 
-		StringBuilder sb = new StringBuilder(250);
+		StringBuilder sb = new StringBuilder(280);
 		sb.Append("[AUTOSK] act via=").Append(via)
 			.Append(" wall=").Append(clocked ? wall.ToString("F2") + "s" : "-")
 			.Append(" active=").Append(clocked ? active.ToString("F2") + "s" : "-")
@@ -585,7 +627,8 @@ internal static class AutoSkillProbe
 			.Append(" inst=").Append(InstanceTag(sk))
 			.Append(" skill=").Append(SkillLabel(sk))
 			.Append(" type=").Append(TypeNumber(ReadType(sk))).Append('(').Append(TypeName(ReadType(sk))).Append(')')
-			.Append(" status=").Append(StatusName(sk))
+			.Append(" verdict=").Append(verdict)
+			.Append(" status=").Append(status)
 			.Append(" wait=").Append(ReadWait(sk)).Append('/').Append(ReadCoolFrames(sk))
 			.Append(" ct=").Append(ReadCoolSeconds(sk))
 			.Append(" dur=").Append(ReadDuration(sk))
@@ -595,10 +638,19 @@ internal static class AutoSkillProbe
 			.Append(" level=").Append(ReadLevel(sk))
 			.Append(" ok=").Append(result)
 			.Append(" n=").Append(st.Activations)
+			.Append(" tries=").Append(st.Attempts)
 			.Append(" dWall=").Append(dWall > 0.0 ? dWall.ToString("F2") + "s" : "-")
 			.Append(" dActive=").Append(dActive > 0.0 ? dActive.ToString("F2") + "s" : "-");
 		RuntimeLog.Write(sb.ToString());
 		if (st.WallIntervals.Count > MaxActivationRows) IntervalsDropped++;
+	}
+
+	/// <summary>R69: the skill's own cooldown in GAME seconds, read for the page's fold
+	/// (`CoolTimeFrame / 30`, so a 100-frame cooldown stays 3.33 s instead of the truncated `ct=3`).</summary>
+	private static double CoolSeconds(Skill sk)
+	{
+		int frames = ReadCoolFrames(sk);
+		return (frames > 0) ? frames / 30.0 : 0.0;
 	}
 
 	// ---- readers: each one counted, so an unreadable field is never a silent 0 ----
@@ -914,6 +966,8 @@ internal static class AutoSkillProbe
 		StringBuilder sb = new StringBuilder(480);
 		sb.Append("[AUTOSK] SUM samples=").Append(SampleRows)
 			.Append(" actCmd=").Append(CommandActivations)
+			.Append(" tries=").Append(AttemptRows)
+			.Append(" unclassified=").Append(UnclassifiedRows)
 			.Append(" cmdUnresolved=").Append(CommandUnresolved)
 			.Append(" indexReadingsDiffer=").Append(IndexReadingsDiffer)
 			.Append(" useEdges=").Append(UsingEdges)
@@ -940,6 +994,7 @@ internal static class AutoSkillProbe
 				// `rows`, not `act`: this counts every row written for the slot. The un-ambiguous
 				// activation total is actCmd in the header.
 				.Append(" rows=").Append(st.Activations)
+				.Append(" tries=").Append(st.Attempts)
 				.Append(" nInterval=").Append(st.WallIntervals.Count)
 				.Append(" medianWall=").Append(Fmt(AutoSkillCadencePolicy.Median(st.WallIntervals.ToArray())))
 				.Append(" medianActive=").Append(Fmt(AutoSkillCadencePolicy.Median(st.ActiveIntervals.ToArray())));

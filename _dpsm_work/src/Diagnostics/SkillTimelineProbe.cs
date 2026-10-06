@@ -14,20 +14,23 @@ namespace DpsMeter;
 /// game has no `ActExecutePlayerOverSkill`: the over skill goes through `Player.ExecuteActiveSkill`, which
 /// the plugin must not patch (the 1.0.48 crash came from a detour body reading a half-built object).
 ///
-/// THE SECOND CHANNEL, AND WHY IT IS A RECORD AND NOT AN EXECUTION.
-/// The four `GameCmdExecuter.AddPlayer*GameRecord` methods are the game's own "I am writing down that this
-/// skill was used" sink, and the unified one is
-/// `AddPlayerSkillGameRecord(Player player, Skill skill, eUserRecordType type, Vector3 pos)`: it carries the
-/// `Skill` OBJECT and the game's own record type (`OverSkillStart`, `SpecialSkillStart`,
-/// `AutoSkill1ForPassiveSkillStart`, ...). A postfix on it therefore observes 奥义/特殊/自动 through ONE
-/// signature, and the Start/Finish member tells an activation apart from its end. It is a POSTFIX and it
-/// touches nothing: a probe that cannot change the game's state cannot break the game's skill use.
+/// THE TWO CHANNELS (R69; the third one is gone).
+///   1. `cmd` -- the R64 auto-skill command postfix. Verified over 9 battles / 471 rows.
+///   2. `skl` -- R67's three active/special command postfixes (`ActExecutePlayer{ActiveSkill,Skill,
+///      SpecialSkill}`). Measured in quest 411001: 595 calls, 554 rejected by the game itself, 41 accepted
+///      and all 41 `Skill.Type == 2` (奥義).
+/// R69 DELETED the R66 `rec` channel (a postfix on `AddPlayerSkillGameRecord`): it was installed and
+/// produced 0 rows with 0 skips in a training battle AND in a real quest, so the page stopped mentioning a
+/// channel that does not exist in this game. The falsification is recorded in REFACTOR-BATCH-R69.md.
 ///
-/// WHAT IS STILL OPEN (R66 must not claim otherwise). Whether `AddPlayerSkillGameRecord` is called for
-/// every activation, or only while the game is recording a replay, is NOT known -- there is no static way
-/// to ask. So the page prints the per-channel row counts, the empty case says so explicitly, and every
-/// record row is written to the log as `[SKILLTL] rec …`. The FIRST battle after this build answers it;
-/// until then the 奥义 column must be read as "observed" and not as "complete".
+/// R69: A CALL IS NOT AN ACTIVATION (this is the correction that matters). The game calls the auto-skill
+/// command once per ATTACK and returns `ok=1` whether or not the skill executed: マッドシーカー's
+/// 実験失敗！ (counter 2970 frames = 99 game s) was called 25 times in one 119 s battle and executed ONCE.
+/// The verdict is the game's own state (`Skill.GetStatus()`): only a call that finds the skill `Using` is
+/// an activation (<see cref="SkillActivationPolicy"/>); the rest are ATTEMPTS, counted in
+/// <see cref="AttemptEvents"/> and per row, never placed on the time axis and never fed to a median. The
+/// `[AUTOSK] act` rows still print EVERY call (with `verdict=`) -- the raw evidence is what let R69 find
+/// this, and a probe that hides the calls it decided against cannot be audited.
 ///
 /// FILTERING. Only our side (`CharacterInfo.IsAlly`: team 1, the same test every other surface uses) and
 /// only our own battle session. A foreign unit's skill use is counted, never stored.
@@ -38,55 +41,58 @@ namespace DpsMeter;
 internal static class SkillTimelineProbe
 {
 	/// <summary>How many activations are kept per battle. 9 battles of this game produced 471 auto-skill
-	/// rows in total and never more than 100 in one battle, so this is ~6x the observed worst case.</summary>
+	/// rows in total and never more than 100 in one battle, so this is ~6x the observed worst case. R69 did
+	/// not shrink it when it removed the attempts from the stream: only ACTIVATIONS are stored now.</summary>
 	internal const int MaxEvents = 600;
 
-	/// <summary>Record-channel rows written to the log before the probe stops writing them (it keeps
-	/// counting and keeping them for the page).</summary>
-	private const int MaxRecordLogRows = 120;
+	/// <summary>R69: distinct (unit, skill, type) attempt rows kept. 24 units were seen in 9 battles, so
+	/// this is ~2.5x the observed worst case; the overflow is counted.</summary>
+	internal const int MaxAttemptRows = 64;
 
 	private static readonly object Gate = new object();
 	private static readonly List<SkillTimelineEvent> Events = new List<SkillTimelineEvent>();
 
+	/// <summary>R69: per (unit, skill, type) count of calls that did NOT execute the skill.</summary>
+	private static readonly Dictionary<string, SkillTimelineAttempt> Attempts =
+		new Dictionary<string, SkillTimelineAttempt>(StringComparer.Ordinal);
+
 	/// <summary>Activations observed through the auto-skill command postfix.</summary>
 	internal static int CommandEvents;
-	/// <summary>Activations observed through `AddPlayerSkillGameRecord`.</summary>
-	internal static int RecordEvents;
-	/// <summary>Record calls that were NOT our side (the enemy's skills go through the same sink).</summary>
+	/// <summary>R69: calls that did not execute the skill, through the auto-skill command postfix. This is
+	/// the counter that used to be published as activations.</summary>
+	internal static int AttemptEvents;
+	/// <summary>R69: calls whose status was neither `Using` nor `Charge`/`Usable` (an unreadable field, or
+	/// a state this build does not know). Counted, never published as an activation: fail closed.</summary>
+	internal static int UnclassifiedEvents;
+	/// <summary>R69: attempt rows dropped after <see cref="MaxAttemptRows"/>.</summary>
+	internal static int DroppedAttemptRows;
+	/// <summary>Calls that were NOT our side (the enemy's skills go through the same hooks).</summary>
 	internal static int ForeignSideSkips;
-	/// <summary>Record calls whose `Player` or `Skill` was null.</summary>
+	/// <summary>Calls whose `Player` or `Skill` was null (or whose name could not be read).</summary>
 	internal static int NullSkips;
 	/// <summary>Record calls of a type that is not a skill ACTIVATION (`*Finish`, Attack*, screen
-	/// gestures, status/buff records, ...). Counted, so "the sink fires but never for a skill start" is a
-	/// visible fact rather than an empty page.</summary>
-	internal static int NonStartSkips;
-	/// <summary>Record calls that arrived with no live session (the sink is patched process-wide).</summary>
+	/// <summary>Calls that arrived with no live session (the hooks are patched process-wide).</summary>
 	internal static int NoSessionSkips;
-	/// <summary>Record rows where the record type and `Skill.Type` disagreed -- the two readings of "what
-	/// kind of skill was that" are kept side by side instead of being averaged.</summary>
-	internal static int KindMismatches;
 	/// <summary>Events dropped after <see cref="MaxEvents"/>.</summary>
 	internal static int DroppedEvents;
 	/// <summary>Field reads that threw.</summary>
 	internal static int ReadErrors;
-	/// <summary>Record rows written to the log (bounded by <see cref="MaxRecordLogRows"/>).</summary>
-	internal static int RecordLogRows;
 
 	internal static void Reset()
 	{
 		lock (Gate)
 		{
 			Events.Clear();
+			Attempts.Clear();
 			CommandEvents = 0;
-			RecordEvents = 0;
+			AttemptEvents = 0;
+			UnclassifiedEvents = 0;
+			DroppedAttemptRows = 0;
 			ForeignSideSkips = 0;
 			NullSkips = 0;
-			NonStartSkips = 0;
 			NoSessionSkips = 0;
-			KindMismatches = 0;
 			DroppedEvents = 0;
 			ReadErrors = 0;
-			RecordLogRows = 0;
 			ActiveCmdCalls = 0;
 			SkillCmdCalls = 0;
 			SpecialCmdCalls = 0;
@@ -103,12 +109,16 @@ internal static class SkillTimelineProbe
 	}
 
 	/// <summary>
-	/// Called by <see cref="AutoSkillProbe"/> once it has RESOLVED the skill and decided this really was an
-	/// activation, so the two probes cannot disagree about what counts: the resolution rule, the
-	/// `Aggregator.Session != null` gate and the "unresolved index is not an activation" rule all stay in
-	/// one place and are reused here rather than re-implemented.
+	/// Called by <see cref="AutoSkillProbe"/> once it has RESOLVED the skill and the game's own status said
+	/// this call really executed it, so the two probes cannot disagree about what counts: the resolution
+	/// rule, the `Aggregator.Session != null` gate, the "unresolved index is not an activation" rule and
+	/// (R69) the `Using` verdict all stay in one place and are reused here rather than re-implemented.
+	///
+	/// <paramref name="coolSeconds"/> is the skill's own cooldown, which is what the page folds by: the game
+	/// cannot execute the same skill twice inside it, so repeated `Using` calls inside one execution collapse
+	/// back into one stamp.
 	/// </summary>
-	internal static void NoteCommandActivation(Player player, Skill skill)
+	internal static void NoteCommandActivation(Player player, Skill skill, double coolSeconds)
 	{
 		try
 		{
@@ -118,8 +128,40 @@ internal static class SkillTimelineProbe
 			if (string.IsNullOrEmpty(unit) || string.IsNullOrEmpty(name)) return;
 			double wall, active;
 			if (!Clocks(out wall, out active)) return;
-			Add(unit, name, TypeOf(skill), SkillTimelineEvent.ChannelCommand, 0, wall, active);
+			Add(unit, name, TypeOf(skill), SkillTimelineEvent.ChannelCommand, 0, wall, active, coolSeconds);
 			lock (Gate) CommandEvents++;
+		}
+		catch { ReadErrors++; }
+	}
+
+	/// <summary>
+	/// R69: one call of the auto-skill command that did NOT execute the skill (the game was still charging,
+	/// or charged but not executing). It is NOT an event: it gets no stamp, no channel and no median -- it
+	/// only raises the attempt count of its (unit, skill, type). The call itself is still written to the
+	/// runtime log by <see cref="AutoSkillProbe"/>, with `verdict=`, so the decision stays auditable.
+	/// </summary>
+	internal static void NoteCommandAttempt(Player player, Skill skill)
+	{
+		try
+		{
+			if (!On()) return;
+			string unit = UnitLabel(player);
+			string name = SkillLabel(skill);
+			if (string.IsNullOrEmpty(unit) || string.IsNullOrEmpty(name)) return;
+			int type = TypeOf(skill);
+			string key = unit + "\u0001" + name + "\u0001" + type.ToString(CultureInfo.InvariantCulture);
+			lock (Gate)
+			{
+				AttemptEvents++;
+				SkillTimelineAttempt row;
+				if (!Attempts.TryGetValue(key, out row))
+				{
+					if (Attempts.Count >= MaxAttemptRows) { DroppedAttemptRows++; return; }
+					row = new SkillTimelineAttempt { Unit = unit, Skill = name, Type = type };
+					Attempts[key] = row;
+				}
+				row.Count++;
+			}
 		}
 		catch { ReadErrors++; }
 	}
@@ -188,99 +230,68 @@ internal static class SkillTimelineProbe
 					+ " wall=" + wall.ToString("F2", CultureInfo.InvariantCulture) + "s"
 					+ " active=" + active.ToString("F2", CultureInfo.InvariantCulture) + "s");
 			}
-			Add(unit, name, type, SkillTimelineEvent.ChannelSkillCommand, 0, wall, active);
+			Add(unit, name, type, SkillTimelineEvent.ChannelSkillCommand, 0, wall, active, CoolSecondsOf(sk));
 		}
 		catch { ReadErrors++; }
-	}
-
-	/// <summary>
-	/// The postfix body for `GameCmdExecuter.AddPlayerSkillGameRecord`. Never throws outwards.
-	/// </summary>
-	internal static void NoteRecord(Player player, Skill skill, eUserRecordType recordType)
-	{
-		try
-		{
-			if (!On()) return;
-			if (Aggregator.Session == null) { lock (Gate) NoSessionSkips++; return; }
-			if (player == null || skill == null) { lock (Gate) NullSkips++; return; }
-			int type = KindOfRecord(recordType);
-			if (type < 0) { lock (Gate) NonStartSkips++; return; }
-			if (!CharacterInfo.IsAlly(player)) { lock (Gate) ForeignSideSkips++; return; }
-
-			string unit = UnitLabel(player);
-			string name = SkillLabel(skill);
-			if (string.IsNullOrEmpty(unit) || string.IsNullOrEmpty(name)) { lock (Gate) NullSkips++; return; }
-
-			int skillType = TypeOf(skill);
-			bool mismatch = (skillType >= 0 && skillType != type);
-			if (mismatch) { lock (Gate) KindMismatches++; }
-
-			double wall, active;
-			bool clocked = Clocks(out wall, out active);
-			// The decision to LOG is taken under the lock (it reads the shared counter), the write itself
-			// is NOT: RuntimeLog does file I/O, and a probe must never hold a lock across I/O on a path the
-			// game's own skill use runs through.
-			bool log = false;
-			lock (Gate)
-			{
-				RecordEvents++;
-				if (RecordLogRows < MaxRecordLogRows) { RecordLogRows++; log = true; }
-			}
-			if (log)
-			{
-				StringBuilder sb = new StringBuilder(180);
-				sb.Append("[SKILLTL] rec unit=").Append(unit)
-					.Append(" skill=").Append(name)
-					.Append(" kind=").Append(SkillTimelinePolicy.KindLabel(type))
-					.Append(" recType=").Append(((int)recordType).ToString(CultureInfo.InvariantCulture))
-					.Append(" skillType=").Append(skillType.ToString(CultureInfo.InvariantCulture))
-					.Append(mismatch ? " MISMATCH" : "")
-					.Append(" wall=").Append(clocked ? wall.ToString("F2", CultureInfo.InvariantCulture) + "s" : "-")
-					.Append(" active=").Append(clocked ? active.ToString("F2", CultureInfo.InvariantCulture) + "s" : "-");
-				RuntimeLog.Write(sb.ToString());
-			}
-			Add(unit, name, type, SkillTimelineEvent.ChannelRecord, (int)recordType, wall, active);
-		}
-		catch { ReadErrors++; }
-	}
-
-	/// <summary>The record types that mean "this skill STARTED". Everything else (including every
-	/// `*Finish`, the attack records, the screen gestures and the status/buff records that share this sink)
-	/// is not an activation and is not stored.</summary>
-	private static int KindOfRecord(eUserRecordType t)
-	{
-		if (t == eUserRecordType.OverSkillStart) return 2;
-		if (t == eUserRecordType.SpecialSkillStart) return 1;
-		if (t == eUserRecordType.AutoSkill1ForPassiveSkillStart) return 3;
-		if (t == eUserRecordType.AutoSkill2ForPassiveSkillStart) return 4;
-		return -1;
 	}
 
 	private static void Add(string unit, string skill, int type, string channel, int recordType,
-		double wall, double active)
+		double wall, double active, double coolSeconds)
 	{
 		lock (Gate)
 		{
 			if (Events.Count >= MaxEvents) { DroppedEvents++; return; }
 			Events.Add(new SkillTimelineEvent
 			{
-				Unit = unit, Skill = skill, Type = type, Channel = channel, RecordType = recordType,
-				Wall = wall, Active = active,
+				Unit = unit, Skill = skill, Type = type, Channel = channel,
+				Wall = wall, Active = active, CoolSeconds = coolSeconds,
 			});
 		}
 	}
 
-	/// <summary>The page's rows, built by the pure text layer from a snapshot of the events. The copy is
-	/// taken under the same lock the hooks use, so a row can never be read half-written.</summary>
+	/// <summary>R69: the skill's own cooldown in GAME seconds. `Skill.CoolTimeFrame / 30` is used rather
+	/// than `Skill.CoolTime` because it keeps the fraction (the corpus's `ct=` column is the truncated
+	/// integer, and the fold must not round a 3.33 s cooldown down to 3). Unreadable -> 0, which the policy
+	/// treats as "fold by the fixed floor".</summary>
+	private static double CoolSecondsOf(Skill sk)
+	{
+		if (sk == null) return 0.0;
+		try
+		{
+			int frames = sk.CoolTimeFrame;
+			return (frames > 0) ? frames / 30.0 : 0.0;
+		}
+		catch { ReadErrors++; return 0.0; }
+	}
+
+	/// <summary>The page's rows, built by the pure text layer from a snapshot of the events and of the
+	/// attempt tallies. Both copies are taken under the same lock the hooks use, so a row can never be read
+	/// half-written.</summary>
 	internal static List<TimelineLine> Rows(bool inBattle)
 	{
 		List<SkillTimelineEvent> copy = Snapshot();
-		return SkillTimelineText.Rows(copy, inBattle);
+		return SkillTimelineText.Rows(copy, AttemptSnapshot(), inBattle);
 	}
 
 	internal static List<SkillTimelineEvent> Snapshot()
 	{
 		lock (Gate) return new List<SkillTimelineEvent>(Events);
+	}
+
+	/// <summary>R69: the attempt tallies, copied under the lock. The row objects are copied too, because the
+	/// page reads them after the lock is released and the hooks keep incrementing them.</summary>
+	internal static List<SkillTimelineAttempt> AttemptSnapshot()
+	{
+		lock (Gate)
+		{
+			var copy = new List<SkillTimelineAttempt>(Attempts.Count);
+			foreach (KeyValuePair<string, SkillTimelineAttempt> kv in Attempts)
+				copy.Add(new SkillTimelineAttempt
+				{
+					Unit = kv.Value.Unit, Skill = kv.Value.Skill, Type = kv.Value.Type, Count = kv.Value.Count,
+				});
+			return copy;
+		}
 	}
 
 	/// <summary>
@@ -293,24 +304,26 @@ internal static class SkillTimelineProbe
 	{
 		if (!On()) return "";   // feature off = no line at all, so "off" and "nothing fired" cannot look alike
 		List<SkillTimelineEvent> copy = Snapshot();
+		List<SkillTimelineAttempt> attempts = AttemptSnapshot();
 		StringBuilder sb = new StringBuilder(640);
 		sb.Append("[SKILLTL] SUM cmd=").Append(CommandEvents)
+			.Append(" tries=").Append(AttemptEvents)
+			.Append(" unclassified=").Append(UnclassifiedEvents)
 			.Append(" skl=").Append(SkillCmdEvents)
 			.Append(" sklCalls(active/skill/special)=").Append(ActiveCmdCalls).Append('/').Append(SkillCmdCalls)
 			.Append('/').Append(SpecialCmdCalls)
 			.Append(" sklRejected=").Append(SkillCmdRejected)
 			.Append(" sklNoSkill=").Append(SkillCmdNoSkill)
-			.Append(" rec=").Append(RecordEvents)
 			.Append(" kept=").Append(copy.Count)
+			.Append(" attemptRows=").Append(attempts.Count)
 			.Append(" foreignSide=").Append(ForeignSideSkips)
 			.Append(" nullSkips=").Append(NullSkips)
-			.Append(" nonStart=").Append(NonStartSkips)
 			.Append(" noSession=").Append(NoSessionSkips)
-			.Append(" kindMismatch=").Append(KindMismatches)
 			.Append(" dropped=").Append(DroppedEvents)
+			.Append(" droppedAttemptRows=").Append(DroppedAttemptRows)
 			.Append(" readErrors=").Append(ReadErrors);
-		if (copy.Count == 0) return sb.ToString();
-		List<TimelineLine> lines = SkillTimelineText.Rows(copy, true);
+		if (copy.Count == 0 && attempts.Count == 0) return sb.ToString();
+		List<TimelineLine> lines = SkillTimelineText.Rows(copy, attempts, true);
 		for (int i = 0; i < lines.Count; i++)
 			sb.Append("\n[SKILLTL] panel ").Append(lines[i].Text);
 		return sb.ToString();

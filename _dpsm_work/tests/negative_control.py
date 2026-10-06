@@ -660,20 +660,36 @@ MUTATIONS = [
          expect="policy/autoskill-cadence/the-median-does-not-reorder-the-callers-array"),
     # ---- R66: the 技能时间表. The probe and the overlay's row plumbing need the IL2CPP/Unity surface and
     # are NOT in the behaviour suite's compile list (see REFACTOR-BATCH-R66 section 5), so what these
-    # mutations guard is the executable half: the merge window (two channels report one activation), the
-    # battle-clock axis, the deterministic order, the median, and every marker that keeps the table from
-    # being a silent truncation.
-    dict(name="skilltimeline-window-eats-the-shortest-real-repeat", file="Policy/SkillTimelinePolicy.cs",
-         find="\t\t\tif (n > 0 && (e.Active - g.Stamps[n - 1]) < MergeSeconds)",
-         repl="\t\t\tif (n > 0 && (e.Active - g.Stamps[n - 1]) < MergeSeconds + 0.1)",
-         expect="policy/skill-timeline/the-shortest-corroborated-repeat-survives"),
+    # mutations guard is the executable half: the fold (R69: the skill's own cooldown), the battle-clock
+    # axis, the deterministic order, the median, and every marker that keeps the table from being a silent
+    # truncation.
+    # R69 re-anchored this one: the fold threshold is no longer the constant. Making FoldSeconds ignore the
+    # cooldown restores EXACTLY the shipped R66/R67 defect (one activation published as several, which is
+    # how a 99-second skill read as `med=4.97s`).
+    dict(name="skilltimeline-fold-ignores-the-cooldown", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\tif (double.IsNaN(cool) || double.IsInfinity(cool) || cool < MergeSeconds) return MergeSeconds;\n\t\treturn cool;",
+         repl="\t\treturn MergeSeconds;",
+         expect="policy/skill-timeline/calls-inside-one-cooldown-are-one-activation"),
     dict(name="skilltimeline-a-double-report-is-listed-twice", file="Policy/SkillTimelinePolicy.cs",
          find="\tinternal const double MergeSeconds = 0.25;",
          repl="\tinternal const double MergeSeconds = 0.05;",
          expect="policy/skill-timeline/a-double-report-is-one-stamp"),
+    # R69: the threshold must travel with the stamp that STARTED the cluster; reading it from the incoming
+    # row lets a later call re-open a cluster that is still inside the first call's cooldown.
+    dict(name="skilltimeline-fold-reads-the-incoming-row", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\t\tif (n > 0 && (e.Active - g.Stamps[n - 1]) < g.StampFold[n - 1])",
+         repl="\t\t\tif (n > 0 && (e.Active - g.Stamps[n - 1]) < FoldSeconds(e))",
+         expect="policy/skill-timeline/the-fold-follows-the-stamp-that-started-the-cluster"),
+    # R69: an unreadable cooldown must degrade to the FLOOR, not to "fold nothing" and not to NaN.
+    dict(name="skilltimeline-nan-cooldown-folds-nothing", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\tif (double.IsNaN(cool) || double.IsInfinity(cool) || cool < MergeSeconds) return MergeSeconds;",
+         repl="\t\tif (double.IsNaN(cool)) return 0.0;\n\t\tif (double.IsInfinity(cool) || cool < MergeSeconds) return MergeSeconds;",
+         expect="policy/skill-timeline/a-nan-cooldown-falls-back-to-the-floor"),
+    # R69 re-anchored: the comparer is a named method now (`CompareGroups`), two tabs in, because
+    # `ApplyAttempts` has to sort with the same order.
     dict(name="skilltimeline-rows-lose-their-order", file="Policy/SkillTimelinePolicy.cs",
-         find="\t\t\tint c = string.CompareOrdinal(a.Unit, b.Unit);\n\t\t\tif (c != 0) return c;\n\t\t\tc = KindRank(a.Type).CompareTo(KindRank(b.Type));\n\t\t\tif (c != 0) return c;\n\t\t\treturn string.CompareOrdinal(a.Skill, b.Skill);",
-         repl="\t\t\treturn 0;",
+         find="\t\tint c = string.CompareOrdinal(a.Unit, b.Unit);\n\t\tif (c != 0) return c;\n\t\tc = KindRank(a.Type).CompareTo(KindRank(b.Type));\n\t\tif (c != 0) return c;\n\t\treturn string.CompareOrdinal(a.Skill, b.Skill);",
+         repl="\t\treturn 0;",
          expect="policy/skill-timeline/groups-are-ordered-by-unit-then-kind"),
     dict(name="skilltimeline-median-drops-the-last-gap", file="Policy/SkillTimelinePolicy.cs",
          find="\t\tfor (int i = 1; i < g.Stamps.Count; i++)",
@@ -718,21 +734,60 @@ MUTATIONS = [
          repl="\tinternal const int StampW = 5;",
          expect="ui/skill-timeline-text/three-digit-stamps-never-run-together"),
     dict(name="skilltimeline-skl-rows-counted-as-cmd", file="Ui/SkillTimelineText.cs",
-         find="\t\t\t\telse if (e.Channel == SkillTimelineEvent.ChannelSkillCommand) skl++;",
-         repl="\t\t\t\telse if (false) skl++;",
+         find="\t\t\t\tif (e.Channel == SkillTimelineEvent.ChannelSkillCommand) skl++;",
+         repl="\t\t\t\tif (false) skl++;",
          expect="ui/skill-timeline-text/skl-rows-are-counted-in-their-own-channel"),
     dict(name="skilltimeline-truncation-hides-the-tail", file="Ui/SkillTimelineText.cs",
          find="\t\tif (groups.Count > shown)",
          repl="\t\tif (false)",
          expect="ui/skill-timeline-text/the-truncated-tail-is-reported"),
-    dict(name="skilltimeline-record-warning-always-on", file="Ui/SkillTimelineText.cs",
-         find="\t\tif (skl + rec == 0)",
-         repl="\t\tif (skl + rec >= 0)",
-         expect="ui/skill-timeline-text/a-record-channel-with-rows-does-not-warn"),
-    dict(name="skilltimeline-warning-ignores-the-skl-channel", file="Ui/SkillTimelineText.cs",
-         find="\t\tif (skl + rec == 0)",
-         repl="\t\tif (rec == 0)",
+    # R69: the 奥义/特殊 warning now watches the ONE live channel (`skl`); the R66/R67 pair of mutations that
+    # leaned on the deleted `rec` channel became these two.
+    dict(name="skilltimeline-skill-warning-always-on", file="Ui/SkillTimelineText.cs",
+         find="\t\tif (skl == 0)",
+         repl="\t\tif (skl >= 0)",
          expect="ui/skill-timeline-text/a-skill-command-channel-with-rows-does-not-warn"),
+    # R69: an attempt-only page must NOT claim that nothing was observed -- that is the difference between
+    # "the skill never fired" and "the probe saw nothing", and it is the case the new attempt rows exist for.
+    dict(name="skilltimeline-attempt-only-page-claims-nothing-happened", file="Ui/SkillTimelineText.cs",
+         find="\t\tif (cmd + skl + tries == 0)",
+         repl="\t\tif (cmd + skl == 0)",
+         expect="ui/skill-timeline-text/an-attempt-only-page-does-not-claim-nothing-was-observed"),
+    # R69: the four new text/policy behaviours of this round.
+    dict(name="skilltimeline-tail-drops-the-attempt-count", file="Ui/SkillTimelineText.cs",
+         find="\t\tif (g.Attempts > 0)\n",
+         repl="\t\tif (false)\n",
+         expect="ui/skill-timeline-text/an-attempt-count-is-printed-on-its-own-row"),
+    dict(name="skilltimeline-summary-hides-the-attempts", file="Ui/SkillTimelineText.cs",
+         find="+ \" 条发动 + 试触发 \"\n\t\t\t+ tries.ToString(CultureInfo.InvariantCulture) + \" 条(未计入) -> \"",
+         repl="+ \" 条发动 -> \"",
+         expect="ui/skill-timeline-text/the-summary-line-counts-the-attempts"),
+    dict(name="skilltimeline-tail-width-shrunk-back", file="Ui/SkillTimelineText.cs",
+         find="\tinternal const int TailW = 33;",
+         repl="\tinternal const int TailW = 25;",
+         expect="ui/skill-timeline-text/the-line-width-is-pinned"),
+    dict(name="skilltimeline-attempts-not-summed-onto-the-row", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\t\tg.Attempts += a.Count;",
+         repl="\t\t\tg.Attempts = a.Count;",
+         expect="policy/skill-attempts/attempts-are-summed-onto-the-row"),
+    dict(name="skilltimeline-attempt-rows-keep-the-arrival-order", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\tif (added) groups.Sort(CompareGroups);",
+         repl="\t\tif (false) groups.Sort(CompareGroups);",
+         expect="policy/skill-attempts/attempt-rows-are-inserted-in-the-tables-order"),
+    dict(name="skilltimeline-attempt-zero-count-opens-a-row", file="Policy/SkillTimelinePolicy.cs",
+         find="\t\t\tif (a == null || a.Count <= 0) continue;",
+         repl="\t\t\tif (a == null || a.Count < 0) continue;",
+         expect="policy/skill-attempts/a-malformed-attempt-tally-adds-no-row"),
+    # R69: the verdict itself. Charging is the state of a call that did NOT execute the skill, so treating it
+    # as an activation restores the exact defect the user's screenshot exposed.
+    dict(name="skillactivation-charge-counts-as-an-activation", file="Policy/SkillActivationPolicy.cs",
+         find="\t\treturn string.Equals(status, StatusUsing, System.StringComparison.Ordinal);",
+         repl="\t\treturn string.Equals(status, StatusUsing, System.StringComparison.Ordinal)\n\t\t\t|| string.Equals(status, StatusCharge, System.StringComparison.Ordinal);",
+         expect="policy/skill-activation/charge-is-not-an-activation"),
+    dict(name="skillactivation-unknown-status-fails-open", file="Policy/SkillActivationPolicy.cs",
+         find="\t\treturn string.Equals(status, StatusUsing, System.StringComparison.Ordinal);",
+         repl="\t\treturn status != null;",
+         expect="policy/skill-activation/an-unknown-status-is-neither"),
     dict(name="skilltimeline-over-row-loses-its-highlight", file="Ui/SkillTimelineText.cs",
          find="\t\t\t: TimelineLineStyle.Header);",
          repl="\t\t\t: TimelineLineStyle.Row);",
@@ -740,7 +795,7 @@ MUTATIONS = [
     dict(name="skilltimeline-channel-line-drops-its-label", file="Ui/SkillTimelineText.cs",
          find="\t\t\t+ \" \u6761 / skl(\u5965\u4e49\u7279\u6b8a\u547d\u4ee4) \" + skl.ToString(CultureInfo.InvariantCulture)",
          repl="\t\t\t+ \" \u6761 / skl \" + skl.ToString(CultureInfo.InvariantCulture)",
-         expect="ui/skill-timeline-text/the-channel-line-counts-all-three-channels"),
+         expect="ui/skill-timeline-text/the-channel-line-names-the-two-live-channels"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

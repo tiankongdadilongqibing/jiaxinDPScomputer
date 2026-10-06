@@ -6,8 +6,12 @@ internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.
 	/// R66: 1002 -> 1076 (+74: 47 in policy/skill-timeline, 27 in ui/skill-timeline-text).
-	/// R67: 1076 -> 1090 (+14: burst multiplicity/cells, wider stamp cells, the skl channel).</summary>
-	public const int ExpectedCases = 1090;
+	/// R67: 1076 -> 1090 (+14: burst multiplicity/cells, wider stamp cells, the skl channel).
+	/// R69: 1090 -> 1140 (+50: +16 policy/skill-timeline for the cooldown fold, +14 policy/skill-activation
+	/// for the Using verdict, +18 policy/skill-attempts for the attempt tallies and their rows, +2 for the
+	/// whole-page width pin, and the rewritten page cases -- the deleted `rec` channel cases are inside that
+	/// delta).</summary>
+	public const int ExpectedCases = 1140;
 
 	private static int Main(string[] args)
 	{
