@@ -157,6 +157,10 @@ public static partial class Aggregator
 		{
 			bool paused = false;
 			try { paused = val.IsPaused || val.IsTimePaused; } catch { }
+			// R71: BEFORE the first advance of the battle, move the clock's ORIGIN from "the plugin saw the
+			// battle" to "the game started it" (measured ~0.9 s late; see BattleClockCalibrationPolicy).
+			// It has to happen here -- one axis per battle -- and it is one-shot.
+			TryAlignClockOrigin(val, Session);
 			// The clock lives in BattleSession: one Advance() for the whole plugin (see its docs).
 			Session.Advance(dt, paused);
 			// Settle any per-hit "did this record inflict an ailment?" re-check whose window has passed.
@@ -239,6 +243,84 @@ public static partial class Aggregator
 			Plugin.LogSource.LogInfo(text);
 			RuntimeLog.Write(text);
 		}
+	}
+
+	/// <summary>
+	/// R71: one-shot alignment of the battle clock's ORIGIN with the game's own battle start (the user chose
+	/// this after the defect was measured: see <see cref="BattleClockCalibrationPolicy"/> for the three
+	/// independent measurements -- the auto-skill charge counters, the game's own on-screen battle timer, and
+	/// the page's earliest activation per skill vs the master's `FirstCoolTime`).
+	///
+	/// Called once per frame from <see cref="Tick"/> BEFORE the frame's advance, and it decides exactly once
+	/// per battle. It only ever ADDS a constant to `ActiveSeconds`/`CombatSeconds`, so:
+	///   * one battle, one origin (never two numbers for one event);
+	///   * every time the plugin publishes shifts together (page, `active=` columns, export
+	///     `events[].t`, `duration`, the per-second buckets);
+	///   * the shift is bounded, reported and refused when the evidence is weak.
+	/// </summary>
+	private static void TryAlignClockOrigin(GameSystem val, BattleSession s)
+	{
+		if (s == null || s.ClockOriginDecided) return;
+		try
+		{
+			if (Plugin.CfgClockAlign == null || !Plugin.CfgClockAlign.Value)
+			{
+				s.ClockOriginDecided = true;
+				s.ClockOriginReason = "off";
+				RuntimeLog.Write("[CLOCK] origin=none reason=off (General/ClockAlignToBattleStart=false; times start when the plugin saw the battle)");
+				return;
+			}
+			double lag;
+			int samples;
+			bool measured = AutoSkillProbe.TryMeasureClockLag(val, GameUnitsPerSecond(), s.ActiveSeconds,
+				out lag, out samples);
+			if (samples > 0) s.ClockOriginSamples = samples;
+
+			if (measured && BattleClockCalibrationPolicy.ShouldRebase(lag, s.ActiveSeconds, Rt.EventCount))
+			{
+				s.ActiveSeconds += lag;
+				s.CombatSeconds += lag;
+				s.ClockOriginShift = lag;
+				s.ClockOriginSamples = samples;
+				s.ClockOriginDecided = true;
+				s.ClockOriginReason = "applied";
+				RuntimeLog.Write("[CLOCK] origin=+" + lag.ToString("F2") + "s samples=" + samples
+					+ " active=" + BattleTime.Log(s.ActiveSeconds) + " hits=" + Rt.EventCount
+					+ " (this battle's times now start at the GAME's battle start)");
+				return;
+			}
+			// Not yet decidable, or refused for a reason that will not change: give up at the window's edge,
+			// where the calibrating slots are no longer guaranteed to be on their first charge.
+			if (s.ActiveSeconds > BattleClockCalibrationPolicy.WindowSeconds)
+			{
+				s.ClockOriginDecided = true;
+				s.ClockOriginReason = "window";
+				RuntimeLog.Write("[CLOCK] origin=none reason=window samples=" + samples + " active="
+					+ BattleTime.Log(s.ActiveSeconds) + " (times start when the plugin saw the battle)");
+				return;
+			}
+			if (Rt.EventCount > 0)
+			{
+				s.ClockOriginDecided = true;
+				s.ClockOriginReason = "events";
+				RuntimeLog.Write("[CLOCK] origin=none reason=events hits=" + Rt.EventCount
+					+ " (an event was already stamped; one battle, one origin)");
+				return;
+			}
+			if (!measured && samples >= BattleClockCalibrationPolicy.MinSamples)
+			{
+				// Samples exist but the combined value was refused (out of bounds): that is not a condition
+				// that improves by waiting, and a wrong shift would corrupt every time in the file.
+				s.ClockOriginDecided = true;
+				s.ClockOriginReason = "range";
+				RuntimeLog.Write("[CLOCK] origin=none reason=range samples=" + samples
+					+ " (combined lag outside [" + BattleClockCalibrationPolicy.MinLagSeconds.ToString("F2") + ", "
+					+ BattleClockCalibrationPolicy.MaxLagSeconds.ToString("F1") + "]s; times unaffected)");
+				return;
+			}
+			// Fewer than two usable slots so far: keep trying until the window closes.
+		}
+		catch { }
 	}
 
 	private static void SampleHp()

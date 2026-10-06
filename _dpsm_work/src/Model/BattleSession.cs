@@ -78,6 +78,23 @@ public sealed class BattleSession
 	/// <summary>True once the first real damage/heal event arrives; the battle clock starts there.</summary>
 	public bool TimingStarted;
 
+	/// <summary>R71: how much was ADDED to the battle clock, once, to move its origin from "the plugin saw
+	/// the battle" to "the game started it" (measured ~0.9 s; see
+	/// <see cref="BattleClockCalibrationPolicy"/>). 0 = no shift (measured as zero, not enough samples, or
+	/// the window/event rule refused it -- <see cref="ClockOriginReason"/> says which).</summary>
+	public double ClockOriginShift;
+
+	/// <summary>R71: usable counter samples behind <see cref="ClockOriginShift"/> (0 when none).</summary>
+	public int ClockOriginSamples;
+
+	/// <summary>R71: one word for the outcome, printed in the `[CLOCK]` line and kept for the record:
+	/// `applied`, `none`, `few`, `window`, `events`, or `off` (the feature switch).</summary>
+	public string ClockOriginReason = "";
+
+	/// <summary>R71: set once the origin has been decided (applied or refused), so the per-frame driver
+	/// stops looking. Never reset within a battle.</summary>
+	public bool ClockOriginDecided;
+
 	/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).
 	/// The only place battle time is accumulated.</summary>
 	public void Advance(double dt, bool paused)

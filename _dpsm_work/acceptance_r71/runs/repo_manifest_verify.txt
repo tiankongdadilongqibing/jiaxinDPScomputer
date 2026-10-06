@@ -1,0 +1,5 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\repo_manifest.py --verify --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+verify: tracked=2491 hashed_excluded=343 corpus=35
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/baseline-manifest.json
+manifest verify: drift=0 changed=1 grew=0 notes=0

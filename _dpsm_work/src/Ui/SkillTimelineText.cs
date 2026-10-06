@@ -114,6 +114,16 @@ internal static class SkillTimelineText
 	internal static List<TimelineLine> Rows(IList<SkillTimelineEvent> events, IList<SkillTimelineAttempt> attempts,
 		int foreignDropped, bool inBattle)
 	{
+		return Rows(events, attempts, foreignDropped, inBattle, 0.0);
+	}
+
+	/// <summary>R71: the same page, plus how much the clock's ORIGIN was moved to sit on the game's own
+	/// battle start (`BattleSession.ClockOriginShift`). It is printed as its own legend line, because the
+	/// page's times are now comparable with the game's 初动/冷却 and a reader has to be able to see why --
+	/// and, when no shift was applied, to see that they are NOT.</summary>
+	internal static List<TimelineLine> Rows(IList<SkillTimelineEvent> events, IList<SkillTimelineAttempt> attempts,
+		int foreignDropped, bool inBattle, double clockOriginShift)
+	{
 		var lines = new List<TimelineLine>();
 		int cmd = 0, skl = 0, tries = 0;
 		if (events != null)
@@ -146,6 +156,14 @@ internal static class SkillTimelineText
 		lines.Add(new TimelineLine(
 			"  试N = 本场调用 N 次但没有发动(不计入时刻与中位)  med = 合并后相邻格子间隔的中位数  "
 			+ "发动时刻一屏放不下时接着下一行(续行只印时刻)", TimelineLineStyle.Dim));
+		// R71: the axis itself. Printed only when the origin was actually moved -- "no line" must not be
+		// mistaken for "the times are on the game's start", and the [CLOCK] log line says which of the two
+		// happened and why.
+		if (clockOriginShift > 0.0)
+			lines.Add(new TimelineLine(
+				"  时刻起点 = 游戏自己的战斗开始(已补回本插件晚看到的 +"
+				+ clockOriginShift.ToString("F2", CultureInfo.InvariantCulture)
+				+ "s;与技能初动/冷却同一原点)", TimelineLineStyle.Dim));
 
 		if (cmd + skl + tries == 0)
 		{

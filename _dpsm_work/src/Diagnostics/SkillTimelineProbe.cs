@@ -337,7 +337,20 @@ internal static class SkillTimelineProbe
 	internal static List<TimelineLine> Rows(bool inBattle)
 	{
 		List<SkillTimelineEvent> copy = Snapshot();
-		return SkillTimelineText.Rows(copy, AttemptSnapshot(), ForeignTotal, inBattle);
+		return SkillTimelineText.Rows(copy, AttemptSnapshot(), ForeignTotal, inBattle, ClockOriginShift());
+	}
+
+	/// <summary>R71: how far this battle's clock origin was moved onto the game's own battle start (0 when
+	/// it was not, which the `[CLOCK]` line explains). Read from the live session, so the page and the log
+	/// can never disagree about which axis the stamps are on.</summary>
+	private static double ClockOriginShift()
+	{
+		try
+		{
+			BattleSession s = Aggregator.Session;
+			return (s != null) ? s.ClockOriginShift : 0.0;
+		}
+		catch { return 0.0; }
 	}
 
 	internal static List<SkillTimelineEvent> Snapshot()
@@ -391,7 +404,7 @@ internal static class SkillTimelineProbe
 			.Append(" droppedAttemptRows=").Append(DroppedAttemptRows)
 			.Append(" readErrors=").Append(ReadErrors);
 		if (copy.Count == 0 && attempts.Count == 0) return sb.ToString();
-		List<TimelineLine> lines = SkillTimelineText.Rows(copy, attempts, ForeignTotal, true);
+		List<TimelineLine> lines = SkillTimelineText.Rows(copy, attempts, ForeignTotal, true, ClockOriginShift());
 		for (int i = 0; i < lines.Count; i++)
 			sb.Append("\n[SKILLTL] panel ").Append(lines[i].Text);
 		return sb.ToString();

@@ -237,7 +237,82 @@ internal static partial class Cases
 		SkillActivationCases(r);
 		SkillSideCases(r);
 		SkillAttemptCases(r);
+		ClockCalibrationCases(r);
 		SkillTimelineTextCases(r);
+	}
+
+	// ------------------------------------------------------------------ R71: the battle clock's origin
+	private static void ClockCalibrationCases(Runner r)
+	{
+		r.Group("policy/battle-clock-calibration");
+
+		// THE MEASURED CASE (2026-10-06, three battles): a slot whose first charge is 4.0 s holds 92 of its
+		// 120 frames when our clock reads 0.03 s -> the game had been charging it 0.93 s, i.e. our origin is
+		// 0.90 s late.
+		double lag;
+		r.True("a-first-charge-slot-measures-the-lag",
+			BattleClockCalibrationPolicy.TryLag(120, 92, 30.0, 0.03, out lag));
+		r.EqD("the-lag-of-the-measured-slot", lag, 0.9033333333333333);
+		r.True("a-full-first-charge-means-no-lag-yet",
+			BattleClockCalibrationPolicy.TryLag(120, 120, 30.0, 0.0, out lag) && lag < 0.001);
+		// Refusals: each one is a way a plausible reading would be wrong.
+		r.True("a-slot-without-a-first-charge-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(0, 0, 30.0, 0.03, out lag));
+		r.True("a-negative-first-charge-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(-300, 100, 30.0, 0.03, out lag));
+		r.True("a-counter-above-its-first-charge-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(120, 121, 30.0, 0.03, out lag));
+		r.True("a-negative-counter-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(120, -1, 30.0, 0.03, out lag));
+		r.True("an-unreadable-units-per-second-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(120, 92, 0.0, 0.03, out lag));
+		r.True("a-sample-outside-the-window-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(900, 800, 30.0, 5.0, out lag));
+		r.True("a-nan-clock-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(120, 92, 30.0, double.NaN, out lag));
+		r.True("an-absurd-lag-is-refused",
+			!BattleClockCalibrationPolicy.TryLag(9000, 0, 30.0, 0.0, out lag));
+
+		// The combination: the MEDIAN of the usable samples (one bad slot must not drag the axis), and no
+		// shift at all below the minimum or with too few samples.
+		r.EqD("the-median-of-three-slots", BattleClockCalibrationPolicy.Combine(new List<double> { 0.90, 0.93, 0.90 }),
+			0.90);
+		r.EqD("a-single-outlier-is-ignored", BattleClockCalibrationPolicy.Combine(new List<double> { 0.90, 0.93, 4.5 }),
+			0.93);
+		r.EqD("samples-beyond-the-max-lag-are-dropped-before-the-median",
+			BattleClockCalibrationPolicy.Combine(new List<double> { 0.90, 0.90, 9.0, 20.0 }), 0.90);
+		r.EqD("samples-that-say-we-are-ahead-are-dropped-too",
+			BattleClockCalibrationPolicy.Combine(new List<double> { 0.90, 0.90, -3.0, -3.0 }), 0.90);
+		r.EqD("a-nan-sample-never-reaches-the-median",
+			BattleClockCalibrationPolicy.Combine(new List<double> { 0.90, 0.90, 0.90, double.NaN }), 0.90);
+		r.EqD("one-sample-is-not-enough", BattleClockCalibrationPolicy.Combine(new List<double> { 0.90 }), 0.0);
+		r.EqD("no-samples-mean-no-shift", BattleClockCalibrationPolicy.Combine(new List<double>()), 0.0);
+		r.EqD("a-null-list-means-no-shift", BattleClockCalibrationPolicy.Combine(null), 0.0);
+		r.EqD("a-sub-noise-lag-is-not-a-shift", BattleClockCalibrationPolicy.Combine(new List<double> { 0.01, 0.02 }),
+			0.0);
+		r.EqD("a-negative-lag-is-not-a-shift", BattleClockCalibrationPolicy.Combine(new List<double> { -0.30, -0.30 }),
+			0.0);
+
+		// The decision: one battle, one origin -- and only inside the window, before the first event.
+		r.True("a-measured-lag-is-applied", BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 0));
+		r.True("the-shift-is-refused-after-an-event",
+			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 0.03, 1));
+		r.True("the-shift-is-refused-outside-the-window",
+			!BattleClockCalibrationPolicy.ShouldRebase(0.90, 3.0, 0));
+		r.True("the-shift-is-refused-below-the-minimum",
+			!BattleClockCalibrationPolicy.ShouldRebase(0.01, 0.03, 0));
+		r.True("the-shift-is-refused-above-the-maximum",
+			!BattleClockCalibrationPolicy.ShouldRebase(6.0, 0.03, 0));
+		r.True("a-zero-lag-is-not-a-shift", !BattleClockCalibrationPolicy.ShouldRebase(0.0, 0.03, 0));
+		r.True("a-nan-lag-is-refused", !BattleClockCalibrationPolicy.ShouldRebase(double.NaN, 0.03, 0));
+		r.Eq("the-bounds-are-pinned",
+			BattleClockCalibrationPolicy.MinSamples * 1000 + (int)(BattleClockCalibrationPolicy.MinLagSeconds * 100)
+			+ (int)BattleClockCalibrationPolicy.MaxLagSeconds, 2000 + 5 + 5);
+
+		// A fresh session carries no shift until the calibration decides (the fields the log/page read).
+		var fresh = new BattleSession();
+		r.EqD("a-fresh-session-has-no-origin-shift", fresh.ClockOriginShift, 0.0);
+		r.Eq("a-fresh-session-has-not-decided-yet", fresh.ClockOriginDecided ? 1 : 0, 0);
 	}
 
 	// ------------------------------------------------------------------ R70: whose skills are these
@@ -535,6 +610,15 @@ internal static partial class Cases
 		r.True("the-legend-mentions-the-continuation-lines",
 			Has(SkillTimelineText.Rows(viaSkl, null, true), "发动时刻一屏放不下时接着下一行"));
 
+		// ---- R71: the axis is stated when the origin was moved onto the game's battle start ----
+		r.True("the-page-states-the-shifted-origin",
+			Has(SkillTimelineText.Rows(viaSkl, null, 0, true, 0.93), "时刻起点 = 游戏自己的战斗开始(已补回本插件晚看到的 +0.93s"));
+		r.True("an-unshifted-page-claims-nothing-about-the-origin",
+			!Has(SkillTimelineText.Rows(viaSkl, null, 0, true, 0.0), "时刻起点"));
+		r.True("the-origin-line-fits-the-pinned-width",
+			DisplayFormat.DispWidth(Find(SkillTimelineText.Rows(viaSkl, null, 0, true, 0.93), "时刻起点"))
+			<= SkillTimelineText.LineWidth);
+
 		var lots = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 16; i++) lots.Add(Ev("U" + i.ToString("D2", CultureInfo.InvariantCulture), "S", 3, 5.0 + i, "cmd"));
 		List<TimelineLine> lotsLines = SkillTimelineText.Rows(lots, null, true);
@@ -623,5 +707,12 @@ internal static partial class Cases
 	{
 		for (int i = 0; i < lines.Count; i++) if (lines[i].Text.Contains(needle)) return true;
 		return false;
+	}
+
+	/// <summary>The first line containing <paramref name="needle"/> ("" when none).</summary>
+	private static string Find(List<TimelineLine> lines, string needle)
+	{
+		for (int i = 0; i < lines.Count; i++) if (lines[i].Text.Contains(needle)) return lines[i].Text;
+		return "";
 	}
 }

@@ -301,6 +301,23 @@ internal static class AutoSkillProbe
 
 	private static void Scan(GameSystem val, BattleSession s, double wall)
 	{
+		var party = new List<Player>(16);
+		CollectParty(val, party, true);
+		for (int i = 0; i < party.Count; i++) ObservePlayer(party[i], s, wall);
+	}
+
+	/// <summary>
+	/// R70/R71: the party players the standby list exposes, in list order, de-duplicated by pointer and
+	/// filtered to OUR SIDE -- ONE walk, used by the charge sampler and by R71's clock calibration, because
+	/// two copies of "who is in this battle" would drift apart exactly the way the resolver and its
+	/// diagnosis did in R65.
+	///
+	/// <paramref name="account"/> is true for the sampler (which owns `players=`/`viaOwner=` in its SUM
+	/// line) and false for the one-shot calibration, so a calibration read cannot inflate the sampler's
+	/// statistics.
+	/// </summary>
+	private static void CollectParty(GameSystem val, List<Player> into, bool account)
+	{
 		StandbyManager mgr = null;
 		StandbyController ctl = null;
 		Il2CppSystem.Collections.Generic.List<StandbyDataBase> list = null;
@@ -331,7 +348,7 @@ internal static class AutoSkillProbe
 					if (ownerSkill != null)
 					{
 						try { p = ownerSkill.m_owner.TryCast<Player>(); } catch { }
-						if (!GameRef.IsNull(p)) PlayersViaOwner++;
+						if (!GameRef.IsNull(p) && account) PlayersViaOwner++;
 					}
 				}
 			}
@@ -349,9 +366,57 @@ internal static class AutoSkillProbe
 				SkillTimelineProbe.NoteForeign(p, "chg", -1);
 				continue;
 			}
-			PlayersSeen++;
-			ObservePlayer(p, s, wall);
+			if (account) PlayersSeen++;
+			into.Add(p);
 		}
+	}
+
+	/// <summary>
+	/// R71: measure how much our battle clock LAGS the game's battle start, from the auto-skill slots that
+	/// are still on their FIRST charge (`Skill.FirstCoolTime` vs `Skill.WaitCountFrame`; see
+	/// <see cref="BattleClockCalibrationPolicy"/> for why that difference IS the origin offset).
+	///
+	/// Only the two NAMED auto slots are read. The 奥義/特殊 slots are not: their initial counter value was
+	/// never measured, and a wrong-but-plausible reading there would shift every time in the battle.
+	///
+	/// Read-only, bounded (<see cref="BattleClockCalibrationPolicy.MaxSamples"/> slots), never throws: it
+	/// runs on the frame path at the very start of a battle. Returns false when fewer than
+	/// <see cref="BattleClockCalibrationPolicy.MinSamples"/> slots can answer -- the caller then keeps
+	/// trying until the calibration window closes.
+	/// </summary>
+	internal static bool TryMeasureClockLag(GameSystem val, double unitsPerSecond, double activeSeconds,
+		out double lag, out int samples)
+	{
+		lag = 0.0;
+		samples = 0;
+		try
+		{
+			if (val == null) return false;
+			var party = new List<Player>(16);
+			CollectParty(val, party, false);
+			var lags = new List<double>(party.Count * 2);
+			for (int i = 0; i < party.Count; i++)
+			{
+				AddClockLagSample(lags, NamedSlotSkill(party[i], 1), unitsPerSecond, activeSeconds);
+				AddClockLagSample(lags, NamedSlotSkill(party[i], 2), unitsPerSecond, activeSeconds);
+				if (lags.Count >= BattleClockCalibrationPolicy.MaxSamples) break;
+			}
+			samples = lags.Count;
+			if (lags.Count < BattleClockCalibrationPolicy.MinSamples) return false;
+			lag = BattleClockCalibrationPolicy.Combine(lags);
+			return lag > 0.0;
+		}
+		catch { ReadErrors++; return false; }
+	}
+
+	private static void AddClockLagSample(List<double> into, Skill sk, double unitsPerSecond, double activeSeconds)
+	{
+		if (sk == null || into.Count >= BattleClockCalibrationPolicy.MaxSamples) return;
+		int first = 0, wait = 0;
+		try { first = sk.FirstCoolTime; } catch { ReadErrors++; return; }
+		try { wait = sk.WaitCountFrame; } catch { ReadErrors++; return; }
+		double lag;
+		if (BattleClockCalibrationPolicy.TryLag(first, wait, unitsPerSecond, activeSeconds, out lag)) into.Add(lag);
 	}
 
 	private static void ObservePlayer(Player p, BattleSession s, double wall)

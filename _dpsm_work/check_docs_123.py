@@ -139,6 +139,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R69.md',
     # R70: 敌方技能混进我方时间表(三路统一团队判据)+ 一行的发动时刻放不下就往下撑
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R70.md',
+    # R71: 战斗钟的原点对齐到游戏自己的战斗开始(开局补回 0.90 s;方案 B)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R71.md',
 ]
 
 
