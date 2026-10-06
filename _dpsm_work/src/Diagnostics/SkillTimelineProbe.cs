@@ -87,6 +87,13 @@ internal static class SkillTimelineProbe
 			DroppedEvents = 0;
 			ReadErrors = 0;
 			RecordLogRows = 0;
+			ActiveCmdCalls = 0;
+			SkillCmdCalls = 0;
+			SpecialCmdCalls = 0;
+			SkillCmdRejected = 0;
+			SkillCmdNoSkill = 0;
+			SkillCmdEvents = 0;
+			_skillLogRows = 0;
 		}
 	}
 
@@ -113,6 +120,75 @@ internal static class SkillTimelineProbe
 			if (!Clocks(out wall, out active)) return;
 			Add(unit, name, TypeOf(skill), SkillTimelineEvent.ChannelCommand, 0, wall, active);
 			lock (Gate) CommandEvents++;
+		}
+		catch { ReadErrors++; }
+	}
+
+	/// <summary>R67: postfix calls on the three active/special command entry points, per entry point --
+	/// printed in the SUM line so "the hook never ran" (all 0) and "it ran but was rejected / was the
+	/// enemy" are different facts. That distinction is exactly what R66's record sink could not give
+	/// beyond "0 everywhere".</summary>
+	internal static int ActiveCmdCalls, SkillCmdCalls, SpecialCmdCalls;
+	/// <summary>R67: calls the game itself REJECTED (`__result == false`): counted, never stored.</summary>
+	internal static int SkillCmdRejected;
+	/// <summary>R67: accepted calls whose skill slot could not be read (null `ActiveSkill`/`SpecialSkill`).</summary>
+	internal static int SkillCmdNoSkill;
+	/// <summary>R67: accepted activations observed through the command entry points (the `skl` channel).</summary>
+	internal static int SkillCmdEvents;
+	private const int MaxSkillLogRows = 120;
+	private static int _skillLogRows;
+
+	/// <summary>
+	/// R67: the body of the postfixes on `GameCmdExecuter.ActExecutePlayerActiveSkill`,
+	/// `ActExecutePlayerSkill` and `ActExecutePlayerSpecialSkill`. `entry` names which one ran
+	/// (`active`/`skill`/`special`). The skill that fired is read back from the unit's own slot AFTER the
+	/// game executed it (`Player.ActiveSkill` for the first two, `Player.SpecialSkill` for the third) and its
+	/// `Skill.Type` labels the row -- the page never assumes "active = 奥义"; the `[SKILLTL] skl` row prints
+	/// what the slot actually held so that mapping is MEASURED, not inferred.
+	/// </summary>
+	internal static void NoteSkillCommand(Player player, string entry, bool accepted)
+	{
+		try
+		{
+			if (!On()) return;
+			lock (Gate)
+			{
+				if (entry == "active") ActiveCmdCalls++;
+				else if (entry == "special") SpecialCmdCalls++;
+				else SkillCmdCalls++;
+			}
+			if (Aggregator.Session == null) { lock (Gate) NoSessionSkips++; return; }
+			if (player == null) { lock (Gate) NullSkips++; return; }
+			if (!CharacterInfo.IsAlly(player)) { lock (Gate) ForeignSideSkips++; return; }
+			if (!accepted) { lock (Gate) SkillCmdRejected++; return; }
+
+			Skill sk = null;
+			try { sk = (entry == "special") ? player.SpecialSkill : player.ActiveSkill; }
+			catch { ReadErrors++; }
+			if (sk == null) { lock (Gate) SkillCmdNoSkill++; return; }
+
+			string unit = UnitLabel(player);
+			string name = SkillLabel(sk);
+			if (string.IsNullOrEmpty(unit) || string.IsNullOrEmpty(name)) { lock (Gate) NullSkips++; return; }
+			int type = TypeOf(sk);
+			double wall, active;
+			if (!Clocks(out wall, out active)) return;
+
+			bool log = false;
+			lock (Gate)
+			{
+				SkillCmdEvents++;
+				if (_skillLogRows < MaxSkillLogRows) { _skillLogRows++; log = true; }
+			}
+			if (log)
+			{
+				RuntimeLog.Write("[SKILLTL] skl entry=" + entry + " unit=" + unit + " skill=" + name
+					+ " kind=" + SkillTimelinePolicy.KindLabel(type)
+					+ " skillType=" + type.ToString(CultureInfo.InvariantCulture)
+					+ " wall=" + wall.ToString("F2", CultureInfo.InvariantCulture) + "s"
+					+ " active=" + active.ToString("F2", CultureInfo.InvariantCulture) + "s");
+			}
+			Add(unit, name, type, SkillTimelineEvent.ChannelSkillCommand, 0, wall, active);
 		}
 		catch { ReadErrors++; }
 	}
@@ -219,6 +295,11 @@ internal static class SkillTimelineProbe
 		List<SkillTimelineEvent> copy = Snapshot();
 		StringBuilder sb = new StringBuilder(640);
 		sb.Append("[SKILLTL] SUM cmd=").Append(CommandEvents)
+			.Append(" skl=").Append(SkillCmdEvents)
+			.Append(" sklCalls(active/skill/special)=").Append(ActiveCmdCalls).Append('/').Append(SkillCmdCalls)
+			.Append('/').Append(SpecialCmdCalls)
+			.Append(" sklRejected=").Append(SkillCmdRejected)
+			.Append(" sklNoSkill=").Append(SkillCmdNoSkill)
 			.Append(" rec=").Append(RecordEvents)
 			.Append(" kept=").Append(copy.Count)
 			.Append(" foreignSide=").Append(ForeignSideSkips)

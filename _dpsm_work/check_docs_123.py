@@ -133,6 +133,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R65.md',
     # R66: 技能发动时刻做成悬浮窗的一页(F4 换岗)+ 用 9 场语料修正两条口径
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R66.md',
+    # R67: 用户截图核对时间表(并N条M格 / 时间格加宽 / 奥义换通道 / gameIdx 结案)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R67.md',
 ]
 
 

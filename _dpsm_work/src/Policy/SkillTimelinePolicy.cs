@@ -34,8 +34,9 @@ internal static class SkillTimelinePolicy
 	/// <summary>Rows the table shows before it collapses the rest into a "... 还有 N 项" line.</summary>
 	internal const int MaxGroups = 14;
 
-	/// <summary>Activation stamps printed per row before "...+N".</summary>
-	internal const int MaxStamps = 12;
+	/// <summary>Activation stamps printed per row before "...+N". R67: 12 -> 9, because each stamp cell
+	/// grew from 5 to 6 columns (see SkillTimelineText.StampW) and the row must keep fitting the panel.</summary>
+	internal const int MaxStamps = 9;
 
 	/// <summary>Chinese label of a `Skill.Type`. Deliberately spells out the two auto-skill slots,
 	/// because "which of the two auto skills fired" is the question this page exists to answer.</summary>
@@ -116,9 +117,11 @@ internal static class SkillTimelinePolicy
 			if (n > 0 && (e.Active - g.Stamps[n - 1]) < MergeSeconds)
 			{
 				g.Merged++;
+				g.Multiplicity[n - 1]++;
 				continue;
 			}
 			g.Stamps.Add(e.Active);
+			g.Multiplicity.Add(1);
 		}
 
 		groups.Sort(delegate (SkillTimelineGroup a, SkillTimelineGroup b)
@@ -167,6 +170,23 @@ internal sealed class SkillTimelineGroup
 	internal int Events;
 
 	/// <summary>Rows folded into the previous stamp by the merge window. Never hidden: the table prints
-	/// `×N` when this is non-zero.</summary>
+	/// it as `并N条` when this is non-zero.</summary>
 	internal int Merged;
+
+	/// <summary>R67: how many raw rows each kept stamp absorbed (1 = no fold), parallel to
+	/// <see cref="Stamps"/>. WHY: R66 printed `x(Merged+1)` and the legend read it as "N activations in
+	/// ONE cell" -- measured 2026-10-06, メアリー showed `x3` while her two folds landed in two DIFFERENT
+	/// cells (49.10+49.10, 79.30+79.37); 3 of the 5 marked rows that battle said something false.</summary>
+	internal readonly List<int> Multiplicity = new List<int>();
+
+	/// <summary>Kept stamps that absorbed at least one fold.</summary>
+	internal int BurstCells
+	{
+		get
+		{
+			int c = 0;
+			for (int i = 0; i < Multiplicity.Count; i++) if (Multiplicity[i] > 1) c++;
+			return c;
+		}
+	}
 }

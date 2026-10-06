@@ -5,8 +5,9 @@ namespace BehaviorTests;
 internal static class Program
 {
 	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.
-	/// R66: 1002 -> 1076 (+74: 47 in policy/skill-timeline, 27 in ui/skill-timeline-text).</summary>
-	public const int ExpectedCases = 1076;
+	/// R66: 1002 -> 1076 (+74: 47 in policy/skill-timeline, 27 in ui/skill-timeline-text).
+	/// R67: 1076 -> 1090 (+14: burst multiplicity/cells, wider stamp cells, the skl channel).</summary>
+	public const int ExpectedCases = 1090;
 
 	private static int Main(string[] args)
 	{

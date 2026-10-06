@@ -313,6 +313,41 @@ public class Plugin : BasePlugin
 	}
 
 	/// <summary>
+	/// R67: the three active/special command entry points of `GameCmdExecuter`, each patched in its OWN
+	/// try (one unresolved signature must not cost the other two). Same layer as the proven auto-skill
+	/// command hook; added because R66's record sink was never called in a full battle.
+	/// </summary>
+	private void TryPatchSkillCommands()
+	{
+		var pos = typeof(Il2CppSystem.Collections.Generic.IEnumerable<UnityEngine.Vector3>);
+		TryPatchSkillCommand("ActExecutePlayerActiveSkill", new Type[] { typeof(Player), pos },
+			nameof(SkillRecordHooks.PostfixActiveSkill));
+		TryPatchSkillCommand("ActExecutePlayerSkill", new Type[] { typeof(Player), pos },
+			nameof(SkillRecordHooks.PostfixSkill));
+		TryPatchSkillCommand("ActExecutePlayerSpecialSkill", new Type[] { typeof(Player), typeof(UnityEngine.Vector3) },
+			nameof(SkillRecordHooks.PostfixSpecialSkill));
+	}
+
+	private void TryPatchSkillCommand(string method, Type[] args, string postfix)
+	{
+		try
+		{
+			var m = AccessTools.Method(typeof(GameCmdExecuter), method, args);
+			if (m == null)
+			{
+				LogSource.LogInfo("[DpsMeter] GameCmdExecuter." + method + " not found; that skl entry stays dark (see [SKILLTL] SUM sklCalls).");
+				return;
+			}
+			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(SkillRecordHooks), postfix));
+			LogSource.LogInfo("[DpsMeter] skill-command postfix applied (GameCmdExecuter." + method + ").");
+		}
+		catch (Exception ex)
+		{
+			LogSource.LogInfo("[DpsMeter] skill-command postfix failed for " + method + " (meter unaffected): " + ex.Message);
+		}
+	}
+
+	/// <summary>
 	/// Patch the attack constructor of DamageCalculater (attacker, blocker, abilityList, draw) to read the
 	/// attacker's 攻击力 BEFORE the body computes 计算威力. Manual patch for the same reason as the crit
 	/// probe: a constructor whose signature resolves differently must not be able to kill the patch set.
@@ -451,6 +486,7 @@ public class Plugin : BasePlugin
 			TryPatchGiveApplier();
 			TryPatchAutoSkillActivation();
 			TryPatchSkillRecord();
+			TryPatchSkillCommands();
 		}
 		catch (Exception ex)
 		{

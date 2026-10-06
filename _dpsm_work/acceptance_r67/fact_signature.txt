@@ -1,0 +1,20 @@
+======================================================================================================================
+FACT signature replay
+  file    battle_411001_20261006_121130__B-20261006-041130-7AA0C98126494171-001.json
+  version 1.7.18   quest 411001   damage events 5614   replayable 5613
+  caps    {"MaxClasses": 2400, "MaxLiveClasses": 900}
+----------------------------------------------------------------------------------------------------------------------
+1.5.1 legacy key           distinct=1751   cap=600   kept=600   served=1830   overflow=3783   servedIfRanked=4059   singletons=759   maxHits=38     STARVED
+1.5.2 shipped key          distinct=228    cap=2400  kept=228   served=5613   overflow=0      servedIfRanked=5613   singletons=60    maxHits=435    OK 
+
+coverage: 1.5.1 legacy 1830/5613 (32.6%)   1.5.2 shipped 5613/5613 (100.0%)
+plugin bookkeeping: observed=5613  sum(facts.items[].hits)=5613  classes=228/2400
+  note: replay served (1830) counts only the 5613 exported events; the plugin counted 5613 Observe calls. Not expected to be equal.
+VERDICT: shipped key fits (headroom 2172 classes) and every consistency check holds.
+
+top 5 classes by hits (shipped key):
+   n=435   ('マッドシーカー', 1, 'ショゴス', 2, 0, 2, 3.219, None, 150, 1, 1, None, ('凍結', '毒', '火傷'))
+   n=435   ('マッドシーカー', 1, 'ショゴス', 2, 0, 2, 2.66, None, 150, 1, 1, None, ('凍結', '毒', '火傷'))
+   n=342   ('テトラ', 1, 'ショゴス', 2, 0, 2, 2.799, None, 150, 1, 1, None, ('凍結', '毒', '火傷'))
+   n=333   ('テトラ', 1, 'ショゴス', 2, 0, 2, 2.313, None, 150, 1, 1, None, ('凍結', '毒', '火傷'))
+   n=279   ('マッドシーカー', 1, 'ショゴス', 2, 0, 2, 2.313, None, 150, 1, 1, None, ('毒', '火傷'))

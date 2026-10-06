@@ -1008,3 +1008,19 @@ R66 已把 `Skill.ActivationType`/`ActivationTypeParam` 打进行(`act=`/`actP=`
 > ("充满后等下一次普攻"),而 9 场、471 行的语料里有 157 次反例。**下结论前先数反例,并写明样本量**;
 > 反例存在时,正确的产物是**把游戏自己的判据字段读出来**(这里是 `Skill.ActivationType`),而不是把
 > 观察到的相关当成因果。
+
+##### R67(插件 1.7.19):时间表的两个口径与 `gameIdx` 的定义
+
+本轮**不动归属口径、不动任何伤害/归属数值、不改导出形状**(`contribution.schemaVersion` 仍 **1.2**)。
+
+- **时间表的 `med` 与 `[AUTOSK] SUM medianActive` 是两个量**:前者是**合并后格子**的相邻间隔中位数,
+  后者是**未合并**逐次发动的中位数。没有连发的行两者相等(实测 4/4),有连发的行不同(实测 3/3,
+  例 エヴァラス 11.25 vs 11.10)。引用时说明用的是哪一个。
+- **连发标记 `并N条M格`**:N = 被 0.25 战斗秒窗口并进前一格的原始条数,M = 收到它们的格子数。
+  R66 的 `xN` 只给一个数,对"两格各并一条"会写成 `x3`(实测 3/5 个带标记的行是这种情况),已废弃。
+- **`gameIdx`(`GameCmdExecuter.ActExecutePlayerAutoSkillForPassive` 的 `index`)**:`0` = `PassiveSkills`
+  里第一个带自动技能的被动(0 基),`1` = `Player.AutoSkill1`(1 基槽位);实测两者是**同一个 `Skill` 对象**
+  (`inst=` 每个真实自动技能只有一个标签),所以按技能身份汇总是对的、按 `gameIdx` 分开是错的。
+- **奥义/特殊的观测通道**:R66 的 `AddPlayerSkillGameRecord` 在训练场 9999 一整场**零调用**
+  (连跳过计数都是 0),不能作为数据源;R67 改为 `ActExecutePlayer{ActiveSkill,Skill,SpecialSkill}`
+  (`skl`),其可用性以下一场 SUM 的 `sklCalls` 为准,在那之前奥义一列只能读作"已观测"。

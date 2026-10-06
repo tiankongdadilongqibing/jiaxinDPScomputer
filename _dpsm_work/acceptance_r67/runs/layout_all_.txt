@@ -1,0 +1,25 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_contribution_layout.py --dir D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+OK   battle_411001_20261004_015919.json  rows=36
+OK   battle_411001_20261004_021914.json  rows=36
+OK   battle_411001_20261004_023627.json  rows=36
+OK   battle_411001_20261004_033231.json  rows=36
+OK   battle_411001_20261004_035437.json  rows=36
+OK   battle_411001_20261004_041309.json  rows=36
+OK   battle_411001_20261004_042637.json  rows=36
+OK   battle_411001_20261004_042844.json  rows=36
+OK   battle_411001_20261004_113553.json  rows=36
+OK   battle_411001_20261004_115024.json  rows=36
+OK   battle_411001_20261004_115417.json  rows=35
+OK   battle_411001_20261004_134524.json  rows=35
+OK   battle_411001_20261004_134853.json  rows=36
+OK   battle_411001_20261004_144548.json  rows=36
+OK   battle_411001_20261004_170157.json  rows=36
+OK   battle_411001_20261004_180353.json  rows=36
+OK   battle_411001_20261004_180834.json  rows=36
+OK   battle_700817_20261004_114821.json  rows=25
+OK   battle_9999_20261004_042458.json  rows=21
+OK   battle_9999_20261004_135214.json  rows=25
+OK   battle_9999_20261004_165952.json  rows=25
+OK   battle_9999_20261004_175957.json  rows=24
+---- layout: files=35 with-section=22 absent=13 bad=0 rows-checked=730

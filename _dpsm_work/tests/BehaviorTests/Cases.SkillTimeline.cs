@@ -175,7 +175,27 @@ internal static partial class Cases
 		// ---- the pinned constants (the text layer and the panel width are built on them) ----
 		r.EqD("the-merge-window-is-the-measured-0.25s", SkillTimelinePolicy.MergeSeconds, 0.25);
 		r.Eq("the-table-shows-14-rows", SkillTimelinePolicy.MaxGroups, 14);
-		r.Eq("a-row-prints-12-stamps", SkillTimelinePolicy.MaxStamps, 12);
+		r.Eq("a-row-prints-9-stamps", SkillTimelinePolicy.MaxStamps, 9);
+
+		// ---- R67: WHERE the folds landed (R66's single number could not say) ----
+		// The measured case: メアリー's two folds landed in two different cells (49.10+49.10, 79.30+79.37).
+		List<SkillTimelineGroup> spread = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("メアリー", "影爪の強制裁断", 3, 49.10, "cmd"), Ev("メアリー", "影爪の強制裁断", 3, 49.10, "cmd"),
+			Ev("メアリー", "影爪の強制裁断", 3, 59.20, "cmd"),
+			Ev("メアリー", "影爪の強制裁断", 3, 79.30, "cmd"), Ev("メアリー", "影爪の強制裁断", 3, 79.37, "cmd"),
+		});
+		r.Eq("two-folds-in-two-cells-count-two-rows", spread[0].Merged, 2);
+		r.Eq("two-folds-in-two-cells-count-two-cells", spread[0].BurstCells, 2);
+		r.Str("each-cell-keeps-its-own-multiplicity", Mult(spread[0]), "2,1,2");
+		List<SkillTimelineGroup> stacked = SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 10.00, "cmd"), Ev("A", "S", 3, 10.05, "rec"), Ev("A", "S", 3, 10.10, "cmd"),
+		});
+		r.Eq("a-triple-in-one-cell-counts-two-rows", stacked[0].Merged, 2);
+		r.Eq("a-triple-in-one-cell-counts-one-cell", stacked[0].BurstCells, 1);
+		r.Str("a-triple-in-one-cell-has-multiplicity-three", Mult(stacked[0]), "3");
+		r.Eq("multiplicity-is-parallel-to-the-stamps", spread[0].Multiplicity.Count, spread[0].Stamps.Count);
 
 		SkillTimelineTextCases(r);
 	}
@@ -188,22 +208,31 @@ internal static partial class Cases
 		// ---- the empty page: "nothing fired" and "the hook saw nothing" are different lines ----
 		List<TimelineLine> empty = SkillTimelineText.Rows(new List<SkillTimelineEvent>(), true);
 		r.True("an-empty-page-in-battle-says-so", Has(empty, "  (本场尚未观测到我方技能发动)"));
-		r.True("an-empty-page-still-prints-the-channel-counts", Has(empty, "观测通道 cmd(命令钩子) 0 条"));
+		r.True("an-empty-page-still-prints-the-channel-counts", Has(empty, "观测通道 cmd(自动技能命令) 0 条"));
 		List<TimelineLine> idle = SkillTimelineText.Rows(new List<SkillTimelineEvent>(), false);
 		r.True("an-empty-page-out-of-battle-says-so-too", Has(idle, "  (未在战斗中,也没有上一场的记录)"));
-		r.Str("the-channel-line-counts-both-channels",
-			SkillTimelineText.ChannelLine(47, 3), "观测通道 cmd(命令钩子) 47 条 / rec(技能记录钩子) 3 条");
+		r.Str("the-channel-line-counts-all-three-channels",
+			SkillTimelineText.ChannelLine(97, 5, 0),
+			"观测通道 cmd(自动技能命令) 97 条 / skl(奥义特殊命令) 5 条 / rec(技能记录) 0 条");
 
-		// ---- the channel diagnosis: rec is the only channel that can see 奥义/特殊 ----
+		// ---- the channel diagnosis: 奥义/特殊 are seen by skl (R67) or rec (R66), never by cmd ----
 		List<SkillTimelineEvent> cmdOnly = new List<SkillTimelineEvent>
 		{
 			Ev("[賢導]トレイラ", "暗沌への導き", 3, 4.0, "cmd"), Ev("[賢導]トレイラ", "暗沌への導き", 3, 13.0, "cmd"),
 		};
-		r.True("a-record-channel-with-no-rows-warns", Has(SkillTimelineText.Rows(cmdOnly, true), "记录通道 0 条"));
+		r.True("no-over-channel-rows-warns", Has(SkillTimelineText.Rows(cmdOnly, true), "两条通道(skl/rec)本场都是 0 条"));
 		List<SkillTimelineEvent> both = new List<SkillTimelineEvent>(cmdOnly);
 		both.Add(Ev("[賢導]トレイラ", "真なる奥義", 2, 31.0, "rec"));
 		r.True("a-record-channel-with-rows-does-not-warn",
-			!Has(SkillTimelineText.Rows(both, true), "记录通道 0 条"));
+			!Has(SkillTimelineText.Rows(both, true), "两条通道(skl/rec)本场都是 0 条"));
+		List<SkillTimelineEvent> viaSkl = new List<SkillTimelineEvent>(cmdOnly);
+		viaSkl.Add(Ev("[賢導]トレイラ", "真なる奥義", 2, 31.0, SkillTimelineEvent.ChannelSkillCommand));
+		r.True("a-skill-command-channel-with-rows-does-not-warn",
+			!Has(SkillTimelineText.Rows(viaSkl, true), "两条通道(skl/rec)本场都是 0 条"));
+		r.True("skl-rows-are-counted-in-their-own-channel",
+			Has(SkillTimelineText.Rows(viaSkl, true), "skl(奥义特殊命令) 1 条"));
+		r.True("skl-rows-are-counted-in-the-raw-total",
+			Has(SkillTimelineText.Rows(viaSkl, true), "原始 3 条"));
 		r.True("a-public-page-does-not-claim-to-have-no-record",
 			!Has(SkillTimelineText.Rows(cmdOnly, false), "也没有上一场的记录"));
 
@@ -220,10 +249,24 @@ internal static partial class Cases
 		r.True("a-row-carries-the-skill-name", row.Text.Contains("暗沌への導き"));
 		r.True("a-row-counts-its-activations", row.Text.Contains("n=3"));
 		r.True("a-row-prints-the-median-gap", row.Text.Contains("med=13.45s"));
-		r.True("a-row-marks-a-folded-burst", row.Text.Contains("x2"));
+		r.True("a-row-marks-a-folded-burst", row.Text.Contains("并1条1格"));
 		r.True("every-row-fits-the-pinned-line-width",
 			DisplayFormat.DispWidth(row.Text) <= SkillTimelineText.LineWidth);
-		r.Eq("the-line-width-is-pinned", SkillTimelineText.LineWidth, 124);
+		r.Eq("the-line-width-is-pinned", SkillTimelineText.LineWidth, 121);
+		// R67: the measured defects of the R66 page, as cases.
+		TimelineLine spreadRow = SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("メアリー", "影爪", 3, 49.10, "cmd"), Ev("メアリー", "影爪", 3, 49.10, "cmd"),
+			Ev("メアリー", "影爪", 3, 79.30, "cmd"), Ev("メアリー", "影爪", 3, 79.37, "cmd"),
+		})[0]);
+		r.True("two-folds-in-two-cells-print-both-numbers", spreadRow.Text.Contains("并2条2格"));
+		r.True("the-r66-one-cell-claim-is-gone", !spreadRow.Text.Contains("x3"));
+		TimelineLine late = SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(new List<SkillTimelineEvent>
+		{
+			Ev("A", "S", 3, 96.2, "cmd"), Ev("A", "S", 3, 107.3, "cmd"), Ev("A", "S", 3, 118.3, "cmd"),
+		})[0]);
+		r.True("three-digit-stamps-stay-separated", late.Text.Contains(" 96.2 107.3 118.3"));
+		r.True("three-digit-stamps-never-run-together", !late.Text.Contains("96.2107.3"));
 		r.True("the-table-header-names-its-four-columns",
 			Has(SkillTimelineText.Rows(both, true), "角色") && Has(SkillTimelineText.Rows(both, true), "种类")
 			&& Has(SkillTimelineText.Rows(both, true), "技能") && Has(SkillTimelineText.Rows(both, true), "发动时刻"));
@@ -246,10 +289,11 @@ internal static partial class Cases
 		// ---- truncation is always stated ----
 		var many = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 15; i++) many.Add(Ev("A", "S", 3, 5.0 + i * 2.0, "cmd"));
+		// 15 stamps, 9 cells: 8 stamps + the "+7" cell
 		r.True("stamps-beyond-the-printed-ones-are-counted",
-			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many)[0]).Text.Contains("+4"));
-		r.Eq("exactly-twelve-stamps-print-without-a-plus",
-			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many.GetRange(0, 12))[0]).Text.Contains("+") ? 1 : 0, 0);
+			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many)[0]).Text.Contains("+7"));
+		r.Eq("exactly-nine-stamps-print-without-a-plus",
+			SkillTimelineText.GroupLine(SkillTimelinePolicy.Group(many.GetRange(0, 9))[0]).Text.Contains("+") ? 1 : 0, 0);
 
 		var lots = new List<SkillTimelineEvent>();
 		for (int i = 0; i < 16; i++) lots.Add(Ev("U" + i.ToString("D2", CultureInfo.InvariantCulture), "S", 3, 5.0 + i, "cmd"));
@@ -289,6 +333,17 @@ internal static partial class Cases
 		{
 			if (sb.Length > 0) sb.Append('|');
 			sb.Append(groups[i].Unit).Append('/').Append(groups[i].Skill);
+		}
+		return sb.ToString();
+	}
+
+	private static string Mult(SkillTimelineGroup g)
+	{
+		var sb = new StringBuilder();
+		for (int i = 0; i < g.Multiplicity.Count; i++)
+		{
+			if (sb.Length > 0) sb.Append(',');
+			sb.Append(g.Multiplicity[i].ToString(CultureInfo.InvariantCulture));
 		}
 		return sb.ToString();
 	}

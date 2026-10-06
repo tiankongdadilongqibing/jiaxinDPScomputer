@@ -49,4 +49,10 @@ internal sealed class SkillTimelineEvent
 
 	internal const string ChannelCommand = "cmd";
 	internal const string ChannelRecord = "rec";
+
+	/// <summary>R67: the game's command entry points for the ACTIVE/SPECIAL skills
+	/// (`GameCmdExecuter.ActExecutePlayer{ActiveSkill,Skill,SpecialSkill}`) -- the same layer as the proven
+	/// auto-skill command hook. Added because the record sink was installed and NEVER CALLED in a full
+	/// battle (R66 live log: rec=0 with every skip counter 0), so 奥义/特殊 had no working channel.</summary>
+	internal const string ChannelSkillCommand = "skl";
 }

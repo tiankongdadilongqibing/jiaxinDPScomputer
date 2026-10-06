@@ -51,14 +51,14 @@ internal static class SkillTimelineText
 	internal const int NameW = 16;
 	internal const int KindW = 6;
 	internal const int SkillW = 18;
-	/// <summary>Width of ONE activation stamp. 5 columns holds every battle clock value a battle can
-	/// produce below 1000 s ("999.9"); beyond that a stamp is one column wider, which the mono font absorbs
-	/// without moving any other column (the tail is last).</summary>
-	internal const int StampW = 5;
-	/// <summary>Width reserved for the `xN` burst mark, the activation count and the median gap. The tail
-	/// is NOT truncated: it is the last column, so an over-long tail costs trailing width only, and hiding
-	/// the median behind ".." would hide exactly the number the page exists to publish.</summary>
-	internal const int TailW = 22;
+	/// <summary>Width of ONE activation stamp. R67: 5 -> 6. MEASURED 2026-10-06 on the user's screenshot:
+	/// with 5 columns a 3-digit stamp ("107.3") filled its cell completely and the row read
+	/// `96.2107.3118.3`. 6 columns keep at least one space in front of every stamp below 10000 s.</summary>
+	internal const int StampW = 6;
+	/// <summary>Width reserved for the `并N条M格` burst mark, the activation count and the median gap. The
+	/// tail is NOT truncated: it is the last column, so an over-long tail costs trailing width only, and
+	/// hiding the median behind ".." would hide exactly the number the page exists to publish.</summary>
+	internal const int TailW = 25;
 
 	/// <summary>The maximum line width in display columns, pinned by a behaviour test so the panel width
 	/// chosen in the renderer cannot silently disagree with the table it has to fit.</summary>
@@ -73,7 +73,7 @@ internal static class SkillTimelineText
 	internal static List<TimelineLine> Rows(IList<SkillTimelineEvent> events, bool inBattle)
 	{
 		var lines = new List<TimelineLine>();
-		int cmd = 0, rec = 0;
+		int cmd = 0, rec = 0, skl = 0;
 		if (events != null)
 		{
 			for (int i = 0; i < events.Count; i++)
@@ -81,22 +81,25 @@ internal static class SkillTimelineText
 				SkillTimelineEvent e = events[i];
 				if (e == null) continue;
 				if (e.Channel == SkillTimelineEvent.ChannelRecord) rec++;
+				else if (e.Channel == SkillTimelineEvent.ChannelSkillCommand) skl++;
 				else cmd++;
 			}
 		}
 
 		lines.Add(new TimelineLine("技能时间表  我方奥义/特殊/自动技能发动时刻   F4 返回", TimelineLineStyle.Header));
+		// R67: the burst mark now states BOTH numbers (rows folded, cells they landed in), because R66's
+		// `xN` read as "N in one cell" and was false whenever the folds were spread over several cells.
 		lines.Add(new TimelineLine(
-			"  单位:战斗时钟秒(游戏秒)  xN = N 次发动并进前一格(间隔<"
+			"  单位:战斗时钟秒(游戏秒)  并N条M格 = N 条发动(间隔<"
 			+ SkillTimelinePolicy.MergeSeconds.ToString("F2", CultureInfo.InvariantCulture)
-			+ "s)  中位 = 相邻发动间隔中位数", TimelineLineStyle.Dim));
+			+ "s)并进了 M 个格子  med = 合并后相邻格子间隔的中位数", TimelineLineStyle.Dim));
 
-		if (cmd + rec == 0)
+		if (cmd + rec + skl == 0)
 		{
 			lines.Add(new TimelineLine(
 				inBattle ? "  (本场尚未观测到我方技能发动)" : "  (未在战斗中,也没有上一场的记录)",
 				TimelineLineStyle.Warn));
-			lines.Add(new TimelineLine("  " + ChannelLine(cmd, rec), TimelineLineStyle.Dim));
+			lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl, rec), TimelineLineStyle.Dim));
 			return lines;
 		}
 		if (!inBattle)
@@ -106,15 +109,17 @@ internal static class SkillTimelineText
 		List<SkillTimelineGroup> groups = SkillTimelinePolicy.Group(events);
 		int merged = 0, rows = 0;
 		for (int i = 0; i < groups.Count; i++) { merged += groups[i].Merged; rows += groups[i].Stamps.Count; }
-		lines.Add(new TimelineLine("  原始 " + (cmd + rec).ToString(CultureInfo.InvariantCulture) + " 条 -> "
+		lines.Add(new TimelineLine("  原始 " + (cmd + rec + skl).ToString(CultureInfo.InvariantCulture) + " 条 -> "
 			+ groups.Count.ToString(CultureInfo.InvariantCulture) + " 行 / "
 			+ rows.ToString(CultureInfo.InvariantCulture) + " 次发动(合并 "
 			+ merged.ToString(CultureInfo.InvariantCulture) + " 条)", TimelineLineStyle.Dim));
-		lines.Add(new TimelineLine("  " + ChannelLine(cmd, rec), TimelineLineStyle.Dim));
-		if (rec == 0)
+		lines.Add(new TimelineLine("  " + ChannelLine(cmd, skl, rec), TimelineLineStyle.Dim));
+		// R67: 奥义/特殊 have two channels now (skl = command hooks, rec = record sink). The warning fires
+		// only when BOTH are empty -- one of them observing is enough to stop calling the column blind.
+		if (skl + rec == 0)
 		{
-			lines.Add(new TimelineLine("  记录通道 0 条:奥义/特殊技能只能由它观测。", TimelineLineStyle.Warn));
-			lines.Add(new TimelineLine("  若本场有奥义却为 0,是该钩子未命中(见 [SKILLTL] 日志),不是没发动。",
+			lines.Add(new TimelineLine("  奥义/特殊 两条通道(skl/rec)本场都是 0 条。", TimelineLineStyle.Warn));
+			lines.Add(new TimelineLine("  若本场确有奥义,是钩子未命中(见 [SKILLTL] SUM 的调用计数),不是没发动。",
 				TimelineLineStyle.Warn));
 		}
 
@@ -165,8 +170,12 @@ internal static class SkillTimelineText
 			stamps.Append(DisplayFormat.PadL("+" + (n - shown).ToString(CultureInfo.InvariantCulture), StampW));
 		sb.Append(DisplayFormat.PadR(stamps.ToString(), StampW * SkillTimelinePolicy.MaxStamps));
 
-		var tail = new StringBuilder(24);
-		if (g.Merged > 0) tail.Append('x').Append((g.Merged + 1).ToString(CultureInfo.InvariantCulture)).Append(' ');
+		var tail = new StringBuilder(28);
+		// R67: N rows folded, M cells they landed in. Two numbers, because one number cannot tell "a
+		// triple in one cell" from "two doubles in two cells" (R66 printed x3 for both).
+		if (g.Merged > 0)
+			tail.Append('并').Append(g.Merged.ToString(CultureInfo.InvariantCulture)).Append('条')
+				.Append(g.BurstCells.ToString(CultureInfo.InvariantCulture)).Append("格 ");
 		tail.Append("n=").Append(n.ToString(CultureInfo.InvariantCulture));
 		double med = SkillTimelinePolicy.MedianInterval(g);
 		if (med > 0.0)
@@ -180,9 +189,10 @@ internal static class SkillTimelineText
 
 	/// <summary>Which channels produced the rows. Printed also when the page is empty, because "the record
 	/// hook produced nothing" and "our units fired nothing" are different statements.</summary>
-	internal static string ChannelLine(int cmd, int rec)
+	internal static string ChannelLine(int cmd, int skl, int rec)
 	{
-		return "观测通道 cmd(命令钩子) " + cmd.ToString(CultureInfo.InvariantCulture)
-			+ " 条 / rec(技能记录钩子) " + rec.ToString(CultureInfo.InvariantCulture) + " 条";
+		return "观测通道 cmd(自动技能命令) " + cmd.ToString(CultureInfo.InvariantCulture)
+			+ " 条 / skl(奥义特殊命令) " + skl.ToString(CultureInfo.InvariantCulture)
+			+ " 条 / rec(技能记录) " + rec.ToString(CultureInfo.InvariantCulture) + " 条";
 	}
 }

@@ -106,14 +106,24 @@ internal static class AutoSkillProbe
 	/// budget for real skills.</summary>
 	internal static int PlaceholderSlots;
 
-	/// <summary>R66: command postfix calls where the game's `index` resolves to TWO DIFFERENT `Skill`
-	/// objects depending on how it is read (1-based auto-skill slot `Player.AutoSkill1/2` versus the 0-based
-	/// position in `Player.PassiveSkills`). MEASURED on 9 battles (471 rows): `gameIdx=0` occurs 24 times
+	/// <summary>R66 (renamed in R67 from `IndexAmbiguous`): command postfix calls where the game's `index`
+	/// resolves to TWO DIFFERENT `Skill` objects depending on how it is read (1-based auto-skill slot
+	/// `Player.AutoSkill1/2` versus the 0-based position in `Player.PassiveSkills`). NOT an ambiguity any
+	/// more: MEASURED 2026-10-06 (first battle with `cmdidx` + `inst=`), `gameIdx=1` resolves only through
+	/// the named slot and its roster-position reading is the nameless AutoSkill2 placeholder, while
+	/// `gameIdx=0` resolves only through the roster position -- and both land on the SAME object (one `inst`
+	/// tag per real auto skill). The resolver's order (named for 1/2, roster position otherwise) is right;
+	/// this counter now only records how often the wrong reading WOULD have differed. MEASURED on 9 battles (471 rows): `gameIdx=0` occurs 24 times
 	/// per (unit,skill) and resolves ONLY through the roster position, `gameIdx=1` resolves through the
 	/// named slot -- and for マッドシーカー every activation arrived with `gameIdx=1`, which is why the two
 	/// readings must be reported side by side instead of silently choosing one. The `[AUTOSK] cmdidx` line
 	/// prints both candidates once per (unit, index) so the semantics stop being a guess.</summary>
-	internal static int IndexAmbiguous;
+	internal static int IndexReadingsDiffer;
+
+	/// <summary>R67: sampler slot numbers of the unit's ACTIVE and SPECIAL skill (`Player.ActiveSkill` /
+	/// `Player.SpecialSkill`). Outside 1/2 (the auto slots) and 100+ (the passive fallback) on purpose.</summary>
+	internal const int ActiveSlotIndex = 10;
+	internal const int SpecialSlotIndex = 11;
 
 	private static readonly Dictionary<string, SlotState> Slots = new Dictionary<string, SlotState>();
 
@@ -177,7 +187,7 @@ internal static class AutoSkillProbe
 		UsingEdges = 0;
 		CommandUnresolved = 0;
 		PlaceholderSlots = 0;
-		IndexAmbiguous = 0;
+		IndexReadingsDiffer = 0;
 		ReadErrors = 0;
 		EmptySlots = 0;
 		PlayersSeen = 0;
@@ -310,6 +320,20 @@ internal static class AutoSkillProbe
 		{
 			live += SampleSlot(p, 1, NamedSlotSkill(p, 1), s, wall);
 			live += SampleSlot(p, 2, NamedSlotSkill(p, 2), s, wall);
+		}
+		catch { ReadErrors++; }
+		// R67: the ACTIVE and SPECIAL skill slots, read-only, as slots 10/11. They are not auto skills and do
+		// not count toward `live` (the passive fallback below is about auto skills only). WHY: the record
+		// sink R66 relied on for 奥义 was never called, and before trusting a new command channel the probe
+		// has to show WHAT these slots hold (`type=` names OverSkill/SpecialSkill/Skill) and how their
+		// counters move -- the same evidence that let R65/R66 read the auto skill instead of guessing it.
+		try
+		{
+			Skill act = null, spe = null;
+			try { act = p.ActiveSkill; } catch { ReadErrors++; }
+			try { spe = p.SpecialSkill; } catch { ReadErrors++; }
+			SampleSlot(p, ActiveSlotIndex, act, s, wall);
+			SampleSlot(p, SpecialSlotIndex, spe, s, wall);
 		}
 		catch { ReadErrors++; }
 		if (live > 0) return;
@@ -669,7 +693,7 @@ internal static class AutoSkillProbe
 			Skill roster = RosterPosSkill(p, gameIdx);
 			bool both = (named != null && roster != null);
 			bool agree = both && PointerOf(named) == PointerOf(roster);
-			if (both && !agree) IndexAmbiguous++;
+			if (both && !agree) IndexReadingsDiffer++;
 			RuntimeLog.Write("[AUTOSK] cmdidx unit=" + unit + " gameIdx=" + gameIdx
 				+ " named=" + SkillLabel(named) + "#" + InstanceTag(named)
 				+ " rosterPos=" + SkillLabel(roster) + "#" + InstanceTag(roster)
@@ -891,7 +915,7 @@ internal static class AutoSkillProbe
 		sb.Append("[AUTOSK] SUM samples=").Append(SampleRows)
 			.Append(" actCmd=").Append(CommandActivations)
 			.Append(" cmdUnresolved=").Append(CommandUnresolved)
-			.Append(" indexAmbiguous=").Append(IndexAmbiguous)
+			.Append(" indexReadingsDiffer=").Append(IndexReadingsDiffer)
 			.Append(" useEdges=").Append(UsingEdges)
 			.Append(" players=").Append(PlayersSeen)
 			.Append(" viaOwner=").Append(PlayersViaOwner)
