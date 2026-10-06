@@ -5,171 +5,217 @@ namespace BehaviorTests;
 internal static partial class Cases
 {
 	/// <summary>
-	/// R75: which mechanism withheld part of a damage-application call (`Policy/AbsorbClassifyPolicy.cs`).
+	/// R76: the OVERSIZED hit as its own judgement (`Policy/AbsorbClassifyPolicy.cs`).
 	///
-	/// Why this group exists. `被吸收/无效化` has been published as `nominal - damage` since 1.5.5 and was then
-	/// read back as if it named a mechanism: 397 records over 46 exports, 395 of them exactly 500,000, all on
-	/// ショゴス -- and a shield was written into the notes on the strength of that number alone, while no
-	/// ability, buff, status, master-data field or value ever carried it. The classifier that replaces that
-	/// inference therefore has two jobs the suite has to hold it to:
+	/// Why the group was rewritten. R75 shipped a classifier built on the guess that `nominal - result` is an
+	/// "absorbed" amount, and the first battle the probe ran in falsified it outright:
 	///
-	///   1. an OBSERVED carrier is named, and the decision order that does the naming is pinned (a fixed-damage
-	///      reading beats a barrier reading, an invincibility flag beats a takeover);
-	///   2. an UNOBSERVED one is NOT invented. `CarrierUnknown` and `Unreadable` are answers, and a failed
-	///      reading must never be able to come back as `Barrier`.
+	///     res == max(0, nominal - lifeBefore)      798 of 798 readable readings, zero violations
 	///
-	/// The `[ABSPROBE]` text is PINNED, not merely "contains": its whole purpose is comparing two battles by
-	/// eye, and the blind spot it exists to expose (`masked=`, the fully withheld hits the existing accounting
-	/// books as full damage) is a number that has to be visible in every battle's line.
+	/// The return value is the OVERFLOW beyond the victim's remaining Life, so on an oversized hit the two
+	/// published fields (`入耐久` = res, `被吸收` = nominal - res) are exactly swapped -- and R75's `Masked`
+	/// bucket filed 790 rows whose life had moved by the whole nominal, i.e. hits that landed in full.
+	///
+	/// What this group now holds the policy to:
+	///   1. the LIFE READING decides, so `lifeDrop == nominal` can never be a withholding again;
+	///   2. an oversized hit reports its own split (`landed = nominal - res`, `overflow = res`) and is
+	///      corroborated by the life movement before it is called `oversized` -- a fixed pool that did not move
+	///      is labelled `oversizedPool` instead, and an unreadable life is its own verdict rather than a guess;
+	///   3. a key row (an oversized hit or a carrier sighting) draws on its OWN budget, because in the measured
+	///      battle the single 400-row cap pushed all 11 deciding rows into `dropped`.
+	///
+	/// The `[ABSPROBE]` text is PINNED, not merely "contains": its purpose is comparing two battles by eye.
 	/// </summary>
 	internal static void AbsorbClassifyCases(Runner r)
 	{
 		r.Group("policy/absorb-classify");
 
-		// ---- the report line ----------------------------------------------------------------------
+		// ---- the report line, and the oversized split it headlines --------------------------------
 
 		var empty = new AbsorbProbeReport();
 		r.Str("an-untouched-report-pins-every-bucket", empty.Describe(),
-			"calls=0 withheld=0 sum=0 masked=0/0 lifeMismatch=0"
-			+ " verdict(barrier/pool/unknown/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0/0"
-			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 active=0 unreadable=0"
-			+ " first(nom/res/life/bar)=0/0/?/? rows=0 dropped=0");
+			"calls=0 ovz=0/0/0 pool=0 partial=0 ovzUnread=0 noMove=0 missing=0 lifeUnread=0"
+			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
+			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=0 active=0 barrUnread=0"
+			+ " first(nom/res/landed/overflow)=0/0/?/? rows=0 key=0 dropped=0 keyDropped=0");
 
 		var d = new AbsorbProbeReport();
-		d.Note(Barrier(1103327, 603327, 1000000, 396673, 500000, 0, true), AbsorbClassifyPolicy.Classify(
-			Barrier(1103327, 603327, 1000000, 396673, 500000, 0, true)));
-		d.Note(Plain(735551, 235551), AbsorbClassifyPolicy.Classify(Plain(735551, 235551)));
-		d.Note(Plain(500000, 0), AbsorbClassifyPolicy.Classify(Plain(500000, 0)));
-		d.Note(Plain(1000, 1000), AbsorbClassifyPolicy.Classify(Plain(1000, 1000)));
-		AbsorbObservation mismatched = Plain(4000, 3000);
-		mismatched.LifeBefore = 5000;
-		mismatched.LifeAfter = 1500;
-		mismatched.LifeReadable = true;
-		d.Note(mismatched, AbsorbClassifyPolicy.Classify(mismatched));
-		d.NoteRow();
-		d.NoteRow();
-		d.NoteDropped();
+		d.Note(Live(600000, 100000, 500000, 0), AbsorbClassifyPolicy.Classify(Live(600000, 100000, 500000, 0)));
+		d.Note(Live(500000, 400000, 500000, 500000), AbsorbClassifyPolicy.Classify(Live(500000, 400000, 500000, 500000)));
+		d.Note(Live(1000, 0, 5000, 4000), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 4000)));
+		d.Note(Live(1000, 0, 5000, 5000), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 5000)));
+		d.Note(Plain(1000, 0), AbsorbClassifyPolicy.Classify(Plain(1000, 0)));
+		d.Note(Live(1000, 0, 5000, 4500), AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 4500)));
+		d.Note(Live(800000, 300000, 500000, 300000), AbsorbClassifyPolicy.Classify(Live(800000, 300000, 500000, 300000)));
 		r.Str("a-filled-report-pins-every-bucket", d.Describe(),
-			"calls=5 withheld=3 sum=1001000 masked=1/500000 lifeMismatch=1"
-			+ " verdict(barrier/pool/unknown/takeover/fixed/invincible/unreadable)=1/0/2/0/0/0/0"
-			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 active=1 unreadable=0"
-			+ " first(nom/res/life/bar)=1103327/603327/603327/500000 rows=2 dropped=1");
+			"calls=7 ovz=1/1100000/800000 pool=1 partial=1 ovzUnread=0 noMove=1 missing=1 lifeUnread=1"
+			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
+			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=2 active=0 barrUnread=0"
+			+ " first(nom/res/landed/overflow)=600000/100000/500000/100000 rows=0 key=0 dropped=0 keyDropped=0");
 
-		// The masked bucket is NOT part of `withheld`: a fully withheld hit is exactly the case the existing
-		// accounting cannot show (it books `result <= 0` as full damage), so folding it into the withheld sum
-		// would report it as a hit that was partly applied.
-		var m = new AbsorbProbeReport();
-		m.Note(Plain(500000, 0), AbsorbClassifyPolicy.Classify(Plain(500000, 0)));
-		r.True("masked-is-counted-apart-from-withheld", m.Masked == 1 && m.MaskedTotal == 500000L && m.Withheld == 0 && m.WithheldTotal == 0L);
+		// The headline sums cover EVERY oversized call, not only the ones the life reading corroborated, so the
+		// number does not flatter itself: 500,000+100,000+500,000 landed and 100,000+400,000+300,000 overflow.
+		r.True("the-oversized-sums-cover-every-oversized-bucket",
+			d.OversizedLandedTotal == 1100000L && d.OversizedOverflowTotal == 800000L
+			&& d.Oversized == 1 && d.OversizedPool == 1 && d.OversizedPartial == 1);
 
-		// Only the FIRST withheld hit is kept, and it is kept with all four numbers: that quad is what a single
-		// battle's log has to settle the carrier with.
-		r.True("the-first-withheld-hit-is-the-one-kept",
-			d.HasFirst && d.FirstNominal == 1103327 && d.FirstResult == 603327
-			&& d.FirstLifeDrop == 603327 && d.FirstBarrierMove == 500000);
+		r.True("the-first-quad-is-the-first-oversized-hit",
+			d.HasFirst && d.FirstNominal == 600000 && d.FirstResult == 100000
+			&& d.FirstLanded == 500000 && d.FirstOverflow == 100000);
 
-		// An unreadable first reading prints as `?` in the quad, never as 0 -- "could not read it" and "it read
-		// zero" are different facts, and a printed 0 here would look like a barrier that moved by nothing.
-		var q = new AbsorbProbeReport();
-		q.Note(Plain(700, 200), AbsorbClassifyPolicy.Classify(Plain(700, 200)));
-		r.True("an-unreadable-first-reading-prints-as-a-question-mark",
-			q.Describe().Contains("first(nom/res/life/bar)=700/200/?/?"));
+		// A life movement that is not `nominal - res` on an oversized hit is a reading in its own right.
+		r.True("the-life-mismatch-counts-only-oversized-rows", d.LifeMismatch == 2);
 
-		// A life movement that is not the return value is a reading in its own right: it decides whether the
-		// return really is "the damage that reached 耐久".
-		r.True("a-life-drop-that-differs-from-the-return-is-counted",
-			d.LifeMismatch == 1 && m.LifeMismatch == 0);
-
-		// One battle, one set of counters.
 		d.Clear();
 		r.Str("clear-empties-every-bucket", d.Describe(),
-			"calls=0 withheld=0 sum=0 masked=0/0 lifeMismatch=0"
-			+ " verdict(barrier/pool/unknown/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0/0"
-			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 active=0 unreadable=0"
-			+ " first(nom/res/life/bar)=0/0/?/? rows=0 dropped=0");
+			"calls=0 ovz=0/0/0 pool=0 partial=0 ovzUnread=0 noMove=0 missing=0 lifeUnread=0"
+			+ " carrier(barrier/pool/takeover/fixed/invincible/unreadable)=0/0/0/0/0/0"
+			+ " seen(barrierDmg/addBarrier/takeover/fixed)=0/0/0/0 lifeMismatch=0 active=0 barrUnread=0"
+			+ " first(nom/res/landed/overflow)=0/0/?/? rows=0 key=0 dropped=0 keyDropped=0");
 		r.True("clear-drops-the-first-quad", !d.HasFirst);
 
-		// ---- the decision -------------------------------------------------------------------------
+		// ---- the life law replaces the old `Masked` bucket -----------------------------------------
 
-		r.True("a-hit-that-withheld-nothing-is-not-a-carrier",
+		// `res == 0` with the life moving by the WHOLE nominal: the hit landed in full. R75 called this
+		// `Masked` ("entirely withheld, booked as full damage") on 790 rows -- the opposite of the truth.
+		r.True("a-hit-that-landed-in-full-is-not-withheld",
+			AbsorbClassifyPolicy.Classify(Live(781, 0, 427761, 426980)) == AbsorbVerdict.None);
+		r.True("a-return-that-is-not-an-overflow-withholds-nothing",
 			AbsorbClassifyPolicy.Classify(Plain(1000, 1000)) == AbsorbVerdict.None);
+		r.True("nothing-to-judge-is-none",
+			AbsorbClassifyPolicy.Classify(Plain(0, 0)) == AbsorbVerdict.None);
 
-		// A fully withheld hit arrives as `result <= 0` and the existing accounting books it as FULL damage;
-		// this verdict is the only thing that makes it countable at all.
-		r.True("a-fully-withheld-hit-is-masked",
-			AbsorbClassifyPolicy.Classify(Plain(500000, 0)) == AbsorbVerdict.Masked);
-		r.True("a-negative-return-is-masked-too",
-			AbsorbClassifyPolicy.Classify(Plain(500000, -7)) == AbsorbVerdict.Masked);
+		// `res > 0` is the definition of an oversized hit, and the split is its own two numbers.
+		var ovz = Live(600000, 100000, 500000, 0);
+		r.True("an-oversized-hit-is-recognised-by-its-own-return",
+			ovz.IsOversized() && ovz.Landed() == 500000 && ovz.Overflow() == 100000);
+		r.True("an-oversized-hit-whose-life-moved-by-the-landed-amount-is-corroborated",
+			AbsorbClassifyPolicy.Classify(ovz) == AbsorbVerdict.Oversized);
 
-		// The barrier is named from its OWN movement, and the comparison is a magnitude: whether `mLife` counts
-		// the pool that is LEFT or the amount taken so far is not established, and the verdict must not depend
-		// on a guess about the polarity.
-		r.True("a-barrier-that-moved-by-the-withheld-amount-names-the-carrier",
-			AbsorbClassifyPolicy.Classify(Barrier(1103327, 603327, 1000000, 396673, 500000, 0, true)) == AbsorbVerdict.Barrier);
-		r.True("the-barrier-lifes-polarity-does-not-decide-the-verdict",
-			AbsorbClassifyPolicy.Classify(Barrier(1103327, 603327, 1000000, 396673, 0, 500000, true)) == AbsorbVerdict.Barrier);
+		// The `ショゴス` shape: an oversized hit whose victim is a fixed pool (Life stays 500,000) is NOT
+		// lumped in with the corroborated ones -- the life reading cannot vouch for the split there.
+		r.True("an-oversized-hit-on-a-fixed-pool-is-labelled-separately",
+			AbsorbClassifyPolicy.Classify(Live(577331, 77331, 500000, 500000)) == AbsorbVerdict.OversizedPool);
 
-		// A pool that ran out INSIDE the hit: the barrier moved, just not by enough. Kept apart from `Barrier`
-		// because this is the one shape that separates "a pool of N" from "N per hit".
-		r.True("a-barrier-that-moved-by-less-is-a-pool",
-			AbsorbClassifyPolicy.Classify(Barrier(1103327, 603327, 1000000, 396673, 500000, 300000, true)) == AbsorbVerdict.BarrierShort);
+		r.True("an-oversized-hit-whose-life-moved-differently-is-not-corroborated",
+			AbsorbClassifyPolicy.Classify(Live(800000, 300000, 500000, 400000)) == AbsorbVerdict.OversizedPartial);
 
-		// Active but unmoved, and active but unreadable: NEITHER may come back as a carrier. This is the rule
-		// that keeps a failed read from being published as an absorption.
-		r.True("an-active-barrier-whose-life-did-not-move-is-not-a-carrier",
-			AbsorbClassifyPolicy.Classify(Barrier(1103327, 603327, 1000000, 396673, 500000, 500000, true)) == AbsorbVerdict.Unreadable);
-		r.True("an-active-barrier-that-could-not-be-read-is-not-a-carrier",
-			AbsorbClassifyPolicy.Classify(Barrier(1103327, 603327, 1000000, 396673, 0, 0, false)) == AbsorbVerdict.Unreadable);
+		// "We could not look" is an answer: never `None` (which would claim the hit landed) and never a split
+		// presented as measured.
+		r.True("an-oversized-hit-with-an-unreadable-life-is-not-corroborated",
+			AbsorbClassifyPolicy.Classify(Plain(600000, 100000)) == AbsorbVerdict.OversizedUnreadable);
 
-		// `Barrier.Damage` running is a sighting in its own right: a barrier can take part in a hit without the
-		// `IsActived` flag having been read as true beforehand (order of the readings is not guaranteed), so the
-		// two routes are ORed -- and that OR needs its own case or the second route is never executed.
-		AbsorbObservation sighting = Barrier(1103327, 603327, 1000000, 396673, 500000, 0, true);
-		sighting.BarrierActiveBefore = false;
-		sighting.BarrierDamageSeen = true;
-		r.True("a-barrier-damage-sighting-names-the-carrier-without-the-active-flag",
-			AbsorbClassifyPolicy.Classify(sighting) == AbsorbVerdict.Barrier);
+		// ---- the other three shapes, each named separately -----------------------------------------
 
-		// Nothing observed => say so. A constant value arriving in THIS bucket is the evidence for a flat
-		// per-hit cut that no exported table carries -- and it is not evidence for a shield.
-		r.True("a-withheld-hit-with-no-carrier-observed-says-so",
-			AbsorbClassifyPolicy.Classify(Plain(1103327, 603327)) == AbsorbVerdict.CarrierUnknown);
+		r.True("a-hit-that-moved-nothing-is-not-withheld",
+			AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 5000)) == AbsorbVerdict.NoLifeMovement);
 
-		// Order of the named carriers, pinned: a fixed-damage reading outranks a barrier reading, and an
-		// invincibility flag outranks a takeover.
-		AbsorbObservation both = Barrier(1103327, 603327, 1000000, 396673, 500000, 0, true);
+		// This -- not `res <= 0` -- is the shape that would actually justify the word 被吸收: part of the hit
+		// went missing and the return value does not say so.
+		r.True("a-partial-movement-without-a-return-is-named",
+			AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 4500)) == AbsorbVerdict.WithheldNoReturn);
+
+		r.True("an-unreadable-life-is-not-a-withheld-hit",
+			AbsorbClassifyPolicy.Classify(Plain(1000, 0)) == AbsorbVerdict.LifeUnreadable);
+		r.True("a-life-that-rose-is-not-a-withholding",
+			AbsorbClassifyPolicy.Classify(Live(1000, 0, 5000, 6000)) == AbsorbVerdict.None);
+
+		// ---- carriers are consulted only when the life law does not explain the hit -----------------
+
+		var withCarrier = Live(800000, 300000, 500000, 400000);
+		withCarrier.TakeOverSeen = true;
+		r.True("a-carrier-is-consulted-when-the-life-law-does-not-explain-the-hit",
+			AbsorbClassifyPolicy.Classify(withCarrier) == AbsorbVerdict.TakeOver);
+
+		var both = Live(800000, 300000, 500000, 400000);
+		both.TakeOverSeen = true;
 		both.FixedDamageSeen = true;
-		r.True("a-fixed-damage-reading-outranks-a-barrier",
+		r.True("a-fixed-damage-reading-outranks-a-takeover",
 			AbsorbClassifyPolicy.Classify(both) == AbsorbVerdict.FixedDamage);
 
-		AbsorbObservation inv = Plain(1103327, 603327);
+		var bar = Live(800000, 300000, 500000, 400000);
+		bar.BarrierActiveBefore = true;
+		bar.BarrierReadable = true;
+		bar.BarrierLifeBefore = 500000;
+		bar.BarrierLifeAfter = 0;
+		r.True("an-active-barrier-that-moved-by-the-landed-amount-names-the-carrier",
+			AbsorbClassifyPolicy.Classify(bar) == AbsorbVerdict.Barrier);
+
+		var pool = Live(800000, 300000, 500000, 400000);
+		pool.BarrierActiveBefore = true;
+		pool.BarrierReadable = true;
+		pool.BarrierLifeBefore = 500000;
+		pool.BarrierLifeAfter = 300000;
+		r.True("a-barrier-that-moved-by-less-is-a-pool",
+			AbsorbClassifyPolicy.Classify(pool) == AbsorbVerdict.BarrierShort);
+
+		// The polarity of the barrier's own life is NOT established (a remaining-absorb pool would fall, an
+		// absorbed-so-far counter would rise), so the comparison is a magnitude and the verdict must not
+		// depend on which way it moved.
+		var rising = Live(800000, 300000, 500000, 400000);
+		rising.BarrierActiveBefore = true;
+		rising.BarrierReadable = true;
+		rising.BarrierLifeBefore = 0;
+		rising.BarrierLifeAfter = 500000;
+		r.True("the-barrier-lifes-polarity-does-not-decide-the-verdict",
+			AbsorbClassifyPolicy.Classify(rising) == AbsorbVerdict.Barrier);
+
+		var barUnknown = Live(800000, 300000, 500000, 400000);
+		barUnknown.BarrierActiveBefore = true;
+		r.True("an-active-barrier-that-could-not-be-read-is-not-a-carrier",
+			AbsorbClassifyPolicy.Classify(barUnknown) == AbsorbVerdict.Unreadable);
+
+		var inv = Live(800000, 300000, 500000, 400000);
 		inv.InvincibleFlag = true;
-		inv.TakeOverSeen = true;
-		r.True("an-invincibility-flag-outranks-takeover",
+		r.True("an-invincibility-flag-is-named-when-nothing-else-fits",
 			AbsorbClassifyPolicy.Classify(inv) == AbsorbVerdict.Invincible);
 
-		AbsorbObservation to = Plain(1103327, 603327);
-		to.TakeOverSeen = true;
-		r.True("a-takeover-reading-is-named", AbsorbClassifyPolicy.Classify(to) == AbsorbVerdict.TakeOver);
+		r.True("nothing-observed-is-not-corroborated",
+			AbsorbClassifyPolicy.Classify(Live(800000, 300000, 500000, 400000)) == AbsorbVerdict.OversizedPartial);
 
-		// The names are shared by the log line and the case labels, so they are pinned here rather than typed
-		// twice.
+		// ---- the row budget (requirement 2 of R76) -------------------------------------------------
+
+		var b = new AbsorbProbeReport();
+		bool o1 = b.TryTakeRow(AbsorbVerdict.None, 2, 1);
+		bool o2 = b.TryTakeRow(AbsorbVerdict.NoLifeMovement, 2, 1);
+		bool o3 = b.TryTakeRow(AbsorbVerdict.None, 2, 1);            // refused by the ordinary cap
+		bool k1 = b.TryTakeRow(AbsorbVerdict.Oversized, 2, 1);       // a key row is still written
+		bool k2 = b.TryTakeRow(AbsorbVerdict.OversizedPool, 2, 1);   // refused by the KEY cap
+		r.True("a-key-row-is-written-past-the-ordinary-cap", o1 && o2 && !o3 && k1 && !k2);
+		r.True("the-two-refusals-are-counted-apart",
+			b.Rows == 3 && b.KeyRows == 1 && b.Dropped == 1 && b.KeyDropped == 1);
+		r.True("only-the-oversized-and-carrier-verdicts-are-key",
+			AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.Oversized)
+			&& AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.OversizedPool)
+			&& AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.Barrier)
+			&& AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.TakeOver)
+			&& !AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.None)
+			&& !AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.NoLifeMovement)
+			&& !AbsorbProbeReport.IsKeyVerdict(AbsorbVerdict.LifeUnreadable));
+
+		// ---- the names ------------------------------------------------------------------------------
+
 		r.True("the-verdict-names-are-stable",
 			AbsorbClassifyPolicy.Name(AbsorbVerdict.None) == "none"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.Oversized) == "oversized"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.OversizedPool) == "oversizedPool"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.OversizedPartial) == "oversizedPartial"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.OversizedUnreadable) == "oversizedUnreadable"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.NoLifeMovement) == "noLifeMovement"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.WithheldNoReturn) == "withheldNoReturn"
+			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.LifeUnreadable) == "lifeUnreadable"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.Barrier) == "barrier"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.BarrierShort) == "pool"
-			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.CarrierUnknown) == "unknown"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.TakeOver) == "takeover"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.FixedDamage) == "fixed"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.Invincible) == "invincible"
-			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.Masked) == "masked"
 			&& AbsorbClassifyPolicy.Name(AbsorbVerdict.Unreadable) == "unreadable");
 		r.True("a-verdict-outside-the-enum-prints-as-a-question-mark",
 			AbsorbClassifyPolicy.Name((AbsorbVerdict)999) == "?");
 	}
 
-	/// <summary>A call with nothing read around it (life and barrier unreadable): the shape the classifier
-	/// must answer "we did not look" for.</summary>
+	/// <summary>A call with no readings around it (life and barrier unreadable): the shape the policy must
+	/// answer "we did not look" for.</summary>
 	private static AbsorbObservation Plain(int nominal, int result)
 	{
 		AbsorbObservation o = new AbsorbObservation();
@@ -178,19 +224,14 @@ internal static partial class Cases
 		return o;
 	}
 
-	/// <summary>A call whose victim carried a barrier: life movement given explicitly so the caller can make
-	/// the movement equal, smaller than or larger than the withheld amount.</summary>
-	private static AbsorbObservation Barrier(int nominal, int result, int lifeBefore, int lifeAfter,
-		int barBefore, int barAfter, bool barReadable)
+	/// <summary>A call with a readable life movement: `before - after` is what the classifier compares against
+	/// the nominal (full application) and against `nominal - res` (an oversized hit's split).</summary>
+	private static AbsorbObservation Live(int nominal, int result, int lifeBefore, int lifeAfter)
 	{
 		AbsorbObservation o = Plain(nominal, result);
 		o.LifeBefore = lifeBefore;
 		o.LifeAfter = lifeAfter;
 		o.LifeReadable = true;
-		o.BarrierActiveBefore = true;
-		o.BarrierLifeBefore = barBefore;
-		o.BarrierLifeAfter = barAfter;
-		o.BarrierReadable = barReadable;
 		return o;
 	}
 }

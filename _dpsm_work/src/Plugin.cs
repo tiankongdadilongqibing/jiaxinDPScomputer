@@ -208,6 +208,13 @@ public class Plugin : BasePlugin
 	/// quiet one.</summary>
 	public static ConfigEntry<int> CfgAbsorbProbeMaxRows;
 
+	/// <summary>R76: the SEPARATE row budget for key rows -- an oversized hit (`res &gt; 0`, i.e. the hit
+	/// exceeded the victim's remaining Life) or a carrier sighting. WHY IT EXISTS: in the first battle the
+	/// probe ran in, the single 400-row cap pushed all 11 deciding `ショゴス` rows into `dropped=5157`, so the
+	/// evidence survived only as an aggregate; a key row is now bounded by its own cap and can never be
+	/// crowded out by ordinary rows, and the two refusals are counted apart (`dropped` / `keyDropped`).</summary>
+	public static ConfigEntry<int> CfgAbsorbProbeKeyRows;
+
 	private Harmony _harmony;
 
 	/// <summary>
@@ -560,6 +567,7 @@ public class Plugin : BasePlugin
 		CfgAbsorbProbe = Config.Bind<bool>("Debug", "AbsorbProbe", true, "PROBE (R75): read what actually withheld part of a damage-application call and log it as [ABSPROBE] rows plus one [ABSPROBE] sum line at battle end. WHY: `被吸收/无效化` is the plugin's own name for `nominal - damage` and nothing ever carried it -- 397 records over 46 exports, 395 of them exactly 500,000 and all of them on ショゴス, while the ally-side ones are irregular (2,821 / 19,010 / 56,087) and `masterdata/*.json` contains no field, row or value of 500,000. Per call it reads the victim's `Life`, its `Character.Barrier` (`IsActived`/`mLife`) and its five invincibility-family flags around the call the `BattleObject.Damage` hook already intercepts, and classifies the result as barrier / pool / unknown / takeover / fixed / invincible / masked / unreadable. Read-only, NO new Harmony patch, and the accounting is untouched -- a fully withheld hit (`result <= 0`) is still booked as full damage by the existing fallback, it is only COUNTED (masked=), because changing it would move every published taken total. Set false to stop both the readings and the lines.");
 		CfgAbsorbProbeHooks = Config.Bind<bool>("Debug", "AbsorbProbeHooks", false, "PROBE (R75), OFF BY DEFAULT: the CARRIER hooks that let the classifier NAME a mechanism -- `Barrier.Activate` / `Deactivate` / `CalcLife` / `Damage`, `TalentActionAddBarrier.ActExecute`, `BattleObject.DamageTakeOver` / `AddDamageTakeOverChara`, `BattleObject.TryGetFixedDamage`. WHY OFF: the one crash this project ever caused (1.0.48/1.0.49 on `BattleObject.ActDamage`) happened inside the generated (il2cpp -> managed) thunk while it CONVERTED a patched method's arguments -- before any postfix body ran, and an inert body did not help -- so a diagnostic must never be able to disable the patch set. Each target is therefore patched one by one from TryPatchAbsorbCarrierHooks (never by PatchAll, which is also why these classes carry no [HarmonyPatch] attribute), each with its own try/catch and its own applied/failed log line, and every postfix declares only `__instance` plus an int/bool argument. Turn it on for the SECOND battle, once the read-only probe has shown which bucket the 500,000 lands in; restart required, because the decision is made while patching at startup.");
 		CfgAbsorbProbeMaxRows = Config.Bind<int>("Debug", "AbsorbProbeMaxRows", 400, "PROBE (R75): the maximum number of [ABSPROBE] rows one battle may write (per-hit rows and carrier rows share the cap). Every row the cap refuses is counted as dropped= in the [ABSPROBE] sum line, so a bounded log can never be mistaken for a quiet one.");
+		CfgAbsorbProbeKeyRows = Config.Bind<int>("Debug", "AbsorbProbeKeyRows", 200, "PROBE (R76): the SEPARATE row budget for key rows -- a hit the life law calls OVERSIZED (`res > 0`, i.e. it exceeded the victim's remaining Life) or a carrier sighting. WHY: in the first battle the probe ran in (R75b, quest 411001) the single 400-row cap pushed ALL 11 deciding ショゴス rows into dropped=5157, so the evidence that settled the question existed only as an aggregate. A key row now draws on this budget instead of the ordinary one and can never be crowded out; refusals are counted apart (`dropped` for ordinary rows, `keyDropped` for key rows).");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");

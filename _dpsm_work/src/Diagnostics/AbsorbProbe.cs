@@ -73,6 +73,14 @@ internal static class AbsorbProbe
 		get { return (Plugin.CfgAbsorbProbeMaxRows != null) ? Plugin.CfgAbsorbProbeMaxRows.Value : 400; }
 	}
 
+	/// <summary>R76: the SEPARATE budget for key rows (an oversized hit or a carrier sighting). In the
+	/// measured battle the single 400-row cap pushed all 11 deciding `ショゴス` rows into `dropped=5157`, so
+	/// the two budgets are counted apart -- `dropped` for ordinary rows, `keyDropped` for key rows.</summary>
+	private static int MaxKeyRows
+	{
+		get { return (Plugin.CfgAbsorbProbeKeyRows != null) ? Plugin.CfgAbsorbProbeKeyRows.Value : 200; }
+	}
+
 	internal static void Reset()
 	{
 		Report.Clear();
@@ -94,13 +102,24 @@ internal static class AbsorbProbe
 	internal static void SawFixedDamage() { _fixedDamageSeq++; Report.NoteFixedDamage(); }
 
 	/// <summary>`[ABSPROBE] barrier` / `[ABSPROBE] carrier` rows from the isolated hooks. Bounded by the
-	/// same row cap as the per-hit rows, so a barrier that fires every frame cannot flood the log.</summary>
+	/// same two-tier budget as the per-hit rows, so a barrier that fires every frame cannot flood the log
+	/// and cannot crowd out an oversized row either.</summary>
 	internal static void LogCarrier(string kind, string detail)
 	{
 		if (!Enabled) return;
-		if (Report.Rows >= MaxRows) { Report.NoteDropped(); return; }
-		Report.NoteRow();
+		if (!Report.TryTakeRow(CarrierVerdict(kind), MaxRows, MaxKeyRows)) return;
 		RuntimeLog.Write("[ABSPROBE] " + kind + " " + detail);
+	}
+
+	/// <summary>Which key family a carrier row belongs to, so it draws on the key budget that matches it.</summary>
+	private static AbsorbVerdict CarrierVerdict(string kind)
+	{
+		switch (kind)
+		{
+			case "takeover": return AbsorbVerdict.TakeOver;
+			case "fixed": return AbsorbVerdict.FixedDamage;
+			default: return AbsorbVerdict.Barrier;
+		}
 	}
 
 	/// <summary>A `Barrier`'s own life as text for the carrier rows (they fire outside a damage call, so
@@ -169,18 +188,16 @@ internal static class AbsorbProbe
 			AbsorbVerdict v = AbsorbClassifyPolicy.Classify(o);
 			Report.Note(o, v);
 
-			bool masked = (nominal > 0 && result <= 0);
-			int lifeDrop = o.LifeDrop();
-			bool lifeMismatch = o.LifeReadable && result > 0 && lifeDrop != result;
-			bool interesting = masked || (v != AbsorbVerdict.None) || o.BarrierActiveBefore || afterActive || lifeMismatch;
-			if (!interesting) return;
+			// R76: the life law decides what deserves a line. `None` -- the return reports no overflow and the
+			// life moved by the whole nominal -- is the only verdict that stays silent by default, so the log
+			// cannot fill up with hits nothing happened to.
+			bool lifeMismatch = o.LifeReadable && o.IsOversized() && o.LifeDrop() != o.Landed();
+			if (v == AbsorbVerdict.None && !o.BarrierActiveBefore && !afterActive && !lifeMismatch) return;
 
-			if (Report.Rows >= MaxRows)
-			{
-				Report.NoteDropped();
-				return;
-			}
-			Report.NoteRow();
+			// Two-tier budget: an oversized hit or a carrier sighting is written even when the ordinary cap is
+			// full. In the measured battle the single cap pushed all 11 deciding rows into `dropped=5157`.
+			if (!Report.TryTakeRow(v, MaxRows, MaxKeyRows)) return;
+
 			RuntimeLog.Write(Render(victim, o, v, lifeMismatch));
 		}
 		catch { }
@@ -193,7 +210,13 @@ internal static class AbsorbProbe
 		sb.Append(" vic=").Append(Aggregator.Desc(victim));
 		sb.Append(" nom=").Append(o.Nominal.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" res=").Append(o.Result.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" withheld=").Append(Num(o.Nominal - o.Result));
+		// R76: the honest split, and the raw difference beside it. `diff` is NOT an absorbed amount -- that
+		// reading is what R75 got wrong -- and landed/overflow are printed only when the return reports an
+		// overflow, so a row without one never looks like a measured split.
+		sb.Append(" diff=").Append(Num(o.Nominal - o.Result));
+		sb.Append(" landed=").Append(o.IsOversized() ? o.Landed().ToString(CultureInfo.InvariantCulture) : "?");
+		sb.Append(" overflow=").Append(o.IsOversized() ? o.Overflow().ToString(CultureInfo.InvariantCulture) : "?");
+		sb.Append(" key=").Append(AbsorbProbeReport.IsKeyVerdict(v) ? 1 : 0);
 		sb.Append(" life=").Append(Num(o.LifeBefore)).Append('/').Append(Num(o.LifeAfter));
 		sb.Append(" lifeDrop=").Append(Num(o.LifeDrop()));
 		if (lifeMismatch) sb.Append(" LIFE-MISMATCH");

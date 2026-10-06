@@ -20,8 +20,12 @@ internal static class Program
 	/// a rename rather than a new case).
 	/// R75: 1275 -> 1298 (+23 for policy/absorb-classify: what withheld part of a hit, the decision order that
 	/// names an OBSERVED carrier, and the rule that an unobserved or unreadable one is never named).
+	/// R76: 1298 -> 1307 (+9 net: the group was rewritten around the measured law
+	/// `res == max(0, nominal - lifeBefore)` -- the OVERSIZED hit became its own family with its own split
+	/// (`landed`/`overflow`), the life reading got the veto that removes R75's false `Masked` bucket, and the
+	/// two-tier row budget that keeps the deciding rows out of `dropped` is pinned here).
 	/// </summary>
-	public const int ExpectedCases = 1298;
+	public const int ExpectedCases = 1307;
 
 	private static int Main(string[] args)
 	{

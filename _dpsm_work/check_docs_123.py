@@ -147,6 +147,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R74.md',
     # R75: 「被吸收/无效化」探针(先读后命名:受击方 Life / Character.Barrier / 无敌族标志 → 分类)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R75.md',
+    # R76: 超量命中单独判定(落地 = nominal − res、溢出 = res;Life 读数优先) + 关键行独立行预算
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R76.md',
     # 会心逐击可观测性调查 + 折衷方案(报告,非逐轮记录)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
 ]

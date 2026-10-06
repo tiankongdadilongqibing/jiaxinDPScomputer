@@ -4,42 +4,78 @@ using System.Text;
 namespace DpsMeter;
 
 /// <summary>
-/// R75: WHICH mechanism withheld part of a damage-application call -- decided from READINGS, never from
-/// naming the difference.
+/// R76: what a damage-application call actually did, judged from the two numbers AND the victim's own life
+/// movement -- with OVERSIZED hits (the hit that exceeded the victim's remaining Life) as their own family.
 ///
-/// WHY IT EXISTS. The plugin has published a number called 被吸收/无效化 since 1.5.5, and every round that
-/// looked at it could only repeat "500,000 less reached 耐久". That label is the plugin's own word for
-/// `nominal - damage`, i.e. for an ARITHMETIC FACT: 46 exports showed 397 such records, 395 of them exactly
-/// 500,000 and all of them on ショゴス, while the ally-side ones are irregular (2,821 / 19,010 / 56,087).
-/// Naming a mechanism from a difference is exactly how a shield gets invented, and no ability, buff, status
-/// or master-data field was ever found carrying the 500,000. So this classifier takes the readings (the
-/// victim's life, its barrier's life, the invincibility family flags, and which carrier hooks fired) and is
-/// allowed -- required -- to answer "CarrierUnknown".
+/// WHY THE JUDGEMENT HAD TO CHANGE. R75 shipped a classifier whose buckets were built from the guess that
+/// `nominal - result` is an "absorbed" amount. The first battle the probe ran in killed that guess:
 ///
-/// THE ONE THING IT MUST NOT DO is turn a failed read into a carrier. `int.MinValue` means "could not read
-/// it" and is classified <see cref="AbsorbVerdict.Unreadable"/>, because "the barrier absorbed it" and "we
-/// could not look" must stay different answers. Pure by construction (no Unity, no IL2CPP, no Plugin), so
-/// the decision table and the `[ABSPROBE]` text are executed by the behaviour suite instead of being argued
-/// about after a battle.
+///   `res == max(0, nominal - lifeBefore)`   --  798 of 798 readable readings, zero violations.
+///
+/// The game's return value is therefore the OVERFLOW (the part of the hit that exceeded the victim's
+/// remaining Life), not the damage that landed. `Hooks/BattleObjectHooks.cs` books `(__result > 0) ? __result
+/// : __0` as 入耐久 and `nominal - that` as 被吸收, so on an oversized hit the two published fields are
+/// exactly SWAPPED: the overflow is published as the damage taken, and the damage that actually landed
+/// (= the victim's remaining Life) is published as "absorbed".
+///
+/// The measurements behind this file (two battles, quest 9999 + 411001):
+///   * 21 oversized hits, every one of them satisfying `nominal - res == lifeBefore` exactly;
+///   * the `ショゴス` objects: 396 of 397 readings show `Life == 500,000` and `lifeDrop == 0`, and 397/397
+///     carry an invincibility-family flag -- so their "被吸收 500000" is that object's LIFE, repeated once per
+///     hit whose nominal exceeded it, and not an absorb ability (their own talent list is `1002 ModeChange` +
+///     `6 攻击力/150/-1` and nothing else);
+///   * `res == 0` with `lifeDrop == nominal`: the whole hit landed. The R75 bucket called that `Masked`
+///     ("entirely withheld"), which is why 790 rows were filed under a name that meant the opposite.
+///
+/// THE RULE THAT REPLACES IT: the LIFE READING decides. `lifeDrop == nominal` means nothing was withheld,
+/// full stop. `res &gt; 0` means the hit was oversized, and then landed = `nominal - res`, overflow = `res`.
+/// A reading that fails never becomes a carrier and never becomes "nothing withheld": it gets its own
+/// verdict, because "we could not look" is an answer.
 /// </summary>
 internal enum AbsorbVerdict
 {
-	/// <summary>Nothing was withheld: `nominal == result` (or neither is positive).</summary>
+	/// <summary>Nothing withheld: the return reports no overflow and the life reading agrees that the whole
+	/// nominal landed (`lifeDrop == nominal`), or there was nothing to judge.</summary>
 	None,
 
-	/// <summary>A barrier was active (or its own Damage ran) AND its life moved by at least what was
-	/// withheld. This is the only verdict that names a carrier from a reading of that carrier.</summary>
+	/// <summary>Oversized, and CORROBORATED: `res &gt; 0` and the victim's life moved by exactly
+	/// `nominal - res`. landed = `nominal - res`, overflow = `res`.</summary>
+	Oversized,
+
+	/// <summary>Oversized (`res &gt; 0`) but the victim's life did NOT move at all: a fixed-pool or
+	/// invincible object (the `ショゴス` case -- `Life` stays 500,000). Kept apart from
+	/// <see cref="Oversized"/> because the life reading cannot corroborate the split here, so this is a
+	/// labelled number, not a measured one.</summary>
+	OversizedPool,
+
+	/// <summary>Oversized (`res &gt; 0`) and the life moved, but by something other than `nominal - res`.
+	/// Either the object was recycled mid-call or a second mechanism is in play: reported rather than
+	/// smoothed over.</summary>
+	OversizedPartial,
+
+	/// <summary>Oversized (`res &gt; 0`) with an unreadable life: the split cannot be corroborated at all.</summary>
+	OversizedUnreadable,
+
+	/// <summary>`res &lt;= 0` (the return reports no overflow) but the victim's life did not move either, on
+	/// a positive nominal: nothing observed landed. This is the `ショゴス` population's normal shape.</summary>
+	NoLifeMovement,
+
+	/// <summary>`res &lt;= 0` and the life moved by MORE than nothing but LESS than the nominal: part of the
+	/// hit went missing and the return value does not say so. This -- not `res &lt;= 0` -- is the shape that
+	/// would actually justify the word 被吸收.</summary>
+	WithheldNoReturn,
+
+	/// <summary>`res &lt;= 0` with an unreadable life: undecidable. Never reported as <see cref="None"/>
+	/// (which would claim the hit landed) and never as an oversized hit.</summary>
+	LifeUnreadable,
+
+	/// <summary>A barrier was active (or its own Damage ran) and its life moved by at least the difference on
+	/// a hit the life law does NOT explain. The only verdict that names a carrier from a reading of that
+	/// carrier.</summary>
 	Barrier,
 
-	/// <summary>A barrier moved but by LESS than what was withheld: the pool ran out inside this hit, or two
-	/// mechanisms are in play at once. Kept apart from <see cref="Barrier"/> on purpose -- a partial pool is
-	/// the one shape that distinguishes "a pool of N" from "N per hit".</summary>
+	/// <summary>A barrier moved, but by less than the difference: the pool ran out inside this hit.</summary>
 	BarrierShort,
-
-	/// <summary>Something withheld damage and not one candidate carrier was observed. A CONSTANT value in
-	/// this bucket (e.g. 500,000 on every hit) is the evidence for a flat per-hit cut that no exported table
-	/// carries -- it is NOT evidence for a shield.</summary>
-	CarrierUnknown,
 
 	/// <summary>`BattleObject.DamageTakeOver` ran for this hit.</summary>
 	TakeOver,
@@ -47,16 +83,11 @@ internal enum AbsorbVerdict
 	/// <summary>`BattleObject.TryGetFixedDamage` answered for this hit.</summary>
 	FixedDamage,
 
-	/// <summary>An invincibility-family flag was set on the victim.</summary>
+	/// <summary>An invincibility-family flag was set on the victim (the OR of the five flags the probe
+	/// reads).</summary>
 	Invincible,
 
-	/// <summary>`result &lt;= 0` while `nominal &gt; 0`: the whole hit was withheld -- and
-	/// `Hooks/BattleObjectHooks.cs`' fallback `(__result &gt; 0) ? __result : __0` then books it as FULL
-	/// damage with `absorbed = 0`, so the existing `[ABSORB]` line cannot show it at all. This verdict is
-	/// what makes that blind spot countable.</summary>
-	Masked,
-
-	/// <summary>A reading the verdict depends on failed. Never reported as a carrier.</summary>
+	/// <summary>A reading the verdict depends on failed. Never reported as a carrier, never as `None`.</summary>
 	Unreadable,
 }
 
@@ -74,7 +105,9 @@ internal struct AbsorbObservation
 	/// <summary>`BattleObject.Damage`'s argument: the damage the game accounts for.</summary>
 	internal int Nominal;
 
-	/// <summary>`BattleObject.Damage`'s return: what actually reached 耐久.</summary>
+	/// <summary>`BattleObject.Damage`'s return: MEASURED to be the OVERFLOW beyond the victim's remaining
+	/// Life (`res == max(0, nominal - lifeBefore)`, 798/798 readable readings), i.e. the part of the hit that
+	/// did NOT stay with the victim.</summary>
 	internal int Result;
 
 	internal int LifeBefore;
@@ -93,11 +126,28 @@ internal struct AbsorbObservation
 	internal bool FixedDamageSeen;
 	internal bool InvincibleFlag;
 
-	/// <summary>How much of the call never reached 耐久. Meaningful only for a call that was applied at all;
-	/// <see cref="AbsorbVerdict.Masked"/> must never be folded into this number.</summary>
-	internal int Withheld()
+	/// <summary>`true` when the return value reports an overflow, i.e. the hit exceeded the victim's
+	/// remaining Life. This is R76's definition of an oversized hit, and it is the ONE definition: every
+	/// verdict in the oversized family requires it.</summary>
+	internal bool IsOversized()
+	{
+		return Result > 0 && Nominal > Result;
+	}
+
+	/// <summary>The part of the hit that stayed with the victim: `nominal - res`. Only meaningful for an
+	/// oversized call. NOTE for anyone reading the export next to this: the published `入耐久` is `res`
+	/// (the overflow) and the published 被吸收/无效化 is this number, so on these calls the two are swapped.
+	/// </summary>
+	internal int Landed()
 	{
 		return Nominal - Result;
+	}
+
+	/// <summary>The overflow itself (`res`): the part of the hit that exceeded the victim's remaining Life.
+	/// </summary>
+	internal int Overflow()
+	{
+		return Result;
 	}
 
 	/// <summary>The victim's own life movement, or `int.MinValue` when it could not be read.</summary>
@@ -108,34 +158,71 @@ internal struct AbsorbObservation
 }
 
 /// <summary>
-/// The decision half. Order is the whole argument, so it is spelled out:
+/// The decision half. The order is the whole argument, so it is spelled out:
 ///
-///   1. <see cref="AbsorbVerdict.Masked"/> FIRST. A call that was entirely withheld arrives as
-///      `result == 0`, which the existing accounting books as full damage -- so it is the one case that must
-///      not be reachable as `None`.
-///   2. The named carriers, each only when its own hook was OBSERVED during this call.
-///   3. The barrier, and only when its own life actually moved: active-but-not-moving is
-///      <see cref="AbsorbVerdict.Unreadable"/>, not a carrier.
-///   4. Otherwise <see cref="AbsorbVerdict.CarrierUnknown"/>: an honest "something did it and we did not see
-///      what", which is what the next battle's data has to resolve.
+///   1. NOTHING TO JUDGE (`nominal &lt;= 0`, or the return reports no overflow) -&gt; the life law decides,
+///      and `lifeDrop == nominal` means <see cref="AbsorbVerdict.None"/>. This single line is what removes
+///      R75's false `Masked` bucket (790 rows whose life moved by exactly the nominal).
+///   2. OVERSIZED (`res &gt; 0`): the split is `landed = nominal - res`, `overflow = res`. It is called
+///      <see cref="AbsorbVerdict.Oversized"/> only when the victim's life moved by exactly that; a pool that
+///      did not move gets <see cref="AbsorbVerdict.OversizedPool"/>, a different movement
+///      <see cref="AbsorbVerdict.OversizedPartial"/>, an unreadable life
+///      <see cref="AbsorbVerdict.OversizedUnreadable"/>.
+///   3. A difference the life law does NOT explain may have a carrier behind it, so only there are the
+///      carrier readings consulted (fixed damage, takeover, invincibility, barrier -- in that order, each
+///      only when its own hook fired).
+///   4. `res &lt;= 0` with a life that moved by part of the nominal is
+///      <see cref="AbsorbVerdict.WithheldNoReturn"/> -- the only shape that would justify the word 被吸收;
+///      an unreadable life is <see cref="AbsorbVerdict.LifeUnreadable"/>, and a life that did not move is
+///      <see cref="AbsorbVerdict.NoLifeMovement"/>.
 /// </summary>
 internal static class AbsorbClassifyPolicy
 {
 	internal static AbsorbVerdict Classify(AbsorbObservation o)
 	{
-		if (o.Nominal > 0 && o.Result <= 0)
-		{
-			return AbsorbVerdict.Masked;
-		}
-
-		int withheld = o.Withheld();
-		if (withheld <= 0)
+		if (o.Nominal <= 0)
 		{
 			return AbsorbVerdict.None;
 		}
 
+		if (o.Result > 0)
+		{
+			int landed = o.Landed();
+			if (landed <= 0)
+			{
+				// The return is not an overflow at all (it equals or exceeds the nominal): nothing withheld.
+				return AbsorbVerdict.None;
+			}
+
+			if (!o.LifeReadable) return AbsorbVerdict.OversizedUnreadable;
+
+			int lifeDrop = o.LifeDrop();
+			if (lifeDrop == landed) return AbsorbVerdict.Oversized;
+			if (lifeDrop == 0) return AbsorbVerdict.OversizedPool;
+
+			AbsorbVerdict carrier = ClassifyCarrier(o, landed);
+			return (carrier != AbsorbVerdict.None) ? carrier : AbsorbVerdict.OversizedPartial;
+		}
+
+		if (!o.LifeReadable) return AbsorbVerdict.LifeUnreadable;
+
+		int drop = o.LifeDrop();
+		if (drop == o.Nominal) return AbsorbVerdict.None;
+		if (drop == 0) return AbsorbVerdict.NoLifeMovement;
+		if (drop > 0 && drop < o.Nominal) return AbsorbVerdict.WithheldNoReturn;
+
+		// The life rose, or moved in a way this policy has no reading for: not a withholding.
+		return AbsorbVerdict.None;
+	}
+
+	/// <summary>
+	/// The carrier readings, consulted ONLY for a difference the life law does not explain. Order is pinned
+	/// because it is the difference between two diagnostics: a fixed-damage override and a damage takeover
+	/// both explain a shortfall, and inventing one when nothing fired is what R75's `Masked` bucket did.
+	/// </summary>
+	private static AbsorbVerdict ClassifyCarrier(AbsorbObservation o, int withheld)
+	{
 		if (o.FixedDamageSeen) return AbsorbVerdict.FixedDamage;
-		if (o.InvincibleFlag) return AbsorbVerdict.Invincible;
 		if (o.TakeOverSeen) return AbsorbVerdict.TakeOver;
 
 		if (o.BarrierActiveBefore || o.BarrierDamageSeen)
@@ -151,7 +238,12 @@ internal static class AbsorbClassifyPolicy
 			return AbsorbVerdict.Unreadable;
 		}
 
-		return AbsorbVerdict.CarrierUnknown;
+		if (o.InvincibleFlag) return AbsorbVerdict.Invincible;
+
+		// Nothing was observed. R75 answered this with a `CarrierUnknown` bucket, which under the measured law
+		// is unreachable for an oversized hit: the shortfall IS the overflow, so the honest fallback is
+		// `OversizedPartial` -- the life reading disagrees with the split -- and not a mechanism nobody saw.
+		return AbsorbVerdict.None;
 	}
 
 	/// <summary>The verdict as it is printed, so a log line and a case label cannot drift apart.</summary>
@@ -160,13 +252,18 @@ internal static class AbsorbClassifyPolicy
 		switch (v)
 		{
 			case AbsorbVerdict.None: return "none";
+			case AbsorbVerdict.Oversized: return "oversized";
+			case AbsorbVerdict.OversizedPool: return "oversizedPool";
+			case AbsorbVerdict.OversizedPartial: return "oversizedPartial";
+			case AbsorbVerdict.OversizedUnreadable: return "oversizedUnreadable";
+			case AbsorbVerdict.NoLifeMovement: return "noLifeMovement";
+			case AbsorbVerdict.WithheldNoReturn: return "withheldNoReturn";
+			case AbsorbVerdict.LifeUnreadable: return "lifeUnreadable";
 			case AbsorbVerdict.Barrier: return "barrier";
 			case AbsorbVerdict.BarrierShort: return "pool";
-			case AbsorbVerdict.CarrierUnknown: return "unknown";
 			case AbsorbVerdict.TakeOver: return "takeover";
 			case AbsorbVerdict.FixedDamage: return "fixed";
 			case AbsorbVerdict.Invincible: return "invincible";
-			case AbsorbVerdict.Masked: return "masked";
 			case AbsorbVerdict.Unreadable: return "unreadable";
 		}
 		return "?";
@@ -174,38 +271,44 @@ internal static class AbsorbClassifyPolicy
 }
 
 /// <summary>
-/// The counting half: one bucket per value, one `[ABSPROBE] sum` line per battle, so two battles can be
-/// compared by eye and "the probe saw nothing" is a different line from "the probe never ran".
+/// The counting half: one bucket per value, one `[ABSPROBE] sum` line per battle, plus the ROW BUDGET that
+/// makes requirement 2 of R76 work.
 ///
-/// The `first(nom/res/life/bar)` quad is the single most informative thing a battle can produce here: it is
-/// the FIRST withheld call's four numbers, taken while the mechanism is certainly still in its first state,
-/// and it settles from one battle whether the withheld amount equals the victim's own life movement and
-/// whether the barrier's life moved at all. Unreadable entries print as `?`, never as 0.
+/// WHY THE BUDGET IS A POLICY AND NOT A PROBE DETAIL. In the measured battle the 400-row cap pushed all 11
+/// oversized `ショゴス` hits into `dropped=5157`, i.e. the deciding rows were the ones thrown away -- the
+/// evidence existed only as an aggregate. The fix is a two-tier budget: an oversized (or carrier) row is
+/// written even after the ordinary cap is full, bounded by its own cap so a pathological battle still cannot
+/// flood the log, and both refusals are counted separately. It lives here, in the pure class, so a mutation
+/// can redden the case that pins it.
 /// </summary>
 internal sealed class AbsorbProbeReport
 {
-	/// <summary>Every damage-application call the probe observed (withheld or not).</summary>
+	/// <summary>Every damage-application call the probe observed.</summary>
 	internal int Calls;
 
-	/// <summary>Calls that withheld something and were applied (`result > 0`).</summary>
-	internal int Withheld;
-	internal long WithheldTotal;
+	/// <summary>Oversized calls whose life movement CORROBORATED the split.</summary>
+	internal int Oversized;
+	internal int OversizedPool;
+	internal int OversizedPartial;
+	internal int OversizedUnreadable;
 
-	/// <summary>Calls with `result &lt;= 0` while `nominal &gt; 0` -- the ones the existing accounting shows
-	/// as full damage. Their sum is the size of that blind spot.</summary>
-	internal int Masked;
-	internal long MaskedTotal;
+	/// <summary>Sum of `nominal - res` and of `res` over every oversized call (all four buckets), so the
+	/// headline does not depend on how well the life reading corroborated each one.</summary>
+	internal long OversizedLandedTotal;
+	internal long OversizedOverflowTotal;
 
-	/// <summary>Calls whose victim life moved by something other than the return value: the reading that
-	/// decides whether the return really is "damage that reached 耐久".</summary>
+	/// <summary>`res &lt;= 0` with a readable life that did not move / moved by part of the nominal.</summary>
+	internal int NoLifeMovement;
+	internal int WithheldNoReturn;
+
+	/// <summary>`res &lt;= 0` with an unreadable life: counted, never guessed.</summary>
+	internal int LifeUnreadable;
+
+	/// <summary>Calls whose victim life moved by something other than `nominal - res`.</summary>
 	internal int LifeMismatch;
 
-	/// <summary>Calls where the victim's barrier was active before the hit.</summary>
 	internal int BarrierActive;
-
-	/// <summary>Calls where the barrier existed but its life could not be read.</summary>
 	internal int BarrierUnreadable;
-
 	internal int BarrierDamageSeen;
 	internal int AddBarrierSeen;
 	internal int TakeOverSeen;
@@ -213,34 +316,41 @@ internal sealed class AbsorbProbeReport
 
 	internal int SolvedBarrier;
 	internal int SolvedBarrierShort;
-	internal int SolvedUnknown;
 	internal int SolvedTakeOver;
 	internal int SolvedFixed;
 	internal int SolvedInvincible;
 	internal int SolvedUnreadable;
 
+	/// <summary>The FIRST call whose return reported an overflow: the quad that settles the split from one
+	/// battle's log (`nom/res/landed/overflow`).</summary>
 	internal bool HasFirst;
 	internal int FirstNominal;
 	internal int FirstResult;
 
-	/// <summary>Seeded to `int.MinValue` at DECLARATION as well as in <see cref="Clear"/>, because a report
-	/// that was never cleared and one that was must print the same line: the suite pins both, and the first
-	/// version of this class printed `0/0` for a fresh instance and `?/?` for a cleared one -- the same state,
-	/// two answers.</summary>
-	internal int FirstLifeDrop = int.MinValue;
-	internal int FirstBarrierMove = int.MinValue;
+	/// <summary>Seeded at DECLARATION as well as in <see cref="Clear"/>, because a report that was never
+	/// cleared and one that was must print the same line -- the suite pins both, and R75 shipped exactly this
+	/// defect once (a fresh instance printed `0/0` where a cleared one printed `?/?`).</summary>
+	internal int FirstLanded = int.MinValue;
+	internal int FirstOverflow = int.MinValue;
 
-	/// <summary>Lines actually written, and the ones the row cap refused.</summary>
+	/// <summary>Rows written (all kinds), key rows written, ordinary refusals, key refusals.</summary>
 	internal int Rows;
+	internal int KeyRows;
 	internal int Dropped;
+	internal int KeyDropped;
 
 	internal void Clear()
 	{
 		Calls = 0;
-		Withheld = 0;
-		WithheldTotal = 0L;
-		Masked = 0;
-		MaskedTotal = 0L;
+		Oversized = 0;
+		OversizedPool = 0;
+		OversizedPartial = 0;
+		OversizedUnreadable = 0;
+		OversizedLandedTotal = 0L;
+		OversizedOverflowTotal = 0L;
+		NoLifeMovement = 0;
+		WithheldNoReturn = 0;
+		LifeUnreadable = 0;
 		LifeMismatch = 0;
 		BarrierActive = 0;
 		BarrierUnreadable = 0;
@@ -250,7 +360,6 @@ internal sealed class AbsorbProbeReport
 		FixedDamageSeen = 0;
 		SolvedBarrier = 0;
 		SolvedBarrierShort = 0;
-		SolvedUnknown = 0;
 		SolvedTakeOver = 0;
 		SolvedFixed = 0;
 		SolvedInvincible = 0;
@@ -258,58 +367,56 @@ internal sealed class AbsorbProbeReport
 		HasFirst = false;
 		FirstNominal = 0;
 		FirstResult = 0;
-		FirstLifeDrop = int.MinValue;
-		FirstBarrierMove = int.MinValue;
+		FirstLanded = int.MinValue;
+		FirstOverflow = int.MinValue;
 		Rows = 0;
+		KeyRows = 0;
 		Dropped = 0;
+		KeyDropped = 0;
 	}
 
-	/// <summary>Record one classified call. `isInteresting` is decided by the caller (the probe), because
-	/// what deserves a log line is a logging policy, not a verdict.</summary>
+	/// <summary>Record one classified call.</summary>
 	internal void Note(AbsorbObservation o, AbsorbVerdict v)
 	{
 		Calls++;
 
-		int withheld = o.Withheld();
-		if (v == AbsorbVerdict.Masked)
+		if (o.IsOversized())
 		{
-			Masked++;
-			MaskedTotal += o.Nominal;
+			OversizedLandedTotal += o.Landed();
+			OversizedOverflowTotal += o.Overflow();
+			if (!HasFirst)
+			{
+				HasFirst = true;
+				FirstNominal = o.Nominal;
+				FirstResult = o.Result;
+				FirstLanded = o.Landed();
+				FirstOverflow = o.Overflow();
+			}
 		}
-		else if (withheld > 0)
-		{
-			Withheld++;
-			WithheldTotal += withheld;
-		}
-
-		if (o.LifeReadable && o.Result > 0 && o.LifeDrop() != o.Result)
-		{
-			LifeMismatch++;
-		}
-		if (o.BarrierActiveBefore) BarrierActive++;
-		if (o.BarrierActiveBefore && !o.BarrierReadable) BarrierUnreadable++;
 
 		switch (v)
 		{
+			case AbsorbVerdict.Oversized: Oversized++; break;
+			case AbsorbVerdict.OversizedPool: OversizedPool++; break;
+			case AbsorbVerdict.OversizedPartial: OversizedPartial++; break;
+			case AbsorbVerdict.OversizedUnreadable: OversizedUnreadable++; break;
+			case AbsorbVerdict.NoLifeMovement: NoLifeMovement++; break;
+			case AbsorbVerdict.WithheldNoReturn: WithheldNoReturn++; break;
+			case AbsorbVerdict.LifeUnreadable: LifeUnreadable++; break;
 			case AbsorbVerdict.Barrier: SolvedBarrier++; break;
 			case AbsorbVerdict.BarrierShort: SolvedBarrierShort++; break;
-			case AbsorbVerdict.CarrierUnknown: SolvedUnknown++; break;
 			case AbsorbVerdict.TakeOver: SolvedTakeOver++; break;
 			case AbsorbVerdict.FixedDamage: SolvedFixed++; break;
 			case AbsorbVerdict.Invincible: SolvedInvincible++; break;
 			case AbsorbVerdict.Unreadable: SolvedUnreadable++; break;
 		}
 
-		if ((v != AbsorbVerdict.None && v != AbsorbVerdict.Masked) && !HasFirst)
+		if (o.LifeReadable && o.IsOversized() && o.LifeDrop() != o.Landed())
 		{
-			HasFirst = true;
-			FirstNominal = o.Nominal;
-			FirstResult = o.Result;
-			FirstLifeDrop = o.LifeDrop();
-			FirstBarrierMove = o.BarrierReadable
-				? (int)((long)o.BarrierLifeBefore - o.BarrierLifeAfter)
-				: int.MinValue;
+			LifeMismatch++;
 		}
+		if (o.BarrierActiveBefore) BarrierActive++;
+		if (o.BarrierActiveBefore && !o.BarrierReadable) BarrierUnreadable++;
 	}
 
 	/// <summary>Counters fed by the carrier hooks themselves (they fire outside the classifier).</summary>
@@ -318,24 +425,65 @@ internal sealed class AbsorbProbeReport
 	internal void NoteTakeOver() { TakeOverSeen++; }
 	internal void NoteFixedDamage() { FixedDamageSeen++; }
 
-	internal void NoteRow() { Rows++; }
-	internal void NoteDropped() { Dropped++; }
+	/// <summary>
+	/// Rows that must survive the ordinary cap. An oversized hit is the entire object of R76, and a carrier
+	/// sighting is the only thing that can name a mechanism, so both are "key"; everything else (a hit that
+	/// landed in full, an unmoved life, an undecidable reading) is ordinary and may be capped.
+	/// </summary>
+	internal static bool IsKeyVerdict(AbsorbVerdict v)
+	{
+		switch (v)
+		{
+			case AbsorbVerdict.Oversized:
+			case AbsorbVerdict.OversizedPool:
+			case AbsorbVerdict.OversizedPartial:
+			case AbsorbVerdict.OversizedUnreadable:
+			case AbsorbVerdict.Barrier:
+			case AbsorbVerdict.BarrierShort:
+			case AbsorbVerdict.TakeOver:
+			case AbsorbVerdict.FixedDamage:
+				return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// May this verdict still write a row? Books the write or the refusal, and keeps the two refusals apart:
+	/// `dropped` (ordinary rows the ordinary cap refused) and `keyDropped` (key rows the key cap refused).
+	/// A key row is checked against its own cap only, so it can never be crowded out by ordinary rows.
+	/// </summary>
+	internal bool TryTakeRow(AbsorbVerdict v, int maxRows, int maxKeyRows)
+	{
+		if (IsKeyVerdict(v))
+		{
+			if (KeyRows >= maxKeyRows) { KeyDropped++; return false; }
+			KeyRows++;
+			Rows++;
+			return true;
+		}
+		if (Rows >= maxRows) { Dropped++; return false; }
+		Rows++;
+		return true;
+	}
 
 	/// <summary>One ASCII line, every bucket named, unreadable printed as `?`. The shape is pinned by the
-	/// behaviour suite because the whole point is comparing two battles by eye.</summary>
+	/// behaviour suite because the point of the line is comparing two battles by eye.</summary>
 	internal string Describe()
 	{
-		var sb = new StringBuilder(320);
+		var sb = new StringBuilder(360);
 		sb.Append("calls=").Append(Calls.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" withheld=").Append(Withheld.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" sum=").Append(WithheldTotal.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" masked=").Append(Masked.ToString(CultureInfo.InvariantCulture))
-		  .Append('/').Append(MaskedTotal.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" lifeMismatch=").Append(LifeMismatch.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" verdict(barrier/pool/unknown/takeover/fixed/invincible/unreadable)=")
+		sb.Append(" ovz=").Append(Oversized.ToString(CultureInfo.InvariantCulture))
+		  .Append('/').Append(OversizedLandedTotal.ToString(CultureInfo.InvariantCulture))
+		  .Append('/').Append(OversizedOverflowTotal.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" pool=").Append(OversizedPool.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" partial=").Append(OversizedPartial.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" ovzUnread=").Append(OversizedUnreadable.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" noMove=").Append(NoLifeMovement.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" missing=").Append(WithheldNoReturn.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" lifeUnread=").Append(LifeUnreadable.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" carrier(barrier/pool/takeover/fixed/invincible/unreadable)=")
 		  .Append(SolvedBarrier.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(SolvedBarrierShort.ToString(CultureInfo.InvariantCulture)).Append('/')
-		  .Append(SolvedUnknown.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(SolvedTakeOver.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(SolvedFixed.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(SolvedInvincible.ToString(CultureInfo.InvariantCulture)).Append('/')
@@ -345,13 +493,16 @@ internal sealed class AbsorbProbeReport
 		  .Append(AddBarrierSeen.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(TakeOverSeen.ToString(CultureInfo.InvariantCulture)).Append('/')
 		  .Append(FixedDamageSeen.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" lifeMismatch=").Append(LifeMismatch.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" active=").Append(BarrierActive.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" unreadable=").Append(BarrierUnreadable.ToString(CultureInfo.InvariantCulture));
-		sb.Append(" first(nom/res/life/bar)=").Append(Num(FirstNominal)).Append('/')
-		  .Append(Num(FirstResult)).Append('/').Append(Num(FirstLifeDrop)).Append('/')
-		  .Append(Num(FirstBarrierMove));
+		sb.Append(" barrUnread=").Append(BarrierUnreadable.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" first(nom/res/landed/overflow)=").Append(Num(FirstNominal)).Append('/')
+		  .Append(Num(FirstResult)).Append('/').Append(Num(FirstLanded)).Append('/')
+		  .Append(Num(FirstOverflow));
 		sb.Append(" rows=").Append(Rows.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" key=").Append(KeyRows.ToString(CultureInfo.InvariantCulture));
 		sb.Append(" dropped=").Append(Dropped.ToString(CultureInfo.InvariantCulture));
+		sb.Append(" keyDropped=").Append(KeyDropped.ToString(CultureInfo.InvariantCulture));
 		return sb.ToString();
 	}
 

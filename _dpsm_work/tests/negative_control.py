@@ -964,15 +964,46 @@ MUTATIONS = [
          find="\t\tif (holdOverflowed) return false;",
          repl="\t\tif (false) return false;",
          expect="policy/battle-clock-calibration/a-hold-overflow-refuses-the-shift"),
-    # ---- R75: what withheld part of a damage-application call. The classifier is allowed to name a carrier
-    # ONLY from a reading, and the one case the existing accounting cannot see at all (`masked`: a hit that was
-    # withheld in full arrives as `result <= 0`, which BattleObjectHooks books as full damage) is a bucket of
-    # its own. These mutations attack exactly those two properties: inventing a carrier from a failed or absent
-    # reading, and filing `masked` as if it were an ordinary partial withholding.
-    dict(name="absorb-masks-as-none", file="Policy/AbsorbClassifyPolicy.cs",
-         find="if (o.Nominal > 0 && o.Result <= 0)",
-         repl="if (false && o.Nominal > 0 && o.Result <= 0)",
-         expect="policy/absorb-classify/a-fully-withheld-hit-is-masked"),
+    # ---- R76: the OVERSIZED hit, judged from the measured law `res == max(0, nominal - lifeBefore)`.
+    # The two ways this can silently go wrong are (a) the LIFE READING losing its veto, so a hit that landed in
+    # full is filed as a withholding again -- which is exactly what R75's `Masked` bucket did to 790 rows -- and
+    # (b) the oversized split being published without the victim's own life movement vouching for it. The
+    # remaining mutations attack the two refusals that are supposed to stay apart, and the carrier readings
+    # being consulted on hits the law already explains.
+    # The R75 REGRESSION itself: a hit whose life moved by the WHOLE nominal -- i.e. one that landed in full --
+    # filed as a withholding. This is the exact failure the measured law replaced.
+    dict(name="absorb-full-application-called-withholding", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\tif (drop == o.Nominal) return AbsorbVerdict.None;",
+         repl="\t\tif (drop == o.Nominal) return AbsorbVerdict.WithheldNoReturn;",
+         expect="policy/absorb-classify/a-hit-that-landed-in-full-is-not-withheld"),
+    dict(name="absorb-fixed-pool-called-corroborated", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tif (lifeDrop == 0) return AbsorbVerdict.OversizedPool;",
+         repl="\t\t\tif (lifeDrop == 0) return AbsorbVerdict.Oversized;",
+         expect="policy/absorb-classify/an-oversized-hit-on-a-fixed-pool-is-labelled-separately"),
+    dict(name="absorb-oversized-unreadable-life-called-corroborated", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tif (!o.LifeReadable) return AbsorbVerdict.OversizedUnreadable;",
+         repl="\t\t\tif (!o.LifeReadable) return AbsorbVerdict.Oversized;",
+         expect="policy/absorb-classify/an-oversized-hit-with-an-unreadable-life-is-not-corroborated"),
+    dict(name="absorb-unreadable-life-called-none", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\tif (!o.LifeReadable) return AbsorbVerdict.LifeUnreadable;",
+         repl="\t\tif (!o.LifeReadable) return AbsorbVerdict.None;",
+         expect="policy/absorb-classify/an-unreadable-life-is-not-a-withheld-hit"),
+    dict(name="absorb-oversized-sums-cover-only-the-corroborated", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tOversizedLandedTotal += o.Landed();",
+         repl="\t\t\tif (v == AbsorbVerdict.Oversized) OversizedLandedTotal += o.Landed();",
+         expect="policy/absorb-classify/the-oversized-sums-cover-every-oversized-bucket"),
+    dict(name="absorb-first-quad-keeps-the-last-not-the-first", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tif (!HasFirst)",
+         repl="\t\t\tif (true)",
+         expect="policy/absorb-classify/the-first-quad-is-the-first-oversized-hit"),
+    dict(name="absorb-key-rows-share-the-ordinary-cap", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tif (KeyRows >= maxKeyRows) { KeyDropped++; return false; }",
+         repl="\t\t\tif (Rows >= maxRows) { KeyDropped++; return false; }",
+         expect="policy/absorb-classify/a-key-row-is-written-past-the-ordinary-cap"),
+    dict(name="absorb-takeover-outranks-fixed-damage", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\tif (o.FixedDamageSeen) return AbsorbVerdict.FixedDamage;\n\t\tif (o.TakeOverSeen) return AbsorbVerdict.TakeOver;",
+         repl="\t\tif (o.TakeOverSeen) return AbsorbVerdict.TakeOver;\n\t\tif (o.FixedDamageSeen) return AbsorbVerdict.FixedDamage;",
+         expect="policy/absorb-classify/a-fixed-damage-reading-outranks-a-takeover"),
     dict(name="absorb-invents-a-barrier-when-unreadable", file="Policy/AbsorbClassifyPolicy.cs",
          find="\t\t\tif (!o.BarrierReadable)\n\t\t\t{\n\t\t\t\treturn AbsorbVerdict.Unreadable;\n\t\t\t}",
          repl="\t\t\tif (!o.BarrierReadable)\n\t\t\t{\n\t\t\t\treturn AbsorbVerdict.Barrier;\n\t\t\t}",
@@ -985,18 +1016,10 @@ MUTATIONS = [
          find="\t\t\tif (moved < 0L) moved = -moved;",
          repl="\t\t\tif (false && moved < 0L) moved = -moved;",
          expect="policy/absorb-classify/the-barrier-lifes-polarity-does-not-decide-the-verdict"),
-    dict(name="absorb-takeover-outranks-invincible", file="Policy/AbsorbClassifyPolicy.cs",
-         find="\t\tif (o.InvincibleFlag) return AbsorbVerdict.Invincible;\n\t\tif (o.TakeOverSeen) return AbsorbVerdict.TakeOver;",
-         repl="\t\tif (o.TakeOverSeen) return AbsorbVerdict.TakeOver;\n\t\tif (o.InvincibleFlag) return AbsorbVerdict.Invincible;",
-         expect="policy/absorb-classify/an-invincibility-flag-outranks-takeover"),
-    dict(name="absorb-first-quad-keeps-the-last-not-the-first", file="Policy/AbsorbClassifyPolicy.cs",
-         find="(v != AbsorbVerdict.None && v != AbsorbVerdict.Masked) && !HasFirst",
-         repl="(v != AbsorbVerdict.None && v != AbsorbVerdict.Masked)",
-         expect="policy/absorb-classify/the-first-withheld-hit-is-the-one-kept"),
-    dict(name="absorb-masked-counts-as-withheld", file="Policy/AbsorbClassifyPolicy.cs",
-         find="\t\t\tMaskedTotal += o.Nominal;\n\t\t}\n\t\telse if (withheld > 0)",
-         repl="\t\t\tMaskedTotal += o.Nominal;\n\t\t\tWithheld++;\n\t\t\tWithheldTotal += o.Nominal;\n\t\t}\n\t\telse if (withheld > 0)",
-         expect="policy/absorb-classify/masked-is-counted-apart-from-withheld"),
+    dict(name="absorb-only-oversized-counts-as-key", file="Policy/AbsorbClassifyPolicy.cs",
+         find="\t\t\tcase AbsorbVerdict.OversizedPool:\n\t\t\tcase AbsorbVerdict.OversizedPartial:",
+         repl="\t\t\tcase AbsorbVerdict.None:\n\t\t\tcase AbsorbVerdict.OversizedPartial:",
+         expect="policy/absorb-classify/only-the-oversized-and-carrier-verdicts-are-key"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

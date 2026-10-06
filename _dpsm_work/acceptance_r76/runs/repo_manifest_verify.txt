@@ -1,0 +1,12 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\repo_manifest.py --verify --exports D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\batch_inputs\rf0
+verify: tracked=2762 hashed_excluded=346 corpus=35
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/doc_convergence.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/docs123.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/repo_manifest_verify.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/selftest_attribution_census.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/selftest_battle_select.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/selftest_v150.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/acceptance_r76/runs/test_gate.txt
+CHANGED (source file this batch works on; review, not drift): tracked_sources/_dpsm_work/baseline-manifest.json
+manifest verify: drift=0 changed=8 grew=0 notes=0
