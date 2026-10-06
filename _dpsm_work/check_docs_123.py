@@ -131,6 +131,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R64.md',
     # R65: 实机证伪 R63 的 ×30(删错数 / 删被证伪的规则 / 修探针)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R65.md',
+    # R66: 技能发动时刻做成悬浮窗的一页(F4 换岗)+ 用 9 场语料修正两条口径
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R66.md',
 ]
 
 

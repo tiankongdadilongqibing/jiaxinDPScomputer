@@ -170,6 +170,14 @@ public class Plugin : BasePlugin
 	/// Diagnostics/AutoSkillProbe.cs.</summary>
 	public static ConfigEntry<bool> CfgAutoSkillProbe;
 
+	/// <summary>R66: collect our units' 奥义/特殊/自动 skill activations for the overlay's 技能时间表 page
+	/// (F4 while the panel is visible) and log them as [SKILLTL] rows. WHY: the auto skill's own cadence
+	/// question ("how often does it fire") cannot be read off `CoolTimeFrame`, and the over/special skills
+	/// had no observation channel at all -- the game's unified record sink
+	/// (`AddPlayerSkillGameRecord`) is the one that carries a `Skill` object plus the game's record type.
+	/// One isolated postfix plus a bounded list; see Diagnostics/SkillTimelineProbe.cs.</summary>
+	public static ConfigEntry<bool> CfgSkillTimeline;
+
 	private Harmony _harmony;
 
 	/// <summary>
@@ -274,6 +282,33 @@ public class Plugin : BasePlugin
 		catch (Exception ex)
 		{
 			LogSource.LogInfo("[DpsMeter] auto-skill activation postfix failed (meter unaffected): " + ex.Message);
+		}
+	}
+
+	/// <summary>
+	/// R66: patch the game's unified skill-record sink
+	/// (`GameCmdExecuter.AddPlayerSkillGameRecord`) SEPARATELY from PatchAll -- same isolation rule as the
+	/// other probes. This is the ONLY channel that observes 奥义/特殊技能 activations (the auto skill has its
+	/// own command hook); if it does not resolve, the 技能时间表 page still shows the auto-skill rows and
+	/// prints `rec 0 条`, so the round produces evidence either way.
+	/// </summary>
+	private void TryPatchSkillRecord()
+	{
+		try
+		{
+			var m = AccessTools.Method(typeof(GameCmdExecuter), "AddPlayerSkillGameRecord",
+				new Type[] { typeof(Player), typeof(Skill), typeof(eUserRecordType), typeof(UnityEngine.Vector3) });
+			if (m == null)
+			{
+				LogSource.LogInfo("[DpsMeter] GameCmdExecuter.AddPlayerSkillGameRecord not found; the 技能时间表 keeps the auto-skill channel only (奥义/特殊 would show rec 0 条).");
+				return;
+			}
+			_harmony.Patch(m, postfix: new HarmonyMethod(typeof(SkillRecordHooks), nameof(SkillRecordHooks.PostfixSkillRecord)));
+			LogSource.LogInfo("[DpsMeter] skill-record postfix applied (GameCmdExecuter.AddPlayerSkillGameRecord).");
+		}
+		catch (Exception ex)
+		{
+			LogSource.LogInfo("[DpsMeter] skill-record postfix failed (meter unaffected): " + ex.Message);
 		}
 	}
 
@@ -401,9 +436,10 @@ public class Plugin : BasePlugin
 		CfgShowContribution = Config.Bind<bool>("General", "ShowContribution", true, "FEATURE (1.7.0 阶段 F): show the 总贡献 dashboard in the overlay (per character: base / own rules / assist / total credit + share, plus the top rules by damage equivalent). It reuses the exact computation the export writes, cached and refreshed at most once a second, so the panel and the exported contribution section are always the same numbers. Requires ReconcileCalc (no folds = no attribution -> the panel says 不可用 instead of showing zeros). Off = panel hidden, export unchanged.");
 		CfgFactStore = Config.Bind<bool>("General", "FactStore", true, "FEATURE (1.5.0 B1): give EVERY damage hit a reference (`event.factId`) into a deduplicated fact table (`facts.items`), where each class carries the four composition lines plus the VICTIM's LIVE state (resistance slots, 蓄积 counters, active statuses) read at that class's first sight. WHY: live state can only be read while the game objects are alive (`FinalizeLocked` clears `ActorStats.Source` immediately after the export), so anything not captured during the battle is unrecoverable; before 1.5.0 that capture happened for at most 160 hits of 5,501 (3%), which is why every new question cost another battle. MEASURED: those 5,501 hits collapse to 331-463 distinct classes across four exports, and 2,838 distinct composition quadruples out of 5,501 events, so a bounded deduped table covers 100% of hits inside the byte budget that used to buy 3%. The expensive live read runs only for the first `MaxLiveClasses` (420) classes; both overflow counters are exported. Bounded and read-only; self-reported as a [DpsMeter][FACT] line. Set false to skip it entirely.");
 		CfgExtractOnBattleEnd = Config.Bind<bool>("General", "ExtractOnBattleEnd", true, "FEATURE (R52 证据提取流程): at battle end, write a SELF-CONTAINED evidence bundle to BepInEx\\plugins\\DpsMeter\\extract\\<stamp>\\ containing (1) battle.json from the same serializer as the normal export, (2) contrib_census.json -- every UNRESOLVED fold grouped by reason/kind/origin/label/factor with its victim and, for the granted channel, the loadout-side carrier verdict (who HOLDS a rule that grants that modifier), (3) masterdata/ as a copy of the game's own table dump, (4) manifest.json hashing every file plus the deployed assembly. WHY: 'what is unknown_kind made of' and 'why is the giver always null' used to cost a one-off script over a 24 MB file, and the answer was not reproducible. ON by default (user request, 2026-10-05): writing the bundle must not depend on the user knowing about a key. A bundle is a ~25 MB copy, so ExtractKeep (default 5) bounds the disk cost; set this false to stop writing them, and press the key below for a one-off on demand. Never throws into the finalisation.");
-		CfgExtractKey = Config.Bind<string>("General", "ExtractKey", ExtractPolicy.DefaultKey, "FEATURE (R52): press this key for an evidence bundle on demand (works in and out of a battle). F1-F12, A-Z or 0-9; NONE disables it. F4 by default because the overlay already owns F5-F12 and F8/F9 must keep their meanings. Every press writes a bundle, so ExtractKeep bounds how many stay on disk.");
+		CfgExtractKey = Config.Bind<string>("General", "ExtractKey", ExtractPolicy.DefaultKey, "FEATURE (R52): press this key for an evidence bundle on demand. R66: the key now has TWO meanings and the panel decides which -- while the overlay is VISIBLE it opens the 技能时间表 page (the hotkey bar says so), and while the panel is HIDDEN (F8) the same key writes the bundle, because that is when a bundle cannot be requested any other way. F1-F12, A-Z or 0-9; NONE disables the key route entirely and leaves the battle-end route (ExtractOnBattleEnd) alone. F4 by default because the overlay already owns F5-F12 and F8/F9 must keep their meanings. Every bundle write is bounded by ExtractKeep.");
 		CfgExtractKeep = Config.Bind<int>("General", "ExtractKeep", ExtractPolicy.DefaultKeep, "FEATURE (R52): how many evidence bundles to keep under BepInEx\\plugins\\DpsMeter\\extract (oldest deleted first, decided by a pure string sort of the timestamped directory names). 1..50.");
 		CfgAutoSkillProbe = Config.Bind<bool>("Debug", "AutoSkillProbe", true, "PROBE (R64): read each party unit's AUTO SKILL from the live Skill side and log (a) the instant it fires as an [AUTOSK] act row and (b) its charge counter every 2 s as an [AUTOSK] chg row, plus a per-slot median interval at battle end. WHY: R63 published the auto-skill master row (暗沌への導き: minCoolTime/maxCoolTime = 300/240 s = 9000/7200 frames) but the ~13.5 s cadence earlier reverse-inferred from a damage channel contradicts it, and the master number cannot be checked without the live skill -- the auto skill is NOT in the standby list the [CLOCKP] line walks (verified: that list holds 地下からの完全顕現/電脳掌都/狂気の眼球, and only 暗沌への導き of those four names is in auto_skill.json). One isolated Harmony postfix on GameCmdExecuter.ActExecutePlayerAutoSkillForPassive + a read-only sampler (Player.AutoSkill1/2, Skill.Type/GetStatus/WaitCountFrame/CoolTimeFrame); if the patch does not resolve, the sampler's rising edge still times the activations and the SUM line says so. Set false to stop both.");
+		CfgSkillTimeline = Config.Bind<bool>("Debug", "SkillTimeline", true, "FEATURE/PROBE (R66): collect OUR units' 奥义/特殊/自动 skill activation moments into the overlay's 技能时间表 page (F4 while the panel is visible) and write them to the runtime log as [SKILLTL] rows. WHY: the auto skill's charge (Skill.CoolTimeFrame / 30) is NOT its firing interval -- an auto skill that has finished charging waits for the unit's next normal attack (measured over 9 battles: トレイラ CoolTimeFrame 240 = 8.0 game s, median observed gap 9.00 game s, and マッドシーカー fires every ~5 s with a 99 game-second charge), and 奥义/特殊 had no observation channel at all. Two channels: the R64 auto-skill command postfix (proven, 471 rows) plus one isolated postfix on GameCmdExecuter.AddPlayerSkillGameRecord, which is the only place that carries both a Skill object and the game's own eUserRecordType (OverSkillStart/SpecialSkillStart/...). Bounded (600 events), our side only, read-only. Off = no hook work, no page, no [SKILLTL] lines.");
 		try
 		{
 			_harmony = new Harmony("dev.dpsmeter");
@@ -414,6 +450,7 @@ public class Plugin : BasePlugin
 			TryPatchMadnessApplier();
 			TryPatchGiveApplier();
 			TryPatchAutoSkillActivation();
+			TryPatchSkillRecord();
 		}
 		catch (Exception ex)
 		{

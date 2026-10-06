@@ -1,0 +1,20 @@
+======================================================================================================================
+FACT signature replay
+  file    battle_9999_20261006_112250__B-20261006-025754-C916794113964F30-009.json
+  version 1.7.17   quest 9999   damage events 304   replayable 303
+  caps    {"MaxClasses": 2400, "MaxLiveClasses": 900}
+----------------------------------------------------------------------------------------------------------------------
+1.5.1 legacy key           distinct=165    cap=600   kept=165   served=303    overflow=0      servedIfRanked=303    singletons=112   maxHits=19     OK 
+1.5.2 shipped key          distinct=152    cap=2400  kept=152   served=303    overflow=0      servedIfRanked=303    singletons=99    maxHits=24     OK 
+
+coverage: 1.5.1 legacy 303/303 (100.0%)   1.5.2 shipped 303/303 (100.0%)
+plugin bookkeeping: observed=303  sum(facts.items[].hits)=303  classes=152/2400
+  note: replay served (303) counts only the 303 exported events; the plugin counted 303 Observe calls. Not expected to be equal.
+VERDICT: shipped key fits (headroom 2248 classes) and every consistency check holds.
+
+top 5 classes by hits (shipped key):
+   n=24    ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 2, 1.322, 40, 190, 0, 0, None, ('恐怖', '毒'))
+   n=19    ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 2, 1.0, 40, 190, 0, 0, None, ('停止',))
+   n=12    ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 2, 1.0, 40, 190, 0, 0, None, ('恐怖',))
+   n=11    ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 2, 1.322, 40, 190, 0, 0, None, ('停止', '恐怖', '毒'))
+   n=10    ('マッドシーカー', 1, 'T.O.W.E.R.typeR', 2, 0, 3, 1.322, 40, 190, 0, 0, None, ('恐怖', '毒'))

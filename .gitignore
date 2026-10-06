@@ -16,9 +16,9 @@
 !/.gitignore
 !/.gitattributes
 !/REPO-BOUNDARY.md
-!/DpsMeter-文档索引.md
-!/DpsMeter-使用说明-完整版.txt
-!/安装说明.txt
+!/DpsMeter-鏂囨。绱㈠紩.md
+!/DpsMeter-浣跨敤璇存槑-瀹屾暣鐗?txt
+!/瀹夎璇存槑.txt
 !/changelog.txt
 !/dpsmeter_analyze.py
 !/dpsmeter_contrib.py
@@ -87,6 +87,7 @@
 !/_dpsm_work/acceptance_r63/
 !/_dpsm_work/acceptance_r64/
 !/_dpsm_work/acceptance_r65/
+!/_dpsm_work/acceptance_r66/
 
 # Derived, multi-MB analysis outputs inside a batch archive. They are reproducible from the frozen
 # snapshot by the tracked tools, so the archive keeps its EVIDENCE (RESULTS.md, corpus_manifest.json,
@@ -120,7 +121,7 @@ rlyehshoujotaix_cl_Data/
 D3D12/
 dotnet/
 DpsMeter-0.9.0-r2/
-汉化/
+姹夊寲/
 *.zip
 *.dll
 *.exe

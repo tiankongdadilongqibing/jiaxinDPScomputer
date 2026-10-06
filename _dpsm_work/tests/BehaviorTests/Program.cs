@@ -4,8 +4,9 @@ namespace BehaviorTests;
 
 internal static class Program
 {
-	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.</summary>
-	public const int ExpectedCases = 1002;
+	/// <summary>Pinned case total. Deleting a case, or dropping a whole group from Main, fails the run.
+	/// R66: 1002 -> 1076 (+74: 47 in policy/skill-timeline, 27 in ui/skill-timeline-text).</summary>
+	public const int ExpectedCases = 1076;
 
 	private static int Main(string[] args)
 	{
@@ -72,6 +73,9 @@ internal static class Program
 		// x30 conversion is gone with it. 1016 -> 1002 cases (16 removed, 2 added in the cadence group).
 		// R64/R65: the auto-skill cadence arithmetic (charge rate, charge in seconds, interval, median).
 		Cases.AutoSkillCadence(r);
+		// R66: the 技能时间表 -- one row per (unit, skill) out of a raw activation stream (merge window,
+		// battle-clock axis, order, burst/overflow marks) plus the page text built from it.
+		Cases.SkillTimeline(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

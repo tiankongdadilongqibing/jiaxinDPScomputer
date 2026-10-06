@@ -92,6 +92,8 @@ public static partial class Aggregator
 		FactStore.Reset();
 		// R64: the auto-skill probe's per-slot charge state and activation history are per battle.
 		AutoSkillProbe.Reset();
+		// R66: the 技能时间表's activation list is per battle too (the page shows THIS battle).
+		SkillTimelineProbe.Reset();
 		// Ability rosters and talent activation counters are per-battle state cached on ActorStats.
 		TalentRuntime.ResetSession();
 		OverlayUGUI.LogSessionStart(battleSession.QuestId);

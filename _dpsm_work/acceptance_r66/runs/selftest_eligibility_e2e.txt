@@ -1,0 +1,9 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\comparison_eligibility.py --selftest-e2e
+  [PASS] two comparable samples: the CLI success path exits 0     rc=0
+  [PASS] a section-less sample alone: nothing may be ranked (exit 4) rc=4
+  [PASS] a section-less member restricts the pooled total (no silent pooling) rc=4
+  [PASS] a changed nested damageBasis is caught at the CLI        rc=0
+  [PASS] no valid input exits 2                                   rc=2
+  [PASS] --applicability is wired into the CLI (recorded per sample) {'battle_411001_20261004_134853.json': 'WARNING', 'battle_411001_20261004_134524.json': None}
+---- selftest-e2e: PASS

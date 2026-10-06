@@ -101,7 +101,11 @@ public static partial class OverlayUGUI
 			? Mathf.Min((float)Screen.width - 40f, 1400f)   // detail lines are long: widen the panel
 			: (View == ViewMode.Contribution
 				? Mathf.Min((float)Screen.width - 40f, 880f)   // the contribution table needs its columns (94 with 自伤)
-				: Mathf.Min((float)Screen.width - 20f, 560f));
+				// R66: the 技能时间表 is a column table too -- one line per (unit, skill) with up to
+				// SkillTimelinePolicy.MaxStamps timestamps, ~114 display columns.
+				: (View == ViewMode.Timeline
+					? Mathf.Min((float)Screen.width - 40f, 900f)
+					: Mathf.Min((float)Screen.width - 20f, 560f)));
 
 		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a
 		// click pointing at the previous page's id.
@@ -669,6 +673,17 @@ public static partial class OverlayUGUI
 			for (int i = firstRow; i < rows.Count; i++) rows[i].Font = mono;
 	}
 
+	/// <summary>R66: the 技能时间表's line styles -> the overlay's existing palette, so the page reads like
+	/// the rest of the panel (header = the same amber as every other header, 奥义/特殊 rows use it too
+	/// because they are the rare ones worth spotting).</summary>
+	private static Color TimelineColor(TimelineLineStyle style)
+	{
+		if (style == TimelineLineStyle.Header) return HeaderColor;
+		if (style == TimelineLineStyle.Warn) return WarnColor;
+		if (style == TimelineLineStyle.Row) return AllyColor;
+		return DimColor;
+	}
+
 	private static List<RowDef> BuildRows()
 	{
 		var rows = new List<RowDef>();
@@ -1044,10 +1059,33 @@ public static partial class OverlayUGUI
 			return rows;
 		}
 
+		// ---- 技能时间表 page (F4 while the panel is visible, see OverlayUGUI.CheckKeys) ----
+		// The rows come from the pure text layer, so what is on screen and what the battle-end [SKILLTL]
+		// log lines contain are the SAME strings -- a panel that cannot be checked against evidence is how
+		// this repo has published a wrong number before.
+		if (View == ViewMode.Timeline)
+		{
+			List<TimelineLine> timeline = SkillTimelineProbe.Rows(inBattle);
+			for (int i = 0; i < timeline.Count; i++)
+			{
+				rows.Add(new RowDef
+				{
+					Text = timeline[i].Text,
+					Color = TimelineColor(timeline[i].Style),
+					Height = 16f,
+				});
+			}
+			// the table aligns by padding with spaces: exact only on the mono font's 1:2 grid
+			Font tlMono = GetMonoFont();
+			if (!GameRef.IsNull(tlMono))
+				for (int i = 0; i < rows.Count; i++) rows[i].Font = tlMono;
+			return rows;
+		}
+
 		// ---- roster ----
 		if (!inBattle)
 		{
-			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F4 证据包", Color = HeaderColor, Height = 20f });
+			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F4 时间表", Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = "下方显示上一场记录;F10 可查看上一场曲线", Color = DimColor, Height = 16f });
 			if (Aggregator.History.Count > 0)
 			{
@@ -1066,7 +1104,7 @@ public static partial class OverlayUGUI
 			else enemyDealt += a.DamageDealt;
 		}
 		double secs = Math.Max(1.0, session.ActiveSeconds);
-		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F4证据包", Color = HeaderColor, Height = 20f });
+		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F4时间表", Color = HeaderColor, Height = 20f });
 		AppendBattleRefRow(rows, session.Ref, session.QuestId, "本场 ");
 		rows.Add(new RowDef { Text = $"我方总伤害 {allyDealt:N0}   秒伤 {(long)(allyDealt / secs):N0}   受击 {allyTaken:N0}   受回复 {allyHeal:N0}", Color = NeutralColor, Height = 18f });
 		if (allyFriendly > 0)

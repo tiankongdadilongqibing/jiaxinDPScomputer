@@ -1,0 +1,13 @@
+# cwd=D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work
+# argv=C:\Users\24134\AppData\Local\Programs\Python\Python311\python.exe D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\check_given_fold_coupling.py --selftest
+baseline: 20 checks, 0 failing
+  [PASS] M1 no applyToChain parameter -- expected "1. GivenTalentDamage takes applyToChain with default true" to fail; failing=['1. GivenTalentDamage takes applyToChain with default true']
+  [PASS] M2 registration moved outside the gate -- expected "2f. the fold registration is inside the gate" to fail; failing=['2a. found the applyToChain gate and the ctx.Add side effect', '2c. mult *= f is inside the gate', '2d. applied++ is inside the gate', '2e. the global GivenApplied++ is inside the gate', '2f. the fold registration is inside the gate']
+  [PASS] M3 caller passes literal true -- expected "3b. the multiply branch evaluates the SAME identifier" to fail; failing=['3b. the multiply branch evaluates the SAME identifier']
+  [PASS] M4 multiply branch no longer uses GivenFoldApplies -- expected "3b. the multiply branch evaluates the SAME identifier" to fail; failing=['3b. the multiply branch evaluates the SAME identifier']
+  [PASS] M5 Madness (outgoing) registration escapes its if -- 1 check(s) failing
+  [PASS] M6 CalcReconcile stops writing givenFoldOn -- expected "6b. CalcReconcile writes "givenFoldOn"" to fail; failing=['6b. CalcReconcile writes "givenFoldOn"']
+  [PASS] M9 diagnostics drops the given switch again -- expected "7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage" to fail; failing=['7a. the diagnostics re-derivation passes the given switch to GivenTalentDamage']
+  [PASS] M10 diagnostics madness multiply loses its switch -- expected "7b. the diagnostics madness multiply is gated on Plugin.CfgMadness" to fail; failing=['7b. the diagnostics madness multiply is gated on Plugin.CfgMadness']
+  [PASS] M11 diagnostics loses the victim madness channel -- expected "7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim" to fail; failing=['7c. the diagnostics models the VICTIM madness fold under Plugin.CfgMadnessVictim']
+---- selftest: 9/9 mutations caught

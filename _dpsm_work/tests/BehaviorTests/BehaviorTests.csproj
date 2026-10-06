@@ -65,6 +65,12 @@
          interval between activations, its median). Pure by construction: the readings themselves need the
          IL2CPP surface and live in the probe, the conversions that publish them do not. -->
     <Compile Include="$(SrcRoot)\Policy\AutoSkillCadencePolicy.cs" />
+    <!-- R66: the 技能时间表: one row per (unit, skill) out of a raw activation stream. Pure: the
+         readings need the IL2CPP surface (Diagnostics/SkillTimelineProbe.cs), the arithmetic that
+         publishes them does not, and that arithmetic is where a wrong table would hide (a merge window
+         that eats a real activation, a median taken over the wrong gaps, rows that reorder mid-battle). -->
+    <Compile Include="$(SrcRoot)\Model\SkillTimelineEvent.cs" />
+    <Compile Include="$(SrcRoot)\Policy\SkillTimelinePolicy.cs" />
     <!-- R52: the extraction-flow decisions (trigger key, bundle name, retention). Game-free by
          construction, which is what lets the retention rule be executed instead of argued about. -->
     <Compile Include="$(SrcRoot)\Policy\ExtractPolicy.cs" />
@@ -83,6 +89,10 @@
     <!-- RF5b: the overlay text layout. No Unity type is involved, which is why it can be compiled here
          and executed as production code instead of being mirrored by a Python replica. -->
     <Compile Include="$(SrcRoot)\Ui\DisplayFormat.cs" />
+    <!-- R66: the 技能时间表's page text (same reason as the contribution columns: the geometry and the
+         xN / +N markers are numbers a reader must be able to check, and the battle-end [SKILLTL] lines
+         print these very strings). -->
+    <Compile Include="$(SrcRoot)\Ui\SkillTimelineText.cs" />
     <Compile Include="$(SrcRoot)\Ui\ContributionColumns.cs" />
     <Compile Include="$(SrcRoot)\Ui\FallbackText.cs" />
     <Compile Include="$(SrcRoot)\Ui\ContributionRowModel.cs" />

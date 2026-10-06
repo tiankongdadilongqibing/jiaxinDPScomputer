@@ -23,7 +23,7 @@ namespace DpsMeter;
 /// </summary>
 public static partial class OverlayUGUI
 {
-	public enum ViewMode { Roster = 0, Chart = 1, Detail = 2, Contribution = 3 }
+	public enum ViewMode { Roster = 0, Chart = 1, Detail = 2, Contribution = 3, Timeline = 4 }
 
 	public static bool Visible = true;
 	public static ViewMode View = ViewMode.Roster;
@@ -120,7 +120,9 @@ public static partial class OverlayUGUI
 	private static float _panelW = 460f;
 	private static bool _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
 	/// <summary>R52: latch for the on-demand evidence-extraction key (General/ExtractKey, default F4).
-	/// Polled in CheckKeys, which runs BEFORE the Visible gate, so it also works with the panel hidden.</summary>
+	/// Polled in CheckKeys, which runs BEFORE the Visible gate, so it also works with the panel hidden.
+	/// R66: that same key now opens the 技能时间表 page while the panel IS visible, and keeps writing the
+	/// bundle while it is HIDDEN -- the one state in which a bundle cannot be asked for any other way.</summary>
 	private static bool _prevExtract;
 	private static Sprite _white;
 	private static float _lastChartDraw;
@@ -503,8 +505,12 @@ public static partial class OverlayUGUI
 				_lastRefresh = 0f;
 			}
 		}
-		// R52: the on-demand evidence bundle. The key is configurable (General/ExtractKey) because the
-		// overlay owns F5-F12 and the game owns an unknown set; an unparsable/off value leaves this dark.
+		// R52 + R66: the configurable key (General/ExtractKey, default F4). WHICH ACTION it performs depends
+		// on whether the panel is on screen, and that is the whole point of the split: while the panel is
+		// visible the key is one of the panel's own view keys (技能时间表, like F5/F6/F10), and while the
+		// panel is hidden the key still writes an evidence bundle -- the battle-end bundle is automatic, but
+		// a bundle requested on the spot is only reachable from a key, and a hidden panel is exactly when no
+		// other route exists. The hotkey bar states which meaning is live.
 		bool extractDown = false;
 		try
 		{
@@ -514,14 +520,25 @@ public static partial class OverlayUGUI
 		catch { }
 		if (extractDown && !_prevExtract)
 		{
-			try
+			if (Visible)
 			{
-				string dir = EvidenceExtractor.Run(Aggregator.Session, "hotkey");
-				RuntimeLog.Write(dir == null
-					? "[DpsMeter] 证据提取:没有可提取的会话"
-					: ("[DpsMeter] 证据提取 -> " + dir));
+				// same remember/restore shape as F6: leaving the page returns to the view it was opened from
+				if (View == ViewMode.Timeline) View = _viewBeforeDetail;
+				else { _viewBeforeDetail = View; View = ViewMode.Timeline; }
+				_scrollOffset = 0f;
+				_lastRefresh = 0f;
 			}
-			catch (Exception ex3) { RuntimeLog.Write("[DpsMeter] 证据提取失败: " + ex3.Message); }
+			else
+			{
+				try
+				{
+					string dir = EvidenceExtractor.Run(Aggregator.Session, "hotkey");
+					RuntimeLog.Write(dir == null
+						? "[DpsMeter] 证据提取:没有可提取的会话"
+						: ("[DpsMeter] 证据提取 -> " + dir));
+				}
+				catch (Exception ex3) { RuntimeLog.Write("[DpsMeter] 证据提取失败: " + ex3.Message); }
+			}
 		}
 		_prevF5 = f5; _prevF6 = f6; _prevF8 = f8; _prevF9 = f9; _prevF10 = f10; _prevF11 = f11; _prevF12 = f12;
 		_prevF7 = f7;

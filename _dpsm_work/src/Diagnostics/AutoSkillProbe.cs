@@ -106,7 +106,27 @@ internal static class AutoSkillProbe
 	/// budget for real skills.</summary>
 	internal static int PlaceholderSlots;
 
+	/// <summary>R66: command postfix calls where the game's `index` resolves to TWO DIFFERENT `Skill`
+	/// objects depending on how it is read (1-based auto-skill slot `Player.AutoSkill1/2` versus the 0-based
+	/// position in `Player.PassiveSkills`). MEASURED on 9 battles (471 rows): `gameIdx=0` occurs 24 times
+	/// per (unit,skill) and resolves ONLY through the roster position, `gameIdx=1` resolves through the
+	/// named slot -- and for マッドシーカー every activation arrived with `gameIdx=1`, which is why the two
+	/// readings must be reported side by side instead of silently choosing one. The `[AUTOSK] cmdidx` line
+	/// prints both candidates once per (unit, index) so the semantics stop being a guess.</summary>
+	internal static int IndexAmbiguous;
+
 	private static readonly Dictionary<string, SlotState> Slots = new Dictionary<string, SlotState>();
+
+	/// <summary>R66: per-battle tags for the `Skill` OBJECT identity (1, 2, 3 ...). The identity key used
+	/// to be text only (EntryId|name|skillId|name), which MERGES two different objects that carry the same
+	/// skill -- and the merged rows then look self-contradictory (measured 2026-10-06: マッドシーカー's
+	/// counter read 2970/2970 at one activation and 2721/2970 at the next, which cannot be one object
+	/// draining at 30 units/game-second). Tagging the pointer turns that into a visible fact.</summary>
+	private static readonly Dictionary<long, int> InstanceTags = new Dictionary<long, int>();
+	private static int _instSeq;
+
+	/// <summary>(unit, gameIdx) pairs whose `cmdidx` diagnosis has already been printed.</summary>
+	private static readonly HashSet<string> IndexLogged = new HashSet<string>();
 
 	/// <summary>Units whose `[AUTOSK] roster` line has already been printed (once per battle).</summary>
 	private static readonly HashSet<string> RosterLogged = new HashSet<string>();
@@ -123,6 +143,10 @@ internal static class AutoSkillProbe
 		internal string SkillName;
 		internal int SkillId;
 		internal int Index;
+		/// <summary>R66: the object tag of the `Skill` this slot is keyed on, and its raw pointer (printed
+		/// in the SUM line only), so "one skill" can be told from "two objects that share a name".</summary>
+		internal int Instance;
+		internal long Pointer;
 		internal int LastType = int.MinValue;
 		internal string LastStatus = "";
 		internal int LastUsing;
@@ -144,12 +168,16 @@ internal static class AutoSkillProbe
 	{
 		Slots.Clear();
 		RosterLogged.Clear();
+		IndexLogged.Clear();
+		InstanceTags.Clear();
+		_instSeq = 0;
 		_lastScanWall = double.MinValue;
 		SampleRows = 0;
 		CommandActivations = 0;
 		UsingEdges = 0;
 		CommandUnresolved = 0;
 		PlaceholderSlots = 0;
+		IndexAmbiguous = 0;
 		ReadErrors = 0;
 		EmptySlots = 0;
 		PlayersSeen = 0;
@@ -203,6 +231,7 @@ internal static class AutoSkillProbe
 					+ " ok=" + (result ? 1 : 0) + " (no Skill resolved for this index; not counted as an activation)");
 				return;
 			}
+			NoteIndexDiagnosis(player, index, resolvedBy);
 			NoteActivation(player, index, sk, "cmd/" + resolvedBy, result ? 1 : 0);
 		}
 		catch { ReadErrors++; }
@@ -328,7 +357,9 @@ internal static class AutoSkillProbe
 			StringBuilder sb = new StringBuilder(300);
 			sb.Append("[AUTOSK] roster unit=").Append(unit)
 				.Append(" auto1=").Append(SkillLabel(NamedSlotSkill(p, 1)))
-				.Append(" auto2=").Append(SkillLabel(NamedSlotSkill(p, 2)));
+				.Append("#").Append(InstanceTag(NamedSlotSkill(p, 1)))
+				.Append(" auto2=").Append(SkillLabel(NamedSlotSkill(p, 2)))
+				.Append("#").Append(InstanceTag(NamedSlotSkill(p, 2)));
 			Il2CppReferenceArray<PassiveSkill> arr = null;
 			try { arr = p.PassiveSkills; } catch { ReadErrors++; }
 			if (arr == null) { sb.Append(" passiveSkills=null"); RuntimeLog.Write(sb.ToString()); return; }
@@ -346,6 +377,7 @@ internal static class AutoSkillProbe
 				try { sk = ps.AutoSkill; } catch { ReadErrors++; }
 				sb.Append(" [pos=").Append(i).Append(" passiveIdx=").Append(pidx)
 					.Append(" skill=").Append(SkillLabel(sk))
+					.Append("#").Append(InstanceTag(sk))
 					.Append(" type=").Append(TypeNumber(ReadType(sk)))
 					.Append(" wait=").Append(ReadWait(sk)).Append('/').Append(ReadCoolFrames(sk))
 					.Append(']');
@@ -374,7 +406,7 @@ internal static class AutoSkillProbe
 		if (!Slots.TryGetValue(key, out st))
 		{
 			if (Slots.Count >= MaxSlots) { SlotsDropped++; return 1; }
-			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk) };
+			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk), Instance = InstanceTag(sk), Pointer = PointerOf(sk) };
 			Slots[key] = st;
 		}
 		st.Unit = unit;
@@ -445,6 +477,7 @@ internal static class AutoSkillProbe
 			.Append(" unit=").Append(unit)
 			.Append(" idx=").Append(index)
 			.Append(" skillId=").Append(st.SkillId)
+			.Append(" inst=").Append(InstanceTag(sk))
 			.Append(" skill=").Append(st.SkillName)
 			.Append(" type=").Append(TypeNumber(type)).Append('(').Append(TypeName(type)).Append(')')
 			.Append(" status=").Append(status)
@@ -454,6 +487,8 @@ internal static class AutoSkillProbe
 			.Append(" stock=").Append(ReadStock(sk))
 			.Append(" passiveAuto=").Append(ReadIsPassiveAuto(sk) ? 1 : 0)
 			.Append(" autoActivate=").Append(ReadAutoActivate(sk))
+			.Append(" act=").Append(ReadActivationType(sk))
+			.Append(" actP=").Append(ReadActivationParam(sk))
 			.Append(" level=").Append(ReadLevel(sk));
 		if (hadPrevious && dWall > 0.0)
 		{
@@ -486,11 +521,15 @@ internal static class AutoSkillProbe
 		if (!Slots.TryGetValue(key, out st))
 		{
 			if (Slots.Count >= MaxSlots) { SlotsDropped++; return; }
-			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk) };
+			st = new SlotState { Unit = unit, Index = index, SkillId = ReadSkillId(sk), Instance = InstanceTag(sk), Pointer = PointerOf(sk) };
 			Slots[key] = st;
 		}
 		CommandActivations++;
 		st.Activations++;
+		// R66: the SAME activation feeds the 技能时间表 page. Called from here (and not from the hook)
+		// because this is the one place that has already decided "this is an activation of this Skill", so
+		// the page and the probe can never disagree about what counts.
+		SkillTimelineProbe.NoteCommandActivation(player, sk);
 
 		double wall, active;
 		bool clocked = Clocks(out wall, out active);
@@ -519,6 +558,7 @@ internal static class AutoSkillProbe
 			.Append(" unit=").Append(unit)
 			.Append(" gameIdx=").Append(index)
 			.Append(" skillId=").Append(st.SkillId)
+			.Append(" inst=").Append(InstanceTag(sk))
 			.Append(" skill=").Append(SkillLabel(sk))
 			.Append(" type=").Append(TypeNumber(ReadType(sk))).Append('(').Append(TypeName(ReadType(sk))).Append(')')
 			.Append(" status=").Append(StatusName(sk))
@@ -526,6 +566,8 @@ internal static class AutoSkillProbe
 			.Append(" ct=").Append(ReadCoolSeconds(sk))
 			.Append(" dur=").Append(ReadDuration(sk))
 			.Append(" stock=").Append(ReadStock(sk))
+			.Append(" act=").Append(ReadActivationType(sk))
+			.Append(" actP=").Append(ReadActivationParam(sk))
 			.Append(" level=").Append(ReadLevel(sk))
 			.Append(" ok=").Append(result)
 			.Append(" n=").Append(st.Activations)
@@ -572,6 +614,17 @@ internal static class AutoSkillProbe
 			Skill named = NamedSlotSkill(p, gameIdx);
 			if (named != null) { resolvedBy = "named"; return named; }
 		}
+		Skill roster = RosterPosSkill(p, gameIdx);
+		if (roster != null) { resolvedBy = "rosterPos"; return roster; }
+		return null;
+	}
+
+	/// <summary>The second reading of the game's index: the `gameIdx`-th entry of `Player.PassiveSkills`
+	/// that actually carries an `AutoSkill`. Shared by the resolver and the R66 diagnosis on purpose -- two
+	/// copies of this walk are exactly how the resolver and its evidence would drift apart.</summary>
+	private static Skill RosterPosSkill(Player p, int gameIdx)
+	{
+		if (p == null || gameIdx < 0) return null;
 		try
 		{
 			Il2CppReferenceArray<PassiveSkill> arr = p.PassiveSkills;
@@ -587,12 +640,57 @@ internal static class AutoSkillProbe
 				Skill sk = null;
 				try { sk = ps.AutoSkill; } catch { ReadErrors++; continue; }
 				if (sk == null) continue;
-				if (seen == gameIdx) { resolvedBy = "rosterPos"; return sk; }
+				if (seen == gameIdx) return sk;
 				seen++;
 			}
 		}
 		catch { ReadErrors++; }
 		return null;
+	}
+
+	/// <summary>
+	/// R66: print what the game's raw `index` selects under BOTH readings, once per (unit, index), and count
+	/// the cases where they disagree.
+	///
+	/// MEASURED on 9 battles / 471 activation rows: the index is only ever 0 or 1; `0` resolves through the
+	/// roster position and `1` through `Player.AutoSkill1`; the per-slot activation counter `n=` is strictly
+	/// increasing ACROSS the two paths, so both paths address the same skill identity. What is still not
+	/// settled is whether they address the same OBJECT (the identity key is text, so two objects sharing a
+	/// name would merge) -- and whether `1` means "slot 1" or "roster position 1" (whose entry is the
+	/// nameless `AutoSkill2` placeholder). This line, plus `inst=`, is what answers both next battle.
+	/// </summary>
+	private static void NoteIndexDiagnosis(Player p, int gameIdx, string resolvedBy)
+	{
+		try
+		{
+			string unit = UnitLabel(p);
+			if (!IndexLogged.Add(unit + "|" + gameIdx)) return;
+			Skill named = (gameIdx == 1 || gameIdx == 2) ? NamedSlotSkill(p, gameIdx) : null;
+			Skill roster = RosterPosSkill(p, gameIdx);
+			bool both = (named != null && roster != null);
+			bool agree = both && PointerOf(named) == PointerOf(roster);
+			if (both && !agree) IndexAmbiguous++;
+			RuntimeLog.Write("[AUTOSK] cmdidx unit=" + unit + " gameIdx=" + gameIdx
+				+ " named=" + SkillLabel(named) + "#" + InstanceTag(named)
+				+ " rosterPos=" + SkillLabel(roster) + "#" + InstanceTag(roster)
+				+ " agree=" + (agree ? 1 : 0)
+				+ " chose=" + resolvedBy
+				+ " (0/1: which reading the game's index means is settled by these two columns)");
+		}
+		catch { ReadErrors++; }
+	}
+
+	/// <summary>R66: the per-battle tag of a `Skill` OBJECT (see <see cref="InstanceTags"/>). 0 when the
+	/// pointer cannot be read, which the log prints as `#0` rather than hiding it.</summary>
+	private static int InstanceTag(Skill sk)
+	{
+		long p = PointerOf(sk);
+		if (p == 0L) return 0;
+		int tag;
+		if (InstanceTags.TryGetValue(p, out tag)) return tag;
+		tag = ++_instSeq;
+		InstanceTags[p] = tag;
+		return tag;
 	}
 
 	private static int ReadType(Skill sk)
@@ -708,6 +806,24 @@ internal static class AutoSkillProbe
 		try { return sk.AutoActivate; } catch { ReadErrors++; return int.MinValue; }
 	}
 
+	/// <summary>R66: `Skill.ActivationType` -- the game's own answer to "WHAT makes this skill fire".
+	/// Printed as its raw number on purpose: the enum's member names are not reachable from the interop
+	/// surface this plugin compiles against (checked 2026-10-06), and the QUESTION it has to settle is
+	/// comparative -- マッドシーカー fires every ~5 game s while its counter reads 2870/2970, so if this
+	/// number differs from the units whose counter really does gate the skill, that is the answer.</summary>
+	private static int ReadActivationType(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return (int)sk.ActivationType; } catch { ReadErrors++; return int.MinValue; }
+	}
+
+	/// <summary>R66: `Skill.ActivationTypeParam`, the parameter of <see cref="ReadActivationType"/>.</summary>
+	private static int ReadActivationParam(Skill sk)
+	{
+		if (sk == null) return int.MinValue;
+		try { return sk.ActivationTypeParam; } catch { ReadErrors++; return int.MinValue; }
+	}
+
 	private static int ReadLevel(Skill sk)
 	{
 		if (sk == null) return int.MinValue;
@@ -723,19 +839,21 @@ internal static class AutoSkillProbe
 
 	// ---- identity / clocks ----
 
-	private static long PointerOf(Player p)
+	private static long PointerOf(Il2CppObjectBase o)
 	{
-		try { return (long)((Il2CppObjectBase)p).Pointer; }
+		try { return (long)o.Pointer; }
 		catch { return 0L; }
 	}
 
-	/// <summary>R65: keyed by the SKILL's identity, not by the slot number -- `Player.AutoSkill1` can hand
-	/// back a different `Skill` over time (measured 2026-10-06: T.O.W.E.R.typeR's slot read CoolTimeFrame
-	/// 420 in two `cmd` rows and 300 in every `chg` sample), and keying by index silently merged the two
-	/// into one self-contradictory row.</summary>
+	/// <summary>R65 (extended in R66 with the object tag): keyed by the SKILL's identity, not by the slot
+	/// number -- `Player.AutoSkill1` can hand back a different `Skill` over time (measured 2026-10-06:
+	/// T.O.W.E.R.typeR's slot read CoolTimeFrame 420 in two `cmd` rows and 300 in every `chg` sample), and
+	/// keying by index silently merged the two into one self-contradictory row. R66 appends the OBJECT tag,
+	/// because the text identity alone still merges two distinct objects that carry the same skill (the
+	/// 2970/2970-then-2721/2970 pair the same battle produced).</summary>
 	private static string KeyOf(Player p, Skill sk)
 	{
-		try { return p.EntryId + "|" + p.Name + "|" + ReadSkillId(sk) + "|" + (sk == null ? "-" : sk.Name); }
+		try { return p.EntryId + "|" + p.Name + "|" + ReadSkillId(sk) + "|" + (sk == null ? "-" : sk.Name) + "|" + InstanceTag(sk); }
 		catch { return "?|" + ReadSkillId(sk); }
 	}
 
@@ -773,6 +891,7 @@ internal static class AutoSkillProbe
 		sb.Append("[AUTOSK] SUM samples=").Append(SampleRows)
 			.Append(" actCmd=").Append(CommandActivations)
 			.Append(" cmdUnresolved=").Append(CommandUnresolved)
+			.Append(" indexAmbiguous=").Append(IndexAmbiguous)
 			.Append(" useEdges=").Append(UsingEdges)
 			.Append(" players=").Append(PlayersSeen)
 			.Append(" viaOwner=").Append(PlayersViaOwner)
@@ -787,6 +906,8 @@ internal static class AutoSkillProbe
 		{
 			SlotState st = kv.Value;
 			sb.Append("\n  ").Append(st.Unit).Append(" idx=").Append(st.Index)
+				.Append(" inst=").Append(st.Instance)
+				.Append(" ptr=0x").Append(st.Pointer.ToString("X"))
 				.Append(" skillId=").Append(st.SkillId)
 				.Append(" skill=").Append(string.IsNullOrEmpty(st.SkillName) ? "-" : st.SkillName)
 				.Append(" type=").Append(TypeNumber(st.LastType)).Append('(').Append(TypeName(st.LastType)).Append(')')

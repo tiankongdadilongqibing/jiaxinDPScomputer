@@ -169,6 +169,22 @@ public static partial class Aggregator
 		{
 			RuntimeLog.Write("[AUTOSK] 自检行输出失败(不影响导出): " + ex.Message);
 		}
+		// R66: the 技能时间表's evidence. The counter line names every channel (so "the record hook never
+		// fired" cannot be mistaken for "our units fired nothing"), and then the page's OWN lines are
+		// written out, so what the panel showed this battle stays checkable offline.
+		try
+		{
+			string stl = SkillTimelineProbe.Summary();
+			if (!string.IsNullOrEmpty(stl))
+			{
+				Plugin.LogSource.LogInfo(stl);
+				RuntimeLog.Write(stl);
+			}
+		}
+		catch (Exception ex)
+		{
+			RuntimeLog.Write("[SKILLTL] 自检行输出失败(不影响导出): " + ex.Message);
+		}
 		// Feasibility probe for the 1.1 design (Diagnostics/SlotProbe.cs): must run BEFORE the export clears
 		// the actors' BattleObject references (below), and before _calcEvents.Clear(). Gated by Debug/SlotProbe.
 		if (Plugin.CfgSlotProbe != null && Plugin.CfgSlotProbe.Value) SlotProbe.Run(s);
