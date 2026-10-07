@@ -157,6 +157,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R78.md',
     # R79 批次:受击来源拆分(新导出段 takenBreakdown + F3 页面,不改已发布数值)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R79.md',
+    # R80 批次:受击来源活过战斗结束 + 不再折叠(段自述 1.1)+ 修掉 1.7.29 写坏导出的引号缺陷
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R80.md',
 ]
 
 

@@ -79,6 +79,7 @@ src/
     TakenBreakdown.cs          1.7.29 受击来源拆分的模型(单位/桶/状态/一击四层 + 段级总额)。
                                和 `ActorStats` 无关:它只描述「谁挨了多少、由谁造成」,
                                由 `Policy/TakenBreakdownPolicy.cs` 分组、`Output/TakenSession.cs` 落盘
+                               (1.7.30:分组无桶上限,每个受害单位一个 `BucketIndex` 字典索引)
 
   Composition/               伤害构成模块(见第 3 节)
     CompositionProbe*.cs       10 个 partial 文件,一个类
@@ -102,8 +103,9 @@ src/
     JsonCheck.cs               1.5.0:写盘前的导出**结构自检**(字符串外括号平衡 + 根键重复),
                                结果进 `[DpsMeter][JSON]` 行。离线探针反向验证它能拒绝四种畸形。
     RuntimeLog.cs              轮转式运行日志(BepInEx\config\dpsmeter_runtime.log)
-    TakenSession.cs            1.7.29:与 `contribution` 段并列的顶层段 `takenBreakdown` 的产出与缓存
-                               (段内自带 `schemaVersion 1.0`、`basis nominal`;每秒最多重算一次)
+    TakenSession.cs            1.7.29 起:与 `contribution` 段并列的顶层段 `takenBreakdown` 的产出与缓存
+                               (段内自带 `schemaVersion`(1.7.30 起 `1.1`)、`basis nominal`;
+                               进行中的战斗每秒最多重算一次,已结束的战斗取 `Aggregator.History[0].Session` 且只算一次)
 
   Ui/                        悬浮窗
     OverlayUGUI*.cs            4 个 partial 文件,一个类
@@ -111,7 +113,8 @@ src/
     OverlayChart.cs            图表绘制(像素级曲线/网格)
     OverlayUI.cs               IMGUI 的 MonoBehaviour 壳
     TakenColumns.cs / TakenPageText.cs
-                               1.7.29:F3「受击来源拆分」页的列宽与行文本(纯模块,行为套件直接执行)
+                               1.7.29 起:F3「受击来源拆分」页的列宽与行文本(纯模块,行为套件直接执行;
+                               1.7.30 起每个受害单位的每个维度是一张子表,桶不折叠、受害单位也不扣人)
 
   Diagnostics/
     Probe.cs                   候选伤害路径计数器([PROBE] 输出),用于找"无来源伤害"

@@ -28,7 +28,7 @@ internal static class Program
 	/// them to be, the printed residual read from the game's own value with the `×0.242` counterfactual pinned,
 	/// the non-exclusion of the split and the residual on one row, and the `[ABSPROBE] note` sentences).
 	/// </summary>
-	public const int ExpectedCases = 1418;
+	public const int ExpectedCases = 1460;
 
 	private static int Main(string[] args)
 	{
@@ -121,6 +121,9 @@ internal static class Program
 		// R79: that projection's page -- the column geometry every padded row assumes, and the words (the
 		// residual is never called an absorption; a best-effort bucket carries its `*`).
 		Cases.TakenPageCases(r);
+		// R80: the BYTES of the exported section. R79's writer emitted unquoted string values and no
+		// compiled test could see the file it produced; this one parses it back.
+		Cases.TakenExportCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

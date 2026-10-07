@@ -303,6 +303,15 @@ TAKEN_STATUS_KEYS = [
 # 1 = 前衛, 2 = 後衛. Anything else means a reader is inventing a position.
 TAKEN_POSITIONS = (0, 1, 2)
 
+# R80 (1.7.30): the SAME section with no bucket cap -- a dimension lists every bucket instead of folding
+# its tail at 64. The shape is unchanged, so this is a version claim, not a new vocabulary: 1.0 means "a
+# dimension may end in a folded 其余 row", 1.1 means "it cannot". A 1.1 section inside an older export is
+# tolerated (a file is judged by the contract it declares), but a 1.7.30 export still claiming 1.0 is a
+# rejection -- an R80 reader that sees 1.0 must not assume the rows add up to the victim's nominal.
+TAKEN_SCHEMA_110 = (1, 1)
+TAKEN_PLUGIN_110 = (1, 7, 30)
+TAKEN_SCHEMAS = ('1.0', '1.1')
+
 
 def _isnum(x):
     return isinstance(x, (int, float)) and not isinstance(x, bool)
@@ -669,6 +678,20 @@ def _check_taken(d, problems, cov):
         problems.append('takenBreakdown.basis=%r (want nominal: the split runs over the game-invoked '
                         'nominal, not over the published taken)' % (sec.get('basis'),))
     cov['takenBreakdown.schemaVersion'] = sec.get('schemaVersion')
+    # R80 (1.7.30): the section stops folding a dimension's tail at 64 buckets, which changes what the
+    # rows MEAN -- before, a dimension could end in a 其余 row and a reader had to treat the list as
+    # partial; after, every bucket is present. Keyed on the section's own version (the contract travels
+    # with the data), with the plugin version as the fallback for a section that omits the claim.
+    _tsec_ver = sec.get('schemaVersion')
+    if isinstance(_tsec_ver, str) and _tsec_ver not in TAKEN_SCHEMAS:
+        problems.append('takenBreakdown.schemaVersion=%r is not one of %s' % (_tsec_ver, list(TAKEN_SCHEMAS)))
+    else:
+        _t110 = (_ver_tuple(_tsec_ver) >= TAKEN_SCHEMA_110) if _tsec_ver else \
+            (_ver_tuple(d.get('version', '0')) >= TAKEN_PLUGIN_110)
+        if not _t110 and _ver_tuple(d.get('version', '0')) >= TAKEN_PLUGIN_110:
+            problems.append('takenBreakdown.schemaVersion=%r but a %s export must declare 1.1: an R80 '
+                            'reader must not assume a dimension is complete'
+                            % (_tsec_ver, d.get('version')))
     cov['takenBreakdown.hits'] = sec.get('hits')
     cov['takenBreakdown.nominal'] = sec.get('nominal')
 
@@ -1163,23 +1186,25 @@ def _fixture_114():
 
 
 def _taken_base():
-    """A 1.7.29 export: everything the round gates require (paramOwners 1.7.2, atkAdd 1.7.4, config
+    """A 1.7.30 export: everything the round gates require (paramOwners 1.7.2, atkAdd 1.7.4, config
     1.7.12, hitDetail.matchRejected 1.7.14) so a case can only fail on the thing it is about."""
     d = _fixture_114()
-    d['version'] = '1.7.29'
+    d['version'] = '1.7.30'
     return d
 
 
-def _taken_fixture():
-    """A faithful R79 takenBreakdown section: two victims and every partition identity satisfied.
+def _taken_fixture(version='1.1'):
+    """A faithful R80 takenBreakdown section: two victims and every partition identity satisfied.
 
     Victim 1 (ally, position 1, key 1) took 300 nominal in two hits -- 200 from a resolvable attacker
     and 100 of same-team damage -- of which 240 landed. Victim 2 (enemy, position unreadable, key 2)
     has no resolvable attacker at all, which is the case that must NOT be folded into a unit bucket.
     Section totals: hits 3, nominal 350, taken 240, residual 110, friendly 100, unknown 50.
+
+    `version` defaults to 1.1 (R80): no dimension is capped, so the bucket lists are complete.
     """
     return {
-        'schemaVersion': '1.0', 'method': 'by-event/1', 'basis': 'nominal',
+        'schemaVersion': version, 'method': 'by-event/1', 'basis': 'nominal',
         'hits': 3, 'nominal': 350, 'taken': 240, 'residual': 110,
         'friendly': 100, 'friendlyHits': 1, 'unknown': 50, 'unknownHits': 1,
         'actors': [
@@ -1382,22 +1407,36 @@ def selftest():
     c_old['events'][0].pop('hitValue', None)
     cases.append(('accepts a 1.5.1 export with no contribution section', c_old, 0))
 
-    # ---- R79 (1.7.29): the incoming side of the ledger. The section is REQUIRED from 1.7.29 on and
-    # merely optional before it, and every identity it states is a claim the page reads aloud: the
+    # ---- R79 (1.7.29) takenBreakdown, extended by R80 (1.7.30). The section is REQUIRED from 1.7.29 on
+    # and merely optional before it, and every identity it states is a claim the page reads aloud: the
     # victim total must survive being split five ways, and the attacker dimension plus the two
     # unbucketed amounts must reconstruct it. A file that breaks one of those must be caught here,
-    # because on the page it would look like a plausible number.
+    # because on the page it would look like a plausible number. R80 added the schema claim itself: 1.1
+    # means "no dimension is capped", so an R80 export still calling itself 1.0 must be rejected.
     t_ok = _taken_base()
     t_ok['takenBreakdown'] = _taken_fixture()
-    cases.append(('accepts a well-formed 1.7.29 takenBreakdown section', t_ok, 0))
+    cases.append(('accepts a well-formed 1.7.30 takenBreakdown section (schema 1.1)', t_ok, 0))
 
     t_old = _fixture_114()
     t_old['takenBreakdown'] = _taken_fixture()
     cases.append(('accepts a 1.7.28 export carrying takenBreakdown (pre-R79 shape check only)',
                   t_old, 0))
 
+    t_10 = _taken_base()
+    t_10['version'] = '1.7.29'
+    t_10['takenBreakdown'] = _taken_fixture('1.0')
+    cases.append(('accepts a 1.7.29 export whose section still declares the capped 1.0 shape', t_10, 0))
+
     t_abs = _taken_base()
-    cases.append(('REJECTS a 1.7.29 export without takenBreakdown', t_abs, 1))
+    cases.append(('REJECTS a 1.7.30 export without takenBreakdown', t_abs, 1))
+
+    t_cap = _taken_base()
+    t_cap['takenBreakdown'] = _taken_fixture('1.0')
+    cases.append(('REJECTS a 1.7.30 export that still claims the capped 1.0 shape', t_cap, 1))
+
+    t_sv = _taken_base()
+    t_sv['takenBreakdown'] = _taken_fixture('2.0')
+    cases.append(('REJECTS a takenBreakdown schemaVersion outside the vocabulary', t_sv, 1))
 
     t_src = _taken_base()
     t_src['takenBreakdown'] = _taken_fixture()
@@ -1436,7 +1475,7 @@ def selftest():
     cases.append(('REJECTS a takenBreakdown over the wrong basis', t_b, 1))
 
     t_err = _taken_base()
-    t_err['takenBreakdown'] = {'schemaVersion': '1.0', 'method': 'by-event/1', 'basis': 'nominal',
+    t_err['takenBreakdown'] = {'schemaVersion': '1.1', 'method': 'by-event/1', 'basis': 'nominal',
                                'error': 'NullReferenceException: boom'}
     cases.append(('REJECTS a degraded takenBreakdown error stub', t_err, 1))
 

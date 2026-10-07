@@ -21,12 +21,12 @@ namespace DpsMeter;
 /// </summary>
 internal static class TakenBreakdownPolicy
 {
-	/// <summary>Most buckets kept per dimension per victim; the tail is folded into one row so one strange
-	/// battle cannot blow up the export or the page.</summary>
-	public const int MaxBuckets = 64;
-
-	/// <summary>Folded-tail bucket key. int.MinValue cannot collide with a real dimension value.</summary>
-	public const int FoldedKey = int.MinValue;
+	// R80: there is NO bucket cap any more. R79 kept 64 rows per dimension per victim and folded the tail
+	// into one row ("其他来源(N 项/M 击)"), which made the page unreadable for a battle with a few hundred
+	// sources -- and the export lost those rows too, because the page and the exported section are built by
+	// this same method. The dimension lists are now complete; Output/TakenSession writes schemaVersion 1.1
+	// for that shape, and the only remaining limit is that a victim's dimension lists can never be longer
+	// than the number of its own hits.
 
 	/// <summary>Was this hit's attacker unresolvable? The aggregator's unattributed branch is exactly the
 	/// case where it published no actor at all (Attr "?" and no actor row), so this is what it counted into
@@ -65,6 +65,11 @@ internal static class TakenBreakdownPolicy
 	{
 		var byKey = new Dictionary<int, TakenActor>();
 		var order = new List<TakenActor>();
+		// R80: one bucket index per victim, shared by the four dimensions and the status list. Bump used to
+		// scan its list linearly, which was affordable while every dimension stopped at 64 rows; with the cap
+		// gone that scan would be O(hits x buckets) and a long battle with a few hundred sources would pay
+		// for it on every recompute (the page recomputes at most once a second, over ALL events).
+		var index = new Dictionary<int, BucketIndex>();
 		if (hits != null)
 		{
 			for (int i = 0; i < hits.Count; i++)
@@ -83,7 +88,13 @@ internal static class TakenBreakdownPolicy
 					byKey[h.VictimKey] = a;
 					order.Add(a);
 				}
-				Add(a, h);
+				BucketIndex bi;
+				if (!index.TryGetValue(h.VictimKey, out bi))
+				{
+					bi = new BucketIndex();
+					index[h.VictimKey] = bi;
+				}
+				Add(a, h, bi);
 			}
 		}
 
@@ -112,7 +123,7 @@ internal static class TakenBreakdownPolicy
 		return res;
 	}
 
-	private static void Add(TakenActor a, TakenHit h)
+	private static void Add(TakenActor a, TakenHit h, BucketIndex index)
 	{
 		a.Hits++;
 		a.Nominal += h.Nominal;
@@ -136,43 +147,60 @@ internal static class TakenBreakdownPolicy
 			// Authoritative when the attacker came from the objects themselves (Attr A / A+O / O); the
 			// "C:calc*" fallback resolved it from recent calc activity and is best effort.
 			bool authoritative = !(h.Attr != null && h.Attr.StartsWith("C:", StringComparison.Ordinal));
-			Bump(a.ByAttacker, h.AttackerKey, h.Attacker, h.Nominal, authoritative);
+			Bump(a.ByAttacker, index.Attacker, h.AttackerKey, h.Attacker, h.Nominal, authoritative);
 		}
 
 		bool record = h.HitMatch == 1;
-		Bump(a.BySource, h.Source, DamageSourceLabelPolicy.Source(h.Source), h.Nominal, record);
-		Bump(a.ByHitType, h.HitType, HitTypeLabel(h.HitType), h.Nominal, record);
-		Bump(a.ByEffect, h.EffectId, EffectLabel(h.EffectId), h.Nominal, record);
+		Bump(a.BySource, index.Source, h.Source, DamageSourceLabelPolicy.Source(h.Source), h.Nominal, record);
+		Bump(a.ByHitType, index.HitType, h.HitType, HitTypeLabel(h.HitType), h.Nominal, record);
+		Bump(a.ByEffect, index.Effect, h.EffectId, EffectLabel(h.EffectId), h.Nominal, record);
 
 		if (!string.IsNullOrEmpty(h.Status))
 		{
-			TakenStatus s = null;
-			for (int i = 0; i < a.ByStatus.Count; i++)
-			{
-				TakenStatus c = a.ByStatus[i];
-				if (c.Status == h.Status && c.Applier == (h.StatusApplier ?? "")) { s = c; break; }
-			}
-			if (s == null)
+			string sk = StatusKey(h.Status, h.StatusApplier);
+			int at;
+			TakenStatus s;
+			if (!index.Status.TryGetValue(sk, out at))
 			{
 				s = new TakenStatus { Status = h.Status, Applier = h.StatusApplier ?? "" };
+				at = a.ByStatus.Count;
 				a.ByStatus.Add(s);
+				index.Status[sk] = at;
+			}
+			else
+			{
+				s = a.ByStatus[at];
 			}
 			s.Amount += h.Nominal;
 			s.Hits++;
 		}
 	}
 
-	private static void Bump(List<TakenBucket> list, int key, string name, long amount, bool authoritative)
+	/// <summary>The status list's bucket identity: the status NAME plus the applier the GAME recorded (a DoT's
+	/// applier is not necessarily the attacker of the hit that ticked it). NUL joins them, so a status whose
+	/// name ends in a digit cannot collide with a different applier.</summary>
+	private static string StatusKey(string status, string applier)
 	{
-		TakenBucket b = null;
-		for (int i = 0; i < list.Count; i++)
-		{
-			if (list[i].Key == key) { b = list[i]; break; }
-		}
-		if (b == null)
+		return status + "\0" + (applier ?? "");
+	}
+
+	/// <summary>Add one hit to a dimension bucket, finding the bucket through the index instead of scanning
+	/// the list (see the note in Build).</summary>
+	private static void Bump(List<TakenBucket> list, Dictionary<int, int> index, int key, string name, long amount,
+	                         bool authoritative)
+	{
+		int at;
+		TakenBucket b;
+		if (!index.TryGetValue(key, out at))
 		{
 			b = new TakenBucket { Key = key, Name = name ?? "" };
+			at = list.Count;
 			list.Add(b);
+			index[key] = at;
+		}
+		else
+		{
+			b = list[at];
 		}
 		b.Amount += amount;
 		b.Hits++;
@@ -182,10 +210,6 @@ internal static class TakenBreakdownPolicy
 	private static void Finish(TakenActor a)
 	{
 		a.Residual = a.Nominal - a.Taken;
-		Fold(a.BySource, "其他来源");
-		Fold(a.ByHitType, "其他属性");
-		Fold(a.ByAttacker, "其他来源单位");
-		Fold(a.ByEffect, "其他效果");
 		Sort(a.BySource);
 		Sort(a.ByHitType);
 		Sort(a.ByAttacker);
@@ -194,7 +218,7 @@ internal static class TakenBreakdownPolicy
 		Quality(a.ByHitType);
 		Quality(a.ByAttacker);
 		Quality(a.ByEffect);
-		FoldStatus(a);
+		SortStatus(a);
 	}
 
 	private static void Sort(List<TakenBucket> list)
@@ -218,27 +242,9 @@ internal static class TakenBreakdownPolicy
 		}
 	}
 
-	/// <summary>Keep the heaviest MaxBuckets-1 rows and fold the tail into one row, so the sum over the
-	/// dimension is still the victim's whole nominal total.</summary>
-	private static void Fold(List<TakenBucket> list, string tailName)
-	{
-		if (list.Count <= MaxBuckets) return;
-		Sort(list);
-		int keep = MaxBuckets - 1;
-		var tail = new TakenBucket { Key = FoldedKey, Name = tailName };
-		for (int i = keep; i < list.Count; i++)
-		{
-			tail.Amount += list[i].Amount;
-			tail.Hits += list[i].Hits;
-			tail.AuthoritativeHits += list[i].AuthoritativeHits;
-		}
-		int folded = list.Count - keep;
-		list.RemoveRange(keep, folded);
-		tail.Name = tailName + "(" + folded + " 项/" + tail.Hits + " 击)";
-		list.Add(tail);
-	}
-
-	private static void FoldStatus(TakenActor a)
+	/// <summary>R80: the status list is sorted, never folded -- every status/applier pair the battle produced
+	/// gets its own row on the page and its own object in the exported section.</summary>
+	private static void SortStatus(TakenActor a)
 	{
 		a.ByStatus.Sort(delegate (TakenStatus x, TakenStatus y)
 		{
@@ -248,14 +254,18 @@ internal static class TakenBreakdownPolicy
 			if (c != 0) return c;
 			return string.CompareOrdinal(x.Status, y.Status);
 		});
-		if (a.ByStatus.Count <= MaxBuckets) return;
-		var tail = new TakenStatus { Status = "其他状态", Applier = "" };
-		for (int i = MaxBuckets - 1; i < a.ByStatus.Count; i++)
-		{
-			tail.Amount += a.ByStatus[i].Amount;
-			tail.Hits += a.ByStatus[i].Hits;
-		}
-		a.ByStatus.RemoveRange(MaxBuckets - 1, a.ByStatus.Count - (MaxBuckets - 1));
-		a.ByStatus.Add(tail);
+	}
+
+	/// <summary>R80: the per-victim bucket lookup, one dictionary per dimension plus the status list. The
+	/// lists themselves stay the ordered output (Build sorts them once at the end); nothing is ever removed,
+	/// so a recorded position stays valid until the sort, after which the index is dropped with the victim.
+	/// Private and per-Build on purpose: it is bookkeeping, never something the model or the export sees.</summary>
+	private sealed class BucketIndex
+	{
+		public readonly Dictionary<int, int> Source = new Dictionary<int, int>();
+		public readonly Dictionary<int, int> HitType = new Dictionary<int, int>();
+		public readonly Dictionary<int, int> Attacker = new Dictionary<int, int>();
+		public readonly Dictionary<int, int> Effect = new Dictionary<int, int>();
+		public readonly Dictionary<string, int> Status = new Dictionary<string, int>();
 	}
 }

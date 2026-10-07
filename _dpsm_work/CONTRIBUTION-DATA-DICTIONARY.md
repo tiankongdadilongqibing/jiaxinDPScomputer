@@ -1112,6 +1112,18 @@ R71 算对了 lag,却因为**顺序**而每场都拒绝:它只在「本场第 2 
 - **口径不变**:1.7.23 与 1.7.22 的 `ActiveSeconds` 是同一条轴(游戏自己的战斗开始);变的只是**它现在真的被应用**。
   引用 1.7.23 之前的文件时,先看那一场的 `[CLOCK]` 行:`origin=none reason=events` 表示**那场仍是旧原点**。
 
+##### R80(插件 1.7.30):`takenBreakdown` 升到 `schemaVersion 1.1`,受击来源不再折叠,并修掉一个把导出写坏的真缺陷
+
+R79 的段形状有两个缺陷(看不全、活不过战斗),这一轮修掉;过程中还发现并修掉一个**让 1.7.29 的导出整体不可解析**的真缺陷。
+
+* **段自述版本 `1.0` → `1.1`**:唯一的差别是**维度不再有桶上限**(R79 每维每单位 64 桶、超出折叠成一条)。除版本号外,段级键、`actors[]` 键、桶键与单位一字未动 ⇒ 按 1.0 写的读取器读 1.1 仍得到同样字段,但**不许再假设某一维已经完整** —— 它现在确实完整。
+* **不再折叠**:`TakenBreakdownPolicy.MaxBuckets` / `FoldedKey` / `Fold(...)` 已删除;导出里的桶键随之不再需要「折叠行落盘成 `0`」这条特例(`key` 现在总是该维度的真实取值,`0` 恢复为字面值 0)。页面同步删除三个上限(最多 12 个受害单位、每行最多 3 个 part、每单位至多 5 条维度行):一个受害单位的一个维度就是一张子表 —— `TakenColumns.BSubHeader` 报该维度桶数、`BHeader` 列头、**每桶一行**、`BTotal("合计", …)` 收尾(该子表合计恒等于该单位的 `nominal`)。列宽 `BLineWidth = 76`(≤ 94 宽版面)。
+* **索引**:`Build` 为每个受害单位建一个 `BucketIndex`(Source/HitType/Attacker/Effect 四个 `Dictionary<int,int>` + Status 的 `Dictionary<string,int>`),命中经字典定位原桶 —— 无上限后线性扫描是 O(hits × buckets),实测某场 `其他攻击者(252)` 已给出量级。
+* **页面能看上一场**:`src/Output/TakenSession.cs` 的 `Get()` 原以 `Aggregator.Session` 为唯一入口,而 `EndSession` 与 teardown 都会把它置 null ⇒ 战斗一结束页面就空。现在与贡献表同一规则:`Aggregator.Session` 活着就用它,否则用 `Aggregator.History[0].Session`(**最近一场已结束战斗**;`BattleSummary.Session` 就是导出写过的那同一个对象,finalize 只清 `ActorStats.Source` 原生引用)。已结束战斗的事件表不再增长,故 1 s 节流只对进行中的战斗有意义(`TakenCachePolicy.IsStale` 新增 `live` 参数,非 live 传 `double.MaxValue`)。
+* **发现并修掉的真缺陷(1.7.29 写出的导出不是合法 JSON)**:R79 的 `TakenSession.cs` 有六处把 `JsonText.Str(...)` 直接拼进对象,而 `Str` **只转义、不加首尾引号**(全仓 101 处调用里只有这六处忘了自己写引号)⇒ 1.7.29 写出的每个 `takenBreakdown` 段都是 `"name":T.O.W.E.R.typeR` 这种**非法 JSON**,任何解析器都读不了(页面读的是内存模型,所以看不出)。**冻结验收语料 `batch_inputs\rf0` 的 35 份全部早于 R79、不含这一段**,因此 R79 的全部闸门对它是盲的;线上语料 schema 检查抓到。现在六处显式加引号,并新增 `tests/BehaviorTests/Cases.TakenExport.cs` —— 它**用 `System.Text.Json` 把 `AppendJson` 的字节解析回来**(为此 `src/Output/TakenSession.cs` 进入行为套件的编译集)。
+* **Home/End**:滚动新增 Home(跳到顶)/ End(跳到尾);F3 进入/返回与 `Shift+F3`(只看前衛)不变。
+* **未做(引用注意)**:不改任何已发布数值与键名(`contribution.schemaVersion` 仍 **1.2**,历史导出一字未动);不做 `←/→` 回看更早场次;不做跨进程落盘(已导出的 `takenBreakdown` 段就是落盘形态);不做行虚拟化(文本池按需增长、从不收缩,长战斗只是多占内存)。
+
 ##### R79(插件 1.7.29):顶层新段 `takenBreakdown` —— 每个单位挨的伤害分别来自谁/什么
 
 这一段回答的问题与 `contribution` 段不同:那段算「谁打出了多少」,这段算「谁挨了多少、由谁造成、算在哪一类里」。它是只读投影,**没有新增任何 Harmony 钩子**;除「站位」外没有新的运行期读取。

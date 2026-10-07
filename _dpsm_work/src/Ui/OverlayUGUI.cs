@@ -351,6 +351,11 @@ public static partial class OverlayUGUI
 		if (((uint)GetAsyncKeyState(34) & 0x8000u) != 0) _scrollOffset += 900f * num;   // PageDown -> later
 		if (((uint)GetAsyncKeyState(38) & 0x8000u) != 0) _scrollOffset -= 360f * num;   // Up
 		if (((uint)GetAsyncKeyState(40) & 0x8000u) != 0) _scrollOffset += 360f * num;   // Down
+		// R80: the 受击来源拆分 page can be thousands of rows long, so walking to its ends with the arrow
+		// keys is not a usable way to reach them. Home/End jump straight to the first/last row; the clamp
+		// below turns End's MaxValue into the real bottom offset, so neither can scroll past the content.
+		if (((uint)GetAsyncKeyState(36) & 0x8000u) != 0) _scrollOffset = 0f;            // Home -> first row
+		if (((uint)GetAsyncKeyState(35) & 0x8000u) != 0) _scrollOffset = float.MaxValue; // End -> last row
 
 		if (!_scrollable) _scrollOffset = 0f;
 		else

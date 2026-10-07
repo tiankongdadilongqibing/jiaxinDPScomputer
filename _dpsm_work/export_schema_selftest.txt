@@ -22,9 +22,12 @@ PASS REJECTS totals.taken != dealt+unattributedDamage     caught=2  [totals iden
 PASS accepts a per-hit givenFoldOn                        caught=0
 PASS REJECTS a non-boolean per-hit givenFoldOn            caught=1  [calc.givenFoldOn type=str want=bool (first hit t=1.0)]
 PASS accepts a 1.5.1 export with no contribution section  caught=0
-PASS accepts a well-formed 1.7.29 takenBreakdown section  caught=0
+PASS accepts a well-formed 1.7.30 takenBreakdown section (schema 1.1) caught=0
 PASS accepts a 1.7.28 export carrying takenBreakdown (pre-R79 shape check only) caught=0
-PASS REJECTS a 1.7.29 export without takenBreakdown       caught=1  [root.takenBreakdown (since 1.7.29)]
+PASS accepts a 1.7.29 export whose section still declares the capped 1.0 shape caught=0
+PASS REJECTS a 1.7.30 export without takenBreakdown       caught=1  [root.takenBreakdown (since 1.7.29)]
+PASS REJECTS a 1.7.30 export that still claims the capped 1.0 shape caught=1  [takenBreakdown.schemaVersion='1.0' but a 1.7.30 export must declare 1.1: an R80 reader must not assume a dimension is complete]
+PASS REJECTS a takenBreakdown schemaVersion outside the vocabulary caught=1  [takenBreakdown.schemaVersion='2.0' is not one of ['1.0', '1.1']]
 PASS REJECTS a bySource that does not sum to the victim nominal caught=1  [takenBreakdown.actors[0].bySource sums to 201 but the victim nominal is 300: the partition must cover the whole victim total]
 PASS REJECTS a victim whose byAttacker+friendly+unknown != nominal caught=1  [takenBreakdown.actors[0]: byAttacker(100)+friendly(100)+unknown(0) != nominal(300)]
 PASS REJECTS a section whose taken+residual != nominal    caught=2  [takenBreakdown identity broken: taken(100)+residual(110) != nominal(350); takenBreakdown.taken(100) != sum over actors(240)]

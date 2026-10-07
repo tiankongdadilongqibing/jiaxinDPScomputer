@@ -45,10 +45,29 @@ internal static class TakenSession
 		_cacheGen = -1;
 	}
 
-	/// <summary>The current session's breakdown, or null when there is no session.</summary>
+	/// <summary>
+	/// The breakdown the PAGE shows: the live session while one is running, otherwise the most recent
+	/// FINISHED battle -- the same rule and the same source the contribution board uses (Ui/OverlayUGUI
+	/// SessionForView / ResolveContributionView read Aggregator.History[0]).
+	///
+	/// R80 fixed a real defect here: R79 resolved through <see cref="Aggregator.Session"/> only, and both
+	/// EndSession and the teardown set that to null, so the page went blank the moment a battle ended -- the
+	/// numbers were never lost, the view simply refused to look. The finished battle keeps its own
+	/// BattleSession (BattleSummary.Session, the very object the export wrote), and Compute only reads
+	/// Events and OrderedActors, both of which survive finalisation (only the actors' live BattleObject
+	/// references are dropped). Reading the summary's own session rather than a BattleSession.FromSummary
+	/// copy is also what keeps the reference-keyed cache below usable.
+	///
+	/// Returns null only when there is neither a live session nor a finished battle to show.
+	/// </summary>
 	public static TakenBreakdown Get()
 	{
 		BattleSession s = Aggregator.Session;
+		if (s == null && Aggregator.History.Count > 0)
+		{
+			BattleSummary last = Aggregator.History[0];
+			if (last != null) s = last.Session;
+		}
 		if (s == null)
 		{
 			Clear();
@@ -56,7 +75,7 @@ internal static class TakenSession
 		}
 		double now = Time.realtimeSinceStartup;
 		if (_cache == null || TakenCachePolicy.IsStale(ReferenceEquals(_cacheSession, s), _cacheEvents, s.Events.Count,
-		                                                _cacheAt, now, _cacheGen, Generation))
+		                                                s.InBattle, _cacheAt, now, _cacheGen, Generation))
 		{
 			_cache = Compute(s);
 			_cacheSession = s;
@@ -131,7 +150,11 @@ internal static class TakenSession
 	{
 		TakenBreakdown b = Compute(s);
 		sb.Append('{');
-		sb.Append("\"schemaVersion\":\"1.0\",");
+		// R80: 1.0 -> 1.1. The only difference is that a dimension can no longer fold its tail into one row,
+		// so `byAttacker`/`bySource`/`byHitType`/`byEffect`/`byStatus` now carry every distinct bucket the
+		// battle produced (R79 stopped at 64). Every other key, unit and identity is unchanged, and the
+		// contribution section's own schemaVersion stays 1.2.
+		sb.Append("\"schemaVersion\":\"1.1\",");
 		sb.Append("\"method\":\"").Append(TakenBreakdown.Method).Append("\",");
 		sb.Append("\"basis\":\"").Append(TakenBreakdown.Basis).Append("\",");
 		sb.Append("\"hits\":").Append(b.Hits).Append(',');
@@ -155,11 +178,15 @@ internal static class TakenSession
 	{
 		sb.Append('{');
 		sb.Append("\"key\":").Append(a.Key).Append(',');
-		sb.Append("\"name\":").Append(JsonText.Str(a.Name)).Append(',');
+		// R80 fixes the quoting: JsonText.Str ESCAPES but does not add the surrounding quotes (see its own
+		// doc comment), and R79 wrote these six fields straight into the object -- which made every
+		// takenBreakdown section valid-looking but unparseable JSON. The frozen acceptance corpus predates
+		// R79, so no gate in that round could see it; the live-corpus schema check caught it.
+		sb.Append("\"name\":\"").Append(JsonText.Str(a.Name)).Append("\",");
 		sb.Append("\"team\":").Append(a.Team).Append(',');
 		sb.Append("\"ally\":").Append(a.Ally ? "true" : "false").Append(',');
 		sb.Append("\"position\":").Append(a.Position).Append(',');
-		sb.Append("\"positionLabel\":").Append(JsonText.Str(TakenBreakdownPolicy.PositionLabel(a.Position))).Append(',');
+		sb.Append("\"positionLabel\":\"").Append(JsonText.Str(TakenBreakdownPolicy.PositionLabel(a.Position))).Append("\",");
 		sb.Append("\"hits\":").Append(a.Hits).Append(',');
 		sb.Append("\"nominal\":").Append(a.Nominal).Append(',');
 		sb.Append("\"taken\":").Append(a.Taken).Append(',');
@@ -181,8 +208,8 @@ internal static class TakenSession
 		{
 			if (i > 0) sb.Append(',');
 			TakenStatus t = a.ByStatus[i];
-			sb.Append("{\"status\":").Append(JsonText.Str(t.Status));
-			sb.Append(",\"applier\":").Append(JsonText.Str(t.Applier));
+			sb.Append("{\"status\":\"").Append(JsonText.Str(t.Status)).Append('"');
+			sb.Append(",\"applier\":\"").Append(JsonText.Str(t.Applier)).Append('"');
 			sb.Append(",\"amount\":").Append(t.Amount);
 			sb.Append(",\"hits\":").Append(t.Hits).Append('}');
 		}
@@ -196,13 +223,13 @@ internal static class TakenSession
 		{
 			if (i > 0) sb.Append(',');
 			TakenBucket b = list[i];
-			// A folded tail carries int.MinValue as its key; emit 0 instead so the file stays readable as
-			// unsigned arithmetic by anything that parses it.
-			sb.Append("{\"key\":").Append(b.Key == TakenBreakdownPolicy.FoldedKey ? 0 : b.Key);
-			sb.Append(",\"name\":").Append(JsonText.Str(b.Name));
+			// R80: no folded tail exists any more, so every key is the real bucket key (0 now means a real
+			// bucket whose value is 0, which is why the old int.MinValue -> 0 rewrite had to go).
+			sb.Append("{\"key\":").Append(b.Key);
+			sb.Append(",\"name\":\"").Append(JsonText.Str(b.Name)).Append('"');
 			sb.Append(",\"amount\":").Append(b.Amount);
 			sb.Append(",\"hits\":").Append(b.Hits);
-			sb.Append(",\"quality\":").Append(JsonText.Str(b.Quality)).Append('}');
+			sb.Append(",\"quality\":\"").Append(JsonText.Str(b.Quality)).Append("\"}");
 		}
 		sb.Append(']');
 	}

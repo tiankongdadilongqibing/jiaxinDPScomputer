@@ -108,9 +108,11 @@ internal static partial class Cases
 		r.Str("a-value-exact-record-is-not-marked",
 			TkFind(tvr.Actors[0].BySource, 1).Quality, "");
 
-		// ---- the fold keeps the dimension's sum equal to the total -------------------------------------
+		// ---- R80: a dimension has NO bucket cap, and the new dictionary index still merges equal keys ----
+		// R79 stopped at 64 buckets and folded the tail into 其他来源(N 项/M 击), which truncated the export
+		// as well as the page. The page's whole purpose is the per-source breakdown, so the cap is gone.
 		var many = new List<TakenHit>();
-		for (int i = 0; i < TakenBreakdownPolicy.MaxBuckets + 3; i++)
+		for (int i = 0; i < 200; i++)
 		{
 			TakenHit h = TkHit(7, "甲", 1, 1);
 			h.Source = i;
@@ -118,16 +120,32 @@ internal static partial class Cases
 		}
 		TakenBreakdown tm = TakenBreakdownPolicy.Build(many, 1);
 		TakenActor ma = tm.Actors[0];
-		r.Eq("the-fold-caps-the-bucket-count", ma.BySource.Count, TakenBreakdownPolicy.MaxBuckets);
-		r.Eq("a-folded-dimension-still-sums-to-the-total", TkSum(ma.BySource), ma.Nominal);
-		// The folded row is NOT positionally last: Finish folds and then sorts by amount, so a folded tail
-		// heavier than any kept row legitimately moves to the front (here: 4 x 1 against 63 x 1). It is found
-		// by its own key, which is the only thing that identifies it.
-		TakenBucket tail = TkFind(ma.BySource, TakenBreakdownPolicy.FoldedKey);
-		r.True("the-folded-tail-is-addressable-by-its-own-key", tail != null);
-		r.Str("the-folded-tail-counts-what-it-ate", tail.Name, "其他来源(4 项/4 击)");
-		r.Eq("the-folded-tail-carries-their-amount", tail.Amount, 4);
-		r.Eq("the-folded-tail-carries-their-hits", tail.Hits, 4);
+		r.Eq("every-distinct-source-gets-its-own-bucket", ma.BySource.Count, 200);
+		r.Eq("an-uncapped-dimension-still-sums-to-the-total", TkSum(ma.BySource), ma.Nominal);
+		r.True("no-folded-tail-row-exists-any-more", TkFind(ma.BySource, int.MinValue) == null);
+
+		// The lookup is a dictionary now (R79 scanned the list per hit: O(hits x buckets), which 200+
+		// buckets made the dominant cost). A repeated key must still land in exactly ONE bucket, and the
+		// index must stay per victim -- one victim's buckets must never absorb another's.
+		var repeat = new List<TakenHit>();
+		for (int i = 0; i < 50; i++)
+		{
+			TakenHit h1 = TkHit(7, "甲", 2, 2);
+			h1.Source = 3;
+			repeat.Add(h1);
+			TakenHit h2 = TkHit(9, "乙", 5, 5);
+			h2.Source = 4;
+			repeat.Add(h2);
+		}
+		TakenBreakdown tr = TakenBreakdownPolicy.Build(repeat, 1);
+		TakenActor rb = tr.Actors[0];   // 乙: 50 x 5
+		TakenActor ra = tr.Actors[1];   // 甲: 50 x 2
+		r.Eq("a-repeated-key-still-merges-into-one-bucket", ra.BySource.Count, 1);
+		r.Eq("the-merged-bucket-carries-every-hit", TkFind(ra.BySource, 3).Hits, 50);
+		r.Eq("the-merged-bucket-carries-their-amount", TkFind(ra.BySource, 3).Amount, 100);
+		r.Eq("another-victim-keeps-its-own-buckets", rb.BySource.Count, 1);
+		r.Eq("and-its-own-amount", TkFind(rb.BySource, 4).Amount, 250);
+		r.Eq("the-index-does-not-leak-across-victims", ra.BySource[0].Key, 3);
 
 		// ---- ordering is by size, never by event order -------------------------------------------------
 		var mixed = new List<TakenHit>();

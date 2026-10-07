@@ -353,6 +353,33 @@ public static partial class OverlayUGUI
 	private static ContributionView _prevSummaryView;
 	private static bool _prevSummaryUsedFolds;
 
+	// ---------------------------------------------------------------------------------------------
+	// R80: the 受击来源拆分 page is unbounded now -- every victim (R79 stopped at 12) and every bucket
+	// (R79 printed three per dimension and folded the rest, under a 64-bucket cap that also truncated the
+	// export). A mid-size fight therefore renders a few THOUSAND lines, and BuildRows() runs every 0.25 s,
+	// so re-deriving those strings per refresh would be the panel's entire cost. The list is memoised on
+	// the three things that can change it -- the breakdown instance, the vanguard filter and whether a
+	// battle is live -- the same way ResolveContributionView memoises its view per finished summary.
+	// Reusing the list also means the strings are the SAME instances between refreshes, which lets Unity's
+	// Text.text setter short-circuit on equality instead of re-uploading a mesh for every row.
+	// ---------------------------------------------------------------------------------------------
+	private static TakenBreakdown _takenLinesFor;
+	private static bool _takenLinesVanguardOnly;
+	private static bool _takenLinesInBattle;
+	private static List<TakenLine> _takenLines;
+
+	private static List<TakenLine> ResolveTakenLines(TakenBreakdown b, bool vanguardOnly, bool inBattle)
+	{
+		if (_takenLines != null && ReferenceEquals(_takenLinesFor, b) && _takenLinesVanguardOnly == vanguardOnly
+		    && _takenLinesInBattle == inBattle)
+			return _takenLines;
+		_takenLines = TakenPageText.Lines(b, vanguardOnly, inBattle);
+		_takenLinesFor = b;
+		_takenLinesVanguardOnly = vanguardOnly;
+		_takenLinesInBattle = inBattle;
+		return _takenLines;
+	}
+
 	internal static ContributionView ResolveContributionView(bool useFolds)
 	{
 		ContributionView live = ContributionSession.Get(useFolds);
@@ -1110,12 +1137,15 @@ public static partial class OverlayUGUI
 			rows.Add(new RowDef
 			{
 				Text = "受击来源拆分  F3返回  Shift+F3 " + (_takenVanguardOnly ? "只看前衛(开)" : "只看前衛")
-				     + "  任务 " + tQuest + "   " + BattleTime.Seconds(tSeconds),
+				     + "  Home/End 首尾  任务 " + tQuest + "   " + BattleTime.Seconds(tSeconds),
 				Color = HeaderColor, Height = 20f,
 			});
 			AppendBattleRefRow(rows, DisplayedRef(inBattle), tQuest, inBattle ? "本场 " : "上一场 ");
 			int firstRow = rows.Count;
-			List<TakenLine> taken = TakenPageText.Lines(TakenSession.Get(), _takenVanguardOnly, inBattle);
+			// R80: the page shows the PREVIOUS battle once a fight is over (TakenSession.Get resolves the
+			// live session first, then Aggregator.History[0]), so "上一场" is what this header means when
+			// inBattle is false -- and the list is memoised, see ResolveTakenLines.
+			List<TakenLine> taken = ResolveTakenLines(TakenSession.Get(), _takenVanguardOnly, inBattle);
 			for (int i = 0; i < taken.Count; i++)
 				rows.Add(new RowDef { Text = taken[i].Text, Color = TakenColor(taken[i].Style), Height = 16f });
 			// the table aligns by padding with spaces: exact only on the mono font's 1:2 grid

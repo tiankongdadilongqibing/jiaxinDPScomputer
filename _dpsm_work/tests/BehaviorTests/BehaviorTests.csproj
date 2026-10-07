@@ -141,9 +141,13 @@
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType
          BattleSession -> GameRef/CharacterInfo/BattleObject/TeamType/GameResult
-         ContributionSession -> UnityEngine.Time + Aggregator.Session -->
+         ContributionSession -> UnityEngine.Time + Aggregator.Session
+         TakenSession -> the same, plus Aggregator.History (R80: the page outlives the battle).
+         R80 added the last one BECAUSE it was missing: its JSON writer shipped in R79 with unquoted
+         string values, and no compiled test could see the bytes it produced. -->
     <Compile Include="$(SrcRoot)\Model\HitRecord.cs" />
     <Compile Include="$(SrcRoot)\Model\BattleSession.cs" />
     <Compile Include="$(SrcRoot)\Output\ContributionSession.cs" />
+    <Compile Include="$(SrcRoot)\Output\TakenSession.cs" />
   </ItemGroup>
 </Project>

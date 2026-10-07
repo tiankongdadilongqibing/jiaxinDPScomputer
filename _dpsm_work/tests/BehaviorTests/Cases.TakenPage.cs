@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DpsMeter;
 
@@ -6,13 +7,18 @@ namespace BehaviorTests;
 internal static partial class Cases
 {
 	/// <summary>
-	/// R79: the 受击来源拆分 page's geometry and text (`Ui/TakenColumns.cs`, `Ui/TakenPageText.cs`).
+	/// R79 built the 受击来源拆分 page, R80 made it COMPLETE (every victim, every bucket). The geometry and
+	/// text of `Ui/TakenColumns.cs` / `Ui/TakenPageText.cs` are checked here.
 	///
-	/// Two things are checked here that a screenshot cannot settle. First the WIDTH: every cell is padded on the
+	/// Two things are checked that a screenshot cannot settle. First the WIDTH: every cell is padded on the
 	/// assumption that a CJK glyph is two columns and an ASCII one is one, so a row whose measured width differs
 	/// from its own header drifts column by column -- exactly the defect R69/R78 chased in the contribution
 	/// table. Second the WORDS: the residual (超出剩余耐久) must never be printed as an absorption, and a
 	/// best-effort bucket must carry its `*`, because both would otherwise read as measurements.
+	///
+	/// R80's own subject is that NOTHING is summarised away: no victim cap, no three-bucket fold, and every
+	/// dimension's sub-table closes on a total that must equal the victim's whole nominal (the model's
+	/// invariant, re-checked here on the strings that actually reach the panel).
 	/// </summary>
 	internal static void TakenPageCases(Runner r)
 	{
@@ -33,20 +39,34 @@ internal static partial class Cases
 			DisplayFormat.DispWidth(TakenColumns.T1Row("站位未知", "非常に長い名前のボスキャラクター", 1, 1, 0, 1, 100.0)),
 			TakenColumns.T1LineWidth);
 
-		// The per-dimension lines are variable-length, so their bound is the panel: the contribution page's
-		// widest table is 94 columns and R79 puts this page on the same panel width.
-		var worst = new List<string>();
-		worst.Add(TakenColumns.BucketPart("非常に長いボス名の単位", 1234567890123L, true));
-		worst.Add(TakenColumns.BucketPart("もう一つの長い名前", 987654321098L, true));
-		worst.Add(TakenColumns.RestPart(97, 555555555555L));
-		r.True("a-worst-case-dimension-line-fits-the-wide-panel",
-			DisplayFormat.DispWidth(TakenColumns.DimensionLine("单位", worst)) <= 94);
+		// ---- the bucket sub-table: one row per bucket, on its own pinned geometry ----------------------
+		r.Eq("the-bucket-row-width-is-pinned", TakenColumns.BLineWidth, 76);
+		r.True("the-bucket-table-fits-the-wide-panel", TakenColumns.BLineWidth <= 94);
+		r.Eq("the-bucket-header-is-exactly-one-row-wide",
+			DisplayFormat.DispWidth(TakenColumns.BHeader()), TakenColumns.BLineWidth);
+		r.Eq("a-bucket-row-is-exactly-one-row-wide",
+			DisplayFormat.DispWidth(TakenColumns.BRow("ボス", 1234567890123L, 42, 48.6, false)),
+			TakenColumns.BLineWidth);
+		r.Eq("the-sub-table-total-is-exactly-one-row-wide",
+			DisplayFormat.DispWidth(TakenColumns.BTotal("合计", 6000000, 42)), TakenColumns.BLineWidth);
+		// The `*` is cut INTO the name cell, so a marked row can never be one column wider than an exact one.
+		string wideName = new string('あ', 40);   // 80 columns: longer than the 46-column cell
+		string wideRow = TakenColumns.BRow(wideName, 1, 1, 100.0, true);
+		r.True("an-overlong-bucket-name-is-cut", !wideRow.Contains(wideName));
+		r.True("an-overlong-bucket-name-is-still-marked", TkCells(wideRow)[0].EndsWith("*"));
+		r.Eq("a-marked-overlong-name-does-not-widen-the-row",
+			DisplayFormat.DispWidth(wideRow), TakenColumns.BLineWidth);
 
-		// ---- the fold marker: an approximation may not look like a measurement -------------------------
-		r.Str("an-approximate-bucket-is-marked", TakenColumns.BucketPart("ショゴス", 500000, true), "ショゴス* 500,000");
-		r.Str("an-exact-bucket-carries-no-marker", TakenColumns.BucketPart("ポポロット", 90676, false), "ポポロット 90,676");
-		r.Str("an-overlong-bucket-name-is-cut-and-still-marked",
-			TakenColumns.BucketPart("非常に長いボスの名前です", 1, true), "非常に長い..* 1");
+		// ---- the approximation marker: an estimate may not look like a measurement ---------------------
+		r.Str("an-approximate-bucket-is-marked", TkCells(TakenColumns.BRow("ショゴス", 500000, 3, 50.0, true))[0],
+			"ショゴス*");
+		r.Str("an-exact-bucket-carries-no-marker", TkCells(TakenColumns.BRow("ポポロット", 90676, 3, 50.0, false))[0],
+			"ポポロット");
+		r.Str("a-short-bucket-name-is-left-alone",
+			TkCells(TakenColumns.BRow("非常に長いボスの名前です", 1, 1, 100.0, true))[0],
+			"非常に長いボスの名前です*");
+		r.Str("the-sub-header-states-the-bucket-count", TakenColumns.BSubHeader("单位(攻击者)", 253),
+			"  - 单位(攻击者)  253 项");
 
 		// ---- the page ----------------------------------------------------------------------------------
 		List<TakenLine> lines = TakenPageText.Lines(TkSample(), false, true);
@@ -71,30 +91,39 @@ internal static partial class Cases
 			TakenPageText.Lines(TkSample(), true, true)[0].Text,
 			"击 4   受击(游戏口径) 450   已发布 450   超出剩余耐久 0");
 
-		// ---- the cap is stated, not silent -------------------------------------------------------------
-		List<TakenLine> many = TakenPageText.Lines(TkManyVictims(TakenPageText.ShownVictims + 3), false, true);
-		r.Eq("the-cap-is-twelve", TakenPageText.ShownVictims, 12);
-		r.True("the-dropped-victims-are-named-with-a-count", TkAny(many, "另有 3 人"));
-		r.True("and-the-page-points-at-the-export-that-has-them", TkAny(many, "takenBreakdown"));
-		r.Eq("the-shown-victim-rows-stop-at-the-cap", TkRows(many), TakenPageText.ShownVictims);
-		r.Eq("no-cap-line-when-nothing-was-dropped", TkCount(lines, "另有"), 0);
+		// ---- R80: every victim is printed, there is no cap and no cap line ------------------------------
+		List<TakenLine> many = TakenPageText.Lines(TkManyVictims(15), false, true);
+		r.Eq("every-victim-gets-a-row", TkRows(many), 15);
+		r.Eq("nothing-is-dropped-from-the-page", TkCount(many, "另有"), 0);
+		r.Eq("no-longer-points-at-the-export-for-missing-rows", TkCount(many, "人(导出"), 0);
 
-		// ---- the empty states --------------------------------------------------------------------------
-		r.Str("an-empty-battle-says-what-is-missing",
-			TakenPageText.Lines(null, false, true)[0].Text, "  本场还没有受击记录(还没有人挨打)");
-		r.Str("outside-a-battle-the-page-says-so",
-			TakenPageText.Lines(null, false, false)[0].Text, "  不在战斗中;受击来源拆分只在战斗中累积");
-		r.Str("an-empty-section-outside-a-battle-still-says-so",
-			TakenPageText.Lines(new TakenBreakdown(), false, false)[0].Text,
-			"  不在战斗中;受击来源拆分只在战斗中累积");
+		// ---- R80: no three-bucket fold either -- a dimension prints one row per bucket ------------------
+		List<TakenLine> wide = TakenPageText.Lines(TkFiveSources(), false, true);
+		r.True("a-five-bucket-dimension-states-five", TkAny(wide, "  - 种类(DamageSource)  5 项"));
+		r.Eq("nothing-is-folded-into-a-remainder-row", TkCount(wide, "其余"), 0);
+		r.Eq("the-five-buckets-are-five-rows", TkBucketRows(wide, "  - 种类(DamageSource)"), 5);
+
+		// ---- the sub-table totals are the model's invariant, on the strings the panel shows ------------
+		r.Str("the-attacker-subtable-totals-the-victims-nominal",
+			TkSubTotal(lines, "  - 单位(攻击者)", 0), "300");
+		r.Str("the-source-subtable-totals-it-too", TkSubTotal(lines, "  - 种类(DamageSource)", 0), "300");
+		r.Str("the-hit-type-subtable-totals-it-too", TkSubTotal(lines, "  - 属性(eDamageCalcType)", 0), "300");
+		r.Str("the-effect-subtable-totals-it-too", TkSubTotal(lines, "  - 效果(m_effectId)", 0), "300");
+		r.Str("the-second-victims-subtable-totals-its-own-nominal",
+			TkSubTotal(lines, "  - 单位(攻击者)", 1), "50");
+		// Every sub-table prints its own total, so none can silently lose a row. The ninth 合计 is the page's
+		// own victim-total row. 其余 is absent on purpose: R79 used it for the folded tail, and there is none.
+		r.Eq("every-sub-table-closes-on-a-total", TkCount(lines, "  合计"), 9);
 
 		// ---- the per-victim block ----------------------------------------------------------------------
-		r.True("the-block-lists-the-source-dimension", TkAny(lines, "  - 种类  "));
-		r.True("the-block-lists-the-attacker-dimension", TkAny(lines, "  - 单位  "));
-		r.True("the-block-lists-the-hit-type-dimension", TkAny(lines, "  - 属性  "));
-		r.True("the-block-lists-the-effect-dimension", TkAny(lines, "  - 效果  "));
-		r.True("the-legend-says-the-dimensions-are-not-all-authoritative", TkAny(lines, "带 * 的只对该维度的部分命中权威"));
-		r.True("the-legend-names-the-export-section-it-mirrors", TkAny(lines, "(每秒最多重算一次;数字与导出的 takenBreakdown 段同源)"));
+		r.True("the-block-lists-the-source-dimension", TkAny(lines, "  - 种类(DamageSource)"));
+		r.True("the-block-lists-the-attacker-dimension", TkAny(lines, "  - 单位(攻击者)"));
+		r.True("the-block-lists-the-hit-type-dimension", TkAny(lines, "  - 属性(eDamageCalcType)"));
+		r.True("the-block-lists-the-effect-dimension", TkAny(lines, "  - 效果(m_effectId)"));
+		r.True("the-block-prints-a-column-header", TkAny(lines, "名字"));
+		r.True("the-legend-says-the-dimensions-are-not-all-authoritative", TkAny(lines, "带 * 的名字只对该维度的部分命中权威"));
+		r.True("the-legend-names-the-export-section-it-mirrors", TkAny(lines, "数字与导出的 takenBreakdown 段同源"));
+		r.True("the-unread-effect-id-is-not-invented", TkAny(lines, "未识别"));
 
 		// A friendly/unknown amount must be visible as such: they are IN the total but belong to no attacker.
 		var mixed = new List<TakenHit>();
@@ -105,13 +134,23 @@ internal static partial class Cases
 		un.AttackerKey = 0; un.Attacker = ""; un.Attr = "?";
 		mixed.Add(un);
 		List<TakenLine> odd = TakenPageText.Lines(TakenBreakdownPolicy.Build(mixed, 1), false, true);
-		r.True("the-two-odd-amounts-get-their-own-line", TkAny(odd, "  - 其他  "));
+		r.True("the-two-odd-amounts-get-their-own-table", TkAny(odd, "  - 其他(不属于任何攻击者桶)  2 项"));
 		r.True("friendly-damage-is-named", TkAny(odd, "同队自伤"));
-		r.True("an-unresolvable-attacker-is-named", TkAny(odd, "攻击者不明 50(1 击)"));
+		r.True("an-unresolvable-attacker-is-named", TkAny(odd, "攻击者不明"));
+		r.Str("and-the-odd-table-totals-them", TkSubTotal(odd, "  - 其他(不属于任何攻击者桶)", 0), "150");
+
+		// ---- the empty states --------------------------------------------------------------------------
+		r.Str("an-empty-battle-says-what-is-missing",
+			TakenPageText.Lines(null, false, true)[0].Text, "  本场还没有受击记录(还没有人挨打)");
+		r.Str("outside-a-battle-the-page-no-longer-claims-it-only-accumulates-live",
+			TakenPageText.Lines(null, false, false)[0].Text, "  没有可看的受击记录(本场与上一场都没有)");
+		r.Str("an-empty-section-outside-a-battle-says-the-same",
+			TakenPageText.Lines(new TakenBreakdown(), false, false)[0].Text,
+			"  没有可看的受击记录(本场与上一场都没有)");
 	}
 
 	/// <summary>Two of our units (one 前衛 hit twice, one 後衛) plus one enemy victim: enough to exercise every
-	/// summary line and both filters.</summary>
+	/// summary line and both filters. レヴァナント carries 300 nominal over two sources but one attacker.</summary>
 	private static TakenBreakdown TkSample()
 	{
 		var hits = new List<TakenHit>();
@@ -142,6 +181,23 @@ internal static partial class Cases
 		return TakenBreakdownPolicy.Build(hits, 1);
 	}
 
+	/// <summary>One victim with five DISTINCT DamageSource values -- R79 printed three and folded the rest.</summary>
+	private static TakenBreakdown TkFiveSources()
+	{
+		var hits = new List<TakenHit>();
+		for (int i = 0; i < 5; i++)
+		{
+			TakenHit h = TkPageHit(1, "甲", 10, 10);
+			h.Position = 1;
+			h.Source = i + 1;
+			h.AttackerKey = 10 + i;
+			h.Attacker = "敵" + i;
+			h.HitMatch = 1;
+			hits.Add(h);
+		}
+		return TakenBreakdownPolicy.Build(hits, 1);
+	}
+
 	private static TakenHit TkPageHit(int victimKey, string victim, long nominal, long amount)
 	{
 		var h = new TakenHit();
@@ -158,6 +214,54 @@ internal static partial class Cases
 		h.Nominal = nominal;
 		h.Amount = amount;
 		return h;
+	}
+
+	/// <summary>The whitespace-separated cells of a built row. Every column is space padded, and no name in
+	/// these cases contains a space, so this is the row's own column split.</summary>
+	private static string[] TkCells(string row)
+	{
+		return row.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+	}
+
+	/// <summary>The amount cell of the sub-table that <paramref name="subHeader"/> opens (the nth one), i.e.
+	/// what the bucket rows above it added up to.</summary>
+	private static string TkSubTotal(List<TakenLine> lines, string subHeader, int nth)
+	{
+		int seen = 0;
+		for (int i = 0; i < lines.Count; i++)
+		{
+			if (lines[i].Text == null || !lines[i].Text.Contains(subHeader)) continue;
+			if (seen++ != nth) continue;
+			for (int j = i + 1; j < lines.Count; j++)
+			{
+				string t = lines[j].Text;
+				if (t == null) continue;
+				if (t.StartsWith("  合计")) return TkCells(t)[1];
+				if (t.StartsWith("  - ")) break;   // the next sub-table started: no total in between
+			}
+			return null;
+		}
+		return null;
+	}
+
+	/// <summary>How many bucket rows the sub-table opened by <paramref name="subHeader"/> printed: the lines
+	/// between its column header and its closing total.</summary>
+	private static int TkBucketRows(List<TakenLine> lines, string subHeader)
+	{
+		for (int i = 0; i < lines.Count; i++)
+		{
+			if (lines[i].Text == null || !lines[i].Text.Contains(subHeader)) continue;
+			int n = 0;
+			for (int j = i + 2; j < lines.Count; j++)   // +2: skip the label and the column header
+			{
+				string t = lines[j].Text;
+				if (t == null) continue;
+				if (t.StartsWith("  合计")) return n;
+				if (t.StartsWith("  - ")) return n;
+				n++;
+			}
+		}
+		return 0;
 	}
 
 	private static bool TkAny(List<TakenLine> lines, string part)

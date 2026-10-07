@@ -11,11 +11,15 @@ using System.Collections.Generic;
 
 namespace UnityEngine
 {
-	/// <summary>Only UnityEngine.Time is touched by the compiled sources (ContributionSession).</summary>
+	/// <summary>Only UnityEngine.Time is touched by the compiled sources (ContributionSession, and since
+	/// R80 TakenSession, which stamps its cache with realtimeSinceStartup).</summary>
 	public static class Time
 	{
 		/// <summary>Settable: the cache tests advance this to cross the 1 s refresh clause.</summary>
 		public static float unscaledTime;
+
+		/// <summary>Settable for the same reason; TakenSession's cache stamp reads this one.</summary>
+		public static float realtimeSinceStartup;
 	}
 }
 
@@ -89,9 +93,11 @@ namespace DpsMeter
 		public static ConfigEntry<bool> CfgJsonPretty;
 	}
 
-	/// <summary>ContributionSession reads Aggregator.Session and nothing else.</summary>
+	/// <summary>ContributionSession reads Aggregator.Session and nothing else; since R80 TakenSession also
+	/// reads the finished-battle ring, which is the only way a page can outlive a battle.</summary>
 	public static class Aggregator
 	{
 		public static BattleSession Session;
+		public static readonly List<BattleSummary> History = new List<BattleSummary>();
 	}
 }

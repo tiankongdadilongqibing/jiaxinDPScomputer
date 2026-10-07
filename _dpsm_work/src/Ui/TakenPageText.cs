@@ -26,21 +26,24 @@ internal struct TakenLine
 /// panel displays can be executed by tests/BehaviorTests instead of being eyeballed. The amounts are the
 /// GAME's accounted damage (nominal) and every dimension partitions that same total, so a row here can be
 /// reconciled line by line against the exported takenBreakdown section.
+///
+/// R80 made the page COMPLETE: every victim is printed (R79 stopped at 12) and every bucket gets its own
+/// row (R79 printed at most three per dimension and folded the rest into 其余N项, on top of the 64-bucket cap
+/// that also truncated the export). The shape now follows the 总贡献 table: a column header, one row per
+/// entry, and a closing total per block, scrolling instead of folding.
 /// </summary>
 internal static class TakenPageText
 {
-	/// <summary>How many victim blocks the page prints. The rest stay in the export, and the page says so
-	/// instead of silently stopping at the cap.</summary>
-	public const int ShownVictims = 12;
-
 	public static List<TakenLine> Lines(TakenBreakdown b, bool vanguardOnly, bool inBattle)
 	{
 		var lines = new List<TakenLine>();
 		if (b == null || b.Actors.Count == 0)
 		{
+			// R80: b is null only when there is NEITHER a live session NOR a finished battle to show, so the
+			// old "只在战斗中累积" sentence would now be a lie -- the previous battle is shown too.
 			Add(lines, inBattle
 				? "  本场还没有受击记录(还没有人挨打)"
-				: "  不在战斗中;受击来源拆分只在战斗中累积", TakenLineStyle.Dim);
+				: "  没有可看的受击记录(本场与上一场都没有)", TakenLineStyle.Dim);
 			return lines;
 		}
 
@@ -87,90 +90,109 @@ internal static class TakenPageText
 			TakenLineStyle.Dim);
 		Add(lines, TakenColumns.Header(), TakenLineStyle.Dim);
 
-		for (int i = 0; i < mine.Count && i < ShownVictims; i++)
+		for (int i = 0; i < mine.Count; i++)
 		{
 			TakenActor a = mine[i];
+			if (i > 0) Add(lines, "", TakenLineStyle.Dim);
 			double share = allyNominal > 0 ? 100.0 * a.Nominal / allyNominal : 0.0;
 			Add(lines, TakenColumns.T1Row(TakenBreakdownPolicy.PositionLabel(a.Position), a.Name, a.Nominal,
 			                              a.Taken, a.Residual, a.Hits, share), TakenLineStyle.Row);
-			AddDimension(lines, "单位", a.ByAttacker);
-			AddDimension(lines, "种类", a.BySource);
-			AddDimension(lines, "属性", a.ByHitType);
-			AddDimension(lines, "效果", a.ByEffect);
-			AddStatus(lines, a.ByStatus);
-			AddOther(lines, a);
+			AddBuckets(lines, "单位(攻击者)", a.ByAttacker, a.Nominal);
+			AddBuckets(lines, "种类(DamageSource)", a.BySource, a.Nominal);
+			AddBuckets(lines, "属性(eDamageCalcType)", a.ByHitType, a.Nominal);
+			AddBuckets(lines, "效果(m_effectId)", a.ByEffect, a.Nominal);
+			AddStatuses(lines, a.ByStatus, a.Nominal);
+			AddOther(lines, a, a.Nominal);
 		}
-		if (mine.Count > ShownVictims)
-			Add(lines, "  ... 另有 " + DisplayFormat.Num(mine.Count - ShownVictims)
-				+ " 人(导出 takenBreakdown 含全部)", TakenLineStyle.Dim);
 		if (mine.Count > 0)
 			Add(lines, TakenColumns.T1TotalsLine(allyNominal, allyTaken, allyResidual, allyHits), TakenLineStyle.Row);
 
 		Add(lines, "", TakenLineStyle.Dim);
 		Add(lines, "  注:单位=事件记的攻击者显示名;种类=DamageSource;属性=eDamageCalcType", TakenLineStyle.Dim);
-		Add(lines, "      带 * 的只对该维度的部分命中权威;效果=技能的 m_effectId;状态=命中的异常与游戏记的付与者",
+		Add(lines, "      带 * 的名字只对该维度的部分命中权威(别的命中只认到攻击者/目标);效果=技能的 m_effectId",
 			TakenLineStyle.Dim);
-		Add(lines, "  (每秒最多重算一次;数字与导出的 takenBreakdown 段同源)", TakenLineStyle.Dim);
+		Add(lines, "      状态=命中的异常与游戏记的付与者;每一节的合计等于该单位的受击(口径)总额", TakenLineStyle.Dim);
+		Add(lines, "  (数字与导出的 takenBreakdown 段同源;进行中的战斗每秒最多重算一次,已结束的战斗只算一次)",
+			TakenLineStyle.Dim);
 		return lines;
 	}
 
-	/// <summary>One dimension line. <see cref="TakenColumns.ShownBuckets"/> is the maximum number of PARTS
-	/// on the line (the folded remainder counts as one), which is what keeps a 3-part line inside the panel
-	/// no matter how long the bucket names are.</summary>
-	private static void AddDimension(List<TakenLine> lines, string label, List<TakenBucket> buckets)
+	/// <summary>
+	/// One dimension's sub-table: a label line, the column header, one row per bucket and the closing total.
+	/// Nothing is folded away any more -- a victim with 300 distinct attackers gets 300 rows, which is the
+	/// whole point of R80: this page exists to be analysed, not summarised.
+	/// </summary>
+	private static void AddBuckets(List<TakenLine> lines, string label, List<TakenBucket> buckets, long nominal)
 	{
 		if (buckets == null || buckets.Count == 0) return;
-		bool hasRest = buckets.Count > TakenColumns.ShownBuckets;
-		int shown = hasRest ? TakenColumns.ShownBuckets - 1 : buckets.Count;
-		var parts = new List<string>();
-		for (int i = 0; i < shown; i++)
-			parts.Add(TakenColumns.BucketPart(buckets[i].Name, buckets[i].Amount, !string.IsNullOrEmpty(buckets[i].Quality)));
-		if (hasRest)
+		Add(lines, TakenColumns.BSubHeader(label, buckets.Count), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
+		long sum = 0;
+		long hits = 0;
+		for (int i = 0; i < buckets.Count; i++)
 		{
-			long rest = 0;
-			for (int i = shown; i < buckets.Count; i++) rest += buckets[i].Amount;
-			parts.Add(TakenColumns.RestPart(buckets.Count - shown, rest));
+			TakenBucket bk = buckets[i];
+			sum += bk.Amount;
+			hits += bk.Hits;
+			Add(lines, TakenColumns.BRow(bk.Name, bk.Amount, bk.Hits, Share(bk.Amount, nominal),
+			                             !string.IsNullOrEmpty(bk.Quality)), TakenLineStyle.Row);
 		}
-		Add(lines, TakenColumns.DimensionLine(label, parts), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BTotal("合计", sum, hits), TakenLineStyle.Dim);
 	}
 
 	/// <summary>The ailments this victim suffered, with the applier the GAME credited -- for damage over time
-	/// that is not the hit's attacker, so the two must not be conflated.</summary>
-	private static void AddStatus(List<TakenLine> lines, List<TakenStatus> list)
+	/// that is not the hit's attacker, so the two must not be conflated. Same table shape as a dimension.</summary>
+	private static void AddStatuses(List<TakenLine> lines, List<TakenStatus> list, long nominal)
 	{
 		if (list == null || list.Count == 0) return;
-		bool hasRest = list.Count > TakenColumns.ShownBuckets;
-		int shown = hasRest ? TakenColumns.ShownBuckets - 1 : list.Count;
-		var parts = new List<string>();
-		for (int i = 0; i < shown; i++)
+		Add(lines, TakenColumns.BSubHeader("状态(异常/付与者)", list.Count), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
+		long sum = 0;
+		long hits = 0;
+		for (int i = 0; i < list.Count; i++)
 		{
-			string name = string.IsNullOrEmpty(list[i].Applier) ? list[i].Status : list[i].Status + "(" + list[i].Applier + ")";
-			parts.Add(TakenColumns.BucketPart(name, list[i].Amount, false));
+			TakenStatus st = list[i];
+			sum += st.Amount;
+			hits += st.Hits;
+			string name = string.IsNullOrEmpty(st.Applier) ? st.Status : st.Status + "(" + st.Applier + ")";
+			Add(lines, TakenColumns.BRow(name, st.Amount, st.Hits, Share(st.Amount, nominal), false),
+			    TakenLineStyle.Row);
 		}
-		if (hasRest)
-		{
-			long rest = 0;
-			for (int i = shown; i < list.Count; i++) rest += list[i].Amount;
-			parts.Add(TakenColumns.RestPart(list.Count - shown, rest));
-		}
-		Add(lines, TakenColumns.DimensionLine("状态", parts), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BTotal("合计", sum, hits), TakenLineStyle.Dim);
 	}
 
 	/// <summary>The two amounts that are IN the victim's nominal total but belong to no attacker bucket:
 	/// same-team damage (friendly fire / 回復反転) and the hits whose attacker could not be resolved. Both
 	/// are part of 受击, so neither may be dropped -- they are why the attacker buckets do not sum to the
-	/// total on their own.</summary>
-	private static void AddOther(List<TakenLine> lines, TakenActor a)
+	/// total on their own, and printing them keeps every block's arithmetic closed.</summary>
+	private static void AddOther(List<TakenLine> lines, TakenActor a, long nominal)
 	{
 		if (a.Friendly <= 0 && a.Unknown <= 0) return;
-		var parts = new List<string>();
-		if (a.Friendly > 0) parts.Add(TakenColumns.BucketPart("同队自伤", a.Friendly, false));
-		// The hit count rides OUTSIDE the name: the name is fitted to BucketName columns, so folding a
-		// "(N 击)" suffix into it would cut the very words that say what the amount is.
+		Add(lines, TakenColumns.BSubHeader("其他(不属于任何攻击者桶)", (a.Friendly > 0 ? 1 : 0) + (a.Unknown > 0 ? 1 : 0)),
+		    TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
+		long sum = 0;
+		long hits = 0;
+		if (a.Friendly > 0)
+		{
+			sum += a.Friendly;
+			hits += a.FriendlyHits;
+			Add(lines, TakenColumns.BRow("同队自伤", a.Friendly, a.FriendlyHits, Share(a.Friendly, nominal), false),
+			    TakenLineStyle.Warn);
+		}
 		if (a.Unknown > 0)
-			parts.Add(TakenColumns.BucketPart("攻击者不明", a.Unknown, false)
-				+ "(" + DisplayFormat.Num(a.UnknownHits) + " 击)");
-		Add(lines, TakenColumns.DimensionLine("其他", parts), TakenLineStyle.Warn);
+		{
+			sum += a.Unknown;
+			hits += a.UnknownHits;
+			Add(lines, TakenColumns.BRow("攻击者不明", a.Unknown, a.UnknownHits, Share(a.Unknown, nominal), false),
+			    TakenLineStyle.Warn);
+		}
+		Add(lines, TakenColumns.BTotal("合计", sum, hits), TakenLineStyle.Dim);
+	}
+
+	private static double Share(long amount, long nominal)
+	{
+		return nominal > 0 ? 100.0 * amount / nominal : 0.0;
 	}
 
 	private static void Add(List<TakenLine> lines, string text, TakenLineStyle style)

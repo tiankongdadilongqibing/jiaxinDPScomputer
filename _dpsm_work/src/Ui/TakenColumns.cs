@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Text;
-
 namespace DpsMeter;
 
 /// <summary>
@@ -27,21 +24,6 @@ internal static class TakenColumns
 	/// inside the panel (see OverlayUGUI.Rows.cs LayoutCharts, which widens the panel for this page).</summary>
 	public const int T1LineWidth = 2 + T1Position + T1Name + T1Nominal + T1Taken + T1Residual + T1Hits + T1Share;
 
-	// ---- the per-dimension lines under a victim ----------------------------------------------------
-	/// <summary>Width of the dimension word (单位 / 种类 / 属性 / 效果 / 状态).</summary>
-	public const int BucketLabel = 6;
-
-	/// <summary>Width a bucket NAME is fitted to before its amount; a longer name is cut with `..`.</summary>
-	public const int BucketName = 12;
-
-	/// <summary>Width of a bucket's amount inside a dimension line. <see cref="DisplayFormat.Amt"/> keeps the
-	/// grouped form while it fits and falls back to an M/G/T suffix after that, so this is an upper bound and
-	/// a long fight can never push the line past the panel.</summary>
-	public const int BucketAmount = 11;
-
-	/// <summary>How many buckets one dimension line prints before the remainder is folded into 其余N项.</summary>
-	public const int ShownBuckets = 3;
-
 	public static readonly ColumnSpec[] T1 =
 	{
 		C("站位", T1Position, false), C("单位", T1Name, false), C("受击(口径)", T1Nominal, true),
@@ -51,6 +33,79 @@ internal static class TakenColumns
 	private static ColumnSpec C(string label, int width, bool right)
 	{
 		return new ColumnSpec { Label = label, Width = width, Right = right };
+	}
+
+	// ---- B: the per-dimension bucket sub-table (R80) ------------------------------------------------
+	/// <summary>
+	/// R80 replaced R79's one-line-per-dimension form (`  - 单位  name amount / name amount / 其余N项 ...`)
+	/// with one ROW per bucket. R79 could only ever print three buckets and folded the rest into 其余N项 --
+	/// the same 64-bucket cap that also truncated the export -- so a victim with 300 distinct attackers was
+	/// unreadable exactly where the analysis matters. The widths below are the new table's; they are wider
+	/// than R79's compact line field because a bucket name is now a whole cell instead of a 12-column prefix.
+	/// </summary>
+	public const int BName = 46;
+
+	/// <summary>Bucket amount. <see cref="DisplayFormat.Amt"/> keeps the grouped form while it fits and falls
+	/// back to an M/G/T suffix after that, so this is an upper bound and a long fight cannot overflow it.</summary>
+	public const int BAmount = 14;
+
+	public const int BHits = 7;
+	public const int BShare = 7;
+
+	/// <summary>The visible width of a bucket row: two leading spaces PLUS every column. Pinned by a test and
+	/// comfortably inside the panel LayoutCharts gives this page (880 px).</summary>
+	public const int BLineWidth = 2 + BName + BAmount + BHits + BShare;
+
+	public static readonly ColumnSpec[] B =
+	{
+		C("名字", BName, false), C("金额", BAmount, true), C("击数", BHits, true), C("占比", BShare, true),
+	};
+
+	/// <summary>The column header of a bucket sub-table, on <see cref="BRow"/>'s own geometry.</summary>
+	public static string BHeader()
+	{
+		return ContributionColumns.HeaderLine(B);
+	}
+
+	/// <summary>The label line that opens a dimension's sub-table: the dimension's name and how many distinct
+	/// buckets it holds. Deliberately not a second total -- the sub-table ends with <see cref="BTotal"/>.</summary>
+	public static string BSubHeader(string label, int count)
+	{
+		return "  - " + label + "  " + DisplayFormat.Num(count) + " 项";
+	}
+
+	/// <summary>
+	/// One bucket row. `approximate` is R79's `*` marker and it is load-bearing: the attacker/effect
+	/// dimensions are only value-exact for a small share of hits, and a best-effort label must never read as
+	/// a measurement. The marker is cut into the name's own width, so a marked row is never wider than an
+	/// unmarked one.
+	/// </summary>
+	public static string BRow(string name, long amount, long hits, double sharePct, bool approximate)
+	{
+		return "  " + DisplayFormat.PadR(BucketName(name, approximate), BName)
+		     + DisplayFormat.Amt(amount, BAmount)
+		     + DisplayFormat.Amt(hits, BHits)
+		     + DisplayFormat.PadL(DisplayFormat.Pct(sharePct), BShare);
+	}
+
+	/// <summary>
+	/// The closing total of a dimension's sub-table. By the model's invariants every dimension partitions the
+	/// victim's whole nominal total, so this row is also the check that nothing was dropped on the way to the
+	/// page. The share cell stays blank rather than printing a second, always-100% percentage.
+	/// </summary>
+	public static string BTotal(string label, long amount, long hits)
+	{
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(label), BName), BName)
+		     + DisplayFormat.Amt(amount, BAmount)
+		     + DisplayFormat.Amt(hits, BHits)
+		     + DisplayFormat.PadL("", BShare);
+	}
+
+	/// <summary>The name cell of a bucket row: the display cell, cut to leave room for the `*` marker.</summary>
+	private static string BucketName(string name, bool approximate)
+	{
+		string cell = DisplayFormat.Fit(DisplayFormat.Cell(name), approximate ? BName - 1 : BName);
+		return approximate ? cell + "*" : cell;
 	}
 
 	/// <summary>The column header, on the same geometry as <see cref="T1Row"/>.</summary>
@@ -86,55 +141,5 @@ internal static class TakenColumns
 		     + DisplayFormat.Amt(residual, T1Residual)
 		     + DisplayFormat.Amt(hits, T1Hits)
 		     + DisplayFormat.PadL("", T1Share);
-	}
-
-	/// <summary>
-	/// One dimension line under a victim: `  - 单位  name amount / name amount / 其余N项 amount`.
-	///
-	/// A plain ASCII hyphen is the bullet ON PURPOSE. The contribution table's measurements are all about
-	/// what happens when a glyph's drawn width disagrees with <see cref="DisplayFormat.DispWidth"/> (U+00D7
-	/// was drawn full-width by the CJK font while being counted as one column), and box-drawing characters
-	/// like U+251C are in exactly that family. The label column is fitted, so a long word cannot push the
-	/// first bucket right.
-	/// </summary>
-	public static string DimensionLine(string label, List<string> parts)
-	{
-		var sb = new StringBuilder(96);
-		sb.Append("  - ");
-		sb.Append(DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(label), BucketLabel), BucketLabel));
-		for (int i = 0; i < parts.Count; i++)
-		{
-			if (i > 0) sb.Append(" / ");
-			sb.Append(parts[i]);
-		}
-		return sb.ToString();
-	}
-
-	/// <summary>
-	/// One bucket of a dimension line: the name fitted to <see cref="BucketName"/> (with the marker that the
-	/// label is only approximate), then the amount, bounded by <see cref="BucketAmount"/> so three parts plus
-	/// their separators can never leave the panel however big the fight was. A `*` here is load-bearing: the
-	/// attacker/effect dimensions are only value-exact for a small share of hits, and a best-effort label must
-	/// never read as a measurement.
-	/// </summary>
-	public static string BucketPart(string name, long amount, bool approximate)
-	{
-		return DisplayFormat.Fit(DisplayFormat.Cell(name), BucketName) + (approximate ? "*" : "")
-		     + " " + Amount(amount);
-	}
-
-	/// <summary>The folded remainder of a dimension: one entry whose amount keeps the sum equal to the
-	/// victim's nominal total, so a shortened line is still an arithmetic statement.</summary>
-	public static string RestPart(int count, long amount)
-	{
-		return DisplayFormat.Fit("其余" + count + "项", BucketName) + " " + Amount(amount);
-	}
-
-	/// <summary>The bare (unpadded) bounded amount of a dimension line. DisplayFormat.Amt right-pads for a
-	/// fixed column; here the amount follows a variable-width name inside a prose line, where the padding
-	/// would only open a gap, so the padding is trimmed back off.</summary>
-	private static string Amount(long amount)
-	{
-		return DisplayFormat.Amt(amount, BucketAmount).Trim();
 	}
 }
