@@ -137,6 +137,10 @@
          are what a reader checks, and these are the very strings the panel draws. -->
     <Compile Include="$(SrcRoot)\Ui\TakenColumns.cs" />
     <Compile Include="$(SrcRoot)\Ui\TakenPageText.cs" />
+    <!-- R82: the hotkey bars of the F3/F5/F6/F4 pages and the roster. Pure on purpose: the bars' text is
+         exactly what used to be printed, and the tests pin that (the click dispatch in the overlay maps
+         each entry to the same method the key calls, so the enum is named after keys). -->
+    <Compile Include="$(SrcRoot)\Ui\HotkeyBarText.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

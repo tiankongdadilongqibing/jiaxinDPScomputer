@@ -31,8 +31,11 @@ internal static class Program
 	/// tag -- the thing the renderer turns into six different bright colours so a hundreds-of-rows page can be
 	/// scanned by section -- plus the two guard cases that no bucket row is tagged and that the six sections
 	/// plus "no section" are seven distinct values, a case that goes red if a tag value is copy-pasted).
+	/// R82: 1469 -> 1499 (+30 in ui/hotkey-bar: every bar's text pinned byte-for-byte against the literal
+	/// it replaced, the ordered list of what a click on that bar does, the rule that a page title and a
+	/// separator are NOT clickable, and the width fallback the first un-measured frame uses).
 	/// </summary>
-	public const int ExpectedCases = 1469;
+	public const int ExpectedCases = 1499;
 
 	private static int Main(string[] args)
 	{
@@ -128,6 +131,11 @@ internal static class Program
 		// R80: the BYTES of the exported section. R79's writer emitted unquoted string values and no
 		// compiled test could see the file it produced; this one parses it back.
 		Cases.TakenExportCases(r);
+		// R82: the clickable hotkey bars. The user's F3 collides with another program, so the printed
+		// entries gained a mouse route -- with every key left exactly as it was, and with the bar text
+		// still byte-for-byte the literal it replaced (the F6 view's hint tail is the one, deliberate,
+		// exception: it moved from the pinned bar, which cannot carry click targets, into its own row).
+		Cases.HotkeyBarCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

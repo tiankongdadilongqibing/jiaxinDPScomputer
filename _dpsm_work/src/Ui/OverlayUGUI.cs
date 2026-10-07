@@ -78,6 +78,22 @@ public static partial class OverlayUGUI
 	private static bool _lmbWasDown;
 	private static float _copyFlashUntil;
 
+	/// <summary>
+	/// R82: one clickable entry of a hotkey bar. The layout pass records one of these per clickable
+	/// segment (see HotkeyBarText / OverlayUGUI.Rows.LayoutCharts), and the click handler dispatches the
+	/// SAME method the keyboard key dispatches -- so "F3 受击来源" on screen and the F3 key cannot drift
+	/// apart. The list is rebuilt on every layout, exactly like <see cref="_copyRefRt"/>.
+	/// </summary>
+	private struct HotkeyHit
+	{
+		public RectTransform Rt;
+		public Text Text;
+		public Color Base;
+		public HotkeyAction Action;
+	}
+
+	private static readonly List<HotkeyHit> _hotkeyHits = new List<HotkeyHit>();
+
 	/// <summary>True for a couple of seconds after a successful copy, so the row can say so.</summary>
 	internal static bool CopyFlashActive
 	{
@@ -276,7 +292,8 @@ public static partial class OverlayUGUI
 			}
 			_canvas.enabled = true;
 			HandleScroll();
-			CheckCopyClick();
+			CheckMouseClick();
+			UpdateHotkeyHover();
 			if (Time.unscaledTime - _lastRefresh >= 0.25f)
 			{
 				_lastRefresh = Time.unscaledTime;
@@ -381,8 +398,13 @@ public static partial class OverlayUGUI
 	/// this overlay deliberately owns nothing in that scene; the click is therefore detected exactly like
 	/// the mouse wheel already is (GetAsyncKeyState + a rectangle test), which adds no component and
 	/// cannot fight the game for input.
+	///
+	/// R82: the same edge now feeds the hotkey bars FIRST (the button-like entries the panel prints), and
+	/// only falls through to the battle-reference row when no entry was hit. Order matters: the entries
+	/// and that row can never overlap, but testing the smaller targets first keeps a click on a bar from
+	/// ever being read as a copy.
 	/// </summary>
-	private static void CheckCopyClick()
+	private static void CheckMouseClick()
 	{
 		try
 		{
@@ -390,11 +412,91 @@ public static partial class OverlayUGUI
 			bool pressed = down && !_lmbWasDown;
 			_lmbWasDown = down;
 			if (!pressed) return;
+			if (TryHotkeyClick()) return;
 			if (GameRef.IsNull(_copyRefRt) || string.IsNullOrEmpty(_copyRefPayload)) return;
 			if (!RectTransformUtility.RectangleContainsScreenPoint(_copyRefRt, Input.mousePosition, null)) return;
 			CopyToClipboard(_copyRefPayload);
 		}
 		catch { }
+	}
+
+	/// <summary>R82: fire the hotkey entry under the pointer, if any. Returns true when a click was
+	/// consumed (the caller then skips the copy target).</summary>
+	private static bool TryHotkeyClick()
+	{
+		try
+		{
+			Vector3 mp = Input.mousePosition;
+			for (int i = 0; i < _hotkeyHits.Count; i++)
+			{
+				HotkeyHit hit = _hotkeyHits[i];
+				if (GameRef.IsNull(hit.Rt)) continue;
+				if (!RectTransformUtility.RectangleContainsScreenPoint(hit.Rt, mp, null)) continue;
+				DispatchHotkey(hit.Action);
+				return true;
+			}
+		}
+		catch (Exception ex) { UiError("HotkeyClick", ex); }
+		return false;
+	}
+
+	/// <summary>R82: brighten the entry under the pointer so "this is clickable" is visible. The layout
+	/// re-applies the base colour on every refresh, so this only has to correct the previous frame's
+	/// highlight.</summary>
+	private static void UpdateHotkeyHover()
+	{
+		try
+		{
+			Vector3 mp = Input.mousePosition;
+			int found = -1;
+			for (int i = 0; i < _hotkeyHits.Count; i++)
+			{
+				RectTransform rt = _hotkeyHits[i].Rt;
+				if (GameRef.IsNull(rt)) continue;
+				if (RectTransformUtility.RectangleContainsScreenPoint(rt, mp, null)) { found = i; break; }
+			}
+			for (int i = 0; i < _hotkeyHits.Count; i++)
+			{
+				HotkeyHit hit = _hotkeyHits[i];
+				if (GameRef.IsNull(hit.Text)) continue;
+				Color want = (i == found) ? Color.Lerp(hit.Base, Color.white, 0.45f) : hit.Base;
+				if (hit.Text.color != want) hit.Text.color = want;
+			}
+		}
+		catch { }
+	}
+
+	/// <summary>
+	/// R82: what a click on a hotkey entry does. Every arm calls the same method the keyboard key calls
+	/// (see CheckKeys) -- the enum is named after keys precisely so this stays a one-line mapping.
+	/// Home/End move the scroll offset the way HandleScroll's own Home/End keys do (level-triggered
+	/// there; a click is already one edge, so the same assignments are made once here).
+	/// </summary>
+	private static void DispatchHotkey(HotkeyAction action)
+	{
+		try
+		{
+			switch (action)
+			{
+				case HotkeyAction.KeyF3: ActF3(false); break;
+				case HotkeyAction.KeyF3Shift: ActF3(true); break;
+				case HotkeyAction.KeyF4: if (Visible) ActTimeline(); break;
+				case HotkeyAction.KeyF5: ActF5(); break;
+				case HotkeyAction.KeyF6: ActF6(); break;
+				case HotkeyAction.KeyF7: ActF7(false); break;
+				case HotkeyAction.KeyF7Shift: ActF7(true); break;
+				case HotkeyAction.KeyF8: ActF8(); break;
+				case HotkeyAction.KeyF9: ActF9(); break;
+				case HotkeyAction.KeyF10: ActF10(); break;
+				case HotkeyAction.KeyF11: ActF11(); break;
+				case HotkeyAction.KeyF12: ActF12(); break;
+				case HotkeyAction.KeyHome: _scrollOffset = 0f; break;
+				case HotkeyAction.KeyEnd: _scrollOffset = float.MaxValue; break;   // clamped by HandleScroll
+				case HotkeyAction.KeyLeft: ActDetailPage(-1); break;
+				case HotkeyAction.KeyRight: ActDetailPage(1); break;
+			}
+		}
+		catch (Exception ex) { UiError("HotkeyDispatch", ex); }
 	}
 
 	/// <summary>The one place text reaches the clipboard. A failure is LOGGED and the row keeps printing
@@ -421,6 +523,135 @@ public static partial class OverlayUGUI
 		}
 	}
 
+	/// <summary>
+	/// R82: the panel's own actions, one method per key. CheckKeys calls these from the keyboard, and
+	/// DispatchHotkey calls the SAME methods from a click on the bar's entry -- this is what keeps
+	/// "the words on screen" and "what the key does" from ever becoming two different behaviours.
+	/// The bodies are exactly the bodies the key handlers had before R82.
+	/// </summary>
+	internal static void ActF3(bool shift)
+	{
+		// Same remember/restore shape as F5/F6: leaving the page returns to the view it was opened from.
+		// R79: Shift+F3 narrows the 受击来源拆分 table to 前衛 (the page title says so) instead of
+		// leaving the page -- the filter is only meaningful while that page is open.
+		if (View == ViewMode.Taken)
+		{
+			if (shift) _takenVanguardOnly = !_takenVanguardOnly;
+			else View = _viewBeforeDetail;
+		}
+		else { _viewBeforeDetail = View; View = ViewMode.Taken; }
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	internal static void ActF5()
+	{
+		if (View == ViewMode.Contribution) View = ViewMode.Roster;
+		else { _viewBeforeDetail = View; View = ViewMode.Contribution; }
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	internal static void ActF6()
+	{
+		// F6 toggles the damage-detail view independently from F10 (roster/chart).
+		if (View == ViewMode.Detail) View = _viewBeforeDetail;
+		else { _viewBeforeDetail = View; View = ViewMode.Detail; }
+		_detailIdx = 0;
+		_detailPage = 0;
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	internal static void ActF7(bool back)
+	{
+		// F7 / Shift+F7 cycle the TARGET filter of the detail view (see _victimFilter). The actual
+		// list of targets is owned by BuildRows (it depends on the selected attacker), so the step is
+		// requested here and resolved there: a non-zero _filterStep is consumed by the next render.
+		if (View != ViewMode.Detail) return;
+		_filterStep = back ? -1 : 1;
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	internal static void ActF8()
+	{
+		Visible = !Visible;
+		if (Visible) _lastRefresh = -1f; // force an immediate rebuild when going back visible
+	}
+
+	internal static void ActF9()
+	{
+		Aggregator.ResetCurrent();
+		ContributionSession.Invalidate();
+		TakenSession.Invalidate();
+	}
+
+	internal static void ActF10()
+	{
+		// F10 only cycles roster <-> chart now (detail has its own key: F6)
+		if (View == ViewMode.Chart) View = ViewMode.Roster;
+		else View = ViewMode.Chart;
+		_detailIdx = 0;
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	internal static void ActF11()
+	{
+		if (View == ViewMode.Detail)
+		{
+			_detailIdx++; // next character in the per-hit detail view
+			_detailPage = 0;
+			_scrollOffset = 0f;
+			_lastRefresh = 0f;
+		}
+		else
+		{
+			// F11 only affects the chart (party-only vs both sides); the roster always keeps
+			// its own ShowEnemies setting so switching views can never lose enemy rows again.
+			Plugin.CfgChartBothSides.Value = !Plugin.CfgChartBothSides.Value;
+			RuntimeLog.Write(Plugin.CfgChartBothSides.Value ? "[DpsMeter] Chart both sides" : "[DpsMeter] Chart party only");
+			_lastRefresh = 0f;
+		}
+	}
+
+	internal static void ActF12()
+	{
+		if (View == ViewMode.Detail)
+		{
+			_detailIdx--; // previous character
+			_detailPage = 0;
+			_scrollOffset = 0f;
+			_lastRefresh = 0f;
+		}
+		else
+		{
+			OverlayChart.UsePerSecond = !OverlayChart.UsePerSecond;
+			Plugin.CfgChartPerSecond.Value = OverlayChart.UsePerSecond;
+			RuntimeLog.Write(OverlayChart.UsePerSecond ? "[DpsMeter] Chart per-second DPS" : "[DpsMeter] Chart cumulative");
+			_lastRefresh = 0f;
+		}
+	}
+
+	/// <summary>The 技能时间表 page (F4 while the panel is visible): toggles it like the other pages.</summary>
+	internal static void ActTimeline()
+	{
+		if (View == ViewMode.Timeline) View = _viewBeforeDetail;
+		else { _viewBeforeDetail = View; View = ViewMode.Timeline; }
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
+	/// <summary>← / → page the F6 per-hit list by battle time; only meaningful in the detail view.</summary>
+	internal static void ActDetailPage(int delta)
+	{
+		if (View != ViewMode.Detail) return;
+		_detailPage += delta;
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
 	private static void CheckKeys()
 	{
 		// R79: F3 opens the 受击来源拆分 page (per-unit INCOMING damage by source). F5-F12 are taken by the
@@ -441,107 +672,29 @@ public static partial class OverlayUGUI
 		bool right = (GetAsyncKeyState(39) & 0x8000) != 0;
 		if (View == ViewMode.Detail && left != _prevLeft)
 		{
-			if (left) { _detailPage--; _scrollOffset = 0f; _lastRefresh = 0f; }
+			if (left) ActDetailPage(-1);
 		}
 		if (View == ViewMode.Detail && right != _prevRight)
 		{
-			if (right) { _detailPage++; _scrollOffset = 0f; _lastRefresh = 0f; }
+			if (right) ActDetailPage(1);
 		}
 		if (f3 && !_prevF3)
 		{
 			bool shift3 = (GetAsyncKeyState(16) & 0x8000) != 0;
-			// Same remember/restore shape as F5/F6: leaving the page returns to the view it was opened from.
-			// R79: Shift+F3 narrows the 受击来源拆分 table to 前衛 (the page title says so) instead of
-			// leaving the page -- the filter is only meaningful while that page is open.
-			if (View == ViewMode.Taken)
-			{
-				if (shift3) _takenVanguardOnly = !_takenVanguardOnly;
-				else View = _viewBeforeDetail;
-			}
-			else { _viewBeforeDetail = View; View = ViewMode.Taken; }
-			_scrollOffset = 0f;
-			_lastRefresh = 0f;
+			ActF3(shift3);
 		}
-		if (f5 && !_prevF5)
-		{
-			if (View == ViewMode.Contribution) View = ViewMode.Roster;
-			else { _viewBeforeDetail = View; View = ViewMode.Contribution; }
-			_scrollOffset = 0f;
-			_lastRefresh = 0f;
-		}
-		if (f6 && !_prevF6)
-		{
-			// F6 toggles the damage-detail view independently from F10 (roster/chart).
-			if (View == ViewMode.Detail) View = _viewBeforeDetail;
-			else { _viewBeforeDetail = View; View = ViewMode.Detail; }
-			_detailIdx = 0;
-			_detailPage = 0;
-			_scrollOffset = 0f;
-			_lastRefresh = 0f;
-		}
+		if (f5 && !_prevF5) ActF5();
+		if (f6 && !_prevF6) ActF6();
 		if (f7 && !_prevF7)
 		{
-			// F7 / Shift+F7 cycle the TARGET filter of the detail view (see _victimFilter). The actual
-			// list of targets is owned by BuildRows (it depends on the selected attacker), so the step is
-			// requested here and resolved there: a non-zero _filterStep is consumed by the next render.
-			if (View == ViewMode.Detail)
-			{
-				bool shift = (GetAsyncKeyState(16) & 0x8000) != 0;
-				_filterStep = shift ? -1 : 1;
-				_scrollOffset = 0f;
-				_lastRefresh = 0f;
-			}
+			bool shift = (GetAsyncKeyState(16) & 0x8000) != 0;
+			ActF7(shift);
 		}
-		if (f8 && !_prevF8)
-		{
-			Visible = !Visible;
-			if (Visible) _lastRefresh = -1f; // force an immediate rebuild when going back visible
-		}
-		if (f9 && !_prevF9) { Aggregator.ResetCurrent(); ContributionSession.Invalidate(); TakenSession.Invalidate(); }
-		if (f10 && !_prevF10)
-		{
-			// F10 only cycles roster <-> chart now (detail has its own key: F6)
-			if (View == ViewMode.Chart) View = ViewMode.Roster;
-			else View = ViewMode.Chart;
-			_detailIdx = 0;
-			_scrollOffset = 0f;
-			_lastRefresh = 0f;
-		}
-		if (f11 && !_prevF11)
-		{
-			if (View == ViewMode.Detail)
-			{
-				_detailIdx++; // next character in the per-hit detail view
-				_detailPage = 0;
-				_scrollOffset = 0f;
-				_lastRefresh = 0f;
-			}
-			else
-			{
-				// F11 only affects the chart (party-only vs both sides); the roster always keeps
-				// its own ShowEnemies setting so switching views can never lose enemy rows again.
-				Plugin.CfgChartBothSides.Value = !Plugin.CfgChartBothSides.Value;
-				RuntimeLog.Write(Plugin.CfgChartBothSides.Value ? "[DpsMeter] Chart both sides" : "[DpsMeter] Chart party only");
-				_lastRefresh = 0f;
-			}
-		}
-		if (f12 && !_prevF12)
-		{
-			if (View == ViewMode.Detail)
-			{
-				_detailIdx--; // previous character
-				_detailPage = 0;
-				_scrollOffset = 0f;
-				_lastRefresh = 0f;
-			}
-			else
-			{
-				OverlayChart.UsePerSecond = !OverlayChart.UsePerSecond;
-				Plugin.CfgChartPerSecond.Value = OverlayChart.UsePerSecond;
-				RuntimeLog.Write(OverlayChart.UsePerSecond ? "[DpsMeter] Chart per-second DPS" : "[DpsMeter] Chart cumulative");
-				_lastRefresh = 0f;
-			}
-		}
+		if (f8 && !_prevF8) ActF8();
+		if (f9 && !_prevF9) ActF9();
+		if (f10 && !_prevF10) ActF10();
+		if (f11 && !_prevF11) ActF11();
+		if (f12 && !_prevF12) ActF12();
 		// R52 + R66: the configurable key (General/ExtractKey, default F4). WHICH ACTION it performs depends
 		// on whether the panel is on screen, and that is the whole point of the split: while the panel is
 		// visible the key is one of the panel's own view keys (技能时间表, like F5/F6/F10), and while the
@@ -560,10 +713,7 @@ public static partial class OverlayUGUI
 			if (Visible)
 			{
 				// same remember/restore shape as F6: leaving the page returns to the view it was opened from
-				if (View == ViewMode.Timeline) View = _viewBeforeDetail;
-				else { _viewBeforeDetail = View; View = ViewMode.Timeline; }
-				_scrollOffset = 0f;
-				_lastRefresh = 0f;
+				ActTimeline();
 			}
 			else
 			{

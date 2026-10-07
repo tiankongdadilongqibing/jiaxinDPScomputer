@@ -33,15 +33,54 @@ public static partial class OverlayUGUI
 		/// is describing.</summary>
 		public bool Copyable;
 		public string CopyText;
+		/// <summary>R82: a hotkey bar is rendered as one Text PER ENTRY, because uGUI has no inline markup
+		/// and a click target has to be a substring of the line. Text is still set to the whole line (the
+		/// concatenation of these segments) -- that is what the behavior suite pins, and it is what a
+		/// non-segmented consumer of this row would print.</summary>
+		public List<HotkeySeg> Segments;
+	}
+
+	/// <summary>1.7.6: the row decides its own font. Without the else branch a row reused from the
+	/// contribution page would keep the monospaced font on the roster page. Shared by plain rows and by
+	/// the per-entry Texts of a hotkey bar (R82), so the two can never disagree.</summary>
+	private static void ApplyRowFont(Text t, RowDef r)
+	{
+		Font want = GameRef.IsNull(r.Font) ? GetFont() : r.Font;
+		if (!GameRef.IsNull(want) && !GameRef.Same(t.font, want))
+		{
+			t.font = want;
+			try { t.material = want.material; } catch { }
+		}
+	}
+
+	/// <summary>R82: the drawn width of one hotkey-bar entry. The pooled Texts run with
+	/// HorizontalWrapMode.Overflow, so preferredWidth is the whole line; when the font is not resolved
+	/// yet (first frame after a scene change) the pure estimator keeps the entries from overlapping.
+	/// A wrong width can only shift entries, never hide them -- but it WOULD misplace the click targets,
+	/// which is why the estimate is only a fallback.</summary>
+	private static float SegmentWidth(Text t, string text, int fontSize)
+	{
+		try
+		{
+			float w = t.preferredWidth;
+			if (w > 1f) return w;
+		}
+		catch { }
+		return HotkeyBarText.EstimateWidth(text, fontSize);
 	}
 
 	private static void Refresh()
 	{
 		List<RowDef> rows = BuildRows();
 
-		// count how many are real text rows (charts don't consume a text object)
+		// count how many are real text rows (charts don't consume a text object); a segmented hotkey bar
+		// consumes one per entry (R82)
 		int textCount = 0;
-		foreach (var r in rows) if (r.ChartSlot == 0) textCount++;
+		foreach (var r in rows)
+		{
+			if (r.ChartSlot != 0) continue;
+			textCount += (r.Segments != null && r.Segments.Count > 0) ? r.Segments.Count : 1;
+		}
 		EnsurePool(textCount);
 
 		// (re)assign font to rows whenever it (re)becomes available
@@ -71,19 +110,28 @@ public static partial class OverlayUGUI
 			if (r.ChartSlot == 3) { chartC = true; continue; }
 			if (ti < _rowTexts.Count)
 			{
-				Text t = _rowTexts[ti];
-				t.gameObject.SetActive(true);
-				t.text = r.Text;
-				t.color = r.Color;
-				// 1.7.6: the row decides its own font. Without the else branch a row reused from the
-				// contribution page would keep the monospaced font on the roster page.
-				Font want = GameRef.IsNull(r.Font) ? GetFont() : r.Font;
-				if (!GameRef.IsNull(want) && !GameRef.Same(t.font, want))
+				if (r.Segments != null && r.Segments.Count > 0)
 				{
-					t.font = want;
-					try { t.material = want.material; } catch { }
+					// R82: one Text per entry of a hotkey bar, each with its own string/colour/font.
+					for (int s = 0; s < r.Segments.Count && ti < _rowTexts.Count; s++)
+					{
+						Text ts = _rowTexts[ti];
+						ts.gameObject.SetActive(true);
+						ts.text = r.Segments[s].Text;
+						ts.color = r.Color;
+						ApplyRowFont(ts, r);
+						ti++;
+					}
 				}
-				ti++;
+				else
+				{
+					Text t = _rowTexts[ti];
+					t.gameObject.SetActive(true);
+					t.text = r.Text;
+					t.color = r.Color;
+					ApplyRowFont(t, r);
+					ti++;
+				}
 			}
 		}
 
@@ -115,6 +163,9 @@ public static partial class OverlayUGUI
 		// click pointing at the previous page's id.
 		_copyRefRt = null;
 		_copyRefPayload = null;
+		// R82: same for the hotkey bar's click targets -- they are rebuilt with every layout, so a click
+		// can never fire an entry that belongs to the page that was on screen a moment ago.
+		_hotkeyHits.Clear();
 		// R56: the copy target is rebuilt with the layout, so switching pages or battles cannot leave a
 		// click pointing at the previous page's id.
 		_copyRefRt = null;
@@ -158,16 +209,45 @@ public static partial class OverlayUGUI
 			}
 			else if (textIdx < _rowTexts.Count)
 			{
-				RectTransform rt = _rowRts[textIdx];
-				if (r.Copyable) { _copyRefRt = rt; _copyRefPayload = r.CopyText; }
-				rt.anchorMin = new Vector2(0f, 1f);
-				rt.anchorMax = new Vector2(0f, 1f);
-				rt.pivot = new Vector2(0f, 1f);
-				rt.anchoredPosition = new Vector2(4f, -y - 1f);
-				rt.sizeDelta = new Vector2(_contentRt.sizeDelta.x - 8f, h);
-				Text t = _rowTexts[textIdx];
-				t.fontSize = h >= 20f ? 14 : 12;
-				textIdx++;
+				if (r.Segments != null && r.Segments.Count > 0)
+				{
+					// R82: lay the entries of a hotkey bar out left to right (each in its own pooled Text)
+					// and record a click target for every clickable one. The width comes from the font's
+					// own measurement, with a pure estimate as the first-frame fallback (see SegmentWidth).
+					float x = 4f;
+					for (int s = 0; s < r.Segments.Count && textIdx < _rowTexts.Count; s++)
+					{
+						HotkeySeg seg = r.Segments[s];
+						RectTransform srt = _rowRts[textIdx];
+						Text st = _rowTexts[textIdx];
+						int segSize = h >= 20f ? 14 : 12;
+						st.fontSize = segSize;
+						float w = SegmentWidth(st, seg.Text, segSize) + HotkeyBarText.Pad;
+						srt.anchorMin = new Vector2(0f, 1f);
+						srt.anchorMax = new Vector2(0f, 1f);
+						srt.pivot = new Vector2(0f, 1f);
+						srt.anchoredPosition = new Vector2(x, -y - 1f);
+						srt.sizeDelta = new Vector2(w, h);
+						if (seg.Clickable)
+							_hotkeyHits.Add(new HotkeyHit { Rt = srt, Text = st, Base = r.Color, Action = seg.Action });
+						x += w;
+						if (s + 1 < r.Segments.Count) x += HotkeyBarText.Gap;
+						textIdx++;
+					}
+				}
+				else
+				{
+					RectTransform rt = _rowRts[textIdx];
+					if (r.Copyable) { _copyRefRt = rt; _copyRefPayload = r.CopyText; }
+					rt.anchorMin = new Vector2(0f, 1f);
+					rt.anchorMax = new Vector2(0f, 1f);
+					rt.pivot = new Vector2(0f, 1f);
+					rt.anchoredPosition = new Vector2(4f, -y - 1f);
+					rt.sizeDelta = new Vector2(_contentRt.sizeDelta.x - 8f, h);
+					Text t = _rowTexts[textIdx];
+					t.fontSize = h >= 20f ? 14 : 12;
+					textIdx++;
+				}
 			}
 			y += h;
 		}
@@ -545,7 +625,9 @@ public static partial class OverlayUGUI
 		int hQuest;
 		double hSeconds;
 		ResolveHeaderBattle(view, out hQuest, out hSeconds);
-		rows.Add(new RowDef { Text = "总贡献  F5返回  任务 " + hQuest + "   " + BattleTime.Seconds(hSeconds), Color = HeaderColor, Height = 20f });
+		// R82: clickable hotkey bar (same text as before, one Text per entry).
+		List<HotkeySeg> contribKeys = HotkeyBarText.Contribution(hQuest.ToString(), BattleTime.Seconds(hSeconds));
+		rows.Add(new RowDef { Text = HotkeyBarText.Line(contribKeys), Segments = contribKeys, Color = HeaderColor, Height = 20f });
 		// R56 (plan §6): the title is bound to the battle this table describes, and it is shown even when
 		// the data is unavailable -- an "unavailable" page must still say WHICH battle it is about.
 		AppendBattleRefRow(rows, DisplayedRef(view != null && view.Live), hQuest, view != null && view.Live ? "本场 " : "上一场 ");
@@ -1017,13 +1099,21 @@ public static partial class OverlayUGUI
 				Text = "—— 逐条伤害(每页 20 秒;←/→ 翻页,滚轮/PgUp·PgDn 滚动)——",
 				Color = DimColor, Height = 16f
 			});
+			// R82: the detail view's own keys, clickable. They used to be the pinned bar's tail (see the
+			// _pinLine comment below); without them a mouse-only reader could switch pages but never leave
+			// the F6 view.
+			List<HotkeySeg> detailKeys = HotkeyBarText.Detail();
+			rows.Add(new RowDef { Text = HotkeyBarText.Line(detailKeys), Segments = detailKeys, Color = HeaderColor, Height = 16f });
 			// everything numeric lives in the pinned bar only (see LayoutPinBar), so the heading above
 			// stays a plain delimiter instead of repeating the counts.
+			// R82: the key hints used to be the tail of this pinned line. The pinned bar is a single Text
+			// (it hangs off the panel, outside the scrolled content) and therefore cannot carry click
+			// targets, so the hints moved into the DETAIL KEYS row below -- same keys, same words, now
+			// clickable, and the pinned bar keeps only the numbers it exists for.
 			_pinLine = $"伤害明细 {_detailIdx + 1}/{names.Count} {who} · 总伤害 {totals[whoKey]:N0} / {counts[whoKey]} 条"
 				+ (ds.Ref == null ? " · 无编号(legacy)" : " · " + ds.Ref.ShortTag)
 				+ (filtered ? $" · 筛选→{filtName} {vTotals[_victimFilter]:N0}/{vCounts[_victimFilter]} 条" : "")
-				+ $" · 第 {_detailPage + 1}/{pages} 页({pageLo:F0}~{pageHi:F0} 秒)本页 {pageN} 条 / 列表 {listTotal} 条"
-				+ " · ←/→ 翻页(20秒/页) F7 筛选目标 F11/F12 换角色 F6返回";
+				+ $" · 第 {_detailPage + 1}/{pages} 页({pageLo:F0}~{pageHi:F0} 秒)本页 {pageN} 条 / 列表 {listTotal} 条";
 			if (pageN == 0)
 				rows.Add(new RowDef
 				{
@@ -1080,7 +1170,9 @@ public static partial class OverlayUGUI
 		{
 			var viewSession = inBattle ? session : (Aggregator.History.Count > 0 ? SessionForView() : null);
 			string modeTag = OverlayChart.UsePerSecond ? "每秒DPS" : "累计";
-			rows.Add(new RowDef { Text = $"{modeTag}  上:我方伤害 中:耐久% 下:敌方  F10列表 F12累计/每秒", Color = HeaderColor, Height = 20f });
+			// R82: clickable hotkey bar (same text as before, one Text per entry).
+			List<HotkeySeg> chartKeys = HotkeyBarText.Chart(modeTag);
+			rows.Add(new RowDef { Text = HotkeyBarText.Line(chartKeys), Segments = chartKeys, Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = ChartCaption(viewSession), Color = DimColor, Height = 16f });
 			AppendBattleRefRow(rows, DisplayedRef(inBattle), viewSession == null ? 0 : viewSession.QuestId, "本图 ");
 
@@ -1128,6 +1220,7 @@ public static partial class OverlayUGUI
 				rows.Add(new RowDef
 				{
 					Text = timeline[i].Text,
+					Segments = timeline[i].Segments,
 					Color = TimelineColor(timeline[i].Style),
 					Height = 16f,
 				});
@@ -1150,10 +1243,12 @@ public static partial class OverlayUGUI
 			// view: null -- this page has no contribution view to describe, and ResolveHeaderBattle's own
 			// fallback (live session, then the most recent finished one) is exactly right here.
 			ResolveHeaderBattle(null, out tQuest, out tSeconds);
+			// R82: clickable hotkey bar (same text as before, one Text per entry).
+			List<HotkeySeg> takenKeys = HotkeyBarText.Taken(tQuest.ToString(), BattleTime.Seconds(tSeconds), _takenVanguardOnly);
 			rows.Add(new RowDef
 			{
-				Text = "受击来源拆分  F3返回  Shift+F3 " + (_takenVanguardOnly ? "只看前衛(开)" : "只看前衛")
-				     + "  Home/End 首尾  任务 " + tQuest + "   " + BattleTime.Seconds(tSeconds),
+				Text = HotkeyBarText.Line(takenKeys),
+				Segments = takenKeys,
 				Color = HeaderColor, Height = 20f,
 			});
 			AppendBattleRefRow(rows, DisplayedRef(inBattle), tQuest, inBattle ? "本场 " : "上一场 ");
@@ -1174,7 +1269,9 @@ public static partial class OverlayUGUI
 		// ---- roster ----
 		if (!inBattle)
 		{
-			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F3 受击来源  F4 时间表", Color = HeaderColor, Height = 20f });
+			// R82: the row is a clickable hotkey bar -- same text as before, one Text per entry.
+			List<HotkeySeg> idleKeys = HotkeyBarText.RosterIdle();
+			rows.Add(new RowDef { Text = HotkeyBarText.Line(idleKeys), Segments = idleKeys, Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = "下方显示上一场记录;F10 可查看上一场曲线", Color = DimColor, Height = 16f });
 			if (Aggregator.History.Count > 0)
 			{
@@ -1193,7 +1290,9 @@ public static partial class OverlayUGUI
 			else enemyDealt += a.DamageDealt;
 		}
 		double secs = Math.Max(1.0, session.ActiveSeconds);
-		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F3受击来源 F4时间表", Color = HeaderColor, Height = 20f });
+		// R82: clickable hotkey bar (same text as before, one Text per entry).
+		List<HotkeySeg> battleKeys = HotkeyBarText.RosterInBattle(session.QuestId.ToString(), BattleTime.Seconds(session.ActiveSeconds));
+		rows.Add(new RowDef { Text = HotkeyBarText.Line(battleKeys), Segments = battleKeys, Color = HeaderColor, Height = 20f });
 		AppendBattleRefRow(rows, session.Ref, session.QuestId, "本场 ");
 		rows.Add(new RowDef { Text = $"我方总伤害 {allyDealt:N0}   秒伤 {(long)(allyDealt / secs):N0}   受击 {allyTaken:N0}   受回复 {allyHeal:N0}", Color = NeutralColor, Height = 18f });
 		if (allyFriendly > 0)

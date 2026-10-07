@@ -20,11 +20,16 @@ internal struct TimelineLine
 {
 	internal string Text;
 	internal TimelineLineStyle Style;
+	/// <summary>R82: non-null only on the page header, which is the one line of this page carrying
+	/// clickable key entries (F4 返回). The renderer lays those out as separate Texts so the entries can
+	/// be clicked; Text stays the whole line (and equals the concatenation of the segments).</summary>
+	internal List<HotkeySeg> Segments;
 
-	internal TimelineLine(string text, TimelineLineStyle style)
+	internal TimelineLine(string text, TimelineLineStyle style, List<HotkeySeg> segments = null)
 	{
 		Text = text;
 		Style = style;
+		Segments = segments;
 	}
 }
 
@@ -142,7 +147,11 @@ internal static class SkillTimelineText
 				if (attempts[i] != null && attempts[i].Count > 0) tries += attempts[i].Count;
 		}
 
-		lines.Add(new TimelineLine("技能时间表  我方奥义/特殊/自动技能发动时刻   F4 返回", TimelineLineStyle.Header));
+		// R82: the header is built from the hotkey-bar module, so its "F4 返回" is a clickable entry on
+		// screen (the string itself is unchanged -- HotkeyBarText.Line reproduces it exactly, and the
+		// cases below pin that).
+		List<HotkeySeg> headerKeys = HotkeyBarText.Timeline();
+		lines.Add(new TimelineLine(HotkeyBarText.Line(headerKeys), TimelineLineStyle.Header, headerKeys));
 		// R67: the burst mark states BOTH numbers (rows folded, cells they landed in), because R66's `xN`
 		// read as "N in one cell" and was false whenever the folds were spread over several cells.
 		// R69: the fold is the skill's own cooldown, not a fixed window, and `试N` is new -- so the legend

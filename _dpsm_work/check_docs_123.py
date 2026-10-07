@@ -161,6 +161,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R80.md',
     # R81 批次:受击来源拆分页的分节配色(每个子表标签行一种鲜艳颜色;页面字符串一字未改)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R81.md',
+    # R82 批次:快捷键行可点击(F3 与用户其他程序冲突时的鼠标通路;键盘行为一字未改)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R82.md',
 ]
 
 
