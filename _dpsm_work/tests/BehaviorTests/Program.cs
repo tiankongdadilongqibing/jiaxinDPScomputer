@@ -27,8 +27,12 @@ internal static class Program
 	/// R78: 1307 -> 1328 (+21 for policy/absorb-wording: the two published labels renamed for what R76 measured
 	/// them to be, the printed residual read from the game's own value with the `×0.242` counterfactual pinned,
 	/// the non-exclusion of the split and the residual on one row, and the `[ABSPROBE] note` sentences).
+	/// R81: 1460 -> 1469 (+9 in ui/taken-page: each of the six sub-tables' LABEL row carries its own section
+	/// tag -- the thing the renderer turns into six different bright colours so a hundreds-of-rows page can be
+	/// scanned by section -- plus the two guard cases that no bucket row is tagged and that the six sections
+	/// plus "no section" are seven distinct values, a case that goes red if a tag value is copy-pasted).
 	/// </summary>
-	public const int ExpectedCases = 1460;
+	public const int ExpectedCases = 1469;
 
 	private static int Main(string[] args)
 	{

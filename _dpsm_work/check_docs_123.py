@@ -159,6 +159,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R79.md',
     # R80 批次:受击来源活过战斗结束 + 不再折叠(段自述 1.1)+ 修掉 1.7.29 写坏导出的引号缺陷
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R80.md',
+    # R81 批次:受击来源拆分页的分节配色(每个子表标签行一种鲜艳颜色;页面字符串一字未改)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R81.md',
 ]
 
 

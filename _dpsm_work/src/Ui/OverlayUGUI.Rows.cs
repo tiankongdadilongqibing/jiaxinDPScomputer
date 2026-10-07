@@ -715,12 +715,28 @@ public static partial class OverlayUGUI
 		return DimColor;
 	}
 
-	/// <summary>R79: the same mapping for the 受击来源拆分 page's line styles.</summary>
-	private static Color TakenColor(TakenLineStyle style)
+	/// <summary>R79: the same mapping for the 受击来源拆分 page's line styles.
+	/// R81: a sub-table's label row also carries its section, and that row gets the section's own bright
+	/// colour -- everything else in the section keeps its ordinary role colour, so the page is still
+	/// scannable by shape while the eye can jump straight to 属性 or 効果.</summary>
+	private static Color TakenColor(TakenLine line)
 	{
-		if (style == TakenLineStyle.Header) return HeaderColor;
-		if (style == TakenLineStyle.Warn) return WarnColor;
-		if (style == TakenLineStyle.Row) return AllyColor;
+		if (line.Style == TakenLineStyle.Header) return HeaderColor;
+		if (line.Style == TakenLineStyle.Warn) return WarnColor;
+		if (line.Style == TakenLineStyle.Row) return AllyColor;
+		return TakenBlockColor(line.Block);
+	}
+
+	/// <summary>R81: one bright colour per sub-table (see the palette in OverlayUGUI.cs); a line that belongs
+	/// to no section keeps the page's ordinary dim grey.</summary>
+	private static Color TakenBlockColor(TakenBlock block)
+	{
+		if (block == TakenBlock.Attacker) return TakenAttackerColor;
+		if (block == TakenBlock.HitType) return TakenHitTypeColor;
+		if (block == TakenBlock.Attr) return TakenAttrColor;
+		if (block == TakenBlock.Effect) return TakenEffectColor;
+		if (block == TakenBlock.Status) return TakenStatusColor;
+		if (block == TakenBlock.Other) return TakenOtherColor;
 		return DimColor;
 	}
 
@@ -1147,7 +1163,7 @@ public static partial class OverlayUGUI
 			// inBattle is false -- and the list is memoised, see ResolveTakenLines.
 			List<TakenLine> taken = ResolveTakenLines(TakenSession.Get(), _takenVanguardOnly, inBattle);
 			for (int i = 0; i < taken.Count; i++)
-				rows.Add(new RowDef { Text = taken[i].Text, Color = TakenColor(taken[i].Style), Height = 16f });
+				rows.Add(new RowDef { Text = taken[i].Text, Color = TakenColor(taken[i]), Height = 16f });
 			// the table aligns by padding with spaces: exact only on the mono font's 1:2 grid
 			Font tkMono = GetMonoFont();
 			if (!GameRef.IsNull(tkMono))

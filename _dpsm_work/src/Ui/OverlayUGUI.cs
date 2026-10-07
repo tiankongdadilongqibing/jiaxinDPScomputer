@@ -141,6 +141,15 @@ public static partial class OverlayUGUI
 	/// <summary>Row colour for status abnormalities (kept visually distinct from the victim row).</summary>
 	private static readonly Color StatusColor = new Color(0.72f, 0.85f, 1f, 1f);
 	private static readonly Color DimColor = new Color(0.62f, 0.66f, 0.72f, 1f);
+	/// <summary>R81: one bright colour per 受击来源拆分 sub-table. R80 stopped folding, so a victim with 300
+	/// attackers makes a page hundreds of rows long; the section's label row is the only landmark, so each
+	/// dimension gets a hue far from the others and from the header amber / warn orange used above.</summary>
+	private static readonly Color TakenAttackerColor = new Color(0.3f, 1f, 1f, 1f);
+	private static readonly Color TakenHitTypeColor = new Color(0.62f, 1f, 0.3f, 1f);
+	private static readonly Color TakenAttrColor = new Color(1f, 0.35f, 0.95f, 1f);
+	private static readonly Color TakenEffectColor = new Color(0.45f, 0.65f, 1f, 1f);
+	private static readonly Color TakenStatusColor = new Color(1f, 0.5f, 0.75f, 1f);
+	private static readonly Color TakenOtherColor = new Color(1f, 0.35f, 0.35f, 1f);
 
 	[DllImport("user32.dll")]
 	private static extern short GetAsyncKeyState(int vKey);

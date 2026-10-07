@@ -1150,6 +1150,31 @@ MUTATIONS = [
          find="\t\tif (s == null && Aggregator.History.Count > 0)",
          repl="\t\tif (false && Aggregator.History.Count > 0)",
          expect="export/taken-section/a-finished-battle-is-still-readable"),
+    # ---- R81: the sub-table LABEL rows carry a section tag, which the renderer turns into six different
+    # bright colours (R80 removed the folding, so a victim with 300 attackers makes a page hundreds of rows
+    # long and the label is its only landmark). Two ways this can rot: the tag never reaches the label row at
+    # all -- every section keeps the same grey, i.e. the state the user reported -- or two sections end up
+    # with ONE value, which paints two dimensions the same colour.
+    dict(name="taken-section-tag-dropped", file="Ui/TakenPageText.cs",
+         find="\t\tAdd(lines, TakenColumns.BSubHeader(label, buckets.Count), TakenLineStyle.Dim, block);",
+         repl="\t\tAdd(lines, TakenColumns.BSubHeader(label, buckets.Count), TakenLineStyle.Dim);",
+         expect="ui/taken-page/the-attacker-label-row-carries-its-section"),
+    dict(name="taken-sections-share-one-tag", file="Ui/TakenPageText.cs",
+         find="\t\t\tAddBuckets(lines, \"属性(eDamageCalcType)\", a.ByHitType, a.Nominal, TakenBlock.Attr);",
+         repl="\t\t\tAddBuckets(lines, \"属性(eDamageCalcType)\", a.ByHitType, a.Nominal, TakenBlock.HitType);",
+         expect="ui/taken-page/the-hit-type-label-row-carries-its-section"),
+    dict(name="taken-status-label-mis-tagged", file="Ui/TakenPageText.cs",
+         find="\t\tAdd(lines, TakenColumns.BSubHeader(\"状态(异常/付与者)\", list.Count), TakenLineStyle.Dim,\n\t\t    TakenBlock.Status);",
+         repl="\t\tAdd(lines, TakenColumns.BSubHeader(\"状态(异常/付与者)\", list.Count), TakenLineStyle.Dim,\n\t\t    TakenBlock.Attacker);",
+         expect="ui/taken-page/the-status-label-row-carries-its-section"),
+    dict(name="taken-two-tags-share-a-value", file="Ui/TakenPageText.cs",
+         find="\tStatus = 5,\n\tOther = 6,",
+         repl="\tStatus = 4,\n\tOther = 6,",
+         expect="ui/taken-page/the-six-sections-plus-none-are-seven-distinct-tags"),
+    dict(name="taken-bucket-rows-get-tagged-too", file="Ui/TakenPageText.cs",
+         find="\t\t\tAdd(lines, TakenColumns.BRow(bk.Name, bk.Amount, bk.Hits, Share(bk.Amount, nominal),\n\t\t\t                             !string.IsNullOrEmpty(bk.Quality)), TakenLineStyle.Row);",
+         repl="\t\t\tAdd(lines, TakenColumns.BRow(bk.Name, bk.Amount, bk.Hits, Share(bk.Amount, nominal),\n\t\t\t                             !string.IsNullOrEmpty(bk.Quality)), TakenLineStyle.Row, block);",
+         expect="ui/taken-page/only-the-section-label-rows-are-tagged"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

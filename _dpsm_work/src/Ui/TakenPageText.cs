@@ -12,11 +12,27 @@ internal enum TakenLineStyle
 	Warn = 3,
 }
 
+/// <summary>R81: which sub-table a line belongs to. The renderer gives every sub-table's LABEL row its own
+/// bright colour, because a victim with 300 attackers produces a page hundreds of lines long and a single
+/// grey wall cannot be scanned -- the eye needs to find "where does 属性 start" without reading every row.
+/// The pure layer only names the section; the UI picks the actual colour (same split as TakenLineStyle).</summary>
+internal enum TakenBlock
+{
+	None = 0,
+	Attacker = 1,
+	HitType = 2,
+	Attr = 3,
+	Effect = 4,
+	Status = 5,
+	Other = 6,
+}
+
 /// <summary>One finished page line: the exact string on screen plus what it is.</summary>
 internal struct TakenLine
 {
 	public string Text;
 	public TakenLineStyle Style;
+	public TakenBlock Block;
 }
 
 /// <summary>
@@ -31,6 +47,10 @@ internal struct TakenLine
 /// row (R79 printed at most three per dimension and folded the rest into 其余N项, on top of the 64-bucket cap
 /// that also truncated the export). The shape now follows the 总贡献 table: a column header, one row per
 /// entry, and a closing total per block, scrolling instead of folding.
+///
+/// R81 tags each sub-table's label row with a <see cref="TakenBlock"/> so the renderer can give the six
+/// sections six different bright colours; no string on the page changes, so an R80 screenshot still matches
+/// line for line.
 /// </summary>
 internal static class TakenPageText
 {
@@ -97,10 +117,10 @@ internal static class TakenPageText
 			double share = allyNominal > 0 ? 100.0 * a.Nominal / allyNominal : 0.0;
 			Add(lines, TakenColumns.T1Row(TakenBreakdownPolicy.PositionLabel(a.Position), a.Name, a.Nominal,
 			                              a.Taken, a.Residual, a.Hits, share), TakenLineStyle.Row);
-			AddBuckets(lines, "单位(攻击者)", a.ByAttacker, a.Nominal);
-			AddBuckets(lines, "种类(DamageSource)", a.BySource, a.Nominal);
-			AddBuckets(lines, "属性(eDamageCalcType)", a.ByHitType, a.Nominal);
-			AddBuckets(lines, "效果(m_effectId)", a.ByEffect, a.Nominal);
+			AddBuckets(lines, "单位(攻击者)", a.ByAttacker, a.Nominal, TakenBlock.Attacker);
+			AddBuckets(lines, "种类(DamageSource)", a.BySource, a.Nominal, TakenBlock.HitType);
+			AddBuckets(lines, "属性(eDamageCalcType)", a.ByHitType, a.Nominal, TakenBlock.Attr);
+			AddBuckets(lines, "效果(m_effectId)", a.ByEffect, a.Nominal, TakenBlock.Effect);
 			AddStatuses(lines, a.ByStatus, a.Nominal);
 			AddOther(lines, a, a.Nominal);
 		}
@@ -122,10 +142,11 @@ internal static class TakenPageText
 	/// Nothing is folded away any more -- a victim with 300 distinct attackers gets 300 rows, which is the
 	/// whole point of R80: this page exists to be analysed, not summarised.
 	/// </summary>
-	private static void AddBuckets(List<TakenLine> lines, string label, List<TakenBucket> buckets, long nominal)
+	private static void AddBuckets(List<TakenLine> lines, string label, List<TakenBucket> buckets, long nominal,
+	                               TakenBlock block)
 	{
 		if (buckets == null || buckets.Count == 0) return;
-		Add(lines, TakenColumns.BSubHeader(label, buckets.Count), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BSubHeader(label, buckets.Count), TakenLineStyle.Dim, block);
 		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
 		long sum = 0;
 		long hits = 0;
@@ -145,7 +166,8 @@ internal static class TakenPageText
 	private static void AddStatuses(List<TakenLine> lines, List<TakenStatus> list, long nominal)
 	{
 		if (list == null || list.Count == 0) return;
-		Add(lines, TakenColumns.BSubHeader("状态(异常/付与者)", list.Count), TakenLineStyle.Dim);
+		Add(lines, TakenColumns.BSubHeader("状态(异常/付与者)", list.Count), TakenLineStyle.Dim,
+		    TakenBlock.Status);
 		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
 		long sum = 0;
 		long hits = 0;
@@ -169,7 +191,7 @@ internal static class TakenPageText
 	{
 		if (a.Friendly <= 0 && a.Unknown <= 0) return;
 		Add(lines, TakenColumns.BSubHeader("其他(不属于任何攻击者桶)", (a.Friendly > 0 ? 1 : 0) + (a.Unknown > 0 ? 1 : 0)),
-		    TakenLineStyle.Dim);
+		    TakenLineStyle.Dim, TakenBlock.Other);
 		Add(lines, TakenColumns.BHeader(), TakenLineStyle.Dim);
 		long sum = 0;
 		long hits = 0;
@@ -195,8 +217,9 @@ internal static class TakenPageText
 		return nominal > 0 ? 100.0 * amount / nominal : 0.0;
 	}
 
-	private static void Add(List<TakenLine> lines, string text, TakenLineStyle style)
+	private static void Add(List<TakenLine> lines, string text, TakenLineStyle style,
+	                        TakenBlock block = TakenBlock.None)
 	{
-		lines.Add(new TakenLine { Text = text, Style = style });
+		lines.Add(new TakenLine { Text = text, Style = style, Block = block });
 	}
 }

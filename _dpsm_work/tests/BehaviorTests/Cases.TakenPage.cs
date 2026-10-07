@@ -139,6 +139,35 @@ internal static partial class Cases
 		r.True("an-unresolvable-attacker-is-named", TkAny(odd, "攻击者不明"));
 		r.Str("and-the-odd-table-totals-them", TkSubTotal(odd, "  - 其他(不属于任何攻击者桶)", 0), "150");
 
+		// ---- R81: each sub-table's LABEL row carries its section, which is what the renderer colours ----
+		// Before R81 every line of this page landed on the same dim grey (or one of the three role colours),
+		// so on a victim with hundreds of attackers there was no landmark between 単位 and 属性 at all.
+		r.Eq("the-attacker-label-row-carries-its-section", (long)TkBlockOf(lines, "  - 单位(攻击者)"),
+			(long)TakenBlock.Attacker);
+		r.Eq("the-source-label-row-carries-its-section", (long)TkBlockOf(lines, "  - 种类(DamageSource)"),
+			(long)TakenBlock.HitType);
+		r.Eq("the-hit-type-label-row-carries-its-section", (long)TkBlockOf(lines, "  - 属性(eDamageCalcType)"),
+			(long)TakenBlock.Attr);
+		r.Eq("the-effect-label-row-carries-its-section", (long)TkBlockOf(lines, "  - 效果(m_effectId)"),
+			(long)TakenBlock.Effect);
+		r.Eq("the-odd-label-row-carries-its-section", (long)TkBlockOf(odd, "  - 其他(不属于任何攻击者桶)"),
+			(long)TakenBlock.Other);
+		// 状態 needs a fixture of its own: none of the tables above carries an ailment
+		var ailed = new List<TakenHit>();
+		TakenHit ail = TkPageHit(1, "甲", 100, 100);
+		ail.Status = "毒"; ail.StatusApplier = "ボス";
+		ailed.Add(ail);
+		List<TakenLine> withStatus = TakenPageText.Lines(TakenBreakdownPolicy.Build(ailed, 1), false, true);
+		r.Eq("the-status-label-row-carries-its-section", (long)TkBlockOf(withStatus, "  - 状态(异常/付与者)"),
+			(long)TakenBlock.Status);
+		// ONLY the label rows are tagged: 8 = two victims x four dimensions that each have a bucket. Tagging a
+		// bucket row would recolour a whole section, which is not what was asked for.
+		r.Eq("only-the-section-label-rows-are-tagged", (long)TkTaggedRows(lines), 8L);
+		r.Eq("the-headline-is-not-tagged-as-a-section", (long)lines[0].Block, (long)TakenBlock.None);
+		// Two tags that share a value share one colour, so the six sections plus "no section" must be seven
+		// distinct values -- this is the case that goes red if a value is copy-pasted in the vocabulary.
+		r.Eq("the-six-sections-plus-none-are-seven-distinct-tags", (long)TkDistinctTags(), 7L);
+
 		// ---- the empty states --------------------------------------------------------------------------
 		r.Str("an-empty-battle-says-what-is-missing",
 			TakenPageText.Lines(null, false, true)[0].Text, "  本场还没有受击记录(还没有人挨打)");
@@ -290,5 +319,41 @@ internal static partial class Cases
 			if (t.StartsWith("  前衛") || t.StartsWith("  後衛") || t.StartsWith("  站位未知")) n++;
 		}
 		return n;
+	}
+
+	/// <summary>R81: the section tag of the line that opens the sub-table named by <paramref name="subHeader"/>.
+	/// A missing label returns None, so the case that asked for it fails rather than silently passing.</summary>
+	private static TakenBlock TkBlockOf(List<TakenLine> lines, string subHeader)
+	{
+		for (int i = 0; i < lines.Count; i++)
+		{
+			string t = lines[i].Text;
+			if (t != null && t.StartsWith(subHeader)) return lines[i].Block;
+		}
+		return TakenBlock.None;
+	}
+
+	/// <summary>R81: how many lines carry a section tag -- only a sub-table's label row should.</summary>
+	private static int TkTaggedRows(List<TakenLine> lines)
+	{
+		int n = 0;
+		for (int i = 0; i < lines.Count; i++)
+			if (lines[i].Block != TakenBlock.None) n++;
+		return n;
+	}
+
+	/// <summary>R81: distinct values in the section vocabulary, "no section" included. Two sections that share
+	/// a value would be drawn in one colour, which defeats the point of the colours.</summary>
+	private static int TkDistinctTags()
+	{
+		TakenBlock[] all =
+		{
+			TakenBlock.None, TakenBlock.Attacker, TakenBlock.HitType, TakenBlock.Attr, TakenBlock.Effect,
+			TakenBlock.Status, TakenBlock.Other,
+		};
+		var seen = new List<TakenBlock>();
+		for (int i = 0; i < all.Length; i++)
+			if (!seen.Contains(all[i])) seen.Add(all[i]);
+		return seen.Count;
 	}
 }
