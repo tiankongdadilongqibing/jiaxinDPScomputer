@@ -24,6 +24,12 @@ internal static partial class Cases
 	/// was rendered with no separator in front of it (`2` + `100.00%` read as `2100.00%`, because the text is
 	/// seven columns wide and `PadL` never shrinks), and the amount column was labelled 金额 -- a currency --
 	/// for a damage amount. Both are pinned below as text, not as intent.
+	///
+	/// R84's subject is the page's SHAPE: it now prints ONE character (the reader's report was that a party's
+	/// worth of sub-tables is a lot of scrolling), chosen by clicking a name in a 角色 list printed above the
+	/// table. The list is checked to hold EVERY character -- with one character on screen it is the only way to
+	/// reach the others -- and the whole-team total row is checked to stay a whole-team total, because with a
+	/// single character on screen a bare `合计` would read as that character's own total.
 	/// </summary>
 	internal static void TakenPageCases(Runner r)
 	{
@@ -37,7 +43,7 @@ internal static partial class Cases
 			DisplayFormat.DispWidth(TakenColumns.T1Row("前衛", "レヴァナント", 6000000, 5000000, 1000000, 42, 48.6)),
 			TakenColumns.T1LineWidth);
 		r.Eq("the-totals-row-is-exactly-one-row-wide",
-			DisplayFormat.DispWidth(TakenColumns.T1TotalsLine(6000000, 5000000, 1000000, 42)),
+			DisplayFormat.DispWidth(TakenColumns.T1TotalsLine("全队合计", 6000000, 5000000, 1000000, 42)),
 			TakenColumns.T1LineWidth);
 		// A long name is fitted, so it can never push the numeric columns right (the R69 defect).
 		r.Eq("an-overlong-name-does-not-widen-the-row",
@@ -98,7 +104,7 @@ internal static partial class Cases
 			"  - 单位(攻击者)  253 项");
 
 		// ---- the page ----------------------------------------------------------------------------------
-		List<TakenLine> lines = TakenPageText.Lines(TkSample(), false, true);
+		List<TakenLine> lines = TakenPageText.Lines(TkSample(), false, true, 0);
 		r.Str("the-first-line-states-both-sides-of-the-total",
 			lines[0].Text, "击 4   受击(游戏口径) 450   已发布 450   超出剩余耐久 0");
 		r.Str("the-second-line-separates-our-side-from-the-enemy-side",
@@ -112,22 +118,27 @@ internal static partial class Cases
 		r.Eq("the-page-never-calls-the-residual-an-absorption", TkCount(lines, "被吸收"), 1);
 		r.True("and-that-one-mention-is-the-denial", TkAny(lines, "不是被吸收"));
 
-		// ---- the two filters ---------------------------------------------------------------------------
-		r.Eq("the-unfiltered-page-shows-both-our-rows", TkRows(TakenPageText.Lines(TkSample(), false, true)), 2);
-		r.Eq("the-vanguard-filter-keeps-only-the-front-row", TkRows(TakenPageText.Lines(TkSample(), true, true)), 1);
+		// ---- one character at a time, and the two filters ------------------------------------------------
+		// R84: the table prints the SELECTED character only -- the first entry (the biggest victim) until the
+		// reader picks another. Everyone else is one click away in the 角色 list above the table, which lists
+		// them all (its own cases are below).
+		r.Eq("the-table-shows-one-character-at-a-time", TkRows(lines), 1);
+		r.Str("and-that-one-is-the-first-entry-by-default", TkCellOf(lines, "  前衛", 1), "レヴァナント");
+		r.Eq("the-vanguard-filter-keeps-only-the-front-row",
+			TkRows(TakenPageText.Lines(TkSample(), true, true, 0)), 1);
 		// the totals line keeps stating the WHOLE battle, so a narrowed table cannot be misread as the picture
 		r.Str("the-vanguard-filter-does-not-move-the-headline-total",
-			TakenPageText.Lines(TkSample(), true, true)[0].Text,
+			TakenPageText.Lines(TkSample(), true, true, 0)[0].Text,
 			"击 4   受击(游戏口径) 450   已发布 450   超出剩余耐久 0");
 
-		// ---- R80: every victim is printed, there is no cap and no cap line ------------------------------
-		List<TakenLine> many = TakenPageText.Lines(TkManyVictims(15), false, true);
-		r.Eq("every-victim-gets-a-row", TkRows(many), 15);
+		// ---- R80 kept complete, R84 adds the index: every victim is reachable, none is dropped ----------
+		List<TakenLine> many = TakenPageText.Lines(TkManyVictims(15), false, true, 0);
+		r.Eq("the-table-still-shows-exactly-one-of-them", TkRows(many), 1);
 		r.Eq("nothing-is-dropped-from-the-page", TkCount(many, "另有"), 0);
 		r.Eq("no-longer-points-at-the-export-for-missing-rows", TkCount(many, "人(导出"), 0);
 
 		// ---- R80: no three-bucket fold either -- a dimension prints one row per bucket ------------------
-		List<TakenLine> wide = TakenPageText.Lines(TkFiveSources(), false, true);
+		List<TakenLine> wide = TakenPageText.Lines(TkFiveSources(), false, true, 0);
 		r.True("a-five-bucket-dimension-states-five", TkAny(wide, "  - 种类(DamageSource)  5 项"));
 		r.Eq("nothing-is-folded-into-a-remainder-row", TkCount(wide, "其余"), 0);
 		r.Eq("the-five-buckets-are-five-rows", TkBucketRows(wide, "  - 种类(DamageSource)"), 5);
@@ -138,11 +149,15 @@ internal static partial class Cases
 		r.Str("the-source-subtable-totals-it-too", TkSubTotal(lines, "  - 种类(DamageSource)", 0), "300");
 		r.Str("the-hit-type-subtable-totals-it-too", TkSubTotal(lines, "  - 属性(eDamageCalcType)", 0), "300");
 		r.Str("the-effect-subtable-totals-it-too", TkSubTotal(lines, "  - 效果(m_effectId)", 0), "300");
-		r.Str("the-second-victims-subtable-totals-its-own-nominal",
-			TkSubTotal(lines, "  - 单位(攻击者)", 1), "50");
-		// Every sub-table prints its own total, so none can silently lose a row. The ninth 合计 is the page's
-		// own victim-total row. 其余 is absent on purpose: R79 used it for the folded tail, and there is none.
-		r.Eq("every-sub-table-closes-on-a-total", TkCount(lines, "  合计"), 9);
+		// R84: the OTHER character is reached by selecting it -- which is exactly how the panel reaches it,
+		// since it is no longer printed underneath the first one.
+		List<TakenLine> second = TakenPageText.Lines(TkSample(), false, true, 3);
+		r.Str("the-other-characters-subtable-totals-its-own-nominal",
+			TkSubTotal(second, "  - 单位(攻击者)", 0), "50");
+		// Every sub-table prints its own total, so none can silently lose a row. One character's block = four
+		// sub-tables here (状態 and 其他 have nothing to print). The page's own whole-team row is NOT one of
+		// these: R84 labelled it 全队合计, so `  合计` can only ever be a sub-table's closing row.
+		r.Eq("every-sub-table-closes-on-a-total", TkCount(lines, "  合计"), 4);
 
 		// ---- the per-victim block ----------------------------------------------------------------------
 		r.True("the-block-lists-the-source-dimension", TkAny(lines, "  - 种类(DamageSource)"));
@@ -162,7 +177,7 @@ internal static partial class Cases
 		TakenHit un = TkPageHit(1, "甲", 50, 50);
 		un.AttackerKey = 0; un.Attacker = ""; un.Attr = "?";
 		mixed.Add(un);
-		List<TakenLine> odd = TakenPageText.Lines(TakenBreakdownPolicy.Build(mixed, 1), false, true);
+		List<TakenLine> odd = TakenPageText.Lines(TakenBreakdownPolicy.Build(mixed, 1), false, true, 0);
 		r.True("the-two-odd-amounts-get-their-own-table", TkAny(odd, "  - 其他(不属于任何攻击者桶)  2 项"));
 		r.True("friendly-damage-is-named", TkAny(odd, "同队自伤"));
 		r.True("an-unresolvable-attacker-is-named", TkAny(odd, "攻击者不明"));
@@ -186,25 +201,66 @@ internal static partial class Cases
 		TakenHit ail = TkPageHit(1, "甲", 100, 100);
 		ail.Status = "毒"; ail.StatusApplier = "ボス";
 		ailed.Add(ail);
-		List<TakenLine> withStatus = TakenPageText.Lines(TakenBreakdownPolicy.Build(ailed, 1), false, true);
+		List<TakenLine> withStatus = TakenPageText.Lines(TakenBreakdownPolicy.Build(ailed, 1), false, true, 0);
 		r.Eq("the-status-label-row-carries-its-section", (long)TkBlockOf(withStatus, "  - 状态(异常/付与者)"),
 			(long)TakenBlock.Status);
-		// ONLY the label rows are tagged: 8 = two victims x four dimensions that each have a bucket. Tagging a
-		// bucket row would recolour a whole section, which is not what was asked for.
-		r.Eq("only-the-section-label-rows-are-tagged", (long)TkTaggedRows(lines), 8L);
+		// ONLY the label rows are tagged: 4 = one victim x four dimensions that each have a bucket. Tagging a
+		// bucket row would recolour a whole section, which is not what was asked for. (R84: one victim's block
+		// is on the page at a time, so this counts that one block's sections.)
+		r.Eq("only-the-section-label-rows-are-tagged", (long)TkTaggedRows(lines), 4L);
 		r.Eq("the-headline-is-not-tagged-as-a-section", (long)lines[0].Block, (long)TakenBlock.None);
 		// Two tags that share a value share one colour, so the six sections plus "no section" must be seven
 		// distinct values -- this is the case that goes red if a value is copy-pasted in the vocabulary.
 		r.Eq("the-six-sections-plus-none-are-seven-distinct-tags", (long)TkDistinctTags(), 7L);
 
+		// ---- R84: the 角色 list -- the index that replaced everyone's rows -------------------------------
+		// With one character on screen, the list is the ONLY way to reach the others, so it is checked to
+		// offer every one of them, in the page's own order, with each entry submitting its own position.
+		List<TakenLine> list = TakenPageText.Lines(TkManyVictims(15), false, true, 0);
+		r.Eq("the-character-list-offers-one-entry-per-character", TkEntries(list).Count, 15);
+		r.Str("the-character-list-submits-each-entry-as-the-character-action", TkEntryActions(list), "TakenActor");
+		r.Str("the-character-list-passes-each-entries-position", TkEntryArgs(list),
+			"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14");
+		r.Str("the-character-list-names-every-character", TkEntryNames(list),
+			"味方0,味方1,味方2,味方3,味方4,味方5,味方6,味方7,味方8,味方9,味方10,味方11,味方12,味方13,味方14");
+		// The marker sits INSIDE the click target, so the entry that is lit up is the one a click switches to.
+		r.Str("the-character-list-marks-the-character-on-screen", TkMarked(list), "▶ 味方0");
+		List<TakenLine> third = TakenPageText.Lines(TkManyVictims(15), false, true, 102);
+		r.Str("and-the-marker-follows-the-selection", TkMarked(third), "▶ 味方2");
+		r.True("the-list-states-which-character-is-on-screen", TkAny(third, "角色 3/15(点名字切换)"));
+		// 15 names at five to a row = three name rows. The caption has a row of its own (see AddActorList),
+		// so the count below counts NAMES, and the one after it pins the wrap width itself.
+		r.Eq("the-character-list-wraps-after-five-names", TkNameRows(list), 3);
+		r.Eq("no-name-row-carries-more-than-five-entries", TkMaxEntriesPerRow(list), 5);
+		// An unknown key -- 0 before anything was picked, or a character that has left the list -- is the
+		// first entry. This is the case that keeps "the page remembered who I was looking at" from silently
+		// becoming "the page showed someone else".
+		List<TakenLine> fallback = TakenPageText.Lines(TkSample(), false, true, 999);
+		r.Eq("an-unknown-selection-lands-on-the-first-character", TkRows(fallback), 1);
+		r.Str("an-unknown-selection-shows-the-first-character", TkCellOf(fallback, "  前衛", 1), "レヴァナント");
+		r.True("an-unknown-selection-says-so-in-the-list", TkAny(fallback, "角色 1/2(点名字切换)"));
+		// The character on screen is NOT what the totals row is about: that row is the whole team, and with a
+		// single character's block above it a bare 合计 would read as that character's own total.
+		List<TakenLine> totals = TakenPageText.Lines(TkSample(), false, true, 3);
+		r.Str("the-totals-row-is-labelled-as-the-teams-total", TkCellOf(totals, "  全队合计", 0), "全队合计");
+		r.Str("and-that-row-keeps-the-whole-team-amount", TkCellOf(totals, "  全队合计", 1), "350");
+		// The list is the page's own victim list: our side only, and under the 前衛 filter.
+		r.Eq("the-victim-list-is-our-side-only", TakenPageText.Victims(TkSample(), false).Count, 2);
+		r.Eq("the-victim-list-follows-the-front-filter", TakenPageText.Victims(TkSample(), true).Count, 1);
+		r.Eq("an-empty-victim-list-selects-nothing", TakenPageText.SelectedIndex(new List<TakenActor>(), 7), -1);
+
 		// ---- the empty states --------------------------------------------------------------------------
 		r.Str("an-empty-battle-says-what-is-missing",
-			TakenPageText.Lines(null, false, true)[0].Text, "  本场还没有受击记录(还没有人挨打)");
+			TakenPageText.Lines(null, false, true, 0)[0].Text, "  本场还没有受击记录(还没有人挨打)");
 		r.Str("outside-a-battle-the-page-no-longer-claims-it-only-accumulates-live",
-			TakenPageText.Lines(null, false, false)[0].Text, "  没有可看的受击记录(本场与上一场都没有)");
+			TakenPageText.Lines(null, false, false, 0)[0].Text, "  没有可看的受击记录(本场与上一场都没有)");
 		r.Str("an-empty-section-outside-a-battle-says-the-same",
-			TakenPageText.Lines(new TakenBreakdown(), false, false)[0].Text,
+			TakenPageText.Lines(new TakenBreakdown(), false, false, 0)[0].Text,
 			"  没有可看的受击记录(本场与上一场都没有)");
+		// R84: nothing to choose from means no list at all -- not an empty caption, not a stray marker.
+		List<TakenLine> empty = TakenPageText.Lines(new TakenBreakdown(), false, false, 0);
+		r.Eq("an-empty-page-offers-no-character-entries", TkEntries(empty).Count, 0);
+		r.Eq("and-no-line-of-an-empty-page-carries-segments", TkNameRows(empty), 0);
 	}
 
 	/// <summary>Two of our units (one 前衛 hit twice, one 後衛) plus one enemy victim: enough to exercise every
@@ -384,5 +440,115 @@ internal static partial class Cases
 		for (int i = 0; i < all.Length; i++)
 			if (!seen.Contains(all[i])) seen.Add(all[i]);
 		return seen.Count;
+	}
+
+	/// <summary>R84: the clickable entries the 角色 list put on the page, in page order. Every other line of
+	/// this page has no segments, so an empty result is how "there is no list" is checked.</summary>
+	private static List<HotkeySeg> TkEntries(List<TakenLine> lines)
+	{
+		var found = new List<HotkeySeg>();
+		for (int i = 0; i < lines.Count; i++)
+		{
+			List<HotkeySeg> segs = lines[i].Segments;
+			if (segs == null) continue;
+			for (int s = 0; s < segs.Count; s++)
+				if (segs[s].Action != HotkeyAction.None) found.Add(segs[s]);
+		}
+		return found;
+	}
+
+	/// <summary>R84: the DISTINCT actions the list's entries submit. The list is supposed to submit exactly
+	/// one (the character action), so a keyboard action leaking into the list shows up here.</summary>
+	private static string TkEntryActions(List<TakenLine> lines)
+	{
+		List<HotkeySeg> entries = TkEntries(lines);
+		var seen = new List<string>();
+		for (int i = 0; i < entries.Count; i++)
+		{
+			string action = entries[i].Action.ToString();
+			if (!seen.Contains(action)) seen.Add(action);
+		}
+		return string.Join(",", seen.ToArray());
+	}
+
+	/// <summary>R84: the argument of every entry, in order -- the position each name submits.</summary>
+	private static string TkEntryArgs(List<TakenLine> lines)
+	{
+		List<HotkeySeg> entries = TkEntries(lines);
+		var parts = new List<string>();
+		for (int i = 0; i < entries.Count; i++) parts.Add(entries[i].Arg.ToString());
+		return string.Join(",", parts.ToArray());
+	}
+
+	/// <summary>R84: the name of every entry, in order, with the marker and the padding removed.</summary>
+	private static string TkEntryNames(List<TakenLine> lines)
+	{
+		List<HotkeySeg> entries = TkEntries(lines);
+		var parts = new List<string>();
+		for (int i = 0; i < entries.Count; i++) parts.Add(TkEntryName(entries[i]));
+		return string.Join(",", parts.ToArray());
+	}
+
+	/// <summary>R84: the entries carrying the "on screen" marker, as the words a reader sees. Two markers (or
+	/// none) make the expectation fail rather than pass as one.</summary>
+	private static string TkMarked(List<TakenLine> lines)
+	{
+		List<HotkeySeg> entries = TkEntries(lines);
+		var parts = new List<string>();
+		for (int i = 0; i < entries.Count; i++)
+		{
+			string text = (entries[i].Text ?? "").Trim();
+			if (text.StartsWith("▶")) parts.Add(text);
+		}
+		return string.Join(",", parts.ToArray());
+	}
+
+	/// <summary>An entry's name: its text without the marker and without the padding that separates it from
+	/// the next entry.</summary>
+	private static string TkEntryName(HotkeySeg seg)
+	{
+		string text = (seg.Text ?? "").Trim();
+		if (text.StartsWith("▶")) text = text.Substring(1).Trim();
+		return text;
+	}
+
+	/// <summary>R84: how many lines of the page carry entries -- i.e. how many rows the 角色 list took. The
+	/// caption is a row of its own, so this counts NAME rows only.</summary>
+	private static int TkNameRows(List<TakenLine> lines)
+	{
+		int n = 0;
+		for (int i = 0; i < lines.Count; i++)
+			if (lines[i].Segments != null) n++;
+		return n;
+	}
+
+	/// <summary>R84: the most entries any one name row carries -- the wrap width as it was actually built.</summary>
+	private static int TkMaxEntriesPerRow(List<TakenLine> lines)
+	{
+		int most = 0;
+		for (int i = 0; i < lines.Count; i++)
+		{
+			List<HotkeySeg> segs = lines[i].Segments;
+			if (segs == null) continue;
+			int n = 0;
+			for (int s = 0; s < segs.Count; s++)
+				if (segs[s].Action != HotkeyAction.None) n++;
+			if (n > most) most = n;
+		}
+		return most;
+	}
+
+	/// <summary>R84: one cell of the first row that opens with <paramref name="prefix"/>. A missing row or a
+	/// missing cell returns "", so the caller's expectation fails instead of the run crashing.</summary>
+	private static string TkCellOf(List<TakenLine> lines, string prefix, int index)
+	{
+		string row = "";
+		for (int i = 0; i < lines.Count; i++)
+		{
+			string t = lines[i].Text;
+			if (t != null && t.StartsWith(prefix)) { row = t; break; }
+		}
+		string[] cells = TkCells(row);
+		return index < cells.Length ? cells[index] : "";
 	}
 }

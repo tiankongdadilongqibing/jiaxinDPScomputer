@@ -165,6 +165,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R82.md',
     # R83 批次:受击来源拆分页的两处显示缺陷(占比列加宽一格不再与击数贴字;桶子表列名 金额→伤害)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R83.md',
+    # R84 批次:受击来源拆分页一页一个角色 + 表上方的角色列表(点名字换人;键盘行为一字未改)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R84.md',
 ]
 
 

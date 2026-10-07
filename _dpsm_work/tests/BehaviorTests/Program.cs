@@ -37,8 +37,12 @@ internal static class Program
 	/// R83: 1499 -> 1506 (+7 in ui/taken-page: the share columns are 8 wide, so a full `100.00%` -- seven
 	/// columns, and `PadL` never shrinks a full cell -- keeps a space of its own instead of being rendered
 	/// against the hit count as `2100.00%`; plus the amount column's label, which may say 伤害 and not 金额).
+	/// R84: 1506 -> 1526 (+20 in ui/taken-page: the page prints ONE character, picked by clicking a name in a
+	/// 角色 list above the table -- the list must offer every character with its own position, mark the one on
+	/// screen, wrap at five names, fall back to the first entry for an unknown key, and the whole-team total
+	/// row must stay labelled as the whole team's).
 	/// </summary>
-	public const int ExpectedCases = 1506;
+	public const int ExpectedCases = 1526;
 
 	private static int Main(string[] args)
 	{

@@ -30,6 +30,15 @@ internal enum HotkeyAction
 	KeyEnd = 14,
 	KeyLeft = 15,
 	KeyRight = 16,
+
+	/// <summary>
+	/// R84: click one character of the 受击来源拆分 page's 角色 list. This is the ONE member that is not a key,
+	/// and it cannot be one: the list carries an entry per character and no single key can name "the third
+	/// one". It still belongs to this vocabulary -- it is one more way to drive the page, dispatched by the
+	/// same <c>DispatchHotkey</c> as every key -- and <see cref="HotkeySeg.Arg"/> carries the entry's index
+	/// in the page's victim list.
+	/// </summary>
+	TakenActor = 17,
 }
 
 /// <summary>
@@ -44,10 +53,23 @@ internal readonly struct HotkeySeg
 	public readonly string Text;
 	public readonly HotkeyAction Action;
 
+	/// <summary>R84: what a page-local entry points at -- the index in the 受击来源拆分 page's character list
+	/// for <see cref="HotkeyAction.TakenActor"/>, 0 for every key-driven action. A key names its action
+	/// completely; an entry of a per-item list additionally has to say WHICH item.</summary>
+	public readonly int Arg;
+
 	public HotkeySeg(string text, HotkeyAction action)
 	{
 		Text = text ?? "";
 		Action = action;
+		Arg = 0;
+	}
+
+	public HotkeySeg(string text, HotkeyAction action, int arg)
+	{
+		Text = text ?? "";
+		Action = action;
+		Arg = arg;
 	}
 
 	public bool Clickable { get { return Action != HotkeyAction.None; } }
@@ -124,6 +146,40 @@ internal static class HotkeyBarText
 			Key("End 首尾", HotkeyAction.KeyEnd),
 			Plain("  任务 " + (quest ?? "") + "   " + (seconds ?? "")),
 		};
+	}
+
+	/// <summary>
+	/// R84: how many 角色 entries go on one row of the 受击来源拆分 page's character list. The page is 880 px
+	/// wide and its widest table row is 81 display columns, so five names of ordinary length fit with room
+	/// to spare. The count is fixed rather than measured because this file is pure and has no font.
+	/// </summary>
+	public const int TakenActorPerRow = 5;
+
+	/// <summary>R84: the indent in front of every character-list row. The caption sits on its OWN row (see
+	/// TakenPageText.AddActorList), so this only has to be the same on every row -- counting spaces to line
+	/// names up under a caption cannot work, because the caption's width depends on whether it reads 1/6 or
+	/// 12/15, while the renderer measures each entry itself.</summary>
+	public const string TakenActorIndent = "  ";
+
+	/// <summary>R84: the caption of the 角色 list: which character of how many is on screen, and that the names
+	/// under it are the way to switch. It is a row of its own -- see TakenActorIndent for why.</summary>
+	public static HotkeySeg TakenActorLabel(int selectedNumber, int total)
+	{
+		return Plain("角色 " + selectedNumber + "/" + total + "(点名字切换)");
+	}
+
+	/// <summary>R84: the head of a wrapped continuation row.</summary>
+	public static HotkeySeg TakenActorWrap()
+	{
+		return Plain(TakenActorIndent);
+	}
+
+	/// <summary>R84: one character's entry in the 角色 list. The selected entry carries ▶, so the page never
+	/// has to be scrolled down to its table row to find out who is on screen -- and the marker is inside the
+	/// click target, so the entry that is lit up is the entry that switches.</summary>
+	public static HotkeySeg TakenActorEntry(string name, int index, bool selected)
+	{
+		return new HotkeySeg((selected ? "▶ " : "  ") + (name ?? "") + "  ", HotkeyAction.TakenActor, index);
 	}
 
 	/// <summary>The 总贡献 page's bar.</summary>

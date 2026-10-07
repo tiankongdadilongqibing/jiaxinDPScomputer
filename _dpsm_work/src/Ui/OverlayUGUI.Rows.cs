@@ -229,7 +229,10 @@ public static partial class OverlayUGUI
 						srt.anchoredPosition = new Vector2(x, -y - 1f);
 						srt.sizeDelta = new Vector2(w, h);
 						if (seg.Clickable)
-							_hotkeyHits.Add(new HotkeyHit { Rt = srt, Text = st, Base = r.Color, Action = seg.Action });
+							_hotkeyHits.Add(new HotkeyHit
+							{
+								Rt = srt, Text = st, Base = r.Color, Action = seg.Action, Arg = seg.Arg,
+							});
 						x += w;
 						if (s + 1 < r.Segments.Count) x += HotkeyBarText.Gap;
 						textIdx++;
@@ -438,25 +441,29 @@ public static partial class OverlayUGUI
 	// (R79 printed three per dimension and folded the rest, under a 64-bucket cap that also truncated the
 	// export). A mid-size fight therefore renders a few THOUSAND lines, and BuildRows() runs every 0.25 s,
 	// so re-deriving those strings per refresh would be the panel's entire cost. The list is memoised on
-	// the three things that can change it -- the breakdown instance, the vanguard filter and whether a
-	// battle is live -- the same way ResolveContributionView memoises its view per finished summary.
+	// the four things that can change it -- the breakdown instance, the vanguard filter, whether a battle is
+	// live, and (R84) which character the page shows -- the same way ResolveContributionView memoises its
+	// view per finished summary.
 	// Reusing the list also means the strings are the SAME instances between refreshes, which lets Unity's
 	// Text.text setter short-circuit on equality instead of re-uploading a mesh for every row.
 	// ---------------------------------------------------------------------------------------------
 	private static TakenBreakdown _takenLinesFor;
 	private static bool _takenLinesVanguardOnly;
 	private static bool _takenLinesInBattle;
+	private static int _takenLinesActorKey;
 	private static List<TakenLine> _takenLines;
 
-	private static List<TakenLine> ResolveTakenLines(TakenBreakdown b, bool vanguardOnly, bool inBattle)
+	private static List<TakenLine> ResolveTakenLines(TakenBreakdown b, bool vanguardOnly, bool inBattle,
+	                                                 int selectedKey)
 	{
 		if (_takenLines != null && ReferenceEquals(_takenLinesFor, b) && _takenLinesVanguardOnly == vanguardOnly
-		    && _takenLinesInBattle == inBattle)
+		    && _takenLinesInBattle == inBattle && _takenLinesActorKey == selectedKey)
 			return _takenLines;
-		_takenLines = TakenPageText.Lines(b, vanguardOnly, inBattle);
+		_takenLines = TakenPageText.Lines(b, vanguardOnly, inBattle, selectedKey);
 		_takenLinesFor = b;
 		_takenLinesVanguardOnly = vanguardOnly;
 		_takenLinesInBattle = inBattle;
+		_takenLinesActorKey = selectedKey;
 		return _takenLines;
 	}
 
@@ -1256,9 +1263,18 @@ public static partial class OverlayUGUI
 			// R80: the page shows the PREVIOUS battle once a fight is over (TakenSession.Get resolves the
 			// live session first, then Aggregator.History[0]), so "上一场" is what this header means when
 			// inBattle is false -- and the list is memoised, see ResolveTakenLines.
-			List<TakenLine> taken = ResolveTakenLines(TakenSession.Get(), _takenVanguardOnly, inBattle);
+			List<TakenLine> taken = ResolveTakenLines(TakenSession.Get(), _takenVanguardOnly, inBattle,
+			                                         _takenActorKey);
 			for (int i = 0; i < taken.Count; i++)
-				rows.Add(new RowDef { Text = taken[i].Text, Color = TakenColor(taken[i]), Height = 16f });
+				rows.Add(new RowDef
+				{
+					Text = taken[i].Text,
+					Color = TakenColor(taken[i]),
+					Height = 16f,
+					// R84: the 角色 list's rows carry clickable entries; every other page line has none
+					// (null), which is exactly what the layout pass treats as "one Text for the whole row".
+					Segments = taken[i].Segments,
+				});
 			// the table aligns by padding with spaces: exact only on the mono font's 1:2 grid
 			Font tkMono = GetMonoFont();
 			if (!GameRef.IsNull(tkMono))

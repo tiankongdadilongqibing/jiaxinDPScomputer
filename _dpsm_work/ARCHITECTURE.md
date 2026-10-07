@@ -79,7 +79,7 @@ src/
     TakenBreakdown.cs          1.7.29 受击来源拆分的模型(单位/桶/状态/一击四层 + 段级总额)。
                                和 `ActorStats` 无关:它只描述「谁挨了多少、由谁造成」,
                                由 `Policy/TakenBreakdownPolicy.cs` 分组、`Output/TakenSession.cs` 落盘
-                               (1.7.30:分组无桶上限,每个受害单位一个 `BucketIndex` 字典索引;1.7.31:每个子表的标签行带 `TakenBlock` 段落标签,只用于渲染层配色;1.7.32:七条快捷键栏(`Ui/HotkeyBarText.cs`)按「键」给出可点段,渲染层每段一个池内 `Text`,点击与键盘走同一批 `Act*` 动作方法;1.7.33:受击来源拆分页的两个占比列各加宽一格(7→8,贡献表自 R12 起就是 8)——`DisplayFormat.Pct` 的 `100.00%` 恰好 7 个显示列而 `DisplayFormat.PadL` 不给填满的格子补位,击数 `2` 曾与它贴成 `2100.00%`;桶子表金额列名 `金额`→`伤害`)
+                               (1.7.30:分组无桶上限,每个受害单位一个 `BucketIndex` 字典索引;1.7.31:每个子表的标签行带 `TakenBlock` 段落标签,只用于渲染层配色;1.7.32:七条快捷键栏(`Ui/HotkeyBarText.cs`)按「键」给出可点段,渲染层每段一个池内 `Text`,点击与键盘走同一批 `Act*` 动作方法;1.7.33:受击来源拆分页的两个占比列各加宽一格(7→8,贡献表自 R12 起就是 8)——`DisplayFormat.Pct` 的 `100.00%` 恰好 7 个显示列而 `DisplayFormat.PadL` 不给填满的格子补位,击数 `2` 曾与它贴成 `2100.00%`;桶子表金额列名 `金额`→`伤害`;1.7.34:F3 页一页只印一个我方受害单位,角色列表在表格上方(每个名字一段、可点、选中的带 `▶`,每行 5 个折行),求和行改名 `全队合计`)
 
   Composition/               伤害构成模块(见第 3 节)
     CompositionProbe*.cs       10 个 partial 文件,一个类
@@ -104,7 +104,7 @@ src/
                                结果进 `[DpsMeter][JSON]` 行。离线探针反向验证它能拒绝四种畸形。
     RuntimeLog.cs              轮转式运行日志(BepInEx\config\dpsmeter_runtime.log)
     TakenSession.cs            1.7.29 起:与 `contribution` 段并列的顶层段 `takenBreakdown` 的产出与缓存
-                               (段内自带 `schemaVersion`(1.7.30 起 `1.1`,1.7.31、1.7.32 与 1.7.33 未动)、`basis nominal`;
+                               (段内自带 `schemaVersion`(1.7.30 起 `1.1`,1.7.31、1.7.32、1.7.33 与 1.7.34 未动)、`basis nominal`;
                                进行中的战斗每秒最多重算一次,已结束的战斗取 `Aggregator.History[0].Session` 且只算一次)
 
   Ui/                        悬浮窗
@@ -114,7 +114,7 @@ src/
     OverlayUI.cs               IMGUI 的 MonoBehaviour 壳
     TakenColumns.cs / TakenPageText.cs
                                1.7.29 起:F3「受击来源拆分」页的列宽与行文本(纯模块,行为套件直接执行;
-                               1.7.30 起每个受害单位的每个维度是一张子表,桶不折叠、受害单位也不扣人;1.7.31 起六个子表标签行各带一个 `TakenBlock` 段落标签,渲染层据此给六段各一种鲜艳颜色,页面字符串与列宽未动;1.7.32 起页面顶部的快捷键提示改由 `Ui/HotkeyBarText.cs` 分段给出(`HotkeySeg{Text,Action}`,`Line()` 逐字重现旧字符串),每段一个池内 `Text` 并可点,`Ui/OverlayUGUI.cs` 的 `CheckMouseClick()` 先测这些段落、未命中才回落复制判定,F6 页的键位提示从锚定条搬成一条新行,键盘行为与页面文案未动;1.7.33 起两个占比列各 8 列(此前 7 列时 `100.00%` 与击数贴成 `2100.00%`),桶子表的金额列名改为 `伤害`,其余列宽与页面字符串未动)
+                               1.7.30 起每个受害单位的每个维度是一张子表,桶不折叠、受害单位也不扣人;1.7.31 起六个子表标签行各带一个 `TakenBlock` 段落标签,渲染层据此给六段各一种鲜艳颜色,页面字符串与列宽未动;1.7.32 起页面顶部的快捷键提示改由 `Ui/HotkeyBarText.cs` 分段给出(`HotkeySeg{Text,Action}`,`Line()` 逐字重现旧字符串),每段一个池内 `Text` 并可点,`Ui/OverlayUGUI.cs` 的 `CheckMouseClick()` 先测这些段落、未命中才回落复制判定,F6 页的键位提示从锚定条搬成一条新行,键盘行为与页面文案未动;1.7.33 起两个占比列各 8 列(此前 7 列时 `100.00%` 与击数贴成 `2100.00%`),桶子表的金额列名改为 `伤害`,其余列宽与页面字符串未动;1.7.34 起表格一页只印一个我方受害单位,角色列表在表格上方(每个名字一段、可点、选中的带 `▶`,每行 5 个折行),求和行改名 `全队合计`)
 
   Diagnostics/
     Probe.cs                   候选伤害路径计数器([PROBE] 输出),用于找"无来源伤害"

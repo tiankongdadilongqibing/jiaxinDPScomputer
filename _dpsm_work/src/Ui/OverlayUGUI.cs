@@ -58,6 +58,12 @@ public static partial class OverlayUGUI
 	/// table can never be mistaken for the whole picture.</summary>
 	private static bool _takenVanguardOnly;
 
+	/// <summary>R84: which character the 受击来源拆分 page (F3) shows. It holds the victim's
+	/// <see cref="TakenActor.Key"/>, not a position in the list: a live fight re-sorts that list by nominal
+	/// every second, and an index would silently change WHICH character is on screen. 0 means "nothing picked
+	/// yet", which the page renders as its first entry (the biggest victim).</summary>
+	private static int _takenActorKey;
+
 	/// <summary>Pinned info bar of the detail view. It lives on the PANEL (not in the scrolled
 	/// content), so the character, the page and the record counts stay visible while scrolling through
 	/// a long list -- previously that information sat in the first rows and scrolled out of sight.</summary>
@@ -90,6 +96,9 @@ public static partial class OverlayUGUI
 		public Text Text;
 		public Color Base;
 		public HotkeyAction Action;
+		/// <summary>R84: the GLYPH's argument (see HotkeySeg.Arg) -- only the 角色 list uses it, to say WHICH
+		/// character the entry names. 0 for every key-named entry.</summary>
+		public int Arg;
 	}
 
 	private static readonly List<HotkeyHit> _hotkeyHits = new List<HotkeyHit>();
@@ -432,7 +441,7 @@ public static partial class OverlayUGUI
 				HotkeyHit hit = _hotkeyHits[i];
 				if (GameRef.IsNull(hit.Rt)) continue;
 				if (!RectTransformUtility.RectangleContainsScreenPoint(hit.Rt, mp, null)) continue;
-				DispatchHotkey(hit.Action);
+				DispatchHotkey(hit.Action, hit.Arg);
 				return true;
 			}
 		}
@@ -471,8 +480,10 @@ public static partial class OverlayUGUI
 	/// (see CheckKeys) -- the enum is named after keys precisely so this stays a one-line mapping.
 	/// Home/End move the scroll offset the way HandleScroll's own Home/End keys do (level-triggered
 	/// there; a click is already one edge, so the same assignments are made once here).
+	/// R84: <paramref name="arg"/> carries the entry's <see cref="HotkeySeg.Arg"/> (which character a 角色
+	/// list entry names). It is 0 for the key-named entries, which is also what they mean.
 	/// </summary>
-	private static void DispatchHotkey(HotkeyAction action)
+	private static void DispatchHotkey(HotkeyAction action, int arg)
 	{
 		try
 		{
@@ -494,6 +505,7 @@ public static partial class OverlayUGUI
 				case HotkeyAction.KeyEnd: _scrollOffset = float.MaxValue; break;   // clamped by HandleScroll
 				case HotkeyAction.KeyLeft: ActDetailPage(-1); break;
 				case HotkeyAction.KeyRight: ActDetailPage(1); break;
+				case HotkeyAction.TakenActor: ActTakenActor(arg); break;
 			}
 		}
 		catch (Exception ex) { UiError("HotkeyDispatch", ex); }
@@ -539,9 +551,31 @@ public static partial class OverlayUGUI
 			if (shift) _takenVanguardOnly = !_takenVanguardOnly;
 			else View = _viewBeforeDetail;
 		}
-		else { _viewBeforeDetail = View; View = ViewMode.Taken; }
+		// R84: entering the page always starts on its first entry (the biggest victim). Flipping the 前衛
+		// filter does NOT clear the selection: the chosen character is remembered by key, so it stays on
+		// screen whenever the filter still contains it, and the page falls back to the first entry when it
+		// does not.
+		else { _takenActorKey = 0; _viewBeforeDetail = View; View = ViewMode.Taken; }
 		_scrollOffset = 0f;
 		_lastRefresh = 0f;
+	}
+
+	/// <summary>R84: show the character the reader clicked in the 角色 list. <paramref name="index"/> is a
+	/// position in that list as it was rendered; it is resolved against the CURRENT list (rebuilt from the
+	/// same helper the page used), so a click on a stale layout can never select a different character than
+	/// the one under the pointer -- out-of-range just does nothing.</summary>
+	internal static void ActTakenActor(int index)
+	{
+		try
+		{
+			if (index < 0) return;
+			List<TakenActor> mine = TakenPageText.Victims(TakenSession.Get(), _takenVanguardOnly);
+			if (index >= mine.Count) return;
+			_takenActorKey = mine[index].Key;
+			_scrollOffset = 0f;
+			_lastRefresh = 0f;
+		}
+		catch (Exception ex) { UiError("TakenActor", ex); }
 	}
 
 	internal static void ActF5()

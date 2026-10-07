@@ -146,10 +146,14 @@ internal static class TakenColumns
 	}
 
 	/// <summary>The page's totals row, on the victim rows' own geometry: the two dimensions where a sum is
-	/// meaningful are filled and the rest stay blank rather than printing a second, ambiguous percentage.</summary>
-	public static string T1TotalsLine(long nominal, long taken, long residual, long hits)
+	/// meaningful are filled and the rest stay blank rather than printing a second, ambiguous percentage.
+	/// R84: the label is a parameter because the page now shows ONE character at a time while this row sums
+	/// the WHOLE allied side -- a bare 合计 printed under a single character's blocks reads as that
+	/// character's own total, which it never was (the same trap the share column had in R83).</summary>
+	public static string T1TotalsLine(string label, long nominal, long taken, long residual, long hits)
 	{
-		return "  " + DisplayFormat.PadR("合计", T1Position + T1Name)
+		return "  " + DisplayFormat.PadR(DisplayFormat.Fit(DisplayFormat.Cell(label), T1Position + T1Name),
+		                                 T1Position + T1Name)
 		     + DisplayFormat.Amt(nominal, T1Nominal)
 		     + DisplayFormat.Amt(taken, T1Taken)
 		     + DisplayFormat.Amt(residual, T1Residual)
