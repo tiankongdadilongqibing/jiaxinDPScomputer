@@ -18,7 +18,12 @@ internal static class TakenColumns
 	public const int T1Taken = 13;
 	public const int T1Residual = 13;
 	public const int T1Hits = 6;
-	public const int T1Share = 7;
+
+	/// <summary>R83: 8, not 7. <see cref="DisplayFormat.Pct"/> prints `100.00%` in exactly seven display
+	/// columns and <see cref="DisplayFormat.PadL"/> never shrinks a full cell, so a seven-wide share cell put
+	/// the percentage's leading digit straight against the hit count and `2` + `100.00%` read as `2100.00%`.
+	/// Eight is what the contribution table has used for this column since R12 (ContributionColumns.T1Share).</summary>
+	public const int T1Share = 8;
 
 	/// <summary>The visible width of a victim row: the two leading spaces PLUS every column. Must stay
 	/// inside the panel (see OverlayUGUI.Rows.cs LayoutCharts, which widens the panel for this page).</summary>
@@ -50,15 +55,24 @@ internal static class TakenColumns
 	public const int BAmount = 14;
 
 	public const int BHits = 7;
-	public const int BShare = 7;
+
+	/// <summary>R83: 8 for the same reason as <see cref="T1Share"/> -- `100.00%` is seven columns wide and a
+	/// full cell gets no padding at all, so at seven the share column touched the hit count (`2` + `100.00%`
+	/// reads as `2100.00%`). Every legitimately computed share is at most `100.00%`, so eight columns always
+	/// leaves at least one space between the two numbers.</summary>
+	public const int BShare = 8;
 
 	/// <summary>The visible width of a bucket row: two leading spaces PLUS every column. Pinned by a test and
 	/// comfortably inside the panel LayoutCharts gives this page (880 px).</summary>
 	public const int BLineWidth = 2 + BName + BAmount + BHits + BShare;
 
+	// R83: the amount column is labelled 伤害, not 金额. Nothing on this page is money -- the cell holds a
+	// damage amount inside the victim's nominal total -- and the contribution table calls the same kind of
+	// cell 当量 in its rule/link tables. The user reported the old label as wrong, and it was: 金额 invited
+	// reading the number as a currency.
 	public static readonly ColumnSpec[] B =
 	{
-		C("名字", BName, false), C("金额", BAmount, true), C("击数", BHits, true), C("占比", BShare, true),
+		C("名字", BName, false), C("伤害", BAmount, true), C("击数", BHits, true), C("占比", BShare, true),
 	};
 
 	/// <summary>The column header of a bucket sub-table, on <see cref="BRow"/>'s own geometry.</summary>

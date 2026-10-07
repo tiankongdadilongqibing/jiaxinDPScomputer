@@ -19,13 +19,18 @@ internal static partial class Cases
 	/// R80's own subject is that NOTHING is summarised away: no victim cap, no three-bucket fold, and every
 	/// dimension's sub-table closes on a total that must equal the victim's whole nominal (the model's
 	/// invariant, re-checked here on the strings that actually reach the panel).
+	///
+	/// R83's subject is the two defects a screenshot found in R80's finished table: a full `100.00%` share cell
+	/// was rendered with no separator in front of it (`2` + `100.00%` read as `2100.00%`, because the text is
+	/// seven columns wide and `PadL` never shrinks), and the amount column was labelled 金额 -- a currency --
+	/// for a damage amount. Both are pinned below as text, not as intent.
 	/// </summary>
 	internal static void TakenPageCases(Runner r)
 	{
 		r.Group("ui/taken-page");
 
 		// ---- the geometry is one number, and the built rows obey it ------------------------------------
-		r.Eq("the-victim-row-width-is-pinned", TakenColumns.T1LineWidth, 80);
+		r.Eq("the-victim-row-width-is-pinned", TakenColumns.T1LineWidth, 81);
 		r.Eq("the-header-is-exactly-one-row-wide",
 			DisplayFormat.DispWidth(TakenColumns.Header()), TakenColumns.T1LineWidth);
 		r.Eq("a-victim-row-is-exactly-one-row-wide",
@@ -40,7 +45,7 @@ internal static partial class Cases
 			TakenColumns.T1LineWidth);
 
 		// ---- the bucket sub-table: one row per bucket, on its own pinned geometry ----------------------
-		r.Eq("the-bucket-row-width-is-pinned", TakenColumns.BLineWidth, 76);
+		r.Eq("the-bucket-row-width-is-pinned", TakenColumns.BLineWidth, 77);
 		r.True("the-bucket-table-fits-the-wide-panel", TakenColumns.BLineWidth <= 94);
 		r.Eq("the-bucket-header-is-exactly-one-row-wide",
 			DisplayFormat.DispWidth(TakenColumns.BHeader()), TakenColumns.BLineWidth);
@@ -56,6 +61,30 @@ internal static partial class Cases
 		r.True("an-overlong-bucket-name-is-still-marked", TkCells(wideRow)[0].EndsWith("*"));
 		r.Eq("a-marked-overlong-name-does-not-widen-the-row",
 			DisplayFormat.DispWidth(wideRow), TakenColumns.BLineWidth);
+
+		// ---- R83: a full share cell may not touch the number before it ---------------------------------
+		// `DisplayFormat.Pct` prints `100.00%` in exactly seven display columns and `PadL` adds NOTHING to a
+		// cell that is already full, so a seven-wide share column rendered the hit count and the percentage as
+		// one run of digits: `2` + `100.00%` read as `2100.00%`. R83 widened both share columns to the
+		// contribution table's own eight. The two cases above pin the geometry; these pin the REASON for it,
+		// so a later "let us save a column" edit has to redden a test that says what it breaks.
+		r.Eq("the-share-text-is-seven-columns-wide", DisplayFormat.DispWidth(DisplayFormat.Pct(100.0)), 7);
+		r.Str("a-full-share-cell-would-get-no-padding", DisplayFormat.PadL(DisplayFormat.Pct(100.0), 7), "100.00%");
+		string fullVictim = TakenColumns.T1Row("前衛", "レヴァナント", 6000000, 6000000, 0, 42, 100.0);
+		r.Str("a-full-victim-share-cell-carries-its-own-padding",
+			fullVictim.Substring(fullVictim.Length - TakenColumns.T1Share), " 100.00%");
+		string fullBucket = TakenColumns.BRow("ショゴス", 6000000, 42, 100.0, false);
+		r.Str("a-full-bucket-share-cell-carries-its-own-padding",
+			fullBucket.Substring(fullBucket.Length - TakenColumns.BShare), " 100.00%");
+		// The separator is the column's width, not a special case for 100%: the share cell always starts with
+		// at least one space of its own, so 99.99% cannot glue either.
+		string nearFull = TakenColumns.BRow("ショゴス", 5999999, 42, 99.99, false);
+		r.True("a-near-full-bucket-share-is-separated-too",
+			nearFull[nearFull.Length - TakenColumns.BShare] == ' ');
+
+		// ---- R83: the amount column is a DAMAGE amount, and says so -------------------------------------
+		r.True("the-bucket-amount-column-is-labelled-damage", TakenColumns.BHeader().Contains("伤害"));
+		r.True("the-bucket-amount-column-is-not-labelled-money", !TakenColumns.BHeader().Contains("金额"));
 
 		// ---- the approximation marker: an estimate may not look like a measurement ---------------------
 		r.Str("an-approximate-bucket-is-marked", TkCells(TakenColumns.BRow("ショゴス", 500000, 3, 50.0, true))[0],

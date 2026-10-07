@@ -34,8 +34,11 @@ internal static class Program
 	/// R82: 1469 -> 1499 (+30 in ui/hotkey-bar: every bar's text pinned byte-for-byte against the literal
 	/// it replaced, the ordered list of what a click on that bar does, the rule that a page title and a
 	/// separator are NOT clickable, and the width fallback the first un-measured frame uses).
+	/// R83: 1499 -> 1506 (+7 in ui/taken-page: the share columns are 8 wide, so a full `100.00%` -- seven
+	/// columns, and `PadL` never shrinks a full cell -- keeps a space of its own instead of being rendered
+	/// against the hit count as `2100.00%`; plus the amount column's label, which may say 伤害 and not 金额).
 	/// </summary>
-	public const int ExpectedCases = 1499;
+	public const int ExpectedCases = 1506;
 
 	private static int Main(string[] args)
 	{

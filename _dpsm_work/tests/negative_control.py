@@ -1199,6 +1199,22 @@ MUTATIONS = [
          find="\t\treturn ascii * 0.56f * fontSize + wide * 1.0f * fontSize;",
          repl="\t\treturn ascii * 0.56f * fontSize + wide * 0.2f * fontSize;",
          expect="ui/hotkey-bar/the-width-estimate-counts-a-cjk-glyph-wider-than-ascii"),
+    # ---- R83: the 受击来源拆分 table's two share columns and the amount column's label. `100.00%` is seven
+    # display columns wide and PadL adds nothing to a cell that is already full, so the first two mutations
+    # render the percentage's leading digit straight against the hit count again (`2` + `100.00%` used to read
+    # as `2100.00%`). The third restores the currency word the user reported as wrong for a damage amount.
+    dict(name="taken-bucket-share-cell-narrowed-to-7", file="Ui/TakenColumns.cs",
+         find="\tpublic const int BShare = 8;",
+         repl="\tpublic const int BShare = 7;",
+         expect="ui/taken-page/a-full-bucket-share-cell-carries-its-own-padding"),
+    dict(name="taken-victim-share-cell-narrowed-to-7", file="Ui/TakenColumns.cs",
+         find="\tpublic const int T1Share = 8;",
+         repl="\tpublic const int T1Share = 7;",
+         expect="ui/taken-page/a-full-victim-share-cell-carries-its-own-padding"),
+    dict(name="taken-amount-column-called-money-again", file="Ui/TakenColumns.cs",
+         find='C("伤害", BAmount, true)',
+         repl='C("金额", BAmount, true)',
+         expect="ui/taken-page/the-bucket-amount-column-is-not-labelled-money"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",
