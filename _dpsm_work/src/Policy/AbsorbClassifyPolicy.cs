@@ -135,8 +135,9 @@ internal struct AbsorbObservation
 	}
 
 	/// <summary>The part of the hit that stayed with the victim: `nominal - res`. Only meaningful for an
-	/// oversized call. NOTE for anyone reading the export next to this: the published `入耐久` is `res`
-	/// (the overflow) and the published 被吸收/无效化 is this number, so on these calls the two are swapped.
+	/// oversized call. NOTE for anyone reading the export next to this: the published amount is `res`
+	/// (the overflow) and the label R78 renamed to 目标剩余耐久 (old name: 被吸收/无效化) is this number, so on
+	/// these calls the two are swapped. R78 did not change either number -- only the words.
 	/// </summary>
 	internal int Landed()
 	{

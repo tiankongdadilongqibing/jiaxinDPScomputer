@@ -89,6 +89,11 @@
          decision is exactly where an invented carrier would hide. `CarrierUnknown` and `Unreadable` are
          answers the suite has to be able to hold the classifier to. -->
     <Compile Include="$(SrcRoot)\Policy\AbsorbClassifyPolicy.cs" />
+    <!-- R78: the WORDS. Everything the plugin says about an oversized call is produced here, so the exact
+         text of the three fields and of the `[ABSPROBE] note` line is executed rather than eyeballed. Pure
+         (no IL2CPP): it takes the numbers and the verdict and returns the string, which is the only way the
+         suite can hold a sentence to the arithmetic it claims. -->
+    <Compile Include="$(SrcRoot)\Policy\AbsorbWording.cs" />
     <!-- R72: the rule that makes the shift LAND: an event arriving before the origin is decided is held and
          replayed at its arrival + the lag, instead of being published on the old axis and blocking the
          shift (which is what happened in every battle the user played). Pure arithmetic + the queue type. -->

@@ -64,8 +64,9 @@ internal static class AttributionPolicy
 
 	/// <summary>
 	/// Does a recorded figure match this hit? The pairing key has to accept BattleObject.Damage's ARGUMENT
-	/// as well as its return value: the return is the damage left after 被吸收/无效化, so for an absorbed
-	/// hit it can never equal the calc's own value (measured 2026-09-27: calc 421,140 -> 198 applied).
+	/// as well as its return value: R78 -- the return is the call's OVERFLOW (the part of the hit that did not
+	/// fit into the victim's remaining Life), so on such a call it can never equal the calc's own value
+	/// (measured 2026-09-27: calc 421,140 -> 198 reported by the return).
 	/// A nominal of 0 means "unknown", never "match 0".
 	/// </summary>
 	public static bool DmgMatches(int candidateDamage, int damage, int nominal)

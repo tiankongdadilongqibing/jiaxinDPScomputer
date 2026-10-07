@@ -830,7 +830,7 @@ public static partial class OverlayUGUI
 			double ratioSum = 0; int ratioN = 0; int noComp = 0;
 			int reverseN = 0; long reverseSum = 0;
 			int friendlyN = 0; long friendlySum = 0;
-			int absorbN = 0; long absorbSum = 0;
+			int overflowN = 0; long overflowSum = 0;   // R78: 旧名 absorbN/absorbSum —— 这不是被吸收量
 			int inflictN = 0;
 			int foreignN = 0;
 			var inflictAgg = new Dictionary<string, int>();
@@ -838,10 +838,11 @@ public static partial class OverlayUGUI
 			{
 				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
 				if (!VictimRowMatches(e)) continue;                               // F7 target filter
-				// 被吸收/无效化: the game's own damage report counts the full value while only Amount reached
-				// 耐久, so this is what makes our total and the game's total reconcile. Counted before the
-				// skips below so an absorbed self-hit is still visible here.
-				if (e.Nominal > e.Amount) { absorbN++; absorbSum += e.Nominal - e.Amount; }
+				// R78(A): 超出剩余耐久 = Nominal − Amount,旧文案叫「被吸收/无效化」。R76 定律(`res ==
+				// max(0, nominal - lifeBefore)`,798/798 读数)说游戏返回值是溢出量,所以这条差额是目标命中前的
+				// 剩余耐久,不是吸收量;游戏自身统计按 Nominal 计入,所以 伤害 + 该值 = 游戏口径。
+				// Counted before the skips below so an oversized self-hit is still visible here.
+				if (e.Nominal > e.Amount) { overflowN++; overflowSum += e.Nominal - e.Amount; }
 				// Did this record inflict an ailment on the victim? (diffed around the hit; 1.0.52)
 				// Two very different cases: the record's attacker IS the applier (本条附加), or the game
 				// credits someone else and this record is just where the change was noticed (他方施加).
@@ -882,7 +883,7 @@ public static partial class OverlayUGUI
 					+ (reverseN > 0 ? $"   回复反噬 {reverseN} 条/{reverseSum:N0}" : "")
 					+ (friendlyN > 0 ? $"   自伤/反噬 {friendlyN} 条/{friendlySum:N0}"
 						+ (Plugin.CfgFilterFriendlyFire != null && Plugin.CfgFilterFriendlyFire.Value ? "(已剔除)" : "(已含在伤害内;游戏自身也计入)") : "")
-					+ (absorbN > 0 ? $"   被吸收/无效化 {absorbN} 条/{absorbSum:N0}(未入耐久;游戏自身统计计入:本场游戏口径 = 伤害 + 该值)" : "")
+					+ (overflowN > 0 ? $"   超出剩余耐久 {overflowN} 条/{overflowSum:N0}(非吸收:命中值超出目标剩余耐久的部分;未入耐久,游戏自身统计按 本场游戏口径 = 伤害 + 该值 计入)" : "")
 					+ (inflictN > 0 ? $"   本条附加异常状态 {inflictN} 条" : "")
 					+ (foreignN > 0 ? $"   他方施加(本行仅承载) {foreignN} 条" : ""),
 				Color = HeaderColor, Height = 18f

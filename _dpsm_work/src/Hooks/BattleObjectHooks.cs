@@ -15,11 +15,14 @@ namespace DpsMeter;
 ///
 /// The ARGUMENT and the RETURN are two different quantities and BOTH are needed:
 ///   __0     = the damage the game accounts for (CharacterStatistics.TakenDamage accumulates this)
-///   result  = the damage that actually reached 耐久 (absorbed / nullified damage is subtracted)
+///   result  = the call's OVERFLOW, i.e. the part of the hit that did NOT fit into the victim's remaining
+///             Life -- MEASURED as `res == max(0, nominal - lifeBefore)` on 798/798 readable readings (R76)
 /// Measured 2026-09-27: per-victim totals from the return matched the game's own counter exactly for
 /// T.O.W.E.R.typeR (12,704,393), レヴナント (3,075,278), 城塞 (417,072) and ポポロット (13,169) --
-/// only [痺夏]シゼル＝メ was short, by exactly one hit (420,942 vs a recorded 198). So the return is
-/// right for normal hits and the difference is 被吸收/无效化, not a missing hook.
+/// only [痺夏]シゼル＝メ was short, by exactly one hit (420,942 vs a recorded 198). So for a normal hit (the
+/// return reports no overflow) the two agree and the published amount IS __0 verbatim; on a call whose return
+/// DOES report an overflow the difference is the victim's remaining Life, NOT an absorption -- R78 renamed the
+/// labels that used to call it 被吸收/无效化 (see `Policy/AbsorbWording.cs`), and this round moves no number.
 /// </summary>
 [HarmonyPatch(typeof(BattleObject), "Damage")]
 public static class DamageHook
@@ -53,8 +56,10 @@ public static class DamageHook
 		}
 		catch { }
 		// R75: classify THIS call AFTER the accounting, so nothing the probe does can move a published
-		// number. The accounting above is deliberately untouched this round -- a fully withheld hit still
-		// arrives as result<=0, and the probe only COUNTS that case (masked=).
+		// number. The accounting above is deliberately untouched -- `int damage = (__result > 0) ? __result :
+		// __0;` is not this round's to change (moving it is the C round's call) -- a fully withheld hit still
+		// arrives as result<=0, and R76's probe counts that shape as `noLifeMovement` (the R75 `masked=`
+		// bucket is gone). R78 named the two published quantities correctly; see Policy/AbsorbWording.cs.
 		try
 		{
 			AbsorbProbe.NoteHit(__instance, __0, __result);

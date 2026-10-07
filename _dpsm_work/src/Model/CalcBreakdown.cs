@@ -71,15 +71,25 @@ public struct CalcBreakdown
 	/// <summary>BaseDamage × KnownMult -- what the chain predicts. This is the printed "理论 ... = R".</summary>
 	public long Theory;
 
-	/// <summary>Damage that reached 耐久 (BattleObject.Damage's return value), i.e. the exported amount.</summary>
+	/// <summary>The amount this plugin PUBLISHED for the hit, i.e. the exported amount: the call's return when
+	/// that return reports an overflow, and `BattleObject.Damage`'s argument otherwise. R78: the return is the
+	/// OVERFLOW beyond the victim's remaining Life (R76: `res == max(0, nominal - lifeBefore)`, 798/798
+	/// readings), so on those calls this field is the part that did NOT fit -- not the damage that reached 耐久.
+	/// </summary>
 	public int Applied;
 
-	/// <summary>Absorbed / nullified part (BattleObject.Damage's argument − return value). The game's own
-	/// statistics count the pre-absorption figure, which is why <see cref="GameValue"/> exists.</summary>
+	/// <summary>The difference `argument − published` (R78: 超出剩余耐久/非吸收; the old name said "absorbed").
+	/// On an overflow call it equals the victim's remaining Life before the hit (see
+	/// `Policy/AbsorbWording.cs`), and it is not an absorption: the shape that would deserve that word (R76's
+	/// `WithheldNoReturn`) is empty in every corpus measured. The game's own statistics count the argument,
+	/// which is why <see cref="GameValue"/> exists.</summary>
 	public int Absorbed;
 
 	/// <summary>Applied / Theory -- everything the chain could NOT identify. Exactly 1.000 is a full match.
-	/// This is the "剩余倍率" the text form prints.</summary>
+	/// This is the "剩余倍率" the text form prints. R78: the TEXT form prints it from the game's value
+	/// (`AbsorbWording.ResidualBasis`), while this field keeps its original basis on purpose -- it is part of
+	/// the export (`calc.residual`) and a `forensics` bucket key, so moving it is the accounting round's call.
+	/// </summary>
 	public double Residual;
 
 	/// <summary>攻击方 CriticalRate (0 when the attacker could not be read).</summary>

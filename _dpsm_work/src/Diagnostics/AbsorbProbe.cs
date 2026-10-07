@@ -8,8 +8,9 @@ namespace DpsMeter;
 /// <summary>
 /// PROBE (R75): what actually withheld part of a damage-application call.
 ///
-/// WHY IT EXISTS. `被吸收/无效化` has been published since 1.5.5 as `nominal - damage` and nothing ever
-/// carried it: 397 records over 46 exports, 395 of them exactly 500,000 and all of them on ショゴス, while
+/// WHY IT EXISTS. The label since 1.5.5 has been `被吸收/无效化` (= `nominal - damage`; R78 renamed it to
+/// 超出剩余耐久 / 目标剩余耐久 because R76 proved what the two numbers ARE) and nothing ever carried it:
+/// 397 records over 46 exports, 395 of them exactly 500,000 and all of them on ショゴス, while
 /// `masterdata/*.json` has no field, row or value of 500,000 at all and the boss's live talent list holds
 /// only `1002 ModeChange` + `6 攻击力/150/-1`. R74's diagnosis round proved that a difference cannot be
 /// turned into a mechanism by staring at it, so this probe reads the things a mechanism WOULD move.
@@ -23,9 +24,10 @@ namespace DpsMeter;
 /// and are OFF by default (`Debug/AbsorbProbeHooks`).
 ///
 /// WHAT IS DELIBERATELY NOT DONE HERE: the accounting is not touched. The existing fallback
-/// `(__result > 0) ? __result : __0` still books a fully-withheld hit as full damage, and the probe only
-/// COUNTS that case (`masked=`), because changing it would move every published taken total and that
-/// decision needs the evidence this round collects. Display and export are unchanged too.
+/// `(__result > 0) ? __result : __0` is still what books a hit and the verdicts only NAME the shape, because
+/// changing the booking would move every published taken total and that decision needs evidence the rounds
+/// collected. Display and export were untouched by R75/R76; R78 changed the WORDS only
+/// (`Policy/AbsorbWording.cs`), which is why this class still moves no number.
 ///
 /// COST: one dictionary write + one `TryCast&lt;Character&gt;` + a handful of property reads per damage event
 /// (5,500 events in the measured battle). Read-only, every failure counted, nothing thrown outward.
@@ -199,6 +201,17 @@ internal static class AbsorbProbe
 			if (!Report.TryTakeRow(v, MaxRows, MaxKeyRows)) return;
 
 			RuntimeLog.Write(Render(victim, o, v, lifeMismatch));
+
+			// R78(D, log side ONLY): the hit line is readings, not a reading. For the verdicts that DECIDE
+			// something, say in words what the verdict means -- `oversizedPool` in particular is the shape the
+			// published label used to describe as an absorption of 500,000, and it is not one (the wording
+			// lives in Policy/AbsorbWording.cs and is unit-tested there). Gated exactly like `key=`, so the
+			// log grows by one line per deciding row and by nothing for the 5,000 rows that decide nothing.
+			if (AbsorbProbeReport.IsKeyVerdict(v))
+			{
+				string note = AbsorbWording.VerdictNote(v, o);
+				if (note != null) RuntimeLog.Write("[ABSPROBE] note " + note);
+			}
 		}
 		catch { }
 	}

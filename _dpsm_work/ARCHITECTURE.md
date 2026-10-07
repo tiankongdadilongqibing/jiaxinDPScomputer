@@ -191,7 +191,7 @@ src/
        └─ Aggregator.RecordDamage(victim, attacker, owner, dmg)
              ├─ 归属:attacker → owner → 最近 calc(A/O) → 未归属(记 [PROBE]/gap)
              ├─ ActorStats 累加(承伤/输出/会心/技能/每秒)
-             └─ TryGetCompForVictim(...) ─→ CompositionProbe.BuildChainParts(calc, victim, 实际伤害)
+             └─ TryGetCompForVictim(...) ─→ CompositionProbe.BuildChainParts(calc, victim, 已发布量:普通命中 = 游戏口径,返回值报溢出时 = 超出剩余耐久)
                                              → comp1 算式 / comp2 攻击方 / comp3 受击方 / comp4 状态异常
                                              → 写入 BattleEvent(导出) + 悬浮窗行
 
@@ -802,7 +802,7 @@ AbilityScan(攻击方/受击方)
 
 0. **构成对账率只有约 1/4–1/3,而且"配对"与"数值"两件事曾被混在一起**
    (**1.3.0 已把度量做掉,准确率本身仍未改善**):
-   · `理论 W × M = T` 与 `实际伤害 A` **完全相等**的只有 **16,857 条(35.8%)** —— 约 2/3 的伤害现有推算算不出来;
+   · `理论 W × M = T` 与 `实际伤害 A` **完全相等**的只有 **16,857 条(35.8%)** —— 约 2/3 的伤害现有推算算不出来(R78 起该量在面板上印作「游戏口径」;本行是 1.3.0 当时的旧词「实际伤害」);
    · 99.5% 的行被标注 `本次伤害与该次计算值不符(近似构成)`,但**在"构成精确对上"的 16,857 行里也有
      98.6% 被标注** → 这条标注表达的是「配对未被结算对象自身佐证」,**不等于构成错了**。
    · ~~因此要么把 `CalcValueMatches` 的语义拆成两个布尔(`配对可信` / `数值吻合`),要么至少改掉措辞,

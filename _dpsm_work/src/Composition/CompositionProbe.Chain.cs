@@ -20,9 +20,12 @@ public static partial class CompositionProbe
 	/// (crit -- not readable -- plus any modifier the game does not expose as text).
 	/// </summary>
 	/// <param name="absorbed">
-	/// 本次计算对应的伤害里没有进入耐久的部分 (BattleObject.Damage 的入参 − 返回值)。
-	/// 游戏自己的 CharacterStatistics.TakenDamage 按入参累计,所以我们记录的"实际伤害"会比游戏少这一段;
-	/// 不把它单独说出来,它就会被误读成"剩余倍率 0.001"这种不存在的游戏机制。
+	/// 差额 = 游戏口径 − 已发布量 (BattleObject.Damage 的入参 − 返回值)。R78 正名:命中超过目标剩余耐久时
+	/// 返回值是**溢出量**(R76 定律 `res == max(0, nominal - lifeBefore)`,798/798 读数),所以这个差额是
+	/// 「目标剩余耐久(命中前读数)」,**不是**被吸收/无效化的量;只有 R76 的 `WithheldNoReturn` 形状才配得上
+	/// "被吸收" 这个词,而它在至今所有语料里都是空的。等价关系(钩子路径):`差额 > 0` ⟺ `res > 0 且
+	/// nominal > res` ⟺ `IsOversized()`;`res <= 0` 时 `已发布量 = __0 = 游戏口径`、差额为 0。
+	/// 文案与残差基数由 `Policy/AbsorbWording.cs` 产出,数值一个都不动。
 	/// </param>
 	public static void BuildChainParts(DamageCalculater calc, BattleObject blocker, int finalDamage, out string line1, out string line2, out string line3, out string line4, int absorbed = 0)
 	{
@@ -408,21 +411,21 @@ public static partial class CompositionProbe
 					.Append(" · 被伤害×").Append(vicMod.ToString("F3")).Append(')');
 				sb1.Append(" · 理论 ").Append(baseDmg).Append(" × ").Append(known.ToString("F3")).Append(" = ").Append(theory);
 			}
-			sb1.Append(" · 实际伤害 ").Append(finalDamage);
-			if (absorbed > 0)
-			{
-				// A hit whose 计算威力 theory is far above the applied damage is normally NOT a wrong power:
-				// part of the damage was absorbed / nullified before it reached 耐久. Say so explicitly,
-				// otherwise the row reads as a 1/1863 "residual" that no game rule explains.
-				sb1.Append(" · 被吸收/无效化 ").Append(absorbed)
-					.Append("(游戏口径 ").Append(finalDamage + absorbed)
-					.Append(" = 入耐久 ").Append(finalDamage).Append(" + 被吸收 ").Append(absorbed)
-					.Append(";游戏自身统计按 ").Append(finalDamage + absorbed).Append(" 计入)");
-			}
-			else if (theory > 0)
-			{
-				sb1.Append(" · 剩余倍率 ×").Append(residual.ToString("F3")).Append("(会心/未识别部分)");
-			}
+			// R78(A): the two published numbers are named for what R76 MEASURED them to be, not for what R75
+			// guessed. `游戏口径` is `BattleObject.Damage`'s argument (= published + 差额); on a call whose
+			// return reports an overflow the published amount is the part of the hit that did NOT fit
+			// (超出剩余耐久) and the difference is the victim's remaining Life before the hit (目标剩余耐久),
+			// which is NOT an absorbed amount -- the only shape that would deserve that word is R76's
+			// `WithheldNoReturn`, and it is empty in every corpus measured. Whether any of it landed is a Life
+			// reading, which this row does not have, so this row does not assert it.
+			// R78(A+B): ONE call produces both suffixes, in order, read from the game's own value. The two
+			// used to be mutually exclusive (`else if`), which hid the ×1.5 crit of exactly the hits whose
+			// nominal exceeded the target's remaining Life -- the number that explains why the game's value is
+			// 596,363 while only 96,363 could not fit. The wording AND the non-exclusion live in
+			// `Policy/AbsorbWording.cs` so the behaviour suite executes them instead of eyeballing them.
+			// NOTE: this is the TEXT basis; `brk.Residual` below keeps its old basis on purpose, because that
+			// value is exported (`calc.residual`, a `forensics` bucket key) and moving it is the C round's call.
+			sb1.Append(AbsorbWording.ChainTail(theory, finalDamage, absorbed));
 			line1 = sb1.ToString();
 			// Structured mirror of line1 (+ the crit stats from line2). Filled as soon as the arithmetic
 			// exists, so a later failure while building lines 2-4 cannot leave a half-filled breakdown

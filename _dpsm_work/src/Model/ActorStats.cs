@@ -37,12 +37,15 @@ public sealed class ActorStats
 
 	/// <summary>
 	/// Sum of BattleObject.Damage's ARGUMENT (the damage the game accounted for), which is what
-	/// CharacterStatistics.TakenDamage accumulates. DamageTaken holds the RETURN value = what actually
-	/// reached 耐久. DamageTakenNominal - DamageTaken = 被吸收/无效化.
+	/// CharacterStatistics.TakenDamage accumulates. DamageTaken holds the PUBLISHED amount = that argument for
+	/// a hit with no overflow, and the call's RETURN (the overflow) when there is one. R78:
+	/// DamageTakenNominal - DamageTaken is 超出剩余耐久 / 非吸收 -- NOT 被吸收/无效化; see
+	/// `Policy/AbsorbWording.cs` and R76's law `res == max(0, nominal - lifeBefore)`.
 	/// </summary>
 	public long DamageTakenNominal;
 
-	/// <summary>Damage that never reached 耐久 (absorbed / nullified). Game口径 = DamageTaken + this.</summary>
+	/// <summary>R78: 超出剩余耐久/非吸收 (the old name blamed an absorption). On an overflow call it is the
+	/// victim's remaining Life before the hit. 游戏口径 = DamageTaken + this.</summary>
 	public long DamageAbsorbed;
 
 	public long HealingGiven;

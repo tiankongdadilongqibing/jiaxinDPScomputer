@@ -153,6 +153,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R77.md',
     # 会心逐击可观测性调查 + 折衷方案(报告,非逐轮记录)
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
+    # R78 批次:两个词正名(文本层,不改数值) + 解除互斥把 ×1.5 会心放回同一行
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R78.md',
 ]
 
 

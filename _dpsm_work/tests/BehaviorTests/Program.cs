@@ -24,8 +24,11 @@ internal static class Program
 	/// `res == max(0, nominal - lifeBefore)` -- the OVERSIZED hit became its own family with its own split
 	/// (`landed`/`overflow`), the life reading got the veto that removes R75's false `Masked` bucket, and the
 	/// two-tier row budget that keeps the deciding rows out of `dropped` is pinned here).
+	/// R78: 1307 -> 1328 (+21 for policy/absorb-wording: the two published labels renamed for what R76 measured
+	/// them to be, the printed residual read from the game's own value with the `×0.242` counterfactual pinned,
+	/// the non-exclusion of the split and the residual on one row, and the `[ABSPROBE] note` sentences).
 	/// </summary>
-	public const int ExpectedCases = 1310;
+	public const int ExpectedCases = 1328;
 
 	private static int Main(string[] args)
 	{
@@ -107,6 +110,10 @@ internal static class Program
 		// or an honest "we did not see it"), decided from readings instead of from the difference -- plus the
 		// `[ABSPROBE]` line that has to stay readable in every battle.
 		Cases.AbsorbClassifyCases(r);
+		// R78: the WORDS the split is published in (the two labels renamed for what R76 measured them to be,
+		// the printed residual read from the game's own value instead of from the overflow, and the
+		// `[ABSPROBE] note` sentences that say what a deciding verdict means).
+		Cases.AbsorbWordingCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

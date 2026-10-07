@@ -109,18 +109,22 @@ internal static class CalcReconcile
 		/// <summary>Subset of Unexplained whose theory exceeds the game's number by more than 10×
 		/// (see <see cref="TheoryExceedsResidualMax"/> for why this is NOT called "mispaired").</summary>
 		public int TheoryExceeds;
-		/// <summary>How much damage was absorbed / nullified before reaching 耐久, summed over the battle.
+		/// <summary>How much of a hit exceeded the target's remaining 耐久, summed over the battle -- R78's
+		/// rename of what this field used to call "absorbed / nullified before reaching 耐久" (R76 measured the
+		/// call's return to be the OVERFLOW: `res == max(0, nominal - lifeBefore)`, 798/798 readable readings;
+		/// see `Policy/AbsorbWording.cs`).
 		///
 		/// Taken from the EVENTS (nominal − amount), not from Aggregator's Rt.AbsorbedTotal, for the same
 		/// reason the rest of this block is derived from the events: one source of truth.
 		///
-		/// It matters because the GAME's own damage statistic counts the PRE-absorption figure (measured:
-		/// it accumulates BattleObject.Damage's argument -- see the 被吸收/无效化 note in the chain text),
-		/// so in barrier content our `dealt` reads lower than the in-game report by exactly this amount.
+		/// It matters because the GAME's own damage statistic counts the value the game accounted for (measured:
+		/// it accumulates BattleObject.Damage's argument -- see the 超出剩余耐久 note in the chain text),
+		/// so our `dealt` reads lower than the in-game report by exactly this amount.
 		/// Measured over the 32 battle-exports of 2026-10-03: 13.15% in aggregate, 55.6% in one battle.
-		/// Exported as its own field so both figures can be reconciled WITHOUT changing the displayed one.</summary>
+		/// Exported as its own field so both figures can be reconciled WITHOUT changing the displayed one.
+		/// R78 changed this doc and the labels only; the number and the export key are untouched.</summary>
 		public long AbsorbedAmount;
-		public int Absorbed;         // records where part of the damage was absorbed / nullified
+		public int Absorbed;         // records where the hit exceeded the target's remaining 耐久 (R78 rename)
 		public int DistinctResiduals;
 		public int PairLiveSame, PairLiveAge, PairValue, PairFifo, PairNone;
 		/// <summary>Compositions whose pairing route was never set. Should stay 0 -- it exists so that a

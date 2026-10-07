@@ -143,9 +143,10 @@ public static partial class Aggregator
 	/// <summary>
 	/// Did the calc that is executing right now actually produce this hit?
 	///
-	/// The pairing key has to be BattleObject.Damage's ARGUMENT as well as its return value: the return is
-	/// the damage left after 被吸收/无效化, so for an absorbed hit it can never equal the calc's own value
-	/// (measured 2026-09-27: calc 421,140 → 198 applied, and 198 matched nothing).
+	/// The pairing key has to be BattleObject.Damage's ARGUMENT as well as its return value: R78 -- the return
+	/// is the call's OVERFLOW (the part of the hit that did not fit into the victim's remaining Life), so on
+	/// such a call it can never equal the calc's own value
+	/// (measured 2026-09-27: calc 421,140 → 198 reported by the return, and 198 matched nothing).
 	///
 	/// 1.3.0 fix: this used to return on the FIRST record whose calc pointer matched, so a single AoE cast
 	/// -- one calc, one record per target, plus the DamageAction / ActDamageAction pair -- was judged

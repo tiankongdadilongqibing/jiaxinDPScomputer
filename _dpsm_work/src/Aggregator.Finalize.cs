@@ -78,20 +78,27 @@ public static partial class Aggregator
 		if (Rt.AbsorbedHits > 0)
 		{
 			// The reconciliation line: our taken total is the damage that reached 耐久, the game's own
-			// counter adds everything that was absorbed on the way, so taken + absorbed must equal it.
-			sb.Append($"\n  >>> 被吸收/无效化 {Rt.AbsorbedTotal} / {Rt.AbsorbedHits} hits  (taken {battleSummary.TotalTaken} + 吸收 {Rt.AbsorbedTotal} = 游戏口径 {battleSummary.TotalTaken + Rt.AbsorbedTotal})");
+			// counter adds everything else it accounted for, so taken + this difference must equal it.
+			// R78(A): renamed. The difference is NOT an absorption: R76 measured the call's return to be the
+			// overflow beyond the victim's remaining Life (`res == max(0, nominal - lifeBefore)`, 798/798
+			// readable readings), so this number is the 剩余耐久(命中前) the hit ran into -- and the shape that
+			// would deserve the word 被吸收 (R76's `WithheldNoReturn`) is empty in every corpus measured.
+			// No number on this line moves; only the words do.
+			sb.Append($"\n  >>> 超出剩余耐久 {Rt.AbsorbedTotal} / {Rt.AbsorbedHits} hits  (taken {battleSummary.TotalTaken} + 超出 {Rt.AbsorbedTotal} = 游戏口径 {battleSummary.TotalTaken + Rt.AbsorbedTotal};非吸收)");
 		}
 		string text = sb.ToString();
 		Plugin.LogSource.LogInfo(text);
 		RuntimeLog.Write(text);
 
 		// R75: what the absorb probe saw, one bucket per value. It sits right after the text that carries the
-		// 被吸收 line because it exists to explain THAT number: a verdict of `barrier` means a barrier's own
-		// life moved by the withheld amount, `pool` that it moved by less (a pool running out inside a hit),
-		// `unknown` that something withheld damage and no carrier was observed -- and a CONSTANT value in that
-		// bucket is the evidence for a flat per-hit cut no exported table carries, which is not a shield. The
-		// `masked=` bucket counts the fully withheld hits the existing accounting cannot show at all (it books
-		// `result <= 0` as full damage), so this line also measures its own blind spot.
+		// 超出剩余耐久 line (R78's rename of 被吸收/无效化) because it exists to explain THAT number: a verdict
+		// of `barrier` means a barrier's own life moved by the withheld amount, `pool` that it moved by less (a
+		// pool running out inside a hit), `unknown` that something withheld damage and no carrier was observed
+		// -- and a CONSTANT value in that bucket is the evidence for a flat per-hit cut no exported table
+		// carries, which is not a shield. The `masked=` bucket counts the fully withheld hits the existing
+		// accounting cannot show at all (it books `result <= 0` as full damage), so this line also measures its
+		// own blind spot. R76 renamed the buckets to the verdicts of `Policy/AbsorbClassifyPolicy.cs`
+		// (`oversizedPool` is the shape this round's wording was wrong about).
 		try
 		{
 			string abs = AbsorbProbe.Summary();

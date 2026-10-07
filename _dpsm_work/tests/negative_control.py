@@ -1048,6 +1048,36 @@ MUTATIONS = [
          find="\t\t\t\tif (IsMeasuredFullApplication(o)) FullLanded++;",
          repl="\t\t\t\tFullLanded++;",
          expect="policy/absorb-classify/only-the-measured-whole-application-counts-as-full"),
+    # ---- R78: the WORDS. This round moved no number, so the only thing a mutation can break here is a
+    # sentence -- and a sentence that mislabels a quantity is precisely the defect R78 fixes. One mutation per
+    # defect: the game's own value called "实际伤害" again, the printed residual read from the overflow (the
+    # ×0.242 "mechanism" no game rule has), the mutual exclusion that hid the ×1.5 crit on exactly the rows
+    # whose nominal exceeded the remaining Life, the old word 被吸收 leaking onto a shape whose numbers do not
+    # support it, a deciding verdict silently losing its sentence, and a note quoting the wrong quantity.
+    dict(name="wording-normal-hit-called-actual-damage", file="Policy/AbsorbWording.cs",
+         find='if (absorbed <= 0) return " · 游戏口径 " + N(published);',
+         repl='if (absorbed <= 0) return " · 实际伤害 " + N(published);',
+         expect="policy/absorb-wording/a-hit-with-no-overflow-is-named-as-the-game-value"),
+    dict(name="wording-residual-read-from-the-overflow", file="Policy/AbsorbWording.cs",
+         find="\t\treturn (long)published + absorbed;",
+         repl="\t\treturn (long)published;",
+         expect="policy/absorb-wording/an-oversized-crit-row-prints-the-split-and-the-crit-together"),
+    dict(name="wording-residual-hidden-on-an-oversized-row", file="Policy/AbsorbWording.cs",
+         find='\t\tif (theory <= 0) return "";',
+         repl='\t\tif (theory <= 0 || absorbed > 0) return "";',
+         expect="policy/absorb-wording/an-oversized-crit-row-prints-the-split-and-the-crit-together"),
+    dict(name="wording-old-word-leaks-onto-a-pool", file="Policy/AbsorbWording.cs",
+         find='非吸收。";',
+         repl='即被吸收。";',
+         expect="policy/absorb-wording/the-old-word-is-used-by-exactly-one-shape"),
+    dict(name="wording-pool-loses-its-sentence", file="Policy/AbsorbWording.cs",
+         find='\t\tstring head = "verdict=" + AbsorbClassifyPolicy.Name(v) + " ⇒ ";',
+         repl='\t\tif (v == AbsorbVerdict.OversizedPool) return null;\n\t\tstring head = "verdict=" + AbsorbClassifyPolicy.Name(v) + " ⇒ ";',
+         expect="policy/absorb-wording/every-decided-verdict-gets-a-note"),
+    dict(name="wording-oversized-note-quotes-the-nominal", file="Policy/AbsorbWording.cs",
+         find='一致;" + N(o.Overflow())',
+         repl='一致;" + N(o.Nominal)',
+         expect="policy/absorb-wording/an-oversized-note-quotes-the-life-drop-it-was-checked-against"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

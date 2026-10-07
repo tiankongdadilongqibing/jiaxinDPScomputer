@@ -63,8 +63,12 @@ public static partial class Aggregator
 
 	/// <param name="nominal">
 	/// BattleObject.Damage's ARGUMENT: the damage the game accounted for (CharacterStatistics.TakenDamage).
-	/// <paramref name="damage"/> is its RETURN: what actually reached 耐久. nominal &gt; damage means part of
-	/// the hit was 被吸收/无效化. Passing 0 (the default) means "same as damage".
+	/// <paramref name="damage"/> is the amount this plugin PUBLISHES: the call's RETURN when that return
+	/// reports an overflow, and the argument itself otherwise. R78: on the overflow path the return is the
+	/// part of the hit that did NOT fit (R76's law `res == max(0, nominal - lifeBefore)`, 798/798 readable
+	/// readings), so `nominal &gt; damage` is NOT "part of the hit was 被吸收/无效化" -- it is "the hit
+	/// exceeded the victim's remaining Life". The wording lives in `Policy/AbsorbWording.cs`; this round moves
+	/// no number. Passing 0 (the default) means "same as damage".
 	/// </param>
 	public static void RecordDamage(BattleObject victim, BattleObject attacker, BattleObject owner, int damage, int nominal = 0)
 	{
@@ -101,8 +105,12 @@ public static partial class Aggregator
 		{
 			Rt.AbsorbedTotal += absorbed;
 			Rt.AbsorbedHits++;
-			// Rare by nature, and the single most confusing row in the detail list, so it is always logged.
-			string l2 = $"[DpsMeter][ABSORB] {Desc(victim)} 被吸收/无效化 {absorbed}(游戏口径 {nominal} = 入耐久 {damage} + 吸收 {absorbed})";
+			// Rare by nature, and the single most confusing row in the log, so it is always logged.
+			// R78(A): renamed. On this path `damage` is the call's RETURN, MEASURED to be the overflow
+			// (Policy/AbsorbWording.cs), i.e. the part of the hit that did not fit into the victim's remaining
+			// Life -- and the difference is that remaining Life, not an absorption. Counting and export are
+			// untouched: every number in this file is what it was before this round.
+			string l2 = $"[DpsMeter][OVERFLOW] {Desc(victim)} 超出剩余耐久 {damage}(游戏口径 {nominal} = 超出剩余耐久 {damage} + 目标剩余耐久 {absorbed};非吸收)";
 			Plugin.LogSource.LogInfo(l2);
 			RuntimeLog.Write(l2);
 		}
