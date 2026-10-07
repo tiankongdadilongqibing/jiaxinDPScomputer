@@ -155,6 +155,8 @@ FILES = [
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REPORT-CRIT-OBSERVABILITY.md',
     # R78 批次:两个词正名(文本层,不改数值) + 解除互斥把 ×1.5 会心放回同一行
     r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R78.md',
+    # R79 批次:受击来源拆分(新导出段 takenBreakdown + F3 页面,不改已发布数值)
+    r'D:\dmmplayer\rlyehshoujotaix_cl\_dpsm_work\REFACTOR-BATCH-R79.md',
 ]
 
 

@@ -62,6 +62,11 @@ ROOT_REQUIRED = [
     # 1.7.12: the settings that change the MEANING of numbers already in this file (today: does
     # totals.dealt include same-team damage?). A file that does not state them cannot be read alone.
     ('config', dict, '1.7.12'),
+    # 1.7.29 (R79): the incoming side of the same events, split per victim (受击来源拆分). The F3 page reads
+    # it, and it is the only place the two amounts that belong to no attacker bucket are stated. A file that
+    # stops writing it takes the whole analyse-incoming story with it, so it is REQUIRED from 1.7.29 on --
+    # every export written before this round keeps validating (the section is optional when absent).
+    ('takenBreakdown', dict, '1.7.29'),
 ]
 
 # 1.7.12: the config block. Version-gated by ROOT_REQUIRED, so every older export stays valid.
@@ -261,6 +266,42 @@ LEDGER_KEYS = [
 LEDGER_KEYS_120 = [('selfTeamHits', int), ('selfTeamDealt', (int, float))]
 CONTRIB_SCHEMA_120 = (1, 2)
 CONTRIB_PLUGIN_120 = (1, 7, 13)
+
+# ---------------------------------------------------------------------------------------------
+# R79 (1.7.29) takenBreakdown: the INCOMING side of the same events, split per VICTIM. It publishes no
+# amount the session had not already recorded -- every number in it is `events[].nominal` and
+# `events[].amount` re-partitioned -- so the thing worth checking here is not a total but the PARTITION:
+# five dimensions (source, hit type, effect, attacker, status) that must each sum to the victim's nominal,
+# plus the two amounts that deliberately belong to NO attacker bucket (same-team damage and hits whose
+# attacker could not be resolved). Validated whenever present, like contribution, so a pre-R79 export
+# still validates and a R79 export cannot silently lose the block.
+# ---------------------------------------------------------------------------------------------
+TAKEN_REQUIRED = [
+    ('schemaVersion', str), ('method', str), ('basis', str),
+    ('hits', int), ('nominal', (int, float)), ('taken', (int, float)), ('residual', (int, float)),
+    ('friendly', (int, float)), ('friendlyHits', int),
+    ('unknown', (int, float)), ('unknownHits', int), ('actors', list),
+]
+
+TAKEN_ACTOR_KEYS = [
+    ('key', int), ('name', str), ('team', int), ('ally', bool), ('position', int),
+    ('hits', int), ('nominal', (int, float)), ('taken', (int, float)), ('residual', (int, float)),
+    ('friendly', (int, float)), ('friendlyHits', int),
+    ('unknown', (int, float)), ('unknownHits', int),
+    ('bySource', list), ('byHitType', list), ('byAttacker', list), ('byEffect', list), ('byStatus', list),
+]
+
+TAKEN_BUCKET_KEYS = [
+    ('key', int), ('name', str), ('amount', (int, float)), ('hits', int), ('quality', str),
+]
+
+TAKEN_STATUS_KEYS = [
+    ('status', str), ('applier', str), ('amount', (int, float)), ('hits', int),
+]
+
+# The position snapshot's closed vocabulary: 0 = the native read failed (the object was already gone),
+# 1 = 前衛, 2 = 後衛. Anything else means a reader is inventing a position.
+TAKEN_POSITIONS = (0, 1, 2)
 
 
 def _isnum(x):
@@ -592,6 +633,135 @@ def _check_coverage_110(d, sec, cv, attributed, problems, cov, is_120=False):
     cov['contribution.analysisDamageCoverage'] = cv.get('analysisDamageCoverage')
     cov['contribution.damageLedger.gap'] = led.get('reconciliationGap')
 
+
+def _taken_bucket_sum(rows):
+    """Sum of a dimension's bucket amounts, or None if a row is malformed (the type check already said so)."""
+    total = 0
+    for row in rows:
+        if not isinstance(row, dict) or not _isnum(row.get('amount')):
+            return None
+        total += row['amount']
+    return total
+
+
+def _check_taken(d, problems, cov):
+    """Optional-section validation + the partition identities of the R79 incoming damage split."""
+    sec = d.get('takenBreakdown')
+    if sec is None:
+        cov['takenBreakdown'] = 'absent (pre-R79 export)'
+        return
+    if not isinstance(sec, dict):
+        problems.append('takenBreakdown is not an object')
+        return
+    if 'error' in sec:
+        problems.append('takenBreakdown reported an internal error (the export itself is intact): %s'
+                        % str(sec.get('error'))[:200])
+    for name, typ in TAKEN_REQUIRED:
+        if name not in sec:
+            problems.append('takenBreakdown.%s missing' % name)
+        elif not isinstance(sec[name], typ):
+            problems.append('takenBreakdown.%s type=%s want=%s'
+                            % (name, type(sec[name]).__name__, _tname(typ)))
+    # The contract travels IN the section, so a reader never has to know which round wrote the file.
+    if sec.get('method') != 'by-event/1':
+        problems.append('takenBreakdown.method=%r (want by-event/1)' % (sec.get('method'),))
+    if sec.get('basis') != 'nominal':
+        problems.append('takenBreakdown.basis=%r (want nominal: the split runs over the game-invoked '
+                        'nominal, not over the published taken)' % (sec.get('basis'),))
+    cov['takenBreakdown.schemaVersion'] = sec.get('schemaVersion')
+    cov['takenBreakdown.hits'] = sec.get('hits')
+    cov['takenBreakdown.nominal'] = sec.get('nominal')
+
+    nominal, taken, residual = sec.get('nominal'), sec.get('taken'), sec.get('residual')
+    if _isnum(nominal) and _isnum(taken) and _isnum(residual) and not _close(nominal, taken + residual):
+        problems.append('takenBreakdown identity broken: taken(%.0f)+residual(%.0f) != nominal(%.0f)'
+                        % (taken, residual, nominal))
+
+    actors = sec.get('actors')
+    if not isinstance(actors, list):
+        actors = []
+    cov['takenBreakdown.actors'] = len(actors)
+    sums = {'nominal': 0.0, 'taken': 0.0, 'residual': 0.0, 'friendly': 0.0, 'unknown': 0.0, 'hits': 0}
+    for i, a in enumerate(actors):
+        if not isinstance(a, dict):
+            problems.append('takenBreakdown.actors[%d] is not an object' % i)
+            continue
+        for k, t in TAKEN_ACTOR_KEYS:
+            if k not in a:
+                problems.append('takenBreakdown.actors[%d] missing %s' % (i, k))
+            elif not isinstance(a[k], t):
+                problems.append('takenBreakdown.actors[%d].%s type=%s want=%s'
+                                % (i, k, type(a[k]).__name__, _tname(t)))
+        if a.get('position') not in TAKEN_POSITIONS:
+            problems.append('takenBreakdown.actors[%d].position=%r is not one of %s'
+                            % (i, a.get('position'), list(TAKEN_POSITIONS)))
+        for k in ('nominal', 'taken', 'residual', 'friendly', 'unknown'):
+            if _isnum(a.get(k)):
+                sums[k] += a[k]
+        if isinstance(a.get('hits'), int):
+            sums['hits'] += a['hits']
+        if isinstance(a.get('friendlyHits'), int) and isinstance(a.get('hits'), int) \
+                and a['friendlyHits'] > a['hits']:
+            problems.append('takenBreakdown.actors[%d] friendlyHits(%d) > hits(%d)'
+                            % (i, a['friendlyHits'], a['hits']))
+        if isinstance(a.get('unknownHits'), int) and isinstance(a.get('hits'), int) \
+                and a['unknownHits'] > a['hits']:
+            problems.append('takenBreakdown.actors[%d] unknownHits(%d) > hits(%d)'
+                            % (i, a['unknownHits'], a['hits']))
+        if _isnum(a.get('nominal')) and _isnum(a.get('taken')) and _isnum(a.get('residual')) \
+                and not _close(a['nominal'], a['taken'] + a['residual']):
+            problems.append('takenBreakdown.actors[%d] identity broken: taken(%.0f)+residual(%.0f) '
+                            '!= nominal(%.0f)' % (i, a['taken'], a['residual'], a['nominal']))
+        if _isnum(a.get('nominal')):
+            for dim in ('bySource', 'byHitType', 'byEffect'):
+                rows = a.get(dim)
+                if not isinstance(rows, list):
+                    continue
+                sub = _taken_bucket_sum(rows)
+                if sub is not None and not _close(a['nominal'], sub):
+                    problems.append('takenBreakdown.actors[%d].%s sums to %.0f but the victim nominal is '
+                                    '%.0f: the partition must cover the whole victim total'
+                                    % (i, dim, sub, a['nominal']))
+            rows = a.get('byAttacker')
+            if isinstance(rows, list):
+                sub = _taken_bucket_sum(rows)
+                if sub is not None and _isnum(a.get('friendly')) and _isnum(a.get('unknown')) \
+                        and not _close(a['nominal'], sub + a['friendly'] + a['unknown']):
+                    problems.append('takenBreakdown.actors[%d]: byAttacker(%.0f)+friendly(%.0f)+unknown(%.0f)'
+                                    ' != nominal(%.0f)'
+                                    % (i, sub, a['friendly'], a['unknown'], a['nominal']))
+        for dim, keys in (('bySource', TAKEN_BUCKET_KEYS), ('byHitType', TAKEN_BUCKET_KEYS),
+                          ('byAttacker', TAKEN_BUCKET_KEYS), ('byEffect', TAKEN_BUCKET_KEYS),
+                          ('byStatus', TAKEN_STATUS_KEYS)):
+            rows = a.get(dim)
+            if not isinstance(rows, list):
+                continue
+            for j, row in enumerate(rows):
+                if not isinstance(row, dict):
+                    problems.append('takenBreakdown.actors[%d].%s[%d] is not an object' % (i, dim, j))
+                    continue
+                for k, t in keys:
+                    if k not in row:
+                        problems.append('takenBreakdown.actors[%d].%s[%d] missing %s' % (i, dim, j, k))
+                    elif not isinstance(row[k], t):
+                        problems.append('takenBreakdown.actors[%d].%s[%d].%s type=%s'
+                                        % (i, dim, j, k, type(row[k]).__name__))
+                # The quality marker is a contract, not decoration: "" means every hit in this bucket was
+                # resolved from the objects themselves; anything else is a best-effort fallback count.
+                if dim != 'byStatus' and isinstance(row.get('quality'), str) and row['quality'] \
+                        and not row['quality'].startswith('近似 '):
+                    problems.append('takenBreakdown.actors[%d].%s[%d].quality=%r (want "" or 近似 a/h)'
+                                    % (i, dim, j, row['quality']))
+    for k in ('nominal', 'taken', 'residual', 'friendly', 'unknown'):
+        if _isnum(sec.get(k)) and not _close(sec[k], sums[k]):
+            problems.append('takenBreakdown.%s(%.0f) != sum over actors(%.0f)' % (k, sec[k], sums[k]))
+    if isinstance(sec.get('hits'), int) and sec['hits'] != sums['hits']:
+        problems.append('takenBreakdown.hits(%d) != sum over actors(%d)' % (sec['hits'], sums['hits']))
+    if isinstance(sec.get('friendlyHits'), int) and isinstance(sec.get('unknownHits'), int):
+        cov['takenBreakdown.friendlyHits'] = sec['friendlyHits']
+        cov['takenBreakdown.unknownHits'] = sec['unknownHits']
+
+
 def _ver_tuple(v):
     try:
         parts = str(v).split('.')
@@ -814,6 +984,9 @@ def check_export(d, name='<mem>'):
     # Phase E: optional contribution section (validated whenever present)
     _check_contribution(d, problems, cov)
 
+    # R79: optional incoming-side section (validated whenever present, like contribution)
+    _check_taken(d, problems, cov)
+
 
     return problems, missing, cov
 
@@ -987,6 +1160,48 @@ def _fixture_114():
     d['version'] = '1.7.14'
     d['hitDetail']['matchRejected'] = 0
     return d
+
+
+def _taken_base():
+    """A 1.7.29 export: everything the round gates require (paramOwners 1.7.2, atkAdd 1.7.4, config
+    1.7.12, hitDetail.matchRejected 1.7.14) so a case can only fail on the thing it is about."""
+    d = _fixture_114()
+    d['version'] = '1.7.29'
+    return d
+
+
+def _taken_fixture():
+    """A faithful R79 takenBreakdown section: two victims and every partition identity satisfied.
+
+    Victim 1 (ally, position 1, key 1) took 300 nominal in two hits -- 200 from a resolvable attacker
+    and 100 of same-team damage -- of which 240 landed. Victim 2 (enemy, position unreadable, key 2)
+    has no resolvable attacker at all, which is the case that must NOT be folded into a unit bucket.
+    Section totals: hits 3, nominal 350, taken 240, residual 110, friendly 100, unknown 50.
+    """
+    return {
+        'schemaVersion': '1.0', 'method': 'by-event/1', 'basis': 'nominal',
+        'hits': 3, 'nominal': 350, 'taken': 240, 'residual': 110,
+        'friendly': 100, 'friendlyHits': 1, 'unknown': 50, 'unknownHits': 1,
+        'actors': [
+            {'key': 1, 'name': 'Alpha', 'team': 1, 'ally': True, 'position': 1, 'hits': 2,
+             'nominal': 300, 'taken': 240, 'residual': 60, 'friendly': 100, 'friendlyHits': 1,
+             'unknown': 0, 'unknownHits': 0,
+             'bySource': [{'key': 2, 'name': 'DOT', 'amount': 100, 'hits': 1, 'quality': ''},
+                          {'key': 1, 'name': 'DirectAttack', 'amount': 200, 'hits': 1, 'quality': ''}],
+             'byHitType': [{'key': 1, 'name': 'Physical', 'amount': 300, 'hits': 2,
+                            'quality': '近似 1/2'}],
+             'byAttacker': [{'key': 9, 'name': 'Beta', 'amount': 200, 'hits': 1, 'quality': ''}],
+             'byEffect': [{'key': 77, 'name': 'effect77', 'amount': 300, 'hits': 2, 'quality': ''}],
+             'byStatus': [{'status': 'poison', 'applier': 'Gamma', 'amount': 100, 'hits': 1}]},
+            {'key': 2, 'name': 'Bravo', 'team': 2, 'ally': False, 'position': 0, 'hits': 1,
+             'nominal': 50, 'taken': 0, 'residual': 50, 'friendly': 0, 'friendlyHits': 0,
+             'unknown': 50, 'unknownHits': 1,
+             'bySource': [{'key': 11, 'name': 'Drain', 'amount': 50, 'hits': 1, 'quality': ''}],
+             'byHitType': [{'key': -1, 'name': 'unidentified', 'amount': 50, 'hits': 1, 'quality': ''}],
+             'byAttacker': [],
+             'byEffect': [{'key': 0, 'name': 'unidentified', 'amount': 50, 'hits': 1, 'quality': ''}],
+             'byStatus': []}],
+    }
 
 
 def _fixture_178():
@@ -1166,6 +1381,64 @@ def selftest():
         c_old['facts']['items'][0].pop(k, None)
     c_old['events'][0].pop('hitValue', None)
     cases.append(('accepts a 1.5.1 export with no contribution section', c_old, 0))
+
+    # ---- R79 (1.7.29): the incoming side of the ledger. The section is REQUIRED from 1.7.29 on and
+    # merely optional before it, and every identity it states is a claim the page reads aloud: the
+    # victim total must survive being split five ways, and the attacker dimension plus the two
+    # unbucketed amounts must reconstruct it. A file that breaks one of those must be caught here,
+    # because on the page it would look like a plausible number.
+    t_ok = _taken_base()
+    t_ok['takenBreakdown'] = _taken_fixture()
+    cases.append(('accepts a well-formed 1.7.29 takenBreakdown section', t_ok, 0))
+
+    t_old = _fixture_114()
+    t_old['takenBreakdown'] = _taken_fixture()
+    cases.append(('accepts a 1.7.28 export carrying takenBreakdown (pre-R79 shape check only)',
+                  t_old, 0))
+
+    t_abs = _taken_base()
+    cases.append(('REJECTS a 1.7.29 export without takenBreakdown', t_abs, 1))
+
+    t_src = _taken_base()
+    t_src['takenBreakdown'] = _taken_fixture()
+    t_src['takenBreakdown']['actors'][0]['bySource'][0]['amount'] = 1
+    cases.append(('REJECTS a bySource that does not sum to the victim nominal', t_src, 1))
+
+    t_atk = _taken_base()
+    t_atk['takenBreakdown'] = _taken_fixture()
+    t_atk['takenBreakdown']['actors'][0]['byAttacker'][0]['amount'] = 100
+    cases.append(('REJECTS a victim whose byAttacker+friendly+unknown != nominal', t_atk, 1))
+
+    t_id = _taken_base()
+    t_id['takenBreakdown'] = _taken_fixture()
+    t_id['takenBreakdown']['taken'] = 100
+    cases.append(('REJECTS a section whose taken+residual != nominal', t_id, 1))
+
+    t_pos = _taken_base()
+    t_pos['takenBreakdown'] = _taken_fixture()
+    t_pos['takenBreakdown']['actors'][1]['position'] = 3
+    cases.append(('REJECTS a position outside 0/1/2 (the game has two rows, plus unreadable)',
+                  t_pos, 1))
+
+    t_q = _taken_base()
+    t_q['takenBreakdown'] = _taken_fixture()
+    t_q['takenBreakdown']['actors'][0]['bySource'][0]['quality'] = '0/1'
+    cases.append(('REJECTS a quality marker that is neither "" nor 近似 a/h', t_q, 1))
+
+    t_m = _taken_base()
+    t_m['takenBreakdown'] = _taken_fixture()
+    t_m['takenBreakdown']['method'] = 'log-share/1'
+    cases.append(('REJECTS a takenBreakdown built by the wrong method', t_m, 1))
+
+    t_b = _taken_base()
+    t_b['takenBreakdown'] = _taken_fixture()
+    t_b['takenBreakdown']['basis'] = 'dealt'
+    cases.append(('REJECTS a takenBreakdown over the wrong basis', t_b, 1))
+
+    t_err = _taken_base()
+    t_err['takenBreakdown'] = {'schemaVersion': '1.0', 'method': 'by-event/1', 'basis': 'nominal',
+                               'error': 'NullReferenceException: boom'}
+    cases.append(('REJECTS a degraded takenBreakdown error stub', t_err, 1))
 
     # 1.7.2 (阶段 G) paramOwners. The requirement is version-gated, and the owner is allowed to be NULL,
     # because "the game never fills Owner" is a RESULT this channel must be able to report -- while a

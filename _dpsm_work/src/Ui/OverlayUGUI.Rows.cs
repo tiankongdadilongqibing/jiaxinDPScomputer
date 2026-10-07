@@ -99,7 +99,9 @@ public static partial class OverlayUGUI
 		float pad = 8f;
 		_panelW = View == ViewMode.Detail
 			? Mathf.Min((float)Screen.width - 40f, 1400f)   // detail lines are long: widen the panel
-			: (View == ViewMode.Contribution
+			: (View == ViewMode.Contribution || View == ViewMode.Taken
+				// R79: the 受击来源拆分 page is a column table too (80 columns of T1 row, and its
+				// per-dimension lines reach ~86), so it shares the contribution table's wide panel.
 				? Mathf.Min((float)Screen.width - 40f, 880f)   // the contribution table needs its columns (94 with 自伤)
 				// R66: the 技能时间表 is a column table too -- one line per (unit, skill) with up to
 				// SkillTimelinePolicy.MaxStamps timestamps. R69: SkillTimelineText.LineWidth is 129 display
@@ -686,6 +688,15 @@ public static partial class OverlayUGUI
 		return DimColor;
 	}
 
+	/// <summary>R79: the same mapping for the 受击来源拆分 page's line styles.</summary>
+	private static Color TakenColor(TakenLineStyle style)
+	{
+		if (style == TakenLineStyle.Header) return HeaderColor;
+		if (style == TakenLineStyle.Warn) return WarnColor;
+		if (style == TakenLineStyle.Row) return AllyColor;
+		return DimColor;
+	}
+
 	private static List<RowDef> BuildRows()
 	{
 		var rows = new List<RowDef>();
@@ -1085,10 +1096,39 @@ public static partial class OverlayUGUI
 			return rows;
 		}
 
+		// ---- 受击来源拆分 page (F3) ----
+		// The rows come from the pure text layer (Ui/TakenPageText.cs), the same rule the 技能时间表 page
+		// follows: the string on screen is one a test can execute, and every amount is the one the exported
+		// takenBreakdown section carries. Shift+F3 narrows the table to 前衛 without touching the totals.
+		if (View == ViewMode.Taken)
+		{
+			int tQuest;
+			double tSeconds;
+			// view: null -- this page has no contribution view to describe, and ResolveHeaderBattle's own
+			// fallback (live session, then the most recent finished one) is exactly right here.
+			ResolveHeaderBattle(null, out tQuest, out tSeconds);
+			rows.Add(new RowDef
+			{
+				Text = "受击来源拆分  F3返回  Shift+F3 " + (_takenVanguardOnly ? "只看前衛(开)" : "只看前衛")
+				     + "  任务 " + tQuest + "   " + BattleTime.Seconds(tSeconds),
+				Color = HeaderColor, Height = 20f,
+			});
+			AppendBattleRefRow(rows, DisplayedRef(inBattle), tQuest, inBattle ? "本场 " : "上一场 ");
+			int firstRow = rows.Count;
+			List<TakenLine> taken = TakenPageText.Lines(TakenSession.Get(), _takenVanguardOnly, inBattle);
+			for (int i = 0; i < taken.Count; i++)
+				rows.Add(new RowDef { Text = taken[i].Text, Color = TakenColor(taken[i].Style), Height = 16f });
+			// the table aligns by padding with spaces: exact only on the mono font's 1:2 grid
+			Font tkMono = GetMonoFont();
+			if (!GameRef.IsNull(tkMono))
+				for (int i = firstRow; i < rows.Count; i++) rows[i].Font = tkMono;
+			return rows;
+		}
+
 		// ---- roster ----
 		if (!inBattle)
 		{
-			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F4 时间表", Color = HeaderColor, Height = 20f });
+			rows.Add(new RowDef { Text = "未在战斗中   F8 显隐  F9 重置  F10 图表  F6 明细  F5 贡献  F3 受击来源  F4 时间表", Color = HeaderColor, Height = 20f });
 			rows.Add(new RowDef { Text = "下方显示上一场记录;F10 可查看上一场曲线", Color = DimColor, Height = 16f });
 			if (Aggregator.History.Count > 0)
 			{
@@ -1107,7 +1147,7 @@ public static partial class OverlayUGUI
 			else enemyDealt += a.DamageDealt;
 		}
 		double secs = Math.Max(1.0, session.ActiveSeconds);
-		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F4时间表", Color = HeaderColor, Height = 20f });
+		rows.Add(new RowDef { Text = $"任务 {session.QuestId}   时间 {BattleTime.Seconds(session.ActiveSeconds)}   F8显隐 F9重置 F10图表 F6明细 F5贡献 F3受击来源 F4时间表", Color = HeaderColor, Height = 20f });
 		AppendBattleRefRow(rows, session.Ref, session.QuestId, "本场 ");
 		rows.Add(new RowDef { Text = $"我方总伤害 {allyDealt:N0}   秒伤 {(long)(allyDealt / secs):N0}   受击 {allyTaken:N0}   受回复 {allyHeal:N0}", Color = NeutralColor, Height = 18f });
 		if (allyFriendly > 0)

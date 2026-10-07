@@ -94,6 +94,14 @@
          (no IL2CPP): it takes the numbers and the verdict and returns the string, which is the only way the
          suite can hold a sentence to the arithmetic it claims. -->
     <Compile Include="$(SrcRoot)\Policy\AbsorbWording.cs" />
+    <!-- R79: 受击来源拆分. The three DamageSource / eDamageCalcType label maps moved out of
+         CompositionProbe.Text.cs (that file touches BattleObject/GameRef and cannot be compiled here), and
+         the projection itself is pure, so the bucket invariants and every printed row are executed rather
+         than eyeballed. The cache policy only delegates to ContributionCachePolicy's rule. -->
+    <Compile Include="$(SrcRoot)\Policy\DamageSourceLabelPolicy.cs" />
+    <Compile Include="$(SrcRoot)\Model\TakenBreakdown.cs" />
+    <Compile Include="$(SrcRoot)\Policy\TakenBreakdownPolicy.cs" />
+    <Compile Include="$(SrcRoot)\Policy\TakenCachePolicy.cs" />
     <!-- R72: the rule that makes the shift LAND: an event arriving before the origin is decided is held and
          replayed at its arrival + the lag, instead of being published on the old axis and blocking the
          shift (which is what happened in every battle the user played). Pure arithmetic + the queue type. -->
@@ -125,6 +133,10 @@
     <Compile Include="$(SrcRoot)\Ui\ContributionColumns.cs" />
     <Compile Include="$(SrcRoot)\Ui\FallbackText.cs" />
     <Compile Include="$(SrcRoot)\Ui\ContributionRowModel.cs" />
+    <!-- R79: the 受击来源拆分 page (F3). Same reason: the column widths, the fold marker and the 口径 words
+         are what a reader checks, and these are the very strings the panel draws. -->
+    <Compile Include="$(SrcRoot)\Ui\TakenColumns.cs" />
+    <Compile Include="$(SrcRoot)\Ui\TakenPageText.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

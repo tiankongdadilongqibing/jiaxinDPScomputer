@@ -22,6 +22,17 @@ PASS REJECTS totals.taken != dealt+unattributedDamage     caught=2  [totals iden
 PASS accepts a per-hit givenFoldOn                        caught=0
 PASS REJECTS a non-boolean per-hit givenFoldOn            caught=1  [calc.givenFoldOn type=str want=bool (first hit t=1.0)]
 PASS accepts a 1.5.1 export with no contribution section  caught=0
+PASS accepts a well-formed 1.7.29 takenBreakdown section  caught=0
+PASS accepts a 1.7.28 export carrying takenBreakdown (pre-R79 shape check only) caught=0
+PASS REJECTS a 1.7.29 export without takenBreakdown       caught=1  [root.takenBreakdown (since 1.7.29)]
+PASS REJECTS a bySource that does not sum to the victim nominal caught=1  [takenBreakdown.actors[0].bySource sums to 201 but the victim nominal is 300: the partition must cover the whole victim total]
+PASS REJECTS a victim whose byAttacker+friendly+unknown != nominal caught=1  [takenBreakdown.actors[0]: byAttacker(100)+friendly(100)+unknown(0) != nominal(300)]
+PASS REJECTS a section whose taken+residual != nominal    caught=2  [takenBreakdown identity broken: taken(100)+residual(110) != nominal(350); takenBreakdown.taken(100) != sum over actors(240)]
+PASS REJECTS a position outside 0/1/2 (the game has two rows, plus unreadable) caught=1  [takenBreakdown.actors[1].position=3 is not one of [0, 1, 2]]
+PASS REJECTS a quality marker that is neither "" nor 近似 a/h caught=1  [takenBreakdown.actors[0].bySource[0].quality='0/1' (want "" or 近似 a/h)]
+PASS REJECTS a takenBreakdown built by the wrong method   caught=1  [takenBreakdown.method='log-share/1' (want by-event/1)]
+PASS REJECTS a takenBreakdown over the wrong basis        caught=1  [takenBreakdown.basis='dealt' (want nominal: the split runs over the game-invoked nominal, not over the published taken)]
+PASS REJECTS a degraded takenBreakdown error stub         caught=10  [takenBreakdown reported an internal error (the export itself is intact): NullReferenceException: boom; takenBreakdown.hits missing; takenBreakdown.nominal missing]
 PASS accepts a well-formed 1.7.2 paramOwners section      caught=0
 PASS REJECTS a 1.7.2 export without paramOwners           caught=1  [root.paramOwners (since 1.7.2)]
 PASS accepts a 1.7.1 export carrying paramOwners          caught=0

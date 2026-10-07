@@ -11,48 +11,21 @@ public static partial class CompositionProbe
 	/// <summary>Chinese label for a DamageSource enum value.</summary>
 	public static string SrcName(int v)
 	{
-		switch (v)
-		{
-			case 0: return "未知";
-			case 1: return "直接攻击";
-			case 2: return "投射物";
-			case 3: return "毒";
-			case 4: return "火伤";
-			case 5: return "持续伤害";
-			case 6: return "反射";
-			case 7: return "自身反射";
-			case 8: return "直接回复";
-			case 9: return "被动回复";
-			case 10: return "吸血";
-			case 11: return "吸收";
-			case 12: return "复活奴仆";
-			case 13: return "不死结束";
-			case 14: return "DOT";
-			case 15: return "回复反噬";
-			case 16: return "调试伤害";
-			default: return "来源" + v;
-		}
+		// R79: the map itself now lives in the pure policy layer (Policy/DamageSourceLabelPolicy.cs) so
+		// tests/BehaviorTests can pin it; the strings are unchanged. This stays the game-side entry point.
+		return DamageSourceLabelPolicy.Source(v);
 	}
 
 	/// <summary>Is this source a healing-family source (never counted as damage output)?</summary>
 	public static bool IsHealSource(int v)
 	{
-		return v == 8 || v == 9 || v == 12 || v == 13 || v == 15 || v == 16;
+		return DamageSourceLabelPolicy.IsHealSource(v);
 	}
 
 	/// <summary>攻撃属性 (eDamageCalcType): physical / magic / penetration / heal.</summary>
 	public static string HitTypeName(int v)
 	{
-		switch (v)
-		{
-			case 0: return "无";
-			case 1: return "物理";
-			case 2: return "魔法";
-			case 3: return "贯通";
-			case 4: return "治疗";
-			case 5: return "物理或魔法";
-			default: return "攻击属性" + v;
-		}
+		return DamageSourceLabelPolicy.HitType(v);
 	}
 
 	/// <summary>Attribute display name of a battle object (empty when unavailable).</summary>

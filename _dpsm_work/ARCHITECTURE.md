@@ -76,6 +76,9 @@ src/
     BattleSummary.cs           已结束一局的摘要(历史列表用)
     BattleTime.cs              战斗时间的**唯一**格式化入口(界面行/明细行/日志都用它)
     CharacterInfo.cs           显示名/阵营/种类标签
+    TakenBreakdown.cs          1.7.29 受击来源拆分的模型(单位/桶/状态/一击四层 + 段级总额)。
+                               和 `ActorStats` 无关:它只描述「谁挨了多少、由谁造成」,
+                               由 `Policy/TakenBreakdownPolicy.cs` 分组、`Output/TakenSession.cs` 落盘
 
   Composition/               伤害构成模块(见第 3 节)
     CompositionProbe*.cs       10 个 partial 文件,一个类
@@ -99,12 +102,16 @@ src/
     JsonCheck.cs               1.5.0:写盘前的导出**结构自检**(字符串外括号平衡 + 根键重复),
                                结果进 `[DpsMeter][JSON]` 行。离线探针反向验证它能拒绝四种畸形。
     RuntimeLog.cs              轮转式运行日志(BepInEx\config\dpsmeter_runtime.log)
+    TakenSession.cs            1.7.29:与 `contribution` 段并列的顶层段 `takenBreakdown` 的产出与缓存
+                               (段内自带 `schemaVersion 1.0`、`basis nominal`;每秒最多重算一次)
 
   Ui/                        悬浮窗
     OverlayUGUI*.cs            4 个 partial 文件,一个类
     OverlayCore.cs             IMGUI(实验性)渲染器入口
     OverlayChart.cs            图表绘制(像素级曲线/网格)
     OverlayUI.cs               IMGUI 的 MonoBehaviour 壳
+    TakenColumns.cs / TakenPageText.cs
+                               1.7.29:F3「受击来源拆分」页的列宽与行文本(纯模块,行为套件直接执行)
 
   Diagnostics/
     Probe.cs                   候选伤害路径计数器([PROBE] 输出),用于找"无来源伤害"

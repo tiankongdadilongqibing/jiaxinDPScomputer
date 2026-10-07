@@ -94,6 +94,20 @@ public static partial class Aggregator
 		ActorStats victimStats = Session.GetActor(victim, create: true);
 		if (victimStats != null)
 		{
+			// R79: 受击来源拆分 needs the victim's position, and the game can move a unit mid-battle, so it
+			// is snapshotted on the FIRST damage this unit takes and never re-read. Guarded like every other
+			// native read here: a failure must leave an explicit "unknown" (ActorStats.Position == 0, printed
+			// as 站位未知) rather than silently passing the unit off as a rearguard.
+			if (!victimStats.PositionProbed)
+			{
+				victimStats.PositionProbed = true;
+				try
+				{
+					if (victim.IsVanguard) victimStats.Position = 1;
+					else if (victim.IsRearguard) victimStats.Position = 2;
+				}
+				catch { victimStats.Position = 0; }
+			}
 			victimStats.DamageTaken += damage;
 			victimStats.DamageTakenNominal += nominal;
 			victimStats.DamageAbsorbed += absorbed;

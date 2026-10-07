@@ -1112,6 +1112,20 @@ R71 算对了 lag,却因为**顺序**而每场都拒绝:它只在「本场第 2 
 - **口径不变**:1.7.23 与 1.7.22 的 `ActiveSeconds` 是同一条轴(游戏自己的战斗开始);变的只是**它现在真的被应用**。
   引用 1.7.23 之前的文件时,先看那一场的 `[CLOCK]` 行:`origin=none reason=events` 表示**那场仍是旧原点**。
 
+##### R79(插件 1.7.29):顶层新段 `takenBreakdown` —— 每个单位挨的伤害分别来自谁/什么
+
+这一段回答的问题与 `contribution` 段不同:那段算「谁打出了多少」,这段算「谁挨了多少、由谁造成、算在哪一类里」。它是只读投影,**没有新增任何 Harmony 钩子**;除「站位」外没有新的运行期读取。
+
+* **口径(段内自述,引用时不许脱离)**:`method = "by-event/1"`(数据源是 `Session.Events` 里 `Type="dmg"` 的事件);`basis = "nominal"` —— 金额是**游戏自己记账的那一份**(事件 `Nominal`,游戏入参 `CharacterStatistics.TakenDamage`),不是本插件发布的 `Amount`;`taken` = Σ 事件 `Amount`(本插件已发布的量),`residual = nominal − taken` —— 按 R78 的用词是**超出剩余耐久,不是被吸收**(`src/Hooks/BattleObjectHooks.cs` 在超量命中上发布的 `Amount` 是**溢出量**)。
+* **段级键**:`schemaVersion`(段自己的版本,初值 `"1.0"`;与 `contribution.schemaVersion` 无关)、`method`、`basis`、`hits`、`nominal`、`taken`、`residual`、`friendly`/`friendlyHits`(同队自伤)、`unknown`/`unknownHits`(攻击者解析不出来)、`actors[]`。
+* **`actors[]`(每个受害单位一行,按 `nominal` 降序、同额按 `key` 升序)**:`key`(本场会话键)、`name`、`team`、`ally`、`position`(**0 未读出 / 1 前衛 / 2 後衛**;**在该单位首次受击时快照一次** —— 游戏会在战斗中移动单位,晚读会把早先的命中全部重新贴标签;`0` 表示当时活对象已不在)、`positionLabel`(中文标签,导出附带)、`hits`、`nominal`、`taken`、`residual`、`friendly`/`friendlyHits`、`unknown`/`unknownHits`,以及五个维度数组 `bySource`/`byHitType`/`byAttacker`/`byEffect`/`byStatus`。
+* **维度数组元素**(`byStatus` 除外):`key`(该维度的取值;**折叠行落盘成 `0`**)、`name`(`byAttacker` 是**事件记的**攻击者显示名)、`amount`、`hits`、`quality`(`""` = 该桶全部命中的标签都来自权威记录,否则形如 `"近似 a/h"` —— 与 `hitDetail.match` 同一条规矩:尽力而为的标签不许读成实测)。`byStatus[]` 元素:`status`、`applier`(**游戏记的**付与者 —— DoT 时它未必等于这次命中的攻击者)、`amount`、`hits`。
+* **恒等式(行为用例与导出守卫双重钉住)**:`nominal == taken + residual`(逐单位与段级);`nominal == ΣbySource == ΣbyHitType == ΣbyEffect`(每个维度各自完整划分同一笔 `nominal`);`nominal == ΣbyAttacker + friendly + unknown`(**同队自伤与攻击者不明是两条独立通道,不混进任何单位桶**);`Σactors[].nominal == 段级 nominal`(守卫按 2.0 绝对容差核对)。
+* **标签复用**:`bySource`/`byHitType` 与页面标签都走策略层唯一实现 `src/Policy/DamageSourceLabelPolicy.cs`(`Source`/`IsHealSource`/`HitType`);`src/Composition/CompositionProbe.Text.cs` 的三个方法已改为委派它(字符串逐字未变)。
+* **桶上限与折叠**:`TakenBreakdownPolicy.MaxBuckets = 64`,超出折叠成一条(名字形如 `其他来源(4 项/4 击)`);**折叠发生在排序之前**,所以重尾的折叠行会出现在最前。
+* **页面**:F3 = 「受击来源拆分」(已在页内按 `Shift+F3` 切换「只看前衛」)。行宽 80 列(`src/Ui/TakenColumns.cs` 的 `T1LineWidth`);受害单位最多列 `TakenPageText.ShownVictims = 12` 个;每单位至多五条维度行、每行最多 3 个 part(其余折成 `其余N项`);口径行逐字写着 `超出剩余耐久 = 前者-后者,不是被吸收`。**不加 `Debug/TakenProbe` 开关**(导出段已含同样且更全的数字,新增键要动配置契约)。
+* **未做(引用注意)**:`src/Hooks/BattleObjectHooks.cs:51` 一字未改 ⇒ **已发布的承伤数值在超量命中上仍记的是溢出量**;修订要先定「落地记 0 / 记 `nominal − res` / 记 `nominal`」。F6 逐条行**不含**受击拆分(只有单位汇总)。
+
 ##### R78(插件 1.7.28):`实际伤害` 与 `被吸收/无效化` 两个词各自印的是哪个量 —— 正名,不改任何数
 
 R76 已证 `BattleObject.Damage` 的返回值是**溢出量**(`res == max(0, nominal − lifeBefore)`,798/798),但插件面板上的两个词一直印着别的量。实测那一场(quest 411001)四条记录:

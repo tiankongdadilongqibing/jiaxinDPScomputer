@@ -23,7 +23,7 @@ namespace DpsMeter;
 /// </summary>
 public static partial class OverlayUGUI
 {
-	public enum ViewMode { Roster = 0, Chart = 1, Detail = 2, Contribution = 3, Timeline = 4 }
+	public enum ViewMode { Roster = 0, Chart = 1, Detail = 2, Contribution = 3, Timeline = 4, Taken = 5 }
 
 	public static bool Visible = true;
 	public static ViewMode View = ViewMode.Roster;
@@ -52,6 +52,11 @@ public static partial class OverlayUGUI
 	internal static int _filterStep;
 
 	private static bool _prevF7;
+
+	/// <summary>R79: the 受击来源拆分 page (F3) can be narrowed to 前衛 units (Shift+F3 while that page is
+	/// open). It filters the VIEW only -- the totals line keeps stating the whole battle, so the narrowed
+	/// table can never be mistaken for the whole picture.</summary>
+	private static bool _takenVanguardOnly;
 
 	/// <summary>Pinned info bar of the detail view. It lives on the PANEL (not in the scrolled
 	/// content), so the character, the page and the record counts stay visible while scrolling through
@@ -118,7 +123,7 @@ public static partial class OverlayUGUI
 	private static float _contentH;
 	private static float _viewH;
 	private static float _panelW = 460f;
-	private static bool _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
+	private static bool _prevF3, _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
 	/// <summary>R52: latch for the on-demand evidence-extraction key (General/ExtractKey, default F4).
 	/// Polled in CheckKeys, which runs BEFORE the Visible gate, so it also works with the panel hidden.
 	/// R66: that same key now opens the 技能时间表 page while the panel IS visible, and keeps writing the
@@ -404,6 +409,9 @@ public static partial class OverlayUGUI
 
 	private static void CheckKeys()
 	{
+		// R79: F3 opens the 受击来源拆分 page (per-unit INCOMING damage by source). F5-F12 are taken by the
+		// other pages and F4 is the user's own extract key (General/ExtractKey), so F3 is the next free one.
+		bool f3 = (GetAsyncKeyState(114) & 0x8000) != 0;
 		// 1.7.0 (阶段 F): F5 opens the dedicated 总贡献 table page (F6 detail, F10 chart keep theirs).
 		bool f5 = (GetAsyncKeyState(116) & 0x8000) != 0;
 		bool f6 = (GetAsyncKeyState(117) & 0x8000) != 0;
@@ -424,6 +432,21 @@ public static partial class OverlayUGUI
 		if (View == ViewMode.Detail && right != _prevRight)
 		{
 			if (right) { _detailPage++; _scrollOffset = 0f; _lastRefresh = 0f; }
+		}
+		if (f3 && !_prevF3)
+		{
+			bool shift3 = (GetAsyncKeyState(16) & 0x8000) != 0;
+			// Same remember/restore shape as F5/F6: leaving the page returns to the view it was opened from.
+			// R79: Shift+F3 narrows the 受击来源拆分 table to 前衛 (the page title says so) instead of
+			// leaving the page -- the filter is only meaningful while that page is open.
+			if (View == ViewMode.Taken)
+			{
+				if (shift3) _takenVanguardOnly = !_takenVanguardOnly;
+				else View = _viewBeforeDetail;
+			}
+			else { _viewBeforeDetail = View; View = ViewMode.Taken; }
+			_scrollOffset = 0f;
+			_lastRefresh = 0f;
 		}
 		if (f5 && !_prevF5)
 		{
@@ -460,7 +483,7 @@ public static partial class OverlayUGUI
 			Visible = !Visible;
 			if (Visible) _lastRefresh = -1f; // force an immediate rebuild when going back visible
 		}
-		if (f9 && !_prevF9) { Aggregator.ResetCurrent(); ContributionSession.Invalidate(); }
+		if (f9 && !_prevF9) { Aggregator.ResetCurrent(); ContributionSession.Invalidate(); TakenSession.Invalidate(); }
 		if (f10 && !_prevF10)
 		{
 			// F10 only cycles roster <-> chart now (detail has its own key: F6)
@@ -540,6 +563,7 @@ public static partial class OverlayUGUI
 				catch (Exception ex3) { RuntimeLog.Write("[DpsMeter] 证据提取失败: " + ex3.Message); }
 			}
 		}
+		_prevF3 = f3;
 		_prevF5 = f5; _prevF6 = f6; _prevF8 = f8; _prevF9 = f9; _prevF10 = f10; _prevF11 = f11; _prevF12 = f12;
 		_prevF7 = f7;
 		_prevExtract = extractDown;

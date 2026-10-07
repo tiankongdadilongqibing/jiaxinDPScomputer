@@ -28,7 +28,7 @@ internal static class Program
 	/// them to be, the printed residual read from the game's own value with the `×0.242` counterfactual pinned,
 	/// the non-exclusion of the split and the residual on one row, and the `[ABSPROBE] note` sentences).
 	/// </summary>
-	public const int ExpectedCases = 1328;
+	public const int ExpectedCases = 1418;
 
 	private static int Main(string[] args)
 	{
@@ -114,6 +114,13 @@ internal static class Program
 		// the printed residual read from the game's own value instead of from the overflow, and the
 		// `[ABSPROBE] note` sentences that say what a deciding verdict means).
 		Cases.AbsorbWordingCases(r);
+		// R79 受击来源拆分: the per-unit INCOMING damage projection (five dimensions partitioning one nominal,
+		// the two amounts that belong to no attacker bucket, the fold that keeps the sum, the position
+		// snapshot taken on a unit's first damage).
+		Cases.TakenBreakdownCases(r);
+		// R79: that projection's page -- the column geometry every padded row assumes, and the words (the
+		// residual is never called an absorption; a best-effort bucket carries its `*`).
+		Cases.TakenPageCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

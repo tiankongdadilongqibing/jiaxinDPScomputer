@@ -62,6 +62,16 @@ public sealed class ActorStats
 
 	public bool IsSummonMerge;
 
+	/// <summary>R79: 前衛 / 後衛 snapshot, taken the first time this unit took damage
+	/// (0 = the live read failed or the object was gone, 1 = vanguard, 2 = rearguard). A later read would
+	/// relabel every earlier hit, because the game can move a unit mid-battle; and this is the only place in
+	/// the plugin that reads a VICTIM's position (the rule engine only reads the attacker's / the holder's).</summary>
+	public int Position;
+
+	/// <summary>R79: true once the position read was attempted, so "unknown" is a recorded answer rather
+	/// than "not asked yet".</summary>
+	public bool PositionProbed;
+
 	public int HitCount;
 
 	public int CritCount;

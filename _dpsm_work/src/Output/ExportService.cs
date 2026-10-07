@@ -779,6 +779,25 @@ public static class ExportService
 				  .Append("\"}");
 			}
 		}
+		// R79: 受击来源拆分 -- what each unit's INCOMING damage was made of (source unit / hit type /
+		// attacker / effect / status), derived from the SAME event list one line above the closing brace, so
+		// "who dealt it" (contribution) and "who took it" (here) can be lined up inside one file. Amounts are
+		// the game's own figure (`basis` in the section); the published amount rides along as `taken`, and
+		// `residual` is R78's 超出剩余耐久 -- never an absorption.
+		sb.Append(",\"takenBreakdown\":");
+		try
+		{
+			TakenSession.AppendJson(sb, s);
+		}
+		catch (System.Exception ex)
+		{
+			// Same rule as the contribution section: a projection bug must never cost the battle its
+			// export. Degrade to a section that SAYS it failed, deliberately without the mandatory fields,
+			// so the schema guard and the offline tools fail loudly instead of reading zeros as measurements.
+			sb.Append("{\"schemaVersion\":\"1.0\",\"method\":\"by-event/1\",\"basis\":\"nominal\",\"error\":\"")
+			  .Append(Escape(ex.GetType().Name + ": " + ex.Message))
+			  .Append("\"}");
+		}
 		sb.Append('}');
 		return sb.ToString();
 	}
