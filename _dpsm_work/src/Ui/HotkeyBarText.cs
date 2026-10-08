@@ -39,6 +39,13 @@ internal enum HotkeyAction
 	/// in the page's victim list.
 	/// </summary>
 	TakenActor = 17,
+
+	/// <summary>
+	/// R85: F2 flips the F6 detail view between 输出明细 (what our units dealt) and 承伤明细 (what they
+	/// took). It carries no argument -- the entry names the key, and the key means "the other side of this
+	/// page", which is exactly what the label says.
+	/// </summary>
+	KeyF2 = 18,
 }
 
 /// <summary>
@@ -215,15 +222,19 @@ internal static class HotkeyBarText
 	}
 
 	/// <summary>The F6 detail view's key row (new in R82; the text is the pinned bar's old hint tail).
-	/// ← / → page the per-hit list, F7 cycles the target filter, F11/F12 switch character, F6 returns.</summary>
-	public static List<HotkeySeg> Detail()
+	/// ← / → page the per-hit list, F7 cycles the counterparty filter, F11/F12 switch character, F6 returns.
+	/// R85 adds F2: it flips the page between 输出明细 and 承伤明细, so <paramref name="taken"/> selects
+	/// which way the entry points and the label always names the side the key will SHOW, not the side that
+	/// is on screen.</summary>
+	public static List<HotkeySeg> Detail(bool taken)
 	{
 		return new List<HotkeySeg>
 		{
 			Key("←", HotkeyAction.KeyLeft),
 			Plain("/"),
 			Key("→ 翻页(20秒/页)  ", HotkeyAction.KeyRight),
-			Key("F7 筛选目标  ", HotkeyAction.KeyF7),
+			Key(taken ? "F7 筛选来源  " : "F7 筛选目标  ", HotkeyAction.KeyF7),
+			Key(taken ? "F2 看输出  " : "F2 看承伤  ", HotkeyAction.KeyF2),
 			Key("F11", HotkeyAction.KeyF11),
 			Plain("/"),
 			Key("F12 换角色  ", HotkeyAction.KeyF12),

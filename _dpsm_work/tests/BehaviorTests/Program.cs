@@ -41,8 +41,17 @@ internal static class Program
 	/// 角色 list above the table -- the list must offer every character with its own position, mark the one on
 	/// screen, wrap at five names, fall back to the first entry for an unknown key, and the whole-team total
 	/// row must stay labelled as the whole team's).
+	/// R85: 1526 -> 1544 (+16 in ui/detail-perspective: the F6 detail view gained the 承伤明细 perspective, so
+	/// the subject/counterparty verdicts, the named 未知来源 bucket, the key/matcher agreement of the F7 filter
+	/// and the three words that name the side on screen are executed rather than eyeballed; +2 in ui/hotkey-bar
+	/// for the F2 entry and its label in both directions).
+	/// R86: 1544 -> 1546 (+2 in ui/detail-perspective: 承伤明细 lists only the units that actually took damage.
+	/// The page registers every ally actor of the session before it accumulates anything, so a unit the battle
+	/// never touched used to enter the F11/F12 rotation as a zero row whose body could only print
+	/// "(该角色本场没有受击事件)"; the list verdict is now pure and pinned in both directions -- dropped on the
+	/// taken side, kept on the dealt side, where a unit that dealt nothing IS a real answer).
 	/// </summary>
-	public const int ExpectedCases = 1526;
+	public const int ExpectedCases = 1546;
 
 	private static int Main(string[] args)
 	{
@@ -143,6 +152,10 @@ internal static class Program
 		// still byte-for-byte the literal it replaced (the F6 view's hint tail is the one, deliberate,
 		// exception: it moved from the pinned bar, which cannot carry click targets, into its own row).
 		Cases.HotkeyBarCases(r);
+		// R85: the F6 detail view's second perspective (承伤明细). The page reuses every number the events
+		// already carry -- only WHICH END of an event is read changes -- so the verdicts and the words that
+		// publish them are pure and live in Ui/DetailPerspective.cs, where the suite can hold them.
+		Cases.DetailPerspectiveCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

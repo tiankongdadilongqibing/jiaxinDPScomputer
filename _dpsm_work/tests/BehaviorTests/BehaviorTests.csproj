@@ -141,6 +141,11 @@
          exactly what used to be printed, and the tests pin that (the click dispatch in the overlay maps
          each entry to the same method the key calls, so the enum is named after keys). -->
     <Compile Include="$(SrcRoot)\Ui\HotkeyBarText.cs" />
+    <!-- R85: the F6 detail page's PERSPECTIVE (输出明细 / 承伤明细). Pure: the two predicates and the three
+         words are exactly what a reader checks, and the key/matcher agreement between the F7 list and the
+         F7 matcher is an invariant that a comment cannot hold. A list offering an entry the matcher never
+         accepts is the bug class this extraction exists to make impossible. -->
+    <Compile Include="$(SrcRoot)\Ui\DetailPerspective.cs" />
     <Compile Include="$(SrcRoot)\Diagnostics\ParamOwnerProbe.cs" />
     <!-- impure, but the game surface it touches is small and stubbed:
          HitRecord -> BattleObject/DamageSource/eDamageCalcType

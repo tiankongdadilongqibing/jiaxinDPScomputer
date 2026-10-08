@@ -388,25 +388,9 @@ public static partial class OverlayUGUI
 			rows.Add(new RowDef { Text = "      " + sb.ToString().Trim(), Color = color, Height = h });
 	}
 
-	/// <summary>Does this event belong to the attacker row the detail view currently has selected?
-	/// Matches BOTH name and team: this content fields the same character NAME on both sides, and keying by
-	/// name alone used to merge our unit with the enemy copy (that is how the enemy healer's 回復反転
-	/// damage ended up on our healer's row).</summary>
-	private static bool AttackerRowMatches(BattleEvent e, string whoName, int whoTeam)
-	{
-		if (e.Type != "dmg" || e.Attacker != whoName) return false;
-		if (e.AttackerTeam != 0 && e.AttackerTeam != whoTeam) return false;
-		return true;
-	}
-
-	/// <summary>Target (victim) filter of the detail view, cycled with F7 / Shift+F7. "" = every target.
-	/// Keyed by "name#team" for the same same-name-on-both-sides reason as the attacker rows; two
-	/// same-named units on the SAME team stay merged (events carry no victim pointer).</summary>
-	private static bool VictimRowMatches(BattleEvent e)
-	{
-		if (string.IsNullOrEmpty(_victimFilter)) return true;
-		return (e.Victim + "#" + e.VictimTeam) == _victimFilter;
-	}
+	// R85: the detail page's two "which end of the event" verdicts (subject + counterparty) and the words
+	// that name them live in Ui/DetailPerspective.cs -- pure, so the behaviour suite executes them. The
+	// filter itself is UI state and stays here; only the key/matcher agreement is shared.
 
 	// ---------------------------------------------------------------------------------------------
 	// 1.7.0 (阶段 F): the dedicated 总贡献 page (F5). Three tables on one page.
@@ -838,6 +822,12 @@ public static partial class OverlayUGUI
 
 		if (View == ViewMode.Detail)
 		{
+			// R85: which side of each event this page reads -- 输出明细 (what our units DEALT, the original
+			// page) or 承伤明细 (what our units TOOK). F2 flips it (see OverlayUGUI.ActF2). Everything below
+			// is the SAME code with the two ends of an event swapped, so the two pages cannot drift into
+			// two different behaviours.
+			bool taken = _detailTaken;
+			string pageTitle = DetailPerspective.PageTitle(taken);
 			// Claim the pending F7 step up front: it must be discarded if this render cannot build a target
 			// list (no session / no rows), otherwise the press would silently apply to some later battle.
 			int filterStep = _filterStep;
@@ -845,7 +835,7 @@ public static partial class OverlayUGUI
 			var ds = inBattle ? session : (Aggregator.History.Count > 0 ? SessionForView() : null);
 			if (ds == null)
 			{
-				rows.Add(new RowDef { Text = "伤害明细  暂无战斗数据", Color = HeaderColor, Height = 20f });
+				rows.Add(new RowDef { Text = pageTitle + "  暂无战斗数据", Color = HeaderColor, Height = 20f });
 				return rows;
 			}
 			// R56 (plan §6): the detail timeline and the identity come from the SAME BattleSession (ds), so
@@ -880,59 +870,104 @@ public static partial class OverlayUGUI
 					keyTeam[key] = (int)a.Team;
 				}
 			}
-			// 2) attackers seen in events but never registered as actors (party side only)
+			// 2) units seen in events but never registered as actors (party side only). WHICH END of the
+			//    event names the unit depends on the page: the attacker in 输出明细, the victim in 承伤明细.
 			foreach (var e in ds.Events)
 			{
-				if (e.Type != "dmg" || e.Attacker == "?") continue;
-				int tm = (e.AttackerTeam == 0) ? 1 : e.AttackerTeam;
+				if (e.Type != "dmg" || IsHealLike(e)) continue;
+				string nm; int tm;
+				if (taken)
+				{
+					if (string.IsNullOrEmpty(e.Victim) || e.Victim == "?") continue;
+					nm = e.Victim; tm = (e.VictimTeam == 0) ? 1 : e.VictimTeam;
+				}
+				else
+				{
+					if (e.Attacker == "?") continue;
+					nm = e.Attacker; tm = (e.AttackerTeam == 0) ? 1 : e.AttackerTeam;
+				}
 				if (tm != 1) continue;
-				if (IsHealLike(e)) continue;
-				string key = e.Attacker + "#" + tm;
-				if (!totals.ContainsKey(key)) { names.Add(key); totals[key] = 0L; counts[key] = 0; disp[key] = e.Attacker; keyName[key] = e.Attacker; keyTeam[key] = tm; }
+				string key = nm + "#" + tm;
+				if (!totals.ContainsKey(key)) { names.Add(key); totals[key] = 0L; counts[key] = 0; disp[key] = nm; keyName[key] = nm; keyTeam[key] = tm; }
 			}
-			// 3) accumulate damage, matching BOTH name and team
+			// 3) accumulate, matching BOTH name and team
 			foreach (var e in ds.Events)
 			{
-				if (e.Type != "dmg" || e.Attacker == "?") continue;
-				string key = e.Attacker + "#" + ((e.AttackerTeam == 0) ? 1 : e.AttackerTeam);
+				if (e.Type != "dmg" || IsHealLike(e)) continue;
+				string key = taken
+					? (e.Victim + "#" + ((e.VictimTeam == 0) ? 1 : e.VictimTeam))
+					: (e.Attacker + "#" + ((e.AttackerTeam == 0) ? 1 : e.AttackerTeam));
 				if (!totals.ContainsKey(key)) continue;
-				if (IsHealLike(e)) continue;
 				totals[key] += e.Amount;
 				counts[key]++;
 			}
+			// 4) R86: 承伤明细 lists only the units that actually took damage.
+			//    Step 1 registers EVERY ally actor the session knows -- party characters AND our token
+			//    units -- and that is right for 输出明细: a unit that dealt nothing is still a real answer.
+			//    It is wrong for the mirror page. A unit this battle never touched has no 承伤 record at
+			//    all, so all it ever did was add a zero row to the F11/F12 rotation (and to the pinned
+			//    bar's "n/N") whose body could print nothing but "(该角色本场没有受击事件)". The tally
+			//    accumulated directly above is what decides, so the list and the table are driven by one
+			//    number and cannot disagree about who is in the list; the verdict itself is pure
+			//    (Ui/DetailPerspective.cs) so the behaviour suite can hold it to that.
+			for (int i = names.Count - 1; i >= 0; i--)
+			{
+				string drop = names[i];
+				if (DetailPerspective.Listable(taken, counts[drop])) continue;
+				names.RemoveAt(i);
+				totals.Remove(drop);
+				counts.Remove(drop);
+				disp.Remove(drop);
+				keyName.Remove(drop);
+				keyTeam.Remove(drop);
+			}
 			if (names.Count == 0)
 			{
-				rows.Add(new RowDef { Text = "伤害明细  本场没有可归属的伤害事件", Color = HeaderColor, Height = 20f });
+				rows.Add(new RowDef { Text = pageTitle + (taken ? "  本场没有受击事件" : "  本场没有可归属的伤害事件"), Color = HeaderColor, Height = 20f });
 				return rows;
 			}
 			names.Sort((a, b) => totals[b].CompareTo(totals[a]));
-			if (_detailIdx < 0) _detailIdx = names.Count - 1;
-			if (_detailIdx >= names.Count) _detailIdx = 0;
-			string whoKey = names[_detailIdx];
+			// R85: the selection is held by KEY, not by position -- the same lesson the 受击来源拆分 page
+			// learned in R84. This list is re-sorted by amount on every render, and F2 re-sorts it by a
+			// DIFFERENT amount (dealt vs taken), so an index alone would silently put a different unit on
+			// screen. F11/F12 clear the key (an index move is what they mean); F2 keeps it, which is how
+			// the same character survives the perspective switch.
+			int whoIdx = string.IsNullOrEmpty(_detailWhoKey) ? -1 : names.IndexOf(_detailWhoKey);
+			if (whoIdx < 0)
+			{
+				if (_detailIdx < 0) _detailIdx = names.Count - 1;
+				if (_detailIdx >= names.Count) _detailIdx = 0;
+				whoIdx = _detailIdx;
+			}
+			_detailIdx = whoIdx;
+			_detailWhoKey = names[whoIdx];
+			string whoKey = names[whoIdx];
 			string who = disp[whoKey];          // display label (tokens get a "[使魔] " prefix)
 			string whoName = keyName[whoKey];   // raw name -- events must be matched with THIS, not the label
 			int whoTeam = keyTeam[whoKey];
 
-			// ---- 0) target filter (F7 / Shift+F7) ----
-			// Every selectable target is derived from THIS attacker's own events, ordered by damage, so the
-			// list can never advertise a target the current character has no record against. Resolving the
-			// F7 step here (instead of in CheckKeys) is what makes that possible.
-			var vKeys = new List<string>();                       // "" = all targets, then "name#team"
+			// ---- 0) counterparty filter (F7 / Shift+F7) ----
+			// Every selectable entry is derived from THIS unit's own events, ordered by damage, so the list
+			// can never advertise a counterparty the current unit has no record against. In 输出明细 the
+			// counterparty is the TARGET (who was hit); in 承伤明细 it is the SOURCE (who did the hitting),
+			// and a hit whose attacker could not be resolved gets its own 未知来源 bucket rather than being
+			// dropped. Resolving the F7 step here (instead of in CheckKeys) is what makes that possible.
+			var vKeys = new List<string>();                       // "" = all, then "name#team"
 			var vDisp = new Dictionary<string, string>();
 			var vTotals = new Dictionary<string, long>();
 			var vCounts = new Dictionary<string, int>();
 			vKeys.Add("");
 			foreach (var e in ds.Events)
 			{
-				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
+				if (!DetailPerspective.SubjectMatches(e, whoName, whoTeam, taken)) continue;
 				if (IsHealLike(e)) continue;
-				string vk = e.Victim + "#" + e.VictimTeam;
+				string vk = DetailPerspective.CounterpartyKey(e, taken);
 				if (!vTotals.ContainsKey(vk))
 				{
 					vKeys.Add(vk);
 					vTotals[vk] = 0L;
 					vCounts[vk] = 0;
-					vDisp[vk] = e.Victim;
+					vDisp[vk] = taken ? DetailPerspective.SourceName(e) : e.Victim;
 				}
 				vTotals[vk] += e.Amount;
 				vCounts[vk]++;
@@ -944,7 +979,7 @@ public static partial class OverlayUGUI
 			vKeys.AddRange(rest);
 			long allTotal = 0L; int allCount = 0;
 			foreach (var kv in vTotals) { allTotal += kv.Value; allCount += vCounts[kv.Key]; }
-			vDisp[""] = "全部目标";
+			vDisp[""] = taken ? "全部来源" : "全部目标";
 			vTotals[""] = allTotal;
 			vCounts[""] = allCount;
 			if (filterStep != 0)
@@ -979,8 +1014,8 @@ public static partial class OverlayUGUI
 			var inflictAgg = new Dictionary<string, int>();
 			foreach (var e in ds.Events)
 			{
-				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
-				if (!VictimRowMatches(e)) continue;                               // F7 target filter
+				if (!DetailPerspective.SubjectMatches(e, whoName, whoTeam, taken)) continue;
+				if (!DetailPerspective.CounterpartyMatches(e, _victimFilter, taken)) continue;   // F7 filter
 				// R78(A): 超出剩余耐久 = Nominal − Amount,旧文案叫「被吸收/无效化」。R76 定律(`res ==
 				// max(0, nominal - lifeBefore)`,798/798 读数)说游戏返回值是溢出量,所以这条差额是目标命中前的
 				// 剩余耐久,不是吸收量;游戏自身统计按 Nominal 计入,所以 伤害 + 该值 = 游戏口径。
@@ -1022,7 +1057,7 @@ public static partial class OverlayUGUI
 				: (counts[whoKey].ToString() + " 条 / " + totals[whoKey].ToString("N0"));
 			rows.Add(new RowDef
 			{
-				Text = $"汇总({sumScope}):{sumCount} 伤害   平均后段倍率 {(ratioN > 0 ? "×" + (ratioSum / ratioN).ToString("F3") : "无")}   未匹配构成 {noComp} 条"
+				Text = $"汇总({sumScope}):{sumCount} {DetailPerspective.AmountWord(taken)}   平均后段倍率 {(ratioN > 0 ? "×" + (ratioSum / ratioN).ToString("F3") : "无")}   未匹配构成 {noComp} 条"
 					+ (reverseN > 0 ? $"   回复反噬 {reverseN} 条/{reverseSum:N0}" : "")
 					+ (friendlyN > 0 ? $"   自伤/反噬 {friendlyN} 条/{friendlySum:N0}"
 						+ (Plugin.CfgFilterFriendlyFire != null && Plugin.CfgFilterFriendlyFire.Value ? "(已剔除)" : "(已含在伤害内;游戏自身也计入)") : "")
@@ -1065,8 +1100,8 @@ public static partial class OverlayUGUI
 			int listTotal = 0;
 			foreach (var e in ds.Events)
 			{
-				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
-				if (!VictimRowMatches(e)) continue;                               // F7 target filter
+				if (!DetailPerspective.SubjectMatches(e, whoName, whoTeam, taken)) continue;
+				if (!DetailPerspective.CounterpartyMatches(e, _victimFilter, taken)) continue;   // F7 filter
 				if (IsHealLike(e)) continue;
 				listTotal++;
 				if (e.T > maxT) maxT = e.T;
@@ -1080,8 +1115,8 @@ public static partial class OverlayUGUI
 			int pageN = 0;
 			foreach (var e in ds.Events)
 			{
-				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
-				if (!VictimRowMatches(e)) continue;                               // F7 target filter
+				if (!DetailPerspective.SubjectMatches(e, whoName, whoTeam, taken)) continue;
+				if (!DetailPerspective.CounterpartyMatches(e, _victimFilter, taken)) continue;   // F7 filter
 				if (IsHealLike(e)) continue;
 				if (e.T < pageLo || e.T >= pageHi) continue;
 				pageN++;
@@ -1090,7 +1125,7 @@ public static partial class OverlayUGUI
 			// The selectable targets, with their own counts, so the filter is discoverable without
 			// documentation: the marked entry is the active one (F7 = next, Shift+F7 = previous).
 			var selSb = new StringBuilder();
-			selSb.Append("目标筛选(F7 下一个 / Shift+F7 上一个):");
+			selSb.Append(DetailPerspective.FilterWord(taken) + "筛选(F7 下一个 / Shift+F7 上一个):");
 			int selShown = 0;
 			foreach (var vk in vKeys)
 			{
@@ -1103,13 +1138,13 @@ public static partial class OverlayUGUI
 			AddWrapped(rows, selSb.ToString(), filtered ? HeaderColor : DimColor, 16f, 118);
 			rows.Add(new RowDef
 			{
-				Text = "—— 逐条伤害(每页 20 秒;←/→ 翻页,滚轮/PgUp·PgDn 滚动)——",
+				Text = "—— 逐条" + DetailPerspective.AmountWord(taken) + "(每页 20 秒;←/→ 翻页,滚轮/PgUp·PgDn 滚动)——",
 				Color = DimColor, Height = 16f
 			});
 			// R82: the detail view's own keys, clickable. They used to be the pinned bar's tail (see the
 			// _pinLine comment below); without them a mouse-only reader could switch pages but never leave
 			// the F6 view.
-			List<HotkeySeg> detailKeys = HotkeyBarText.Detail();
+			List<HotkeySeg> detailKeys = HotkeyBarText.Detail(taken);
 			rows.Add(new RowDef { Text = HotkeyBarText.Line(detailKeys), Segments = detailKeys, Color = HeaderColor, Height = 16f });
 			// everything numeric lives in the pinned bar only (see LayoutPinBar), so the heading above
 			// stays a plain delimiter instead of repeating the counts.
@@ -1117,7 +1152,7 @@ public static partial class OverlayUGUI
 			// (it hangs off the panel, outside the scrolled content) and therefore cannot carry click
 			// targets, so the hints moved into the DETAIL KEYS row below -- same keys, same words, now
 			// clickable, and the pinned bar keeps only the numbers it exists for.
-			_pinLine = $"伤害明细 {_detailIdx + 1}/{names.Count} {who} · 总伤害 {totals[whoKey]:N0} / {counts[whoKey]} 条"
+			_pinLine = $"{pageTitle} {_detailIdx + 1}/{names.Count} {who} · {"总" + DetailPerspective.AmountWord(taken)} {totals[whoKey]:N0} / {counts[whoKey]} 条"
 				+ (ds.Ref == null ? " · 无编号(legacy)" : " · " + ds.Ref.ShortTag)
 				+ (filtered ? $" · 筛选→{filtName} {vTotals[_victimFilter]:N0}/{vCounts[_victimFilter]} 条" : "")
 				+ $" · 第 {_detailPage + 1}/{pages} 页({pageLo:F0}~{pageHi:F0} 秒)本页 {pageN} 条 / 列表 {listTotal} 条";
@@ -1132,8 +1167,8 @@ public static partial class OverlayUGUI
 			int shown = 0;
 			foreach (var e in ds.Events)
 			{
-				if (!AttackerRowMatches(e, whoName, whoTeam)) continue;
-				if (!VictimRowMatches(e)) continue;                               // F7 target filter
+				if (!DetailPerspective.SubjectMatches(e, whoName, whoTeam, taken)) continue;
+				if (!DetailPerspective.CounterpartyMatches(e, _victimFilter, taken)) continue;   // F7 filter
 				if (IsHealLike(e)) continue;
 				if (e.T < pageLo || e.T >= pageHi) continue;
 				shown++;
@@ -1142,14 +1177,22 @@ public static partial class OverlayUGUI
 				string stApp = StatusDeltaProbe.Appliers(e);
 				rows.Add(new RowDef
 				{
-					// "附加" claims the row DID it, which is only true when the game credits this very
-					// attacker; otherwise the row merely carries the observation ("目标被挂").
-					Text = $"{shown}. {BattleTime.Hit(e.T)} → {e.Victim}   伤害 {e.Amount:N0}"
-						+ (e.Friendly ? "   [自伤/反噬]" : "")
-						+ (string.IsNullOrEmpty(e.Triggers) ? "" : "   素质发动:" + e.Triggers)
-						+ (stTag.Length == 0 ? ""
-							: (stOwn ? "   附加:" + stTag
-								: "   目标被挂:" + stTag + (stApp.Length > 0 ? " (施加者 " + stApp + ")" : " (施加者未知)"))),
+					// In 输出明细 the row's subject is the ATTACKER, so "附加" claims the row DID it, which is
+					// only true when the game credits this very attacker; otherwise the row merely carries the
+					// observation ("目标被挂"). In 承伤明细 the subject is the VICTIM, so neither word applies
+					// -- the row says 受异常 and names the applier the game credits.
+					Text = taken
+						? $"{shown}. {BattleTime.Hit(e.T)} ← {DetailPerspective.SourceName(e)}   {DetailPerspective.AmountWord(true)} {e.Amount:N0}"
+							+ (e.Friendly ? "   [自伤/反噬]" : "")
+							+ (string.IsNullOrEmpty(e.Triggers) ? "" : "   素质发动:" + e.Triggers)
+							+ (stTag.Length == 0 ? ""
+								: "   受异常:" + stTag + (stApp.Length > 0 ? " (施加者 " + stApp + ")" : " (施加者未知)"))
+						: $"{shown}. {BattleTime.Hit(e.T)} → {e.Victim}   伤害 {e.Amount:N0}"
+							+ (e.Friendly ? "   [自伤/反噬]" : "")
+							+ (string.IsNullOrEmpty(e.Triggers) ? "" : "   素质发动:" + e.Triggers)
+							+ (stTag.Length == 0 ? ""
+								: (stOwn ? "   附加:" + stTag
+									: "   目标被挂:" + stTag + (stApp.Length > 0 ? " (施加者 " + stApp + ")" : " (施加者未知)"))),
 					Color = e.Friendly ? WarnColor : (stTag.Length == 0 ? NeutralColor : (stOwn ? StatusColor : DimColor)),
 					Height = 16f
 				});
@@ -1169,7 +1212,7 @@ public static partial class OverlayUGUI
 					});
 			}
 			if (listTotal == 0)
-				rows.Add(new RowDef { Text = "(该角色本场没有伤害事件)", Color = WarnColor, Height = 16f });
+				rows.Add(new RowDef { Text = taken ? "(该角色本场没有受击事件)" : "(该角色本场没有伤害事件)", Color = WarnColor, Height = 16f });
 			return rows;
 		}
 

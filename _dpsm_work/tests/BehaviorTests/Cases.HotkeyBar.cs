@@ -50,8 +50,13 @@ internal static partial class Cases
 			HotkeyBarText.Line(HotkeyBarText.Timeline()),
 			"技能时间表  我方奥义/特殊/自动技能发动时刻   F4 返回");
 		r.Str("the-detail-key-row-keeps-the-pinned-bars-old-hint",
-			HotkeyBarText.Line(HotkeyBarText.Detail()),
-			"←/→ 翻页(20秒/页)  F7 筛选目标  F11/F12 换角色  F6返回");
+			HotkeyBarText.Line(HotkeyBarText.Detail(false)),
+			"←/→ 翻页(20秒/页)  F7 筛选目标  F2 看承伤  F11/F12 换角色  F6返回");
+		// R85: the label names the side the key will SHOW, not the side on screen, so the taken variant
+		// reads "F2 看输出" and its F7 label says 来源 (the counterparty there is who DID the hitting).
+		r.Str("the-taken-detail-key-row-names-the-other-side",
+			HotkeyBarText.Line(HotkeyBarText.Detail(true)),
+			"←/→ 翻页(20秒/页)  F7 筛选来源  F2 看输出  F11/F12 换角色  F6返回");
 
 		// ---- what a click on each bar offers -----------------------------------------------------------
 		r.Str("the-idle-roster-bar-offers-the-seven-keys",
@@ -72,9 +77,12 @@ internal static partial class Cases
 		r.Str("the-timeline-offers-only-return",
 			HbActions(HotkeyBarText.Timeline()),
 			"KeyF4");
-		r.Str("the-detail-row-offers-paging-filter-and-character",
-			HbActions(HotkeyBarText.Detail()),
-			"KeyLeft,KeyRight,KeyF7,KeyF11,KeyF12,KeyF6");
+		r.Str("the-detail-row-offers-paging-filter-perspective-and-character",
+			HbActions(HotkeyBarText.Detail(false)),
+			"KeyLeft,KeyRight,KeyF7,KeyF2,KeyF11,KeyF12,KeyF6");
+		r.Str("the-taken-detail-row-offers-the-same-entries",
+			HbActions(HotkeyBarText.Detail(true)),
+			HbActions(HotkeyBarText.Detail(false)));
 
 		// The mapping is by KEY, so an entry that only exists to leave a page shares its action with the
 		// entry that opened it. If someone ever "helpfully" splits those into two actions, this goes red.
@@ -94,8 +102,8 @@ internal static partial class Cases
 			HbTags(HotkeyBarText.RosterInBattle("9999", "45秒"), 0), "None");
 		r.True("the-separators-between-two-entries-are-not-clickable",
 			HbTags(HotkeyBarText.Taken("1", "1秒", false), 4) == "None"
-			&& HbTags(HotkeyBarText.Detail(), 1) == "None"
-			&& HbTags(HotkeyBarText.Detail(), 5) == "None");
+			&& HbTags(HotkeyBarText.Detail(false), 1) == "None"
+			&& HbTags(HotkeyBarText.Detail(false), 6) == "None");
 		r.True("every-clickable-entry-has-a-label",
 			HbAllLabelled(HotkeyBarText.RosterIdle())
 			&& HbAllLabelled(HotkeyBarText.RosterInBattle("9999", "45秒"))
@@ -103,7 +111,8 @@ internal static partial class Cases
 			&& HbAllLabelled(HotkeyBarText.Contribution("9999", "45秒"))
 			&& HbAllLabelled(HotkeyBarText.Chart("累计"))
 			&& HbAllLabelled(HotkeyBarText.Timeline())
-			&& HbAllLabelled(HotkeyBarText.Detail()));
+			&& HbAllLabelled(HotkeyBarText.Detail(false))
+			&& HbAllLabelled(HotkeyBarText.Detail(true)));
 		r.True("the-plain-action-is-never-clickable",
 			!new HotkeySeg("任意", HotkeyAction.None).Clickable
 			&& new HotkeySeg("任意", HotkeyAction.KeyF3).Clickable
@@ -117,7 +126,8 @@ internal static partial class Cases
 			&& !HbHasNewline(HotkeyBarText.Contribution("9999", "45秒"))
 			&& !HbHasNewline(HotkeyBarText.Chart("累计"))
 			&& !HbHasNewline(HotkeyBarText.Timeline())
-			&& !HbHasNewline(HotkeyBarText.Detail()));
+			&& !HbHasNewline(HotkeyBarText.Detail(false))
+			&& !HbHasNewline(HotkeyBarText.Detail(true)));
 
 		// ---- the width fallback (only used until the font can measure) ----------------------------------
 		r.True("the-width-estimate-is-zero-for-empty-text",

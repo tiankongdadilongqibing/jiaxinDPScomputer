@@ -1193,7 +1193,7 @@ MUTATIONS = [
     dict(name="hotkey-bar-detail-row-drops-return", file="Ui/HotkeyBarText.cs",
          find='\t\t\tKey("F6返回", HotkeyAction.KeyF6),',
          repl='\t\t\tPlain("F6返回"),',
-         expect="ui/hotkey-bar/the-detail-row-offers-paging-filter-and-character"),
+         expect="ui/hotkey-bar/the-detail-row-offers-paging-filter-perspective-and-character"),
     dict(name="hotkey-bar-idle-entry-text-changed", file="Ui/HotkeyBarText.cs",
          find='\t\t\tKey("F10 图表  ", HotkeyAction.KeyF10),',
          repl='\t\t\tKey("F10 圖表  ", HotkeyAction.KeyF10),',
@@ -1238,6 +1238,39 @@ MUTATIONS = [
          find='\tpublic const int TakenActorPerRow = 5;',
          repl='\tpublic const int TakenActorPerRow = 50;',
          expect="ui/taken-page/the-character-list-wraps-after-five-names"),
+    # ---- R85: the F6 detail view's second perspective (承伤明细). The page swaps the two ENDS of every
+    # damage event, so each mutation breaks the swap in exactly one place: the subject verdict ignores the
+    # side, the counterparty key ignores the side, the named 未知来源 bucket degrades to the raw "?", the
+    # two words that tell the reader which side is on screen are swapped, and the bar's F2 entry loses its
+    # direction. The key/matcher agreement is covered by the same predicate the page calls, which is why
+    # breaking the key reddens a case rather than silently offering an unmatched filter.
+    dict(name="detail-subject-ignores-the-perspective", file="Ui/DetailPerspective.cs",
+         find="\t\tif (taken)\n\t\t{\n\t\t\tif (e.Victim != whoName) return false;",
+         repl="\t\tif (false)\n\t\t{\n\t\t\tif (e.Victim != whoName) return false;",
+         expect="ui/detail-perspective/the-taken-subject-is-the-victim"),
+    dict(name="detail-counterparty-ignores-the-perspective", file="Ui/DetailPerspective.cs",
+         find='\t\treturn taken ? (SourceName(e) + "#" + e.AttackerTeam) : (e.Victim + "#" + e.VictimTeam);',
+         repl='\t\treturn (e.Victim + "#" + e.VictimTeam);',
+         expect="ui/detail-perspective/the-counterparty-is-the-target-when-dealt-and-the-source-when-taken"),
+    dict(name="detail-unknown-source-degrades-to-a-question-mark", file="Ui/DetailPerspective.cs",
+         find='\t\treturn (string.IsNullOrEmpty(e.Attacker) || e.Attacker == "?") ? UnknownSource : e.Attacker;',
+         repl='\t\treturn e.Attacker;',
+         expect="ui/detail-perspective/an-unresolvable-attacker-is-named-not-dropped"),
+    dict(name="detail-filter-word-swapped", file="Ui/DetailPerspective.cs",
+         find='\tpublic static string FilterWord(bool taken) { return taken ? "来源" : "目标"; }',
+         repl='\tpublic static string FilterWord(bool taken) { return taken ? "目标" : "来源"; }',
+         expect="ui/detail-perspective/the-filter-word-names-the-counterparty"),
+    dict(name="detail-bar-f2-entry-loses-its-direction", file="Ui/HotkeyBarText.cs",
+         find='\t\t\tKey(taken ? "F2 看输出  " : "F2 看承伤  ", HotkeyAction.KeyF2),',
+         repl='\t\t\tKey("F2 看承伤  ", HotkeyAction.KeyF2),',
+         expect="ui/hotkey-bar/the-taken-detail-key-row-names-the-other-side"),
+    # R86: 承伤明细 must list only the units that actually took damage. The page registers every ally
+    # actor first and accumulates afterwards, so the defect is exactly "the list is not filtered by the
+    # tally" -- making the predicate unconditional puts the zero-record characters back on the page.
+    dict(name="detail-taken-list-keeps-units-with-no-record", file="Ui/DetailPerspective.cs",
+         find="\t\treturn !taken || eventCount > 0;",
+         repl="\t\treturn true;",
+         expect="ui/detail-perspective/the-taken-list-drops-units-that-never-took-damage"),
     dict(name="comment-only-control", file="Model/BattleSession.cs",
          find="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller).",
          repl="/// <summary>Advance the clock by one frame's REAL seconds (already stall-clamped by the caller) [prose].",

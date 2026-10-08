@@ -31,6 +31,20 @@ public static partial class OverlayUGUI
 	private static int _detailIdx;
 	private static ViewMode _viewBeforeDetail = ViewMode.Roster;
 
+	/// <summary>R85: which side of the F6 detail view is on screen -- false = 输出明细 (the damage this unit
+	/// DEALT, the original page), true = 承伤明细 (the damage this unit TOOK). F2 flips it and the detail
+	/// bar's entry dispatches the SAME method, so the words on screen and the key cannot drift apart.
+	/// The page, the counterparty filter and the per-hit list are all rebuilt from the selected unit's own
+	/// events every render, so the flag only has to pick which side of each event is read.</summary>
+	private static bool _detailTaken;
+
+	/// <summary>R85: the unit the detail view shows, held as "name#team" rather than as a position.
+	/// Both perspectives re-sort the same party list by a different quantity (dealt vs taken), so an index
+	/// would silently point at a DIFFERENT unit after F2 -- exactly the failure the 受击来源拆分 page hit in
+	/// R84. F2 keeps this key, so the character survives the switch; F11/F12 clear it and fall back to
+	/// <see cref="_detailIdx"/>, which is what "next/previous character" means. "" = nothing picked yet.</summary>
+	private static string _detailWhoKey = "";
+
 	/// <summary>Time-window page of the F6 detail list: one page = DetailPageSeconds of battle time.
 	/// ← / → move it (see CheckKeys); the list itself is no longer capped by a row count.</summary>
 	private static int _detailPage;
@@ -148,7 +162,7 @@ public static partial class OverlayUGUI
 	private static float _contentH;
 	private static float _viewH;
 	private static float _panelW = 460f;
-	private static bool _prevF3, _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
+	private static bool _prevF2, _prevF3, _prevF5, _prevF6, _prevF8, _prevF9, _prevF10, _prevF11, _prevF12;
 	/// <summary>R52: latch for the on-demand evidence-extraction key (General/ExtractKey, default F4).
 	/// Polled in CheckKeys, which runs BEFORE the Visible gate, so it also works with the panel hidden.
 	/// R66: that same key now opens the 技能时间表 page while the panel IS visible, and keeps writing the
@@ -489,6 +503,7 @@ public static partial class OverlayUGUI
 		{
 			switch (action)
 			{
+				case HotkeyAction.KeyF2: ActF2(); break;
 				case HotkeyAction.KeyF3: ActF3(false); break;
 				case HotkeyAction.KeyF3Shift: ActF3(true); break;
 				case HotkeyAction.KeyF4: if (Visible) ActTimeline(); break;
@@ -541,6 +556,20 @@ public static partial class OverlayUGUI
 	/// "the words on screen" and "what the key does" from ever becoming two different behaviours.
 	/// The bodies are exactly the bodies the key handlers had before R82.
 	/// </summary>
+	/// <summary>R85: F2 flips the F6 detail view between 输出明细 (what our units dealt) and 承伤明细 (what
+	/// our units took). It works from any view -- the flag is a property of the detail page, not of the
+	/// moment the key is pressed -- so a reader can pick the perspective first and open the page after.
+	/// The selected unit is kept (see <see cref="_detailWhoKey"/>); the page and the counterparty filter
+	/// are reset because both are derived from a different side of the same events.</summary>
+	internal static void ActF2()
+	{
+		_detailTaken = !_detailTaken;
+		_detailPage = 0;
+		_victimFilter = "";
+		_scrollOffset = 0f;
+		_lastRefresh = 0f;
+	}
+
 	internal static void ActF3(bool shift)
 	{
 		// Same remember/restore shape as F5/F6: leaving the page returns to the view it was opened from.
@@ -592,6 +621,7 @@ public static partial class OverlayUGUI
 		if (View == ViewMode.Detail) View = _viewBeforeDetail;
 		else { _viewBeforeDetail = View; View = ViewMode.Detail; }
 		_detailIdx = 0;
+		_detailWhoKey = "";
 		_detailPage = 0;
 		_scrollOffset = 0f;
 		_lastRefresh = 0f;
@@ -636,6 +666,7 @@ public static partial class OverlayUGUI
 		if (View == ViewMode.Detail)
 		{
 			_detailIdx++; // next character in the per-hit detail view
+			_detailWhoKey = "";   // R85: the step is an INDEX move, so it must not be re-pinned by key
 			_detailPage = 0;
 			_scrollOffset = 0f;
 			_lastRefresh = 0f;
@@ -655,6 +686,7 @@ public static partial class OverlayUGUI
 		if (View == ViewMode.Detail)
 		{
 			_detailIdx--; // previous character
+			_detailWhoKey = "";   // R85: same as F11 -- an index move, not a key re-pin
 			_detailPage = 0;
 			_scrollOffset = 0f;
 			_lastRefresh = 0f;
@@ -688,6 +720,9 @@ public static partial class OverlayUGUI
 
 	private static void CheckKeys()
 	{
+		// R85: F2 flips the F6 detail view between 输出明细 (dealt) and 承伤明细 (taken). VK_F2 = 113; it is
+		// the only free function key (F1 is left alone, F3-F12 all name other pages/actions).
+		bool f2 = (GetAsyncKeyState(113) & 0x8000) != 0;
 		// R79: F3 opens the 受击来源拆分 page (per-unit INCOMING damage by source). F5-F12 are taken by the
 		// other pages and F4 is the user's own extract key (General/ExtractKey), so F3 is the next free one.
 		bool f3 = (GetAsyncKeyState(114) & 0x8000) != 0;
@@ -712,6 +747,7 @@ public static partial class OverlayUGUI
 		{
 			if (right) ActDetailPage(1);
 		}
+		if (f2 && !_prevF2) ActF2();
 		if (f3 && !_prevF3)
 		{
 			bool shift3 = (GetAsyncKeyState(16) & 0x8000) != 0;
@@ -761,6 +797,7 @@ public static partial class OverlayUGUI
 				catch (Exception ex3) { RuntimeLog.Write("[DpsMeter] 证据提取失败: " + ex3.Message); }
 			}
 		}
+		_prevF2 = f2;
 		_prevF3 = f3;
 		_prevF5 = f5; _prevF6 = f6; _prevF8 = f8; _prevF9 = f9; _prevF10 = f10; _prevF11 = f11; _prevF12 = f12;
 		_prevF7 = f7;
