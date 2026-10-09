@@ -24,6 +24,10 @@
 !/dpsmeter_contrib.py
 !/README.md
 !/AGENTS.md
+# R87: the project's OWN changelog. NOTE: `changelog.txt` above is BepInEx's upstream file (it lives in
+# the game root because the plugin ships inside a BepInEx tree) -- it is not this project's history and
+# must never be edited to record a DpsMeter release.
+!/CHANGELOG.md
 !/_dpsm_work/
 
 # --- the live plugin config is small text and IS part of the baseline ---

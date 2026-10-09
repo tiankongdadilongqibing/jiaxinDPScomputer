@@ -42,6 +42,16 @@
     <Compile Include="$(SrcRoot)\Model\StatusKey.cs" />
     <Compile Include="$(SrcRoot)\Model\ClauseStatusRun.cs" />
     <Compile Include="$(SrcRoot)\Model\AtkAddFold.cs" />
+    <!-- R87 (方案A): the self-addend census. Pure on purpose: the two mapping tables (talent type to
+         the name the runtime prints, reference code to the name inside the Ref string) cannot be read
+         off the code at all; they were MEASURED against abilities whose printed name states the same
+         thing, so a reader has to be able to hold them to the corpus. The key builders and the
+         team-scoped declarer match are the parts a wrong edit would break, and they are exactly the
+         parts this makes executable. The JSON writer rides along because R80 shipped a section whose
+         writer produced unquoted strings and no compiled test could see the bytes. -->
+    <Compile Include="$(SrcRoot)\Model\AtkAddCensus.cs" />
+    <Compile Include="$(SrcRoot)\Policy\AtkAddDeclarePolicy.cs" />
+    <Compile Include="$(SrcRoot)\Policy\AtkAddCensusPolicy.cs" />
     <Compile Include="$(SrcRoot)\Output\Contribution.cs" />
     <Compile Include="$(SrcRoot)\Output\CalcReconcile.cs" />
     <Compile Include="$(SrcRoot)\Output\JsonText.cs" />

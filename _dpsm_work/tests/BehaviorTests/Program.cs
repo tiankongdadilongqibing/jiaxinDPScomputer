@@ -50,8 +50,13 @@ internal static class Program
 	/// never touched used to enter the F11/F12 rotation as a zero row whose body could only print
 	/// "(该角色本场没有受击事件)"; the list verdict is now pure and pinned in both directions -- dropped on the
 	/// taken side, kept on the dealt side, where a unit that dealt nothing IS a real answer).
+	/// R87: 1546 -> 1576 (+30 in atkadd/self-declared: 方案A, the census of the addends the fold classified as
+	/// the holder's own. The two mapping tables it rests on cannot be read off the code -- they were MEASURED
+	/// against abilities whose printed name states the same fact -- and the team scope is the whole reason the
+	/// match is decidable in a mirror battle. Both are executed here, together with the two identities the
+	/// guard asserts and the writer's bytes, which R80 taught us to parse back rather than trust).
 	/// </summary>
-	public const int ExpectedCases = 1546;
+	public const int ExpectedCases = 1576;
 
 	private static int Main(string[] args)
 	{
@@ -156,6 +161,7 @@ internal static class Program
 		// already carry -- only WHICH END of an event is read changes -- so the verdicts and the words that
 		// publish them are pure and live in Ui/DetailPerspective.cs, where the suite can hold them.
 		Cases.DetailPerspectiveCases(r);
+		Cases.AtkAddDeclareCases(r);
 
 		int fail = r.Failed;
 		if (r.Cases != ExpectedCases)

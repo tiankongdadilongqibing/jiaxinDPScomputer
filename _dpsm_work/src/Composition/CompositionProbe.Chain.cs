@@ -1031,7 +1031,19 @@ public static partial class CompositionProbe
 				{
 					string rt = val.ReferenceType.ToString();
 					int rp = val.ReferenceParam;
-					if (!string.IsNullOrEmpty(rt) && rt != "None") it.Ref = "/ref" + rt + rp;
+					if (!string.IsNullOrEmpty(rt) && rt != "None")
+					{
+						it.Ref = "/ref" + rt + rp;
+						// R87 (方案A): the same two values, STRUCTURED, so the census can match this runtime
+						// addend against a loadout declaration (which carries the reference as a code, not a
+						// string) without parsing the Ref text back apart. No new game read.
+						it.RefType = rt;
+						it.RefParam = rp;
+					}
+					// A "None" reference leaves RefType null and RefParam 0 -- the SAME shape the declaration
+					// side produces for p[2] == 0 (see AtkAddDeclarePolicy.DeclKey). If RefParam were allowed
+					// through here it would not match that side at all, and the entry would read as
+					// `undeclared` for a reason that has nothing to do with who granted it.
 				}
 				catch { }
 			}

@@ -752,8 +752,15 @@ public static class ExportService
 		  .Append(",\"selfByKey\":").Append(AtkAddFold.SelfByKey)
 		  .Append(",\"selfByNameFallback\":").Append(AtkAddFold.SelfByNameFallback)
 		  .Append(",\"nameCollision\":").Append(AtkAddFold.NameCollision)
-		  .Append(",\"ownerUnknown\":").Append(AtkAddFold.OwnerUnknown)
-		  .Append('}');
+		  .Append(",\"ownerUnknown\":").Append(AtkAddFold.OwnerUnknown);
+		// R87 (方案A): WHERE the self-classified addends came from. A team-wide "編成時、味方全員に付与"
+		// grant has its ParamData.Owner written as the HOLDER, so the fold calls it self and the granter
+		// gets no credit -- this sub-object answers "who could have declared it" from the loadout, as a
+		// CANDIDATE list with an explicit refusal count, and moves no published number. Gated in
+		// check_export_schema.py on plugin >= 1.7.37, so every older export still validates unchanged.
+		sb.Append(",\"selfDeclared\":");
+		AtkAddCensusWriter.AppendJson(sb, s);
+		sb.Append('}');
 		sb.Append(",\"statsRows\":");
 		AbilityRoster.AppendStatsJson(sb);
 		// 1.6.0 (阶段 E): the contribution section. Derived here, from the event list, exactly like

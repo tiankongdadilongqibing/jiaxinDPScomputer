@@ -87,6 +87,16 @@ ATKADD_KEYS_178 = [
     ('selfByKey', int), ('selfByNameFallback', int), ('nameCollision', int), ('ownerUnknown', int),
 ]
 
+# R87 (方案A): the self-addend census -- WHERE the attack-power addends the fold classified as the holder's
+# own came from, answered from the loadout as a CANDIDATE list. Required only for plugin >= 1.7.37, so every
+# older export still validates unchanged. The three list fields are declared here for presence/type and the
+# two identities are asserted separately below; they are the reason the section is checkable at all.
+ATKADD_SELFDECLARED_KEYS_1737 = [
+    ('entries', int), ('values', int), ('dupKeyEntries', int), ('matched', int),
+    ('ambiguous', int), ('undeclared', int), ('noHolder', int),
+    ('givers', list), ('ambiguousItems', list), ('undeclaredItems', list),
+]
+
 # reconcile keys, with the version that introduced them
 RECON_REQUIRED = [
     ('dmgEvents', int, '1.3.0'), ('withCalc', int, '1.3.0'), ('exact', int, '1.3.0'),
@@ -868,6 +878,42 @@ def check_export(d, name='<mem>'):
                     and sv != sk + sn:
                 problems.append('atkAdd self identity broken: selfValues(%d) != selfByKey(%d) + '
                                 'selfByNameFallback(%d)' % (sv, sk, sn))
+        # R87 (方案A): the self-addend census. Two identities, both flat, and both the reason the section
+        # can be reconciled rather than merely read:
+        #   entries == values + dupKeyEntries     (the reference dimension can only SPLIT a fold key)
+        #   entries == matched + ambiguous + undeclared + noHolder
+        # plus the one cross-section check that makes it evidence: `values` IS atkAdd.selfValues, so the two
+        # can only disagree if they were taken from different states of the battle.
+        if ver >= (1, 7, 37):
+            sd = d['atkAdd'].get('selfDeclared')
+            if not isinstance(sd, dict):
+                missing.append('atkAdd.selfDeclared (since 1.7.37)')
+            else:
+                for k, ty in ATKADD_SELFDECLARED_KEYS_1737:
+                    if k not in sd:
+                        missing.append('atkAdd.selfDeclared.%s (since 1.7.37)' % k)
+                    elif not isinstance(sd[k], ty):
+                        problems.append('atkAdd.selfDeclared.%s type=%s want=%s'
+                                        % (k, type(sd[k]).__name__, _tname(ty)))
+                nums = [sd.get(x) for x in ('entries', 'values', 'dupKeyEntries', 'matched',
+                                            'ambiguous', 'undeclared', 'noHolder')]
+                if all(isinstance(x, int) and not isinstance(x, bool) for x in nums):
+                    ent, val, dup, mat, amb, und, noh = nums
+                    if ent != val + dup:
+                        problems.append('atkAdd.selfDeclared entries identity broken: entries(%d) != '
+                                        'values(%d) + dupKeyEntries(%d)' % (ent, val, dup))
+                    if ent != mat + amb + und + noh:
+                        problems.append('atkAdd.selfDeclared bucket identity broken: entries(%d) != '
+                                        'matched(%d) + ambiguous(%d) + undeclared(%d) + noHolder(%d)'
+                                        % (ent, mat, amb, und, noh))
+                    if dup < 0:
+                        problems.append('atkAdd.selfDeclared.dupKeyEntries(%d) is negative' % dup)
+                if isinstance(sd.get('values'), int) and not isinstance(sd.get('values'), bool) \
+                        and isinstance(d['atkAdd'].get('selfValues'), int) \
+                        and not isinstance(d['atkAdd'].get('selfValues'), bool) \
+                        and sd['values'] != d['atkAdd']['selfValues']:
+                    problems.append('atkAdd.selfDeclared.values(%d) != atkAdd.selfValues(%d)'
+                                    % (sd['values'], d['atkAdd']['selfValues']))
     if 'paramOwners' in d and isinstance(d['paramOwners'], dict):
         # 2-tuple spec on purpose: the section is validated whenever present, so an export that
         # carries it is checked even when its version stamp predates the requirement.
